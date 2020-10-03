@@ -1,5 +1,5 @@
 import 'phaser'
-import PhaserLogo from '../objects/playerCharacterToken'
+import PlayerCharacterToken from '../objects/playerCharacterToken'
 import FpsText from '../objects/fpsText'
 import { getUrlParam } from '../helpers/browserState'
 import { Room } from '../../../typings/custom'
@@ -12,7 +12,7 @@ import { getFacing } from '../helpers/orientation';
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
   fpsText: Phaser.GameObjects.Text;
-  mainCharacter: PhaserLogo;
+  mainCharacter: PlayerCharacterToken;
   upKey: Phaser.Input.Keyboard.Key;
   downKey: Phaser.Input.Keyboard.Key;
   leftKey: Phaser.Input.Keyboard.Key;
@@ -26,7 +26,7 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     // tslint:disable-next-line:no-unused-expression
-    this.mainCharacter = new PhaserLogo(this, this.cameras.main.width / 2, 0)
+    this.mainCharacter = new PlayerCharacterToken(this, this.cameras.main.width / 2, 0)
     this.mainCharacter.setDepth(1);
     // const fireball =
       // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
