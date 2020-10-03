@@ -1,36 +1,37 @@
 import 'phaser'
-import PhaserLogo from '../objects/playerCharacterToken'
+import PlayerCharacterToken from '../objects/playerCharacterToken'
 import FpsText from '../objects/fpsText'
 import { getUrlParam } from '../helpers/browserState'
 import { Room } from '../../../typings/custom'
 import globalState from '../worldstate/index';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
+import FireBall from '../objects/fireBall';
 import { facingToSpriteNameMap } from '../helpers/constants';
 import { getFacing } from '../helpers/orientation';
 
-/*
-  The main scene handles the actual game play.
-*/
+// The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
   fpsText: Phaser.GameObjects.Text;
-  mainCharacter: PhaserLogo;
+  mainCharacter: PlayerCharacterToken;
   upKey: Phaser.Input.Keyboard.Key;
   downKey: Phaser.Input.Keyboard.Key;
   leftKey: Phaser.Input.Keyboard.Key;
   rightKey: Phaser.Input.Keyboard.Key;
-  
 
   constructor() {
     super({ key: 'MainScene' })
   }
 
-  preload() {
-  }
+  preload() {}
 
   create() {
     // tslint:disable-next-line:no-unused-expression
-    this.mainCharacter = new PhaserLogo(this, this.cameras.main.width / 2, 0)
-    this.fpsText = new FpsText(this)
+    this.mainCharacter =
+      new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
+    this.mainCharacter.setDepth(1);
+    // const fireball =
+      // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
+    this.fpsText = new FpsText(this);
 
     this.upKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
     this.downKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
@@ -47,19 +48,26 @@ export default class MainScene extends Phaser.Scene {
 
     const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
     const tiles = map.addTilesetImage('test-tileset');
-    const layer = map.createStaticLayer(0, tiles, 600, 200);
-    layer.setCollisionBetween(0,31,true)
-
+    const roomHeight = tiles.tileHeight * room.layout.length;
+    const roomWidth = tiles.tileWidth * room.layout[0].length;
+    const layer = map.createStaticLayer(
+      0,
+      tiles,
+      (this.cameras.main.width / 2) - roomWidth / 2,
+      (this.cameras.main.height / 2) - roomHeight / 2
+    );
+    layer.setCollisionBetween(0, 31, true);
+    layer.setDepth(0);
 
     this.physics.add.collider(this.mainCharacter, layer);
 
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
     // layer.renderDebug(debugGraphics, {
     //   tileColor: null, // Color of non-colliding tiles
-    //   collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
+    //   collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), 
+      // Color of colliding tiles
     //   faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
     // });
-
   }
 
   update() {
@@ -67,6 +75,9 @@ export default class MainScene extends Phaser.Scene {
 
     let yFacing = 0;
     let xFacing = 0;
+
+    const speed = 100;
+
     if (this.upKey.isDown)
     {
       yFacing = -1;
@@ -105,7 +116,7 @@ export default class MainScene extends Phaser.Scene {
       globalState.playerCharacter.isWalking = false;
     }
 
-    this.mainCharacter.setVelocity(xFacing * 200, yFacing * 200);
-
+    this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
+    this.mainCharacter.body.velocity.normalize().scale(speed);
   }
 }
