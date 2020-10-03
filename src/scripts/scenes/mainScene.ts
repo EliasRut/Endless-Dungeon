@@ -21,6 +21,6 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     this.fpsText.update()
-    const characterHealth = globalState.playerCharacter.health;
+    // const characterHealth = globalState.playerCharacter.health
   }
 }
