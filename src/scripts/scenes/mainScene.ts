@@ -29,7 +29,7 @@ export default class MainScene extends Phaser.Scene {
     this.mainCharacter = new PhaserLogo(this, this.cameras.main.width / 2, 0)
     this.mainCharacter.setDepth(1);
     // const fireball =
-    // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
+      // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.fpsText = new FpsText(this);
 
     this.upKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -50,7 +50,6 @@ export default class MainScene extends Phaser.Scene {
     const layer = map.createStaticLayer(0, tiles, 600, 200);
     layer.setCollisionBetween(0,31,true)
     layer.setDepth(0);
-
 
     this.physics.add.collider(this.mainCharacter, layer);
 
