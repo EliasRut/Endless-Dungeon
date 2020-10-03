@@ -9,7 +9,7 @@ import FireBallEffect from '../objects/fireBallEffect';
 import { facingToSpriteNameMap } from '../helpers/constants';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
-
+import EnemyToken from '../objects/enemyToken';
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -23,6 +23,7 @@ export default class MainScene extends Phaser.Scene {
   effects: Map<string, FireBall>;
   fireballEffect: FireBallEffect | undefined;
   tileLayer: any;
+  enemy: EnemyToken;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -35,6 +36,11 @@ export default class MainScene extends Phaser.Scene {
     this.mainCharacter =
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
+
+    this.enemy = new EnemyToken(this, this.cameras.main.width/2+20, this.cameras.main.height /2+20);
+    this.enemy.setDepth(1);
+    // const fireball =
+      // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
 
     this.fpsText = new FpsText(this);
 
@@ -66,6 +72,7 @@ export default class MainScene extends Phaser.Scene {
     this.tileLayer.setDepth(0);
 
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
+    this.physics.add.collider(this.enemy, this.tileLayer);
 
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
     // layer.renderDebug(debugGraphics, {
@@ -78,7 +85,7 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     this.fpsText.update();
-
+    this.enemy.update(globalState.playerCharacter.x, globalState.playerCharacter.y);
     let yFacing = 0;
     let xFacing = 0;
 
@@ -136,8 +143,8 @@ export default class MainScene extends Phaser.Scene {
       const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
       this.fireballEffect = new FireBallEffect(
         this,
-        this.mainCharacter.x + (30 * fireballVelocities.x),
-        this.mainCharacter.y + (30 * fireballVelocities.y)
+        this.mainCharacter.x + (16 * fireballVelocities.x),
+        this.mainCharacter.y + (16 * fireballVelocities.y)
       );
       this.fireballEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
       this.fireballEffect.body.velocity.normalize().scale(300);
@@ -145,6 +152,11 @@ export default class MainScene extends Phaser.Scene {
       this.physics.add.collider(this.fireballEffect, this.tileLayer, (effect) => {
         effect.destroy();
         this.fireballEffect = undefined;
+      });
+      this.physics.add.collider(this.fireballEffect, this.enemy, (effect, enemy) => {
+        effect.destroy();
+        this.fireballEffect = undefined;
+        this.enemy.health = this.enemy.health - 3;
       });
     }
   }
