@@ -8,6 +8,7 @@ import PlayerCharacter from '../worldstate/PlayerCharacter';
 import FireBall from '../objects/fireBall';
 import { facingToSpriteNameMap } from '../helpers/constants';
 import { getFacing } from '../helpers/orientation';
+import EnemyToken from '../objects/enemyToken';
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -17,6 +18,7 @@ export default class MainScene extends Phaser.Scene {
   downKey: Phaser.Input.Keyboard.Key;
   leftKey: Phaser.Input.Keyboard.Key;
   rightKey: Phaser.Input.Keyboard.Key;
+  enemy: EnemyToken;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -29,6 +31,9 @@ export default class MainScene extends Phaser.Scene {
     this.mainCharacter =
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
+
+    this.enemy = new EnemyToken(this, this.cameras.main.width/2+20, this.cameras.main.height /2+20);
+    this.enemy.setDepth(1);
     // const fireball =
       // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.fpsText = new FpsText(this);
@@ -60,6 +65,7 @@ export default class MainScene extends Phaser.Scene {
     layer.setDepth(0);
 
     this.physics.add.collider(this.mainCharacter, layer);
+    this.physics.add.collider(this.enemy, layer);
 
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
     // layer.renderDebug(debugGraphics, {
@@ -72,7 +78,7 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     this.fpsText.update();
-
+    this.enemy.update(globalState.playerCharacter.x, globalState.playerCharacter.y);
     let yFacing = 0;
     let xFacing = 0;
 
