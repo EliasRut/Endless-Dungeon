@@ -1,5 +1,6 @@
 import { Game } from "phaser";
 import NPC from "../worldstate/NPC"
+import Player from "../worldstate/PlayerCharacter"
 
 export default class Enemy extends NPC {
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -10,11 +11,8 @@ export default class Enemy extends NPC {
   scene.physics.add.existing(this)
   this.enemy = 1;
   //this.body.setCircle(10, 10, 12);
-  this.setInteractive()
-    .on('pointerdown', () => {
-        this.health--;
-    });
 
+    //cool effects!
     const particles = scene.add.particles('fire');
     particles.setDepth(1);
     this.emitter = particles.createEmitter({
@@ -34,13 +32,25 @@ export default class Enemy extends NPC {
     this.emitter.start();
   }
 
-  public update(px: number, py: number) {
+  //update from main Scene
+  public update(player: Player) {
     if(this.health <= 0){
         this.destroy();
         return;
     }
+    const px = player.x;
+    const py = player.y;
     const distance = Math.sqrt((this.x - px)*(this.x - px) + (this.y - py)*(this.y - py));
 
+    //damages you if you're close
+    if (distance < 30){
+        player.slowFactor = 0.5;
+        player.health -= 0.1;
+    }
+    else{
+        player.slowFactor = 1;
+    }
+    //follows you only if you're close enough, then runs straight at you.
     if(distance < this.vision){
 
         const xSpeed = (px-this.x)/(Math.abs(px-this.x)+Math.abs(py-this.y))*this.movementSpeed;
@@ -54,6 +64,7 @@ export default class Enemy extends NPC {
     }
   }
 
+  //destroy the enemy
   destroy() {
     this.emitter.stopFollow();
     this.emitter.stop();
