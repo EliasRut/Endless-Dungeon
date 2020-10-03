@@ -26,7 +26,8 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     // tslint:disable-next-line:no-unused-expression
-    this.mainCharacter = new PlayerCharacterToken(this, this.cameras.main.width / 2, 0)
+    this.mainCharacter =
+      new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
     // const fireball =
       // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
@@ -47,8 +48,15 @@ export default class MainScene extends Phaser.Scene {
 
     const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
     const tiles = map.addTilesetImage('test-tileset');
-    const layer = map.createStaticLayer(0, tiles, 600, 200);
-    layer.setCollisionBetween(0,31,true)
+    const roomHeight = tiles.tileHeight * room.layout.length;
+    const roomWidth = tiles.tileWidth * room.layout[0].length;
+    const layer = map.createStaticLayer(
+      0,
+      tiles,
+      (this.cameras.main.width / 2) - roomWidth / 2,
+      (this.cameras.main.height / 2) - roomHeight / 2
+    );
+    layer.setCollisionBetween(0, 31, true);
     layer.setDepth(0);
 
     this.physics.add.collider(this.mainCharacter, layer);
