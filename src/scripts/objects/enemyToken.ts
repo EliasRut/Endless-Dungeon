@@ -5,7 +5,7 @@ export default class Enemy extends NPC {
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-  super(scene, x, y, 'enemy')
+  super(scene, x, y, 'empty_tile')
   scene.add.existing(this)
   scene.physics.add.existing(this)
   this.enemy = 1;
