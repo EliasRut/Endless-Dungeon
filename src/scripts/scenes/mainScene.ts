@@ -25,6 +25,10 @@ import { getFacing } from '../helpers/orientation';
     super({ key: 'MainScene' })
   }
 
+  preload() {
+
+  }
+
   create() {
     // tslint:disable-next-line:no-unused-expression
     this.mainCharacter = new PhaserLogo(this, this.cameras.main.width / 2, 0)
@@ -68,6 +72,9 @@ import { getFacing } from '../helpers/orientation';
 
     let yFacing = 0;
     let xFacing = 0;
+
+    const speed = 100;
+
     if (this.upKey.isDown)
     {
       yFacing = -1;
@@ -106,7 +113,7 @@ import { getFacing } from '../helpers/orientation';
       globalState.playerCharacter.isWalking = false;
     }
 
-    this.mainCharacter.setVelocity(xFacing * 200, yFacing * 200);
-
+    this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
+    this.mainCharacter.body.velocity.normalize().scale(speed);
   }
 }
