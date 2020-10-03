@@ -9,7 +9,7 @@ import FireBallEffect from '../objects/fireBallEffect';
 import { facingToSpriteNameMap } from '../helpers/constants';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
-import FireBall from '../abilities/fireBall'
+// import IceNova from '../abilities/iceNova'
 import EnemyToken from '../objects/enemyToken';
 
 // The main scene handles the actual game play.
