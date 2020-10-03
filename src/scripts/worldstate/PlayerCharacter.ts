@@ -5,4 +5,7 @@ export default class PlayerCharacter {
 
   public x = 0;
   public y = 0;
+
+  public lastX = 0;
+  public lastY = 0;
 };
