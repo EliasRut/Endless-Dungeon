@@ -52,7 +52,7 @@ export default class PreloadScene extends Phaser.Scene {
           start: walkFrameOffset,
           end: walkFrameOffset + numWalkFrames - 1
         }),
-        frameRate: 8,
+        frameRate: 12,
         repeat: -1
       });
     }
