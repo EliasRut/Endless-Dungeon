@@ -5,9 +5,11 @@ import { getUrlParam } from '../helpers/browserState'
 import { Room } from '../../../typings/custom'
 import globalState from '../worldstate/index';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
-import FireBall from '../objects/fireBall';
+import FireBallEffect from '../objects/fireBallEffect';
 import { facingToSpriteNameMap } from '../helpers/constants';
-import { getFacing } from '../helpers/orientation';
+import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
+import FireBall from '../abilities/fireBall'
+
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -17,6 +19,10 @@ export default class MainScene extends Phaser.Scene {
   downKey: Phaser.Input.Keyboard.Key;
   leftKey: Phaser.Input.Keyboard.Key;
   rightKey: Phaser.Input.Keyboard.Key;
+  abilityKey1: Phaser.Input.Keyboard.Key;
+  effects: Map<string, FireBall>;
+  fireballEffect: FireBallEffect | undefined;
+  tileLayer: any;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -29,16 +35,16 @@ export default class MainScene extends Phaser.Scene {
     this.mainCharacter =
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
-    // const fireball =
-      // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
+
     this.fpsText = new FpsText(this);
 
     this.upKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
     this.downKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
     this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
     this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+    this.abilityKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 
-    this.drawRoom()
+    this.drawRoom();
 
   }
 
@@ -50,16 +56,16 @@ export default class MainScene extends Phaser.Scene {
     const tiles = map.addTilesetImage('test-tileset');
     const roomHeight = tiles.tileHeight * room.layout.length;
     const roomWidth = tiles.tileWidth * room.layout[0].length;
-    const layer = map.createStaticLayer(
+    this.tileLayer = map.createStaticLayer(
       0,
       tiles,
       (this.cameras.main.width / 2) - roomWidth / 2,
       (this.cameras.main.height / 2) - roomHeight / 2
     );
-    layer.setCollisionBetween(0, 31, true);
-    layer.setDepth(0);
+    this.tileLayer.setCollisionBetween(0, 31, true);
+    this.tileLayer.setDepth(0);
 
-    this.physics.add.collider(this.mainCharacter, layer);
+    this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
     // layer.renderDebug(debugGraphics, {
@@ -118,5 +124,28 @@ export default class MainScene extends Phaser.Scene {
 
     this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
     this.mainCharacter.body.velocity.normalize().scale(speed);
+
+    globalState.playerCharacter.x = this.mainCharacter.x;
+    globalState.playerCharacter.y = this.mainCharacter.y;
+
+    if (this.fireballEffect) {
+      this.fireballEffect.update();
+    }
+
+    if (this.abilityKey1.isDown && !this.fireballEffect) {
+      const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
+      this.fireballEffect = new FireBallEffect(
+        this,
+        this.mainCharacter.x + (30 * fireballVelocities.x),
+        this.mainCharacter.y + (30 * fireballVelocities.y)
+      );
+      this.fireballEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
+      this.fireballEffect.body.velocity.normalize().scale(300);
+
+      this.physics.add.collider(this.fireballEffect, this.tileLayer, (effect) => {
+        effect.destroy();
+        this.fireballEffect = undefined;
+      });
+    }
   }
 }
