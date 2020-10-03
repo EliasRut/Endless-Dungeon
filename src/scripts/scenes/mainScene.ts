@@ -9,6 +9,7 @@ import FireBallEffect from '../objects/fireBallEffect';
 import { facingToSpriteNameMap } from '../helpers/constants';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
+// import IceNova from '../abilities/iceNova'
 import EnemyToken from '../objects/enemyToken';
 import ItemToken from '../objects/itemToken';
 
@@ -25,7 +26,11 @@ export default class MainScene extends Phaser.Scene {
   fireballEffect: FireBallEffect | undefined;
   tileLayer: any;
   enemy: EnemyToken;
+<<<<<<< HEAD
   item: ItemToken;
+=======
+  sportLight: Phaser.GameObjects.Light;
+>>>>>>> 42f8cf088daed3b015fc434a6a07f9431fe9d127
 
   constructor() {
     super({ key: 'MainScene' })
@@ -39,11 +44,16 @@ export default class MainScene extends Phaser.Scene {
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
 
+    this.cameras.default.startFollow(this.mainCharacter);
+
     this.enemy = new EnemyToken(this, this.cameras.main.width/2+20, this.cameras.main.height /2+20);
     this.enemy.setDepth(1);
 
+<<<<<<< HEAD
     this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
     this.item.setDepth(1);
+=======
+>>>>>>> 42f8cf088daed3b015fc434a6a07f9431fe9d127
     // const fireball =
       // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
 
@@ -56,7 +66,6 @@ export default class MainScene extends Phaser.Scene {
     this.abilityKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 
     this.drawRoom();
-
   }
 
   drawRoom() {

@@ -7,6 +7,7 @@ export default class FireBallEffect extends Phaser.Physics.Arcade.Image {
     this.setDepth(1);
     scene.physics.add.existing(this);
     this.body.setCircle(6, 0, 0);
+    this.body.setMass(1);
 
     const particles = scene.add.particles('fire');
     particles.setDepth(1);

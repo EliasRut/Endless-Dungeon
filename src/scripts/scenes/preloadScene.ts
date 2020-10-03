@@ -19,6 +19,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('test-tileset', 'assets/img/til_Test.png');
 
     this.load.image('fire', 'assets/img/muzzleflash3.png');
+    this.load.image('ice', 'assets/img/ice_spike.png');
 
     const roomId = getUrlParam('roomName') || 'room-firstTest';
     this.load.json(roomId, `assets/rooms/${roomId}.json`);
