@@ -6,10 +6,11 @@ import { Room } from '../../../typings/custom'
 import globalState from '../worldstate/index';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
 import FireBallEffect from '../objects/fireBallEffect';
+import IceNovaEffect from '../objects/iceSpikeEffect';
+// import IceNovaEffect from '../objects/iceNovaEffect';
 import { facingToSpriteNameMap } from '../helpers/constants';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
-// import IceNova from '../abilities/iceNova'
 import EnemyToken from '../objects/enemyToken';
 
 // The main scene handles the actual game play.
@@ -21,11 +22,12 @@ export default class MainScene extends Phaser.Scene {
   leftKey: Phaser.Input.Keyboard.Key;
   rightKey: Phaser.Input.Keyboard.Key;
   abilityKey1: Phaser.Input.Keyboard.Key;
+  abilityKey2: Phaser.Input.Keyboard.Key;
   effects: Map<string, FireBall>;
   fireballEffect: FireBallEffect | undefined;
+  icenovaEffect: IceNovaEffect | undefined;
   tileLayer: any;
   enemy: EnemyToken;
-  sportLight: Phaser.GameObjects.Light;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -39,7 +41,7 @@ export default class MainScene extends Phaser.Scene {
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
 
-    this.cameras.default.startFollow(this.mainCharacter);
+    this.cameras.main.startFollow(this.mainCharacter, false);
 
     this.enemy = new EnemyToken(this, this.cameras.main.width/2+20, this.cameras.main.height /2+20);
     this.enemy.setDepth(1);
@@ -54,6 +56,7 @@ export default class MainScene extends Phaser.Scene {
     this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
     this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
     this.abilityKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+    this.abilityKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
 
     this.drawRoom();
   }
@@ -163,5 +166,31 @@ export default class MainScene extends Phaser.Scene {
         this.enemy.health = this.enemy.health - 3;
       });
     }
+
+    if (this.icenovaEffect) {
+      this.icenovaEffect.update();
+    }
+
+    if (this.abilityKey2.isDown && !this.icenovaEffect) {
+      const iceNovaVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
+      this.icenovaEffect = new IceNovaEffect(
+        this,
+        this.mainCharacter.x + (16 * iceNovaVelocities.x),
+        this.mainCharacter.y + (16 * iceNovaVelocities.y)
+      );
+      this.icenovaEffect.setVelocity(iceNovaVelocities.x, iceNovaVelocities.y);
+      this.icenovaEffect.body.velocity.normalize().scale(300);
+
+      this.physics.add.collider(this.icenovaEffect, this.tileLayer, (effect) => {
+        effect.destroy();
+        this.icenovaEffect = undefined;
+      });
+      this.physics.add.collider(this.icenovaEffect, this.enemy, (effect, enemy) => {
+        effect.destroy();
+        this.icenovaEffect = undefined;
+        this.enemy.health = this.enemy.health - 3;
+      });
+    }
+
   }
 }
