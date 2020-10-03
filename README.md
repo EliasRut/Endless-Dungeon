@@ -16,3 +16,11 @@ npm install
 ```
 npm start
 ```
+
+# Recommended Visual Studio Code extensions
+Please install the following:
+* Live Share
+* tslint
+
+You might also want to install GitLens
+
