@@ -18,6 +18,11 @@ export default class MainScene extends Phaser.Scene {
     this.mainCharacter = new PhaserLogo(this, this.cameras.main.width / 2, 0)
     this.fpsText = new FpsText(this)
 
+    setInterval(() => {
+      // Set player character position
+      globalState.playerCharacter.x = Math.random() * this.cameras.main.width;
+      globalState.playerCharacter.y = Math.random() * this.cameras.main.height;
+    }, 1000);
   }
 
   update() {
