@@ -18,6 +18,13 @@ export default class MainScene extends Phaser.Scene {
   leftKey: Phaser.Input.Keyboard.Key;
   rightKey: Phaser.Input.Keyboard.Key;
 
+  mapX: integer = 600;
+  mapY: integer = 200;
+  tileWidth: integer = 16;
+  tileHeight: integer = 16;
+
+  room: Room;
+
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -25,9 +32,14 @@ export default class MainScene extends Phaser.Scene {
   preload() {}
 
   create() {
+    const layer = this.drawRoom();
+
     // tslint:disable-next-line:no-unused-expression
-    this.mainCharacter = new PhaserLogo(this, this.cameras.main.width / 2, 0)
+    this.mainCharacter = new PhaserLogo(this
+                            , this.mapX+(this.room.layout.length/2.0*this.tileWidth)
+                            , this.mapY+(this.room.layout[0].length/2.0*this.tileHeight));
     this.mainCharacter.setDepth(1);
+
     // const fireball =
     // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.fpsText = new FpsText(this);
@@ -37,22 +49,20 @@ export default class MainScene extends Phaser.Scene {
     this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
     this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
-    this.drawRoom()
-
+    this.physics.add.collider(this.mainCharacter, layer);
   }
 
   drawRoom() {
     const roomId = getUrlParam('roomName') || 'room-firstTest';
-    const room = this.cache.json.get(roomId) as Room;
+    this.room = this.cache.json.get(roomId) as Room;
 
-    const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
+    const map = this.make.tilemap({data: this.room.layout
+                    , tileWidth: this.tileWidth
+                    , tileHeight: this.tileHeight});
     const tiles = map.addTilesetImage('test-tileset');
-    const layer = map.createStaticLayer(0, tiles, 600, 200);
+    const layer = map.createStaticLayer(0, tiles, this.mapX, this.mapY);
     layer.setCollisionBetween(0,31,true)
     layer.setDepth(0);
-
-
-    this.physics.add.collider(this.mainCharacter, layer);
 
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
     // layer.renderDebug(debugGraphics, {
@@ -61,6 +71,7 @@ export default class MainScene extends Phaser.Scene {
       // Color of colliding tiles
     //   faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
     // });
+    return layer;
   }
 
   update() {
