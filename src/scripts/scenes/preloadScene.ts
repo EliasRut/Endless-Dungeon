@@ -13,15 +13,13 @@ export default class PreloadScene extends Phaser.Scene {
   preload() {
     this.load.spritesheet('main-character', 'assets/img/main-character.png',
       { frameWidth: 40, frameHeight: 40 });
+    this.load.image('empty-char', 'assets/img/empty_16x16_char.png');
     this.load.image('phaser-logo', 'assets/img/phaser-logo.png');
-    this.load.image('test-tileset', 'assets/img/phaser-logo.png');
 
-    // this.anims.create({
-    //   key: 'player-character-idle-se',
-    //   frames: this.anims.generateFrameNumbers('main-character', { start: 4, end: 4}),
-    //   frameRate: 0,
-    //   repeat: -1
-    // });
+    this.load.image('test-tileset', 'assets/img/til_Test.png');
+
+    const roomId = getUrlParam('roomName') || 'room-firstTest';
+    this.load.json(roomId, `assets/rooms/${roomId}.json`);
   }
 
   create() {

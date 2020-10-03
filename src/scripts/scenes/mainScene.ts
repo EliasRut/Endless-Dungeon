@@ -25,19 +25,25 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    const roomId = getUrlParam('roomName') || 'room-firstTest';
-    this.load.json(roomId, `assets/rooms/${roomId}.json`);
+    // const roomId = getUrlParam('roomName') || 'room-firstTest';
+    // this.load.json(roomId, `assets/rooms/${roomId}.json`);
   }
 
   create() {
     // tslint:disable-next-line:no-unused-expression
     this.mainCharacter = new PhaserLogo(this, this.cameras.main.width / 2, 0)
     this.fpsText = new FpsText(this)
+
     this.upKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
     this.downKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
     this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
     this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
+    this.drawRoom()
+
+  }
+
+  drawRoom() {
     const roomId = getUrlParam('roomName') || 'room-firstTest';
     const room = this.cache.json.get(roomId) as Room;
 
@@ -55,9 +61,12 @@ export default class MainScene extends Phaser.Scene {
     // }
 
     const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
-    const tiles = map.addTilesetImage('phaser-logo');
+    const tiles = map.addTilesetImage('test-tileset');
     const layer = map.createStaticLayer(0, tiles, 600, 200);
     layer.setCollisionBetween(0,31,true)
+
+
+    this.physics.add.collider(this.mainCharacter, layer);
 
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
     // layer.renderDebug(debugGraphics, {
@@ -66,17 +75,10 @@ export default class MainScene extends Phaser.Scene {
     //   faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
     // });
 
-  //   setInterval(() => {
-  //     // Set player character position
-  //     globalState.playerCharacter.x = 0 * this.cameras.main.height;
-  //     globalState.playerCharacter.y = 0 * this.cameras.main.height;
-  //   }, 1000);
   }
 
   update() {
     this.fpsText.update();
-    this.mainCharacter.setPosition(globalState.playerCharacter.x, globalState.playerCharacter.y);
-
 
     let yFacing = 0;
     let xFacing = 0;
@@ -117,6 +119,8 @@ export default class MainScene extends Phaser.Scene {
       this.mainCharacter.play(`player-character-idle-${characterDirection}`);
       globalState.playerCharacter.isWalking = false;
     }
+
+    this.mainCharacter.setVelocity(xFacing * 200, yFacing * 200);
 
   }
 }
