@@ -9,8 +9,13 @@ import PlayerCharacter from "./PlayerCharacter";
 
 // This is the world state typing.
 export class WorldState {
-  playerCharacter: PlayerCharacter;
-  dungeon: Dungeon;
+  public playerCharacter: PlayerCharacter;
+  public dungeon: Dungeon;
+
+  constructor() {
+    this.playerCharacter = new PlayerCharacter();
+    this.dungeon = new Dungeon();
+  }
 }
 
 // This initializes an instance of the world state. We want this to be a Singleton.

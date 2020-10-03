@@ -7,6 +7,7 @@ import globalState from '../worldstate/index';
 */
 export default class MainScene extends Phaser.Scene {
   fpsText: Phaser.GameObjects.Text
+  mainCharacter: PhaserLogo;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -14,7 +15,7 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     // tslint:disable-next-line:no-unused-expression
-    new PhaserLogo(this, this.cameras.main.width / 2, 0)
+    this.mainCharacter = new PhaserLogo(this, this.cameras.main.width / 2, 0)
     this.fpsText = new FpsText(this)
 
   }
@@ -22,5 +23,7 @@ export default class MainScene extends Phaser.Scene {
   update() {
     this.fpsText.update()
     const characterHealth = globalState.playerCharacter.health;
+    this.mainCharacter.setPosition(globalState.playerCharacter.x, globalState.playerCharacter.y);
+    // console.log(globalState.playerCharacter.name)
   }
 }
