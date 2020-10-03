@@ -1,10 +1,12 @@
 import 'phaser'
-import PhaserLogo from '../objects/phaserLogo'
+import PhaserLogo from '../objects/playerCharacterToken'
 import FpsText from '../objects/fpsText'
 import { getUrlParam } from '../helpers/browserState'
 import { Room } from '../../../typings/custom'
 import globalState from '../worldstate/index';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
+import { facingToSpriteNameMap } from '../helpers/constants';
+import { getFacing } from '../helpers/orientation';
 
 /*
   The main scene handles the actual game play.
@@ -74,23 +76,46 @@ export default class MainScene extends Phaser.Scene {
   update() {
     this.fpsText.update();
     this.mainCharacter.setPosition(globalState.playerCharacter.x, globalState.playerCharacter.y);
-    
+
+
+    let yFacing = 0;
+    let xFacing = 0;
     if (this.upKey.isDown)
     {
-        globalState.playerCharacter.y--;
+      yFacing = -1;
+      globalState.playerCharacter.y--;
     }
     else if (this.downKey.isDown)
     {
+      yFacing = 1;
       globalState.playerCharacter.y++;
     }
 
     if (this.leftKey.isDown)
     {
+      xFacing = -1;
       globalState.playerCharacter.x--;
     }
     else if (this.rightKey.isDown)
     {
+      xFacing = 1;
       globalState.playerCharacter.x++;
+    }
+
+    if (yFacing !== 0 || xFacing !== 0) {
+      const lastFacing = globalState.playerCharacter.currentFacing;
+      const newFacing = getFacing(xFacing, yFacing);
+
+      if (lastFacing !== newFacing || globalState.playerCharacter.isWalking === false) {
+        const characterDirection = facingToSpriteNameMap[newFacing];
+        this.mainCharacter.play(`player-walk-${characterDirection}`);
+        globalState.playerCharacter.currentFacing = newFacing;
+        globalState.playerCharacter.isWalking = true;
+      }
+    } else /* No movement keys pressed */ {
+      const characterDirection = facingToSpriteNameMap[globalState.playerCharacter.currentFacing];
+      this.mainCharacter.play(`player-character-idle-${characterDirection}`);
+      globalState.playerCharacter.isWalking = false;
     }
 
   }
