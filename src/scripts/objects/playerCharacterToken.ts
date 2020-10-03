@@ -3,5 +3,7 @@ export default class PlayerCharacterToken extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, 'empty-tile')
     scene.add.existing(this)
     scene.physics.add.existing(this)
+
+    this.body.setCircle(8, 12, 12);
   }
 }
