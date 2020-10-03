@@ -25,8 +25,6 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    // const roomId = getUrlParam('roomName') || 'room-firstTest';
-    // this.load.json(roomId, `assets/rooms/${roomId}.json`);
   }
 
   create() {
@@ -46,19 +44,6 @@ export default class MainScene extends Phaser.Scene {
   drawRoom() {
     const roomId = getUrlParam('roomName') || 'room-firstTest';
     const room = this.cache.json.get(roomId) as Room;
-
-    // //  Create some map data dynamically
-    // //  Map size is 128x128 tiles
-    // const data: number[][] = [];
-
-    // for (let y = 0; y < 128; y++)
-    // {
-    //   data[y] = [];
-    //     for (let x = 0; x < 128; x++)
-    //     {
-    //         data[y][x] = Math.floor(Math.random() * 20);
-    //     }
-    // }
 
     const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
     const tiles = map.addTilesetImage('test-tileset');
