@@ -25,6 +25,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
+
   }
 
   create() {
@@ -67,6 +68,9 @@ export default class MainScene extends Phaser.Scene {
 
     let yFacing = 0;
     let xFacing = 0;
+
+    const speed = 100;
+
     if (this.upKey.isDown)
     {
       yFacing = -1;
@@ -105,7 +109,7 @@ export default class MainScene extends Phaser.Scene {
       globalState.playerCharacter.isWalking = false;
     }
 
-    this.mainCharacter.setVelocity(xFacing * 200, yFacing * 200);
-
+    this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
+    this.mainCharacter.body.velocity.normalize().scale(speed);
   }
 }
