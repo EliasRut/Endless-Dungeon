@@ -1,6 +1,9 @@
 import PhaserLogo from '../objects/phaserLogo'
 import FpsText from '../objects/fpsText'
 
+/*
+  The main scene handles the actual game play.
+*/
 export default class MainScene extends Phaser.Scene {
   fpsText: Phaser.GameObjects.Text
 
@@ -9,6 +12,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
+    // tslint:disable-next-line:no-unused-expression
     new PhaserLogo(this, this.cameras.main.width / 2, 0)
     this.fpsText = new FpsText(this)
 
