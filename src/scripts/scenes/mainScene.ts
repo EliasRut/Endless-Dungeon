@@ -91,7 +91,7 @@ export default class MainScene extends Phaser.Scene {
     const roomOriginY = (this.cameras.main.height / 2) - roomHeight / 2;
     this.tileLayer = map.createStaticLayer(
       0,
-      tiles,
+      [tiles],
       roomOriginX,
       roomOriginY
     );
@@ -109,7 +109,7 @@ export default class MainScene extends Phaser.Scene {
       this.enemy[npcCounter].setDepth(1);
       this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
       npcCounter++;
-    })
+    });
 
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
@@ -140,7 +140,7 @@ export default class MainScene extends Phaser.Scene {
   triggerAbility(origin: Character, type: AbilityType) {
     // throw all projectiles
     const projectileData = Abilities[type].projectileData;
-    const facingVelocities = getVelocitiesForFacing(origin.currentFacing)!;
+    const facingVelocities = origin.getFacingVelocities();
 
     for (let i = 0; i < (Abilities[type].projectiles || 0); i++) {
       const effect = new projectileData!.effect(

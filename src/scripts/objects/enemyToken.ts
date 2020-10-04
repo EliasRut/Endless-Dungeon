@@ -113,8 +113,12 @@ export default class EnemyToken extends CharacterToken {
         break;
         case 'red-ball':
           const totalDistance = Math.abs(px - this.x) + Math.abs(py - this.y);
-          const xSpeed = (px - this.x) / totalDistance * this.stateObject.movementSpeed;
-          const ySpeed = (py - this.y) / totalDistance * this.stateObject.movementSpeed;          
+          const xFactor = (px - this.x) / totalDistance;
+          const yFactor = (py - this.y) / totalDistance;
+          (this.stateObject as Enemy).exactTargetXFactor = xFactor;
+          (this.stateObject as Enemy).exactTargetYFactor = yFactor;
+          const xSpeed = xFactor * this.stateObject.movementSpeed;
+          const ySpeed = yFactor * this.stateObject.movementSpeed;
           const newFacing = getFacing(xSpeed, ySpeed);
           const animation = this.stateObject.updateMovingState(true, newFacing);
           if (animation) {
@@ -169,7 +173,6 @@ export default class EnemyToken extends CharacterToken {
         }
         break;
       case 'red-ball':
-        console.log("range attacker");
         if (this.attackedAt + 5000 < time) {
           this.setVelocityX(0);
           this.setVelocityY(0);

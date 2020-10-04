@@ -1,4 +1,5 @@
 import { ANIMATION_IDLE, ANIMATION_WALK, Facings, facingToSpriteNameMap, Faction } from "../helpers/constants";
+import { getVelocitiesForFacing } from "../helpers/orientation";
 
 export default abstract class Character {
   private animationBase: string;
@@ -46,5 +47,9 @@ export default abstract class Character {
     this.currentFacing = facing;
     this.isWalking = hasMoved;
     return `${this.animationBase}-${ANIMATION_WALK}-${characterDirection}`;
+  }
+
+  getFacingVelocities() {
+    return getVelocitiesForFacing(this.currentFacing);
   }
 }
