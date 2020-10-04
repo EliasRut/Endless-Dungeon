@@ -90,6 +90,7 @@ export default class MainScene extends Phaser.Scene {
       roomOriginY
     );
     this.tileLayer.setCollisionBetween(0, 31, true);
+    this.tileLayer.setCollisionBetween(40, 71, true);
     this.tileLayer.setDepth(0);
     let npcCounter = 0;
     room.npcs?.forEach((npc) => {
@@ -128,7 +129,8 @@ export default class MainScene extends Phaser.Scene {
     this.overlayScreens.inventory.setVisible(false);
   }
 
-  update() {
+  update(globalTime, delta) {
+    console.log(`${globalTime} time has passed, ${delta} since last time.`);
     this.fpsText.update();
 
     this.enemy.forEach(curEnemy => {
