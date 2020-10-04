@@ -13,4 +13,12 @@ export default class Item extends Phaser.Physics.Arcade.Sprite{
         player.mainStat = this.mainStat;
         player.updateStats();
     }
+
+    public unequip(player: PlayerCharacter){
+        player.itemHealth = 0;
+        player.weaponDamage = 1;
+        player.itemMovementSpeed = 0;
+        player.mainStat = 1;
+        player.updateStats();
+    }
   };

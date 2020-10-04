@@ -1,5 +1,6 @@
 import { getUrlParam } from "../helpers/browserState";
 import { spriteDirectionList } from "../helpers/constants";
+import globalState from "../worldstate";
 
 /*
   The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -10,43 +11,59 @@ export default class PreloadScene extends Phaser.Scene {
     super({ key: 'PreloadScene' })
   }
 
+  neededAnimations = ['player'];
+
   preload() {
-    this.load.spritesheet('main-character', 'assets/img/main-character.png',
+    // Empty tile
+    this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
+
+    // Player
+    this.load.spritesheet('player', 'assets/img/main-character.png',
       { frameWidth: 40, frameHeight: 40 });
 
-    // this.load.image('test-items', 'assets/img/items_test.png');
-    this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
-      { frameWidth: 16, frameHeight: 16 });
-
+    // Overlay screens
     this.load.spritesheet('screen-background', 'assets/img/screen-background.png',
       { frameWidth: 64, frameHeight: 64 });
-    this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
-    this.load.image('phaser-logo', 'assets/img/phaser-logo.png');
 
-    this.load.image('test-tileset', 'assets/img/til_Dungeon-extruded.png');
-
-
+    // Ability effects
     this.load.image('fire', 'assets/img/muzzleflash3.png');
     this.load.image('ice', 'assets/img/ice_spike.png');
     this.load.image('snow', 'assets/img/snowflake.png');
 
-    this.load.spritesheet('red-link', 'assets/img/red-link.png',
-    { frameWidth: 40, frameHeight: 40 });
-
-    const roomId = getUrlParam('roomName') || 'room-firstTest';
-    this.load.json(roomId, `assets/rooms/${roomId}.json`);
-
-    // const itemId = getUrlParam('itemName') || 'weapons';
-    // this.load.json(itemId, `assets/items/${itemId}.json`);
-    // console.log(this.cache.json.get(itemId));
+    // Items
+    this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
+      { frameWidth: 16, frameHeight: 16 });
 
     // load test music
     this.load.audio('testSound', 'assets/sounds/testSound.MP3')
+    this.load.bitmapFont('pixelfont', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
+
+    // Find out which files we need by going through all rendered rooms
+    const requiredTilesets = new Set<string>();
+    const requiredNpcs = new Set<string>();
+    globalState.availableRooms.forEach((room) => {
+      requiredTilesets.add(room.tileset);
+      room.npcs?.forEach((npc) => {
+        requiredNpcs.add(npc.id);
+      })
+    })
+
+    // Tiles
+    requiredTilesets.forEach((tileSet) => {
+      this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
+    })
+
+    // NPCs
+    requiredNpcs.forEach((npc) => {
+    this.load.spritesheet(npc, `assets/img/${npc}.png`,
+      { frameWidth: 40, frameHeight: 40 });
+      this.neededAnimations.push(npc);
+    })
   }
 
   create() {
 
-    // Create player character animations
+    // Create character animations
     for (let directionIndex = 0; directionIndex < 8; directionIndex++) {
       const numIdleFrames = 4;
       const numWalkFrames = 8;
@@ -57,41 +74,25 @@ export default class PreloadScene extends Phaser.Scene {
 
       const directionName = spriteDirectionList[directionIndex];
 
-      this.anims.create({
-        key: `player-character-idle-${directionName}`,
-        frames: this.anims.generateFrameNumbers('main-character', {
-          start: idleFrameOffset,
-          end: idleFrameOffset /* Currently only 1 drawn */
-        }),
-        frameRate: 5,
-        repeat: -1
-      });
-      this.anims.create({
-        key: `player-walk-${directionName}`,
-        frames: this.anims.generateFrameNumbers('main-character', {
-          start: walkFrameOffset,
-          end: walkFrameOffset + numWalkFrames - 1
-        }),
-        frameRate: 12,
-        repeat: -1
-      });
-      this.anims.create({
-        key: `red-link-idle-${directionName}`,
-        frames: this.anims.generateFrameNumbers('red-link', {
-          start: idleFrameOffset,
-          end: idleFrameOffset /* Currently only 1 drawn */
-        }),
-        frameRate: 5,
-        repeat: -1
-      });
-      this.anims.create({
-        key: `red-link-walk-${directionName}`,
-        frames: this.anims.generateFrameNumbers('red-link', {
-          start: walkFrameOffset,
-          end: walkFrameOffset + numWalkFrames - 1
-        }),
-        frameRate: 12,
-        repeat: -1
+      this.neededAnimations.forEach((tokenName) => {
+        this.anims.create({
+          key: `${tokenName}-idle-${directionName}`,
+          frames: this.anims.generateFrameNumbers(tokenName, {
+            start: idleFrameOffset,
+            end: idleFrameOffset /* Currently only 1 drawn */
+          }),
+          frameRate: 5,
+          repeat: -1
+        });
+        this.anims.create({
+          key: `${tokenName}-walk-${directionName}`,
+          frames: this.anims.generateFrameNumbers(tokenName, {
+            start: walkFrameOffset,
+            end: walkFrameOffset + numWalkFrames - 1
+          }),
+          frameRate: 12,
+          repeat: -1
+        });
       });
     }
 
