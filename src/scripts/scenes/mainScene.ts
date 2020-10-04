@@ -43,6 +43,7 @@ export default class MainScene extends Phaser.Scene {
   abilities: AbilityEffect[];
   alive:number;
   isPaused = false;
+  healthBar: Phaser.GameObjects.Image;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -51,7 +52,7 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.alive = 0;
     // tslint:disable-next-line:no-unused-expression
-    this.cameras.main.fadeIn(5000);
+    this.cameras.main.fadeIn(5);
     this.mainCharacter =
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
@@ -80,7 +81,8 @@ export default class MainScene extends Phaser.Scene {
 
     this.sound.play('testSound', {volume: 0.08, loop: true});
 
-    const backpackIcon = this.add.image(this.cameras.main.width - 32, 32, 'icon-backpack');
+    // GUI
+    const backpackIcon = this.add.image(this.cameras.main.width - 32, 53, 'icon-backpack');
     backpackIcon.setScrollFactor(0);
     backpackIcon.setInteractive();
     backpackIcon.on('pointerdown', () => {
@@ -96,6 +98,22 @@ export default class MainScene extends Phaser.Scene {
       this.overlayScreens.statScreen.toggleVisible();
     });
 
+    const heroIcon = this.add.image(32, 40, 'icon-hero');
+    heroIcon.setScrollFactor(0);
+
+    const guiBaseIcon = this.add.image(116, 50, 'icon-guibase');
+    guiBaseIcon.setScrollFactor(0);
+
+    this.healthBar = this.add.image(62, 35, 'icon-healthbar');
+    this.healthBar.setScrollFactor(0);
+    this.healthBar.setOrigin(0, 0.5);
+
+    const abilty1Icon = this.add.image(72, 63, 'icon-abilities', 0);
+    abilty1Icon.setScrollFactor(0);
+    const abilty2Icon = this.add.image(101, 63, 'icon-abilities', 1);
+    abilty2Icon.setScrollFactor(0);
+    const abilty3Icon = this.add.image(130, 63, 'icon-abilities', 2);
+    abilty3Icon.setScrollFactor(0);
 
   }
 
@@ -271,5 +289,8 @@ export default class MainScene extends Phaser.Scene {
     };
 
     this.overlayScreens.statScreen.update();
+
+    const healthRatio = globalState.playerCharacter.health / globalState.playerCharacter.maxHealth;
+    this.healthBar.scaleX = healthRatio * 98;
   }
 }
