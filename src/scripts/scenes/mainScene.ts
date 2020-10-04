@@ -73,7 +73,7 @@ export default class MainScene extends Phaser.Scene {
     );
     this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
 
-    // this.sound.play('testSound', {volume: 0.08, loop: true});
+    this.sound.play('testSound', {volume: 0.08, loop: true});
   }
 
   collectItem(player, item) {
