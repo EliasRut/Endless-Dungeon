@@ -40,6 +40,8 @@ export default class PreloadScene extends Phaser.Scene {
     // this.load.json(itemId, `assets/items/${itemId}.json`);
     // console.log(this.cache.json.get(itemId));
 
+    // load test music
+    this.load.audio('testSound', 'assets/sounds/testSound.MP3')
   }
 
   create() {

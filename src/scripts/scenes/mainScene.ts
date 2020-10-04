@@ -29,6 +29,8 @@ export default class MainScene extends Phaser.Scene {
   abilityKey1: Phaser.Input.Keyboard.Key;
   abilityKey2: Phaser.Input.Keyboard.Key;
   abilityKey3: Phaser.Input.Keyboard.Key;
+  soundKey1: Phaser.Input.Keyboard.Key;
+  soundKey2: Phaser.Input.Keyboard.Key;
   effects: Map<string, FireBall>;
   fireballEffect: FireBallEffect | undefined;
   dustnovaEffect: DustNovaEffect | undefined;
@@ -72,6 +74,8 @@ export default class MainScene extends Phaser.Scene {
     this.abilityKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
     this.abilityKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
     this.abilityKey3 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
+    this.soundKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+    this.soundKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
 
     const roomSize = this.drawRoom()
 
@@ -316,6 +320,14 @@ export default class MainScene extends Phaser.Scene {
       });
     }
 
+    if (this.soundKey1.isDown) {
+      this.sound.play('testSound', {volume: 0.5});
+    };
+
+    if (this.soundKey2.isDown) {
+      this.sound.stopAll();
+    };
+    
     Object.values(this.overlayScreens).forEach((screen) => {
       if (screen) {
         screen.incXY(
@@ -324,6 +336,8 @@ export default class MainScene extends Phaser.Scene {
         );
       }
     })
+
+   }
     this.lastCameraPosition = {x: globalState.playerCharacter.x, y: globalState.playerCharacter.y};
   }
 }
