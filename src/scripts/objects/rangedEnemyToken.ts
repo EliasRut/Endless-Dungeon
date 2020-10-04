@@ -15,13 +15,14 @@ export default class RangedEnemyToken extends EnemyToken {
 
   public update(time: number,) {
 
+        const player = globalState.playerCharacter;
+
         //check death
         if (this.stateObject.health <= 0){
+            this.dropItem(player,this.scene);
             this.destroy();
             return;
         }
-
-        const player = globalState.playerCharacter;
 
         const px = player.x;
         const py = player.y;
