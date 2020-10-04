@@ -14,8 +14,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.spritesheet('main-character', 'assets/img/main-character.png',
       { frameWidth: 40, frameHeight: 40 });
 
-    this.load.image('test-items', 'assets/img/items_test.png');
-    this.load.spritesheet('test-items-spritesheet', 'assets/img/main-items_test.png',
+    // this.load.image('test-items', 'assets/img/items_test.png');
+    this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
       { frameWidth: 16, frameHeight: 16 });
     this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
     this.load.image('phaser-logo', 'assets/img/phaser-logo.png');

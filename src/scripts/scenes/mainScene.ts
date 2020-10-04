@@ -47,7 +47,7 @@ export default class MainScene extends Phaser.Scene {
     // const itemId =  'weapons';
     // const item = this.cache.json.get(itemId) as Weapon;
     // this.add.tileSprite(120,120,16,16,'test-items')
-    const sprite = this.add.sprite(120, 120, 'test-items-spritesheet', 8);
+    const sprite = this.add.sprite(120, 120, 'test-items-spritesheet', 34);
     // sprite.frame = new Phaser.Textures.Frame('test-items',)
 
     // const map = this.make.tilemap({data: [[3]], tileWidth: 16, tileHeight: 16});
