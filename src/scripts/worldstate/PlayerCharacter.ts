@@ -1,4 +1,4 @@
-import { Facings } from "../helpers/constants";
+import { Facings, Faction } from "../helpers/constants";
 import Character from './Character';
 
 // This class handles the players character and all mechanical events associated with it.
@@ -12,8 +12,16 @@ export default class PlayerCharacter extends Character {
   public x = 0;
   public y = 0;
 
+  public abilityCastTime = [
+    -Infinity,
+    -Infinity,
+    -Infinity,
+    -Infinity
+  ];
+
   constructor() {
     super('player', 100, 1, 200);
+    this.faction = Faction.PLAYER;
   }
 
   public updateStats(){

@@ -1,13 +1,14 @@
 import { Facings } from "../helpers/constants";
 import { getRotationInRadiansForFacing, getVelocitiesForFacing } from "../helpers/orientation";
+import AbilityEffect from './abilityEffect';
 
-export default class IceSpikeEffect extends Phaser.Physics.Arcade.Image {
+export default class IceSpikeEffect extends AbilityEffect {
     snowEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
     spikeEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
     stuckEnemy?: Phaser.Physics.Arcade.Body;
     stuckEnemyOffset?: {x, y};
-    constructor(scene: Phaser.Scene, x: number, y: number, facing: Facings) {
-      super(scene, x, y, 'ice');
+    constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings) {
+      super(scene, x, y, 'ice', facing);
       this.setScale(0.5);
       this.setRotation(getRotationInRadiansForFacing(facing));
       scene.add.existing(this);
@@ -66,7 +67,7 @@ export default class IceSpikeEffect extends Phaser.Physics.Arcade.Image {
       };
     }
 
-    destroy(callback) {
+    destroy() {
       // this.snowEmitter.stopFollow();
       this.snowEmitter.setEmitterAngle({min: -180, max: 180});
       this.snowEmitter.setSpeed({min:10, max: 120});
@@ -88,7 +89,6 @@ export default class IceSpikeEffect extends Phaser.Physics.Arcade.Image {
       setTimeout(() => {
         this.snowEmitter.stop();
         super.destroy();
-        callback();
       }, 2000);
     }
 

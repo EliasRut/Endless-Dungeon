@@ -1,6 +1,6 @@
-import { ANIMATION_IDLE, ANIMATION_WALK, Facings, facingToSpriteNameMap } from "../helpers/constants";
+import { ANIMATION_IDLE, ANIMATION_WALK, Facings, facingToSpriteNameMap, Faction } from "../helpers/constants";
 
-export default class Character {
+export default abstract class Character {
   private animationBase: string;
   public health: number;
   public damage: number;
@@ -9,6 +9,12 @@ export default class Character {
 
   public currentFacing: Facings = Facings.SOUTH;
   public isWalking = false;
+
+  public x = 0;
+  public y = 0;
+  public vision = 0;
+
+  public faction: Faction;
 
   constructor(
       animationBase: string,

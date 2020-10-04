@@ -16,6 +16,10 @@ import StatScreen from '../screens/statScreen';
 import InventoryScreen from '../screens/inventoryScreen'
 import KeyboardHelper from '../helpers/keyboardHelper'
 import AbilityEffect from '../objects/abilityEffect';
+import Character from '../worldstate/Character';
+import { Abilities, AbilityType } from '../abilities/abilityData';
+import CharacterToken from '../objects/characterToken';
+import { Faction } from '../helpers/constants';
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -35,7 +39,7 @@ export default class MainScene extends Phaser.Scene {
   sportLight: Phaser.GameObjects.Light;
   overlayScreens: {[name: string]: OverlayScreen} = {};
   lastCameraPosition: {x: number, y: number};
-  abilities: AbilityEffect[];
+  abilityEffects: AbilityEffect[] = [];
 
   constructor() {
     super({ key: 'MainScene' })
@@ -69,7 +73,7 @@ export default class MainScene extends Phaser.Scene {
     );
     this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
 
-    this.sound.play('testSound', {volume: 0.08, loop: true});
+    // this.sound.play('testSound', {volume: 0.08, loop: true});
   }
 
   collectItem(player, item) {
@@ -134,28 +138,43 @@ export default class MainScene extends Phaser.Scene {
     this.overlayScreens.inventory.setVisible(false);
   }
 
-  triggerAbility() {
-    // if (this.keyboardHelper.abilityKey1.isDown && !this.fireballEffect) {
-    //   const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
-    //   this.fireballEffect = new FireBallEffect(
-    //     this,
-    //     this.mainCharacter.x + (16 * fireballVelocities.x),
-    //     this.mainCharacter.y + (16 * fireballVelocities.y)
-    //   );
-    //   this.fireballEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
-    //   this.fireballEffect.body.velocity.normalize().scale(300);
+  triggerAbility(origin: Character, type: AbilityType) {
+    // throw all projectiles
+    const projectileData = Abilities[type].projectileData;
+    const facingVelocities = getVelocitiesForFacing(origin.currentFacing)!;
 
-    //   this.physics.add.collider(this.fireballEffect, this.tileLayer, (effect) => {
-    //     effect.destroy();
-    //     this.fireballEffect = undefined;
-    //   });
-    //   this.physics.add.collider(this.fireballEffect, this.enemy, (effect, target) => {
-    //     effect.destroy();
-    //     this.fireballEffect = undefined;
-    //     const enemy = target as EnemyToken;
-    //     enemy.health = enemy.health - globalState.playerCharacter.damage;
-    //   });
-    // }
+    for (let i = 0; i < (Abilities[type].projectiles || 0); i++) {
+      const effect = new projectileData!.effect(
+        this,
+        origin.x + facingVelocities.x * projectileData!.xOffset,
+        origin.y + facingVelocities.y * projectileData!.yOffset,
+        '',
+        origin.currentFacing
+      );
+      effect.setVelocity(facingVelocities.x, facingVelocities.y);
+      effect.body.velocity.normalize().scale(projectileData!.velocity);
+
+      this.physics.add.collider(effect, this.tileLayer, () => {
+        effect.destroy();
+        if (projectileData?.collisionSound) {
+          this.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
+        }
+      });
+
+      const targetTokens = origin.faction === Faction.PLAYER ? this.enemy : this.mainCharacter;
+      this.physics.add.collider(effect, targetTokens, (effect, target) => {
+        effect.destroy();
+        const enemy = target as CharacterToken;
+        enemy.stateObject.health -= origin.damage;
+        if (projectileData?.collisionSound) {
+          this.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
+        }
+      });
+      this.abilityEffects.push(effect);
+    }
+    if (Abilities[type].sound) {
+      this.sound.play(Abilities[type].sound!, {volume: Abilities[type].sfxVolume!});
+    }
   }
 
   update(globalTime, delta) {
@@ -189,85 +208,38 @@ export default class MainScene extends Phaser.Scene {
       this.fireballEffect.update();
     }
 
-    if (this.keyboardHelper.abilityKey1.isDown && !this.fireballEffect) {
-      this.sound.play('sound-fireball', {volume: 0.2});
-      const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
-      this.fireballEffect = new FireBallEffect(
-        this,
-        this.mainCharacter.x + (16 * fireballVelocities.x),
-        this.mainCharacter.y + (16 * fireballVelocities.y)
-      );
-      this.fireballEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
-      this.fireballEffect.body.velocity.normalize().scale(300);
+    const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
+    castAbilities.forEach((ability) => {
+      this.triggerAbility(globalState.playerCharacter, ability);
+    });
 
-      this.physics.add.collider(this.fireballEffect, this.tileLayer, (effect) => {
-        effect.destroy();
-        this.fireballEffect = undefined;
-        this.sound.play('sound-fireball-explosion', {volume: 0.4});
-      });
-      this.physics.add.collider(this.fireballEffect, this.enemy, (effect, target) => {
-        effect.destroy();
-        this.fireballEffect = undefined;
-        const enemy = target as EnemyToken;
-        enemy.health = enemy.health - globalState.playerCharacter.damage;
-        this.sound.play('sound-fireball-explosion', {volume: 0.4});
-      });
-    }
+    this.abilityEffects = this.abilityEffects.filter(
+      (effect) => !effect.destroyed
+    );
+    this.abilityEffects.forEach((effect) => {
+      effect.update();
+    });
 
-    if (this.icespikeEffect) {
-      this.icespikeEffect.update();
-    }
+    // if (this.keyboardHelper.abilityKey3.isDown && !this.dustnovaEffect) {
+    //   const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
+    //   this.dustnovaEffect = new DustNovaEffect(
+    //     this,
+    //     this.mainCharacter.x + (16 * fireballVelocities.x),
+    //     this.mainCharacter.y + (16 * fireballVelocities.y)
+    //   );
+    //   this.dustnovaEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
+    //   this.dustnovaEffect.body.velocity.normalize().scale(300);
 
-    if (this.keyboardHelper.abilityKey2.isDown && !this.icespikeEffect) {
-      this.sound.play('sound-icespike', {volume: 0.3});
-      const iceSpikeVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
-      this.icespikeEffect = new IceSpikeEffect(
-        this,
-        this.mainCharacter.x + (16 * iceSpikeVelocities.x),
-        this.mainCharacter.y + (16 * iceSpikeVelocities.y),
-        globalState.playerCharacter.currentFacing
-      );
-      this.icespikeEffect.setVelocity(iceSpikeVelocities.x, iceSpikeVelocities.y);
-      this.icespikeEffect.body.velocity.normalize().scale(300);
-
-      this.physics.add.collider(this.icespikeEffect, this.tileLayer, (effect) => {
-        this.sound.play('sound-icespike-hit', {volume: 0.2});
-        (effect as IceSpikeEffect).destroy(() => {
-          this.icespikeEffect = undefined;
-        });
-      });
-      this.physics.add.collider(this.icespikeEffect, this.enemy, (effect, target) => {
-        this.sound.play('sound-icespike-hit', {volume: 0.2});
-        const enemy = target as EnemyToken;
-        enemy.health = enemy.health - globalState.playerCharacter.damage;
-        const castEffect = (effect as IceSpikeEffect);
-        castEffect.attachToEnemy(enemy);
-        castEffect.destroy(() => {
-          this.icespikeEffect = undefined;
-        });
-      });
-    }
-
-    if (this.keyboardHelper.abilityKey3.isDown && !this.dustnovaEffect) {
-      const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
-      this.dustnovaEffect = new DustNovaEffect(
-        this,
-        this.mainCharacter.x + (16 * fireballVelocities.x),
-        this.mainCharacter.y + (16 * fireballVelocities.y)
-      );
-      this.dustnovaEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
-      this.dustnovaEffect.body.velocity.normalize().scale(300);
-
-      this.physics.add.collider(this.dustnovaEffect, this.tileLayer, (effect) => {
-        effect.destroy();
-        this.dustnovaEffect = undefined;
-      });
-      this.physics.add.collider(this.dustnovaEffect, this.enemy, (effect, enemy) => {
-        effect.destroy();
-        this.dustnovaEffect = undefined;
-        this.enemy[0].health = this.enemy[0].health - globalState.playerCharacter.damage;
-      });
-    }
+    //   this.physics.add.collider(this.dustnovaEffect, this.tileLayer, (effect) => {
+    //     effect.destroy();
+    //     this.dustnovaEffect = undefined;
+    //   });
+    //   this.physics.add.collider(this.dustnovaEffect, this.enemy, (effect, enemy) => {
+    //     effect.destroy();
+    //     this.dustnovaEffect = undefined;
+    //     this.enemy[0].health = this.enemy[0].health - globalState.playerCharacter.damage;
+    //   });
+    // }
     
     if (this.soundKey2.isDown) {
       this.sound.stopAll();

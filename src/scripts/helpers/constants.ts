@@ -1,3 +1,5 @@
+import { AbilityType } from "../abilities/abilityData";
+
 export const enum Facings {
   SOUTH,
   SOUTH_EAST,
@@ -33,3 +35,21 @@ export const facingToSpriteNameMap = {
 
 export const ANIMATION_IDLE = 'idle';
 export const ANIMATION_WALK = 'walk';
+
+export const enum Faction {
+  PLAYER,
+  NPCS,
+  ENEMIES
+};
+
+export const enum AbilityKey {
+  ONE = 0,
+  TWO = 1,
+  THREE = 2,
+  FOUR = 3
+};
+
+export const AbilityKeyMapping = {
+  [AbilityKey.ONE]: AbilityType.FIREBALL,
+  [AbilityKey.TWO]: AbilityType.ICESPIKE,
+};

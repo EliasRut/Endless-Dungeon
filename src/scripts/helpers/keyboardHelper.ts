@@ -1,4 +1,6 @@
+import { Abilities, AbilityType } from "../abilities/abilityData";
 import globalState from "../worldstate";
+import { AbilityKey, AbilityKeyMapping } from './constants';
 
 export default class KeyboardHelper {
   upKey: Phaser.Input.Keyboard.Key;
@@ -41,6 +43,38 @@ export default class KeyboardHelper {
     }
 
     return [xFacing, yFacing];
+  }
+
+  getRelevantKeyForEnum(abilityKey: AbilityKey) {
+    switch (abilityKey) {
+      case AbilityKey.ONE: return this.abilityKey1;
+      case AbilityKey.TWO: return this.abilityKey2;
+      case AbilityKey.THREE: return this.abilityKey3;
+      case AbilityKey.FOUR: return this.abilityKey4;
+    }
+  }
+
+  getCastedAbilities(gameTime: number) {
+    return [
+      this.castIfPressed(AbilityKey.ONE, gameTime),
+      this.castIfPressed(AbilityKey.TWO, gameTime),
+    ].filter((ability) => !!ability) as AbilityType[];
+  }
+
+  castIfPressed(abilityKey: AbilityKey, gameTime: number) {
+    const relevantKey = this.getRelevantKeyForEnum(abilityKey);
+    if (!relevantKey.isDown) {
+      return false;
+    }
+    const ability = AbilityKeyMapping[abilityKey] as AbilityType;
+    const abilityData = Abilities[ability];
+    const lastCasted = globalState.playerCharacter.abilityCastTime[abilityKey];
+    const readyAt = lastCasted + (abilityData.cooldownMs || 0);
+    if (readyAt > gameTime) {
+      return false;
+    }
+    globalState.playerCharacter.abilityCastTime[abilityKey] = gameTime;
+    return ability;
   }
 
 }

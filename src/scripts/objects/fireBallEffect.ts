@@ -1,8 +1,10 @@
+import { Facings } from "../helpers/constants";
+import AbilityEffect from "./abilityEffect";
 
-export default class FireBallEffect extends Phaser.Physics.Arcade.Image {
+export default class FireBallEffect extends AbilityEffect {
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'empty-tile');
+  constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings) {
+    super(scene, x, y, 'empty-tile', facing);
     scene.add.existing(this);
     this.setDepth(1);
     scene.physics.add.existing(this);

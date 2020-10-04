@@ -3,8 +3,10 @@ import { Facings, facingToSpriteNameMap } from "../helpers/constants";
 import NPC from "../worldstate/NPC"
 import Player from "../worldstate/PlayerCharacter"
 import { getFacing } from '../helpers/orientation';
+import CharacterToken from './characterToken';
+import Enemy from "../worldstate/Enemy";
 
-export default class Enemy extends NPC {
+export default class EnemyToken extends CharacterToken {
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
   lastFacing: Facings = Facings.SOUTH;
 
@@ -12,7 +14,7 @@ export default class Enemy extends NPC {
   super(scene, x, y, tokenName);
   scene.add.existing(this);
   scene.physics.add.existing(this);
-  this.enemy = 1;
+  this.stateObject = new Enemy(tokenName, 10, 10, 35);
   //this.body.setCircle(10, 10, 12);
 
     //cool effects!
@@ -37,7 +39,7 @@ export default class Enemy extends NPC {
 
   //update from main Scene
   public update(player: Player) {
-    if(this.health <= 0){
+    if (this.stateObject.health <= 0){
         this.destroy();
         return;
     }
@@ -54,10 +56,10 @@ export default class Enemy extends NPC {
         player.slowFactor = 1;
     }
     //follows you only if you're close enough, then runs straight at you.
-    if(distance < this.vision){
-
-        const xSpeed = (px-this.x)/(Math.abs(px-this.x)+Math.abs(py-this.y))*this.movementSpeed;
-        const ySpeed = (py-this.y)/(Math.abs(px-this.x)+Math.abs(py-this.y))*this.movementSpeed;
+    if(distance < this.stateObject.vision){
+      const totalDistance = Math.abs(px - this.x) + Math.abs(py - this.y);
+        const xSpeed = (px - this.x) / totalDistance * this.stateObject.movementSpeed;
+        const ySpeed = (py - this.y) / totalDistance * this.stateObject.movementSpeed;
         this.setVelocityX(xSpeed);
         this.setVelocityY(ySpeed);
         this.emitter.setSpeedX(xSpeed);
