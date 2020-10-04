@@ -75,9 +75,10 @@ export default class MainScene extends Phaser.Scene {
   drawRoom() {
     const roomId = getUrlParam('roomName') || 'room-firstTest';
     const room = this.cache.json.get(roomId) as Room;
+    const roomTileset = room.tileset;
 
     const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
-    const tiles = map.addTilesetImage('test-tileset-image', 'test-tileset', 16, 16, 1, 2);
+    const tiles = map.addTilesetImage(`${roomTileset}-image`, roomTileset, 16, 16, 1, 2);
     const roomHeight = tiles.tileHeight * room.layout.length;
     const roomWidth = tiles.tileWidth * room.layout[0].length;
 

@@ -1,5 +1,6 @@
 import { getUrlParam } from "../helpers/browserState";
 import { spriteDirectionList } from "../helpers/constants";
+import globalState from "../worldstate";
 
 /*
   The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -33,13 +34,27 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
       { frameWidth: 16, frameHeight: 16 });
 
+    // Find out which files we need by going through all rendered rooms
+    const requiredTilesets = new Set<string>();
+    const requiredNpcs = new Set<string>();
+    globalState.availableRooms.forEach((room) => {
+      requiredTilesets.add(room.tileset);
+      room.npcs?.forEach((npc) => {
+        requiredNpcs.add(npc.id);
+      })
+    })
+
     // Tiles
-    this.load.image('test-tileset', 'assets/img/til-dungeon-extruded.png');
+    requiredTilesets.forEach((tileSet) => {
+      this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
+    })
 
     // NPCs
-    this.neededAnimations.push('red-link');
-    this.load.spritesheet('red-link', 'assets/img/red-link.png',
-    { frameWidth: 40, frameHeight: 40 });
+    requiredNpcs.forEach((npc) => {
+    this.load.spritesheet(npc, `assets/img/${npc}.png`,
+      { frameWidth: 40, frameHeight: 40 });
+      this.neededAnimations.push(npc);
+    })
   }
 
   create() {
