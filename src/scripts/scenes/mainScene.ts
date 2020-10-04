@@ -13,6 +13,9 @@ import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
 import EnemyToken from '../objects/enemyToken';
 import ItemToken from '../objects/itemToken';
+import OverlayScreen from '../screens/overlayScreen'
+import StatScreen from '../screens/statScreen';
+import InventoryScreen from '../screens/inventoryScreen'
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -32,6 +35,8 @@ export default class MainScene extends Phaser.Scene {
   tileLayer: any;
   enemy: EnemyToken;
   item: ItemToken;
+  overlayScreens: {[name: string]: OverlayScreen} = {};
+  lastCameraPosition: {x: number, y: number};
 
   constructor() {
     super({ key: 'MainScene' })
@@ -45,6 +50,7 @@ export default class MainScene extends Phaser.Scene {
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
 
+    this.lastCameraPosition = {x: 0, y: 0};
     this.cameras.main.startFollow(this.mainCharacter, false);
 
     this.enemy = new EnemyToken(this, this.cameras.main.width/2+20, this.cameras.main.height /2+20);
@@ -67,6 +73,16 @@ export default class MainScene extends Phaser.Scene {
     this.abilityKey3 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
 
     this.drawRoom();
+
+    this.overlayScreens.statScreen = new StatScreen(this);
+    this.overlayScreens.statScreen.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
+    this.add.existing(this.overlayScreens.statScreen);
+    // this.overlayScreens.statScreen.setVisible(false);
+
+    this.overlayScreens.inventory = new InventoryScreen(this);
+    this.overlayScreens.inventory.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
+    this.add.existing(this.overlayScreens.inventory);
+    this.overlayScreens.inventory.setVisible(false);
   }
 
   drawRoom() {
@@ -98,8 +114,55 @@ export default class MainScene extends Phaser.Scene {
     // });
   }
 
+  
+
+  // drawStatScreen() {
+
+    // this.add.group()
+    // const leftBorderX = 16 + this.cameras.main.x;
+    // const topBorderY = 80 + this.cameras.main.y;
+    // const screenWidth = 200;
+    // const screenHeight = 224;
+    // const tileSize = 64;
+    // const rightBorderX = leftBorderX + screenWidth - tileSize;
+    // const bottomBorderY = topBorderY + screenHeight - tileSize;
+    // const middlePieceX = leftBorderX + tileSize;
+    // const middlePieceY = topBorderY + tileSize;
+
+    // const topLeftCorner = this.add.image(leftBorderX, topBorderY, 'screen-background', 0);
+    // const topRightCorner = this.add.image(rightBorderX, topBorderY, 'screen-background', 2);
+    // const bottomLeftCorner = this.add.image(leftBorderX, bottomBorderY, 'screen-background', 6);
+    // const bottomRightCorner = this.add.image(rightBorderX, bottomBorderY, 'screen-background', 8);
+
+    // const topBorder = this.add.image(middlePieceX, topBorderY, 'screen-background', 1);
+    // const bottomBorder = this.add.image(middlePieceX, bottomBorderY, 'screen-background', 7);
+
+    // const leftBorder = this.add.image(leftBorderX, middlePieceY, 'screen-background', 3);
+    // const rightBorder = this.add.image(rightBorderX, middlePieceY, 'screen-background', 5);
+
+    // const centerPiece = this.add.image(middlePieceX, middlePieceY, 'screen-background', 4);
+
+    // const pieces = [
+    //   topLeftCorner,
+    //   topRightCorner,
+    //   bottomLeftCorner,
+    //   bottomRightCorner,
+    //   topBorder,
+    //   bottomBorder,
+    //   leftBorder,
+    //   rightBorder,
+    //   centerPiece,
+    // ];
+    // pieces.forEach((piece) => {
+    //   piece.setDepth(3);
+    // })
+  // }
+
   update() {
     this.fpsText.update();
+    const lastPlayerX = globalState.playerCharacter.x;
+    const lastPlayerY = globalState.playerCharacter.y;
+
     this.enemy.update(globalState.playerCharacter);
     this.item.update(globalState.playerCharacter);
 
@@ -236,5 +299,15 @@ export default class MainScene extends Phaser.Scene {
         console.log("life remaining =" ,this.enemy.health);
       });
     }
+
+    Object.values(this.overlayScreens).forEach((screen) => {
+      if (screen) {
+        screen.incXY(
+          globalState.playerCharacter.x - this.lastCameraPosition.x,
+          globalState.playerCharacter.y - this.lastCameraPosition.y
+        );
+      }
+    })
+    this.lastCameraPosition = {x: globalState.playerCharacter.x, y: globalState.playerCharacter.y};
   }
 }
