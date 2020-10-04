@@ -6,10 +6,11 @@ import { Room } from '../../../typings/custom'
 import globalState from '../worldstate/index';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
 import FireBallEffect from '../objects/fireBallEffect';
+// import IceNovaEffect from '../objects/iceSpikeEffect';
+import IceNovaEffect from '../objects/iceNovaEffect';
 import { facingToSpriteNameMap } from '../helpers/constants';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
-// import IceNova from '../abilities/iceNova'
 import EnemyToken from '../objects/enemyToken';
 import ItemToken from '../objects/itemToken';
 
@@ -22,8 +23,10 @@ export default class MainScene extends Phaser.Scene {
   leftKey: Phaser.Input.Keyboard.Key;
   rightKey: Phaser.Input.Keyboard.Key;
   abilityKey1: Phaser.Input.Keyboard.Key;
+  abilityKey2: Phaser.Input.Keyboard.Key;
   effects: Map<string, FireBall>;
   fireballEffect: FireBallEffect | undefined;
+  icenovaEffect: IceNovaEffect | undefined;
   tileLayer: any;
   enemy: EnemyToken;
   item: ItemToken;
@@ -41,13 +44,14 @@ export default class MainScene extends Phaser.Scene {
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
 
-    this.cameras.default.startFollow(this.mainCharacter);
+    this.cameras.main.startFollow(this.mainCharacter, false);
 
     this.enemy = new EnemyToken(this, this.cameras.main.width/2+20, this.cameras.main.height /2+20);
     this.enemy.setDepth(1);
 
     this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
     this.item.setDepth(1);
+
     // const fireball =
       // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
 
@@ -58,6 +62,7 @@ export default class MainScene extends Phaser.Scene {
     this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
     this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
     this.abilityKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+    this.abilityKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
 
     this.drawRoom();
   }
@@ -67,7 +72,7 @@ export default class MainScene extends Phaser.Scene {
     const room = this.cache.json.get(roomId) as Room;
 
     const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
-    const tiles = map.addTilesetImage('test-tileset');
+    const tiles = map.addTilesetImage('test-tileset-image', 'test-tileset', 16, 16, 1, 2);
     const roomHeight = tiles.tileHeight * room.layout.length;
     const roomWidth = tiles.tileWidth * room.layout[0].length;
     this.tileLayer = map.createStaticLayer(
@@ -176,5 +181,36 @@ export default class MainScene extends Phaser.Scene {
         console.log("life remaining =" ,this.enemy.health);
       });
     }
+
+    if (this.icenovaEffect) {
+      this.icenovaEffect.update();
+    }
+
+    if (this.abilityKey2.isDown && !this.icenovaEffect) {
+      const iceNovaVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
+      this.icenovaEffect = new IceNovaEffect(
+        this,
+        this.mainCharacter.x + (16 * iceNovaVelocities.x),
+        this.mainCharacter.y + (16 * iceNovaVelocities.y),
+        globalState.playerCharacter.currentFacing
+      );
+      this.icenovaEffect.setVelocity(iceNovaVelocities.x, iceNovaVelocities.y);
+      this.icenovaEffect.body.velocity.normalize().scale(300);
+
+      this.physics.add.collider(this.icenovaEffect, this.tileLayer, (effect) => {
+        (effect as IceNovaEffect).destroy(() => {
+          this.icenovaEffect = undefined;
+        });
+      });
+      this.physics.add.collider(this.icenovaEffect, this.enemy, (effect, enemy) => {
+        this.enemy.health = this.enemy.health - 3;
+        const castEffect = (effect as IceNovaEffect);
+        castEffect.attachToEnemy(enemy);
+        castEffect.destroy(() => {
+          this.icenovaEffect = undefined;
+        });
+      });
+    }
+
   }
 }

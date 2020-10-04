@@ -1,12 +1,15 @@
 import { Game } from "phaser";
+import { Facings, facingToSpriteNameMap } from "../helpers/constants";
 import NPC from "../worldstate/NPC"
 import Player from "../worldstate/PlayerCharacter"
+import { getFacing } from '../helpers/orientation';
 
 export default class Enemy extends NPC {
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
+  lastFacing: Facings = Facings.SOUTH;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-  super(scene, x, y, 'empty-tile');
+  super(scene, x, y, 'red-link');
   scene.add.existing(this);
   scene.physics.add.existing(this);
   this.enemy = 1;
@@ -16,7 +19,7 @@ export default class Enemy extends NPC {
     const particles = scene.add.particles('fire');
     particles.setDepth(1);
     this.emitter = particles.createEmitter({
-      alpha: { start: 0.4, end: 0.0 },
+      alpha: { start: 0.3, end: 0.0 },
       scale: { start: 0.0, end: 2 },
       tint: 0x1c092d,//0x008800, //0x663300
       speed: 0,
@@ -57,10 +60,20 @@ export default class Enemy extends NPC {
         const ySpeed = (py-this.y)/(Math.abs(px-this.x)+Math.abs(py-this.y))*this.movementSpeed;
         this.setVelocityX(xSpeed);
         this.setVelocityY(ySpeed);
+        this.emitter.setSpeedX(xSpeed);
+        this.emitter.setSpeedY(ySpeed);
+        const newFacing = getFacing(xSpeed, ySpeed);
+        if (newFacing !== this.lastFacing) {
+          this.play(`red-link-walk-${facingToSpriteNameMap[newFacing]}`);
+        }
+        this.lastFacing = newFacing;
     }
     else {
-        this.setVelocityX(0);
-        this.setVelocityY(0);
+      this.setVelocityX(0);
+      this.setVelocityY(0);
+      this.emitter.setSpeedX(0);
+      this.emitter.setSpeedY(0);
+      this.play(`red-link-idle-${facingToSpriteNameMap[this.lastFacing]}`);
     }
   }
 

@@ -24,6 +24,11 @@ const config: Phaser.Types.Core.GameConfig = {
     arcade: {
       debug: false,
     }
+  },
+  render: {
+    antialias: false,
+    pixelArt: true,
+    roundPixels: false
   }
 }
 
