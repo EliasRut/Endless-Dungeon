@@ -64,26 +64,21 @@ export default class MainScene extends Phaser.Scene {
     this.abilityKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
     this.abilityKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
 
-    this.drawRoom()
+    const roomSize = this.drawRoom()
 
-    // const itemId =  'weapons';
-    // const item = this.cache.json.get(itemId) as Weapon;
-    // this.add.tileSprite(120,120,16,16,'test-items')
-    const sprite = this.add.sprite(120, 120, 'test-items-spritesheet', 34);
-    // sprite.frame = new Phaser.Textures.Frame('test-items',)
+    // Spawn item in location
+    const sprite = this.physics.add.sprite(
+      (this.cameras.main.width / 2) + (roomSize[0] / 4),
+      (this.cameras.main.height / 2) + (roomSize[1] / 4),
+      'test-items-spritesheet', 34
+    );
+    this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this)
 
-    // const map = this.make.tilemap({data: [[3]], tileWidth: 16, tileHeight: 16});
-    // const tiles = map.addTilesetImage('test-items');
-    
-    // const layer = map.createStaticLayer(
-    //   0,
-    //   tiles, 120,120
-    //   // (this.cameras.main.width / 2) + 10,
-    //   // (this.cameras.main.height / 2) + 10
-    // );
-    // layer.setDepth(0);
+  }
 
+  collectItem(player,item) {
 
+    item.disableBody(true,true)
   }
 
   drawRoom() {
@@ -113,6 +108,7 @@ export default class MainScene extends Phaser.Scene {
       // Color of colliding tiles
     //   faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
     // });
+    return [roomWidth,roomHeight]
   }
 
   update() {
@@ -195,7 +191,7 @@ export default class MainScene extends Phaser.Scene {
       this.physics.add.collider(this.fireballEffect, this.enemy, (effect, enemy) => {
         effect.destroy();
         this.fireballEffect = undefined;
-        this.enemy.health = this.enemy.health - globalState.playerCharacter.damage;
+        // this.enemy.health = this.enemy.health - globalState.playerCharacter.damage;
         console.log("damage dome =" ,globalState.playerCharacter.damage);
         console.log("life remaining =" ,this.enemy.health);
       });
