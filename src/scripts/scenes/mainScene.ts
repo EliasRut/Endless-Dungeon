@@ -10,6 +10,8 @@ import IceSpikeEffect from '../objects/iceSpikeEffect';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
 import EnemyToken from '../objects/enemyToken';
+import RangedEnemyToken from '../objects/rangedEnemyToken';
+import MeleeEnemyToken from '../objects/meleeEnemyToken';
 import ItemToken from '../objects/itemToken';
 import OverlayScreen from '../screens/overlayScreen'
 import StatScreen from '../screens/statScreen';
@@ -62,7 +64,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.enemy = [];
 
-    this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
+    this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50,39);
     this.item.setDepth(1);
 
     this.keyboardHelper = new KeyboardHelper(this);
@@ -72,12 +74,12 @@ export default class MainScene extends Phaser.Scene {
     this.drawOverlayScreens();
 
     // Spawn item in location
-    const sprite = this.physics.add.sprite(
-      (this.cameras.main.width / 2) + (roomSize[0] / 4),
-      (this.cameras.main.height / 2) + (roomSize[1] / 4),
-      'test-items-spritesheet', 34
-    );
-    this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
+    // const sprite = this.physics.add.sprite(
+    //   (this.cameras.main.width / 2) + (roomSize[0] / 4),
+    //   (this.cameras.main.height / 2) + (roomSize[1] / 4),
+    //   'test-items-spritesheet', 34
+    // );
+    // this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
 
     this.sound.play('testSound', {volume: 0.08, loop: true});
 
@@ -144,12 +146,33 @@ export default class MainScene extends Phaser.Scene {
     this.tileLayer.setDepth(0);
     let npcCounter = 0;
     room.npcs?.forEach((npc) => {
-      this.enemy[npcCounter] = new EnemyToken(
-        this,
-        roomOriginX + npc.x * tiles.tileWidth,
-        roomOriginY + npc.y * tiles.tileHeight,
-        npc.id
-      );
+      const xCoord = roomOriginX + npc.x * tiles.tileWidth;
+      const yCoord = roomOriginY + npc.y * tiles.tileHeight;
+
+      switch(npc.id) {
+        case 'red-link': {
+          this.enemy[npcCounter] =
+                new MeleeEnemyToken( this, xCoord, yCoord, npc.id);
+          break;
+        }
+        case 'red-ball': {
+          this.enemy[npcCounter] =
+                new RangedEnemyToken( this, xCoord, yCoord, npc.id);
+          break;
+        }
+        default: {
+          console.log("Unknown enemy.")
+          break;
+        }
+
+      }
+
+      // this.enemy[npcCounter] = new EnemyToken(
+      //   this,
+      //   roomOriginX + npc.x * tiles.tileWidth,
+      //   roomOriginY + npc.y * tiles.tileHeight,
+      //   npc.id
+      // );
       this.enemy[npcCounter].setDepth(1);
       this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
       npcCounter++;

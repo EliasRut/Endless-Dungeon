@@ -3,8 +3,8 @@ import Item from "../worldstate/Item"
 import Player from "../worldstate/PlayerCharacter"
 
 export default class ItemToken extends Item {
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-  super(scene, x, y, 'test-items-spritesheet', 39);
+  constructor(scene: Phaser.Scene, x: number, y: number, tile: number) {
+  super(scene, x, y, 'test-items-spritesheet', tile);
   scene.add.existing(this)
   scene.physics.add.existing(this)
   this.itemHealth = 100;
