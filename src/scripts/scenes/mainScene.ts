@@ -15,6 +15,7 @@ import OverlayScreen from '../screens/overlayScreen'
 import StatScreen from '../screens/statScreen';
 import InventoryScreen from '../screens/inventoryScreen'
 import KeyboardHelper from '../helpers/keyboardHelper'
+import AbilityEffect from '../objects/abilityEffect';
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -31,6 +32,7 @@ export default class MainScene extends Phaser.Scene {
   sportLight: Phaser.GameObjects.Light;
   overlayScreens: {[name: string]: OverlayScreen} = {};
   lastCameraPosition: {x: number, y: number};
+  abilities: AbilityEffect[];
 
   constructor() {
     super({ key: 'MainScene' })
@@ -61,7 +63,7 @@ export default class MainScene extends Phaser.Scene {
       (this.cameras.main.height / 2) + (roomSize[1] / 4),
       'test-items-spritesheet', 34
     );
-    this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this)
+    this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
   }
 
   collectItem(player, item) {
