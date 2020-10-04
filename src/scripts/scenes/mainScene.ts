@@ -92,21 +92,18 @@ export default class MainScene extends Phaser.Scene {
     this.tileLayer.setCollisionBetween(0, 31, true);
     this.tileLayer.setDepth(0);
     let npcCounter = 0;
-    for (let y = 0; y < room.npcs.length; y++) {
-      for (let x = 0; x < room.npcs[0].length; x++) {
-        if (room.npcs[y][x] !== 0) {
-          this.enemy[npcCounter] = new EnemyToken(
-            this,
-            roomOriginX + x * tiles.tileWidth,
-            roomOriginY + y * tiles.tileHeight,
-            room.npcs[y][x]
-          );
-          this.enemy[npcCounter].setDepth(1);
-          this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
-          npcCounter++;
-        }
-      }
-    }
+    room.npcs?.forEach((npc) => {
+      this.enemy[npcCounter] = new EnemyToken(
+        this,
+        roomOriginX + npc.x * tiles.tileWidth,
+        roomOriginY + npc.y * tiles.tileHeight,
+        npc.id
+      );
+      this.enemy[npcCounter].setDepth(1);
+      this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
+      npcCounter++;
+    })
+
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
     // const debugGraphics = this.add.graphics().setAlpha(0.75);

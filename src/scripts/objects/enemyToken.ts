@@ -8,8 +8,8 @@ export default class Enemy extends NPC {
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
   lastFacing: Facings = Facings.SOUTH;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
-  super(scene, x, y, 'enemy');
+  constructor(scene: Phaser.Scene, x: number, y: number, tokenName: string) {
+  super(scene, x, y, tokenName);
   scene.add.existing(this);
   scene.physics.add.existing(this);
   this.enemy = 1;
