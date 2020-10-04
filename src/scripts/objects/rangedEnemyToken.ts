@@ -14,13 +14,7 @@ export default class MeleeEnemyToken extends EnemyToken {
   }
 
   public update(time: number,) {
-
-    //check death
-    if (this.stateObject.health <= 0){
-        console.log("dying enemy")
-        this.destroy();
-        return;
-    }
+        this.healthCheck();
 
         const player = globalState.playerCharacter;
 

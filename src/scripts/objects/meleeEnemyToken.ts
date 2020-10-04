@@ -29,24 +29,15 @@ export default class MeleeEnemyToken extends EnemyToken {
     this.proximity = 15;
   }
 
-
   public update(time: number) {
-    //   super.update(time);
+        //   super.update(time);
+        this.healthCheck();
 
+        const player = globalState.playerCharacter;
 
-    //check death
-    if (this.stateObject.health <= 0){
-        console.log("dying enemy")
-        this.destroy();
-        return;
-    }
-
-
-      const player = globalState.playerCharacter;
-
-      const px = player.x;
-      const py = player.y;
-      const distance = this.getDistance(player);
+        const px = player.x;
+        const py = player.y;
+        const distance = this.getDistance(player);
 
         //damages & slows you if you're close
         if (distance < 30) {

@@ -111,22 +111,17 @@ export default class MainScene extends Phaser.Scene {
 
       switch(npc.id) {
         case 'red-link': {
-          this.enemy[npcCounter] = new MeleeEnemyToken(
-            this,
-            xCoord,
-            yCoord,
-            npc.id
-          );
+          this.enemy[npcCounter] =
+                new MeleeEnemyToken( this, xCoord, yCoord, npc.id);
+          break;
         }
         case 'red-ball': {
-          this.enemy[npcCounter] = new RangedEnemyToken(
-            this,
-            xCoord,
-            yCoord,
-            npc.id
-          );
+          this.enemy[npcCounter] =
+                new RangedEnemyToken( this, xCoord, yCoord, npc.id);
+          break;
         }
         default: {
+          console.log("Unknown enemy.")
           break;
         }
 
