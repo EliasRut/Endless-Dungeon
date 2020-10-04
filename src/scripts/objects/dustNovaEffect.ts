@@ -1,5 +1,4 @@
-
-export default class FireBallEffect extends Phaser.Physics.Arcade.Image {
+export default class DustNovaEffect extends Phaser.Physics.Arcade.Image {
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'empty-tile');

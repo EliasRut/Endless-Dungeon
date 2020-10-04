@@ -6,8 +6,8 @@ import { Room } from '../../../typings/custom'
 import globalState from '../worldstate/index';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
 import FireBallEffect from '../objects/fireBallEffect';
-// import IceNovaEffect from '../objects/iceSpikeEffect';
-import IceNovaEffect from '../objects/iceNovaEffect';
+import DustNovaEffect from '../objects/dustNovaEffect';
+import IceSpikeEffect from '../objects/iceSpikeEffect';
 import { facingToSpriteNameMap } from '../helpers/constants';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
@@ -24,9 +24,11 @@ export default class MainScene extends Phaser.Scene {
   rightKey: Phaser.Input.Keyboard.Key;
   abilityKey1: Phaser.Input.Keyboard.Key;
   abilityKey2: Phaser.Input.Keyboard.Key;
+  abilityKey3: Phaser.Input.Keyboard.Key;
   effects: Map<string, FireBall>;
   fireballEffect: FireBallEffect | undefined;
-  icenovaEffect: IceNovaEffect | undefined;
+  dustnovaEffect: DustNovaEffect | undefined;
+  icespikeEffect: IceSpikeEffect | undefined;
   tileLayer: any;
   enemy: EnemyToken;
   item: ItemToken;
@@ -62,6 +64,7 @@ export default class MainScene extends Phaser.Scene {
     this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
     this.abilityKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
     this.abilityKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
+    this.abilityKey3 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
 
     this.drawRoom();
   }
@@ -181,35 +184,57 @@ export default class MainScene extends Phaser.Scene {
       });
     }
 
-    if (this.icenovaEffect) {
-      this.icenovaEffect.update();
+    if (this.icespikeEffect) {
+      this.icespikeEffect.update();
     }
 
-    if (this.abilityKey2.isDown && !this.icenovaEffect) {
-      const iceNovaVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
-      this.icenovaEffect = new IceNovaEffect(
+    if (this.abilityKey2.isDown && !this.icespikeEffect) {
+      const iceSpikeVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
+      this.icespikeEffect = new IceSpikeEffect(
         this,
-        this.mainCharacter.x + (16 * iceNovaVelocities.x),
-        this.mainCharacter.y + (16 * iceNovaVelocities.y),
+        this.mainCharacter.x + (16 * iceSpikeVelocities.x),
+        this.mainCharacter.y + (16 * iceSpikeVelocities.y),
         globalState.playerCharacter.currentFacing
       );
-      this.icenovaEffect.setVelocity(iceNovaVelocities.x, iceNovaVelocities.y);
-      this.icenovaEffect.body.velocity.normalize().scale(300);
+      this.icespikeEffect.setVelocity(iceSpikeVelocities.x, iceSpikeVelocities.y);
+      this.icespikeEffect.body.velocity.normalize().scale(300);
 
-      this.physics.add.collider(this.icenovaEffect, this.tileLayer, (effect) => {
-        (effect as IceNovaEffect).destroy(() => {
-          this.icenovaEffect = undefined;
+      this.physics.add.collider(this.icespikeEffect, this.tileLayer, (effect) => {
+        (effect as IceSpikeEffect).destroy(() => {
+          this.icespikeEffect = undefined;
         });
       });
-      this.physics.add.collider(this.icenovaEffect, this.enemy, (effect, enemy) => {
+      this.physics.add.collider(this.icespikeEffect, this.enemy, (effect, enemy) => {
         this.enemy.health = this.enemy.health - 3;
-        const castEffect = (effect as IceNovaEffect);
+        const castEffect = (effect as IceSpikeEffect);
         castEffect.attachToEnemy(enemy);
         castEffect.destroy(() => {
-          this.icenovaEffect = undefined;
+          this.icespikeEffect = undefined;
         });
       });
     }
 
+    if (this.abilityKey3.isDown && !this.dustnovaEffect) {
+      const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
+      this.dustnovaEffect = new DustNovaEffect(
+        this,
+        this.mainCharacter.x + (16 * fireballVelocities.x),
+        this.mainCharacter.y + (16 * fireballVelocities.y)
+      );
+      this.dustnovaEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
+      this.dustnovaEffect.body.velocity.normalize().scale(300);
+
+      this.physics.add.collider(this.dustnovaEffect, this.tileLayer, (effect) => {
+        effect.destroy();
+        this.dustnovaEffect = undefined;
+      });
+      this.physics.add.collider(this.dustnovaEffect, this.enemy, (effect, enemy) => {
+        effect.destroy();
+        this.dustnovaEffect = undefined;
+        this.enemy.health = this.enemy.health - globalState.playerCharacter.damage;
+        console.log("damage dome =" ,globalState.playerCharacter.damage);
+        console.log("life remaining =" ,this.enemy.health);
+      });
+    }
   }
 }
