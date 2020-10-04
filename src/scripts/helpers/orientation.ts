@@ -1,18 +1,18 @@
 import { Facings } from "./constants"
 
 export const getFacing = (x: number, y: number) => {
-  if (x < 0) {
-    if (y < 0) {
+  if (x < 0 && Math.abs(y/x) < 3) {
+    if (y < 0 && Math.abs(x/y) < 3) {
       return Facings.NORTH_WEST;
-    } else if (y > 0) {
+    } else if (y > 0 && Math.abs(x/y) < 3) {
       return Facings.SOUTH_WEST;
     }
     // y === 0
     return Facings.WEST;
-  } else if (x > 0) {
-    if (y < 0) {
+  } else if (x > 0 && Math.abs(y/x) < 3) {
+    if (y < 0 && Math.abs(x/y) < 3) {
       return Facings.NORTH_EAST;
-    } else if (y > 0) {
+    } else if (y > 0 && Math.abs(x/y) < 3) {
       return Facings.SOUTH_EAST;
     }
     // y === 0

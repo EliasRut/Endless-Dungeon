@@ -43,6 +43,7 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     // tslint:disable-next-line:no-unused-expression
+    this.cameras.main.fadeIn(5000);
     this.mainCharacter =
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
@@ -164,9 +165,11 @@ export default class MainScene extends Phaser.Scene {
     });
 
     this.item.update(globalState.playerCharacter);
-
-    if(globalState.playerCharacter.health <= 0){
+    var test = 0;
+    if(globalState.playerCharacter.health <= 0 && test ===0){
+      this.cameras.main.fadeOut(3000);
       console.log("you died");
+      test = 1;
       return;
     }
 
