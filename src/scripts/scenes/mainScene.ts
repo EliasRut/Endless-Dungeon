@@ -179,7 +179,7 @@ export default class MainScene extends Phaser.Scene {
 
   update(globalTime, delta) {
     this.enemy.forEach(curEnemy => {
-      curEnemy.update(globalState.playerCharacter)
+      curEnemy.update(globalTime);
     });
 
     this.item.update(globalState.playerCharacter);
