@@ -3,6 +3,7 @@ import { getVelocitiesForFacing } from "../helpers/orientation";
 
 export default abstract class Character {
   private animationBase: string;
+  public maxHealth: number;
   public health: number;
   public damage: number;
   public movementSpeed: number;
@@ -24,6 +25,7 @@ export default abstract class Character {
       movementSpeed: number = 100
     ) {
     this.animationBase = animationBase;
+    this.maxHealth = health;
     this.health = health;
     this.damage = damage;
     this.movementSpeed = movementSpeed;

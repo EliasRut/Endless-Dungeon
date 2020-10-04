@@ -30,9 +30,19 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('ice', 'assets/img/ice_spike.png');
     this.load.image('snow', 'assets/img/snowflake.png');
 
+    // GUI
+    this.load.image('icon-backpack', 'assets/img/backpack-icon.png');
+    this.load.image('icon-hero', 'assets/img/hero-icon.png');
+    this.load.image('icon-guibase', 'assets/img/gui-base.png');
+    this.load.image('icon-healthbar', 'assets/img/gui-life.png');
+    this.load.spritesheet('icon-abilities', 'assets/img/abilities-sheet.png',
+      { frameWidth: 20, frameHeight: 20 });
+
     // Items
     this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
       { frameWidth: 16, frameHeight: 16 });
+
+    console.log(this.textures.list)
 
     // load test music
     this.load.audio('testSound', 'assets/sounds/testSound.MP3');

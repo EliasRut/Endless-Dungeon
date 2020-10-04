@@ -1,7 +1,7 @@
 import 'phaser'
 import PlayerCharacterToken from '../objects/playerCharacterToken';
 import { getUrlParam } from '../helpers/browserState'
-import { Room, Weapon } from '../../../typings/custom'
+import { Room} from '../../../typings/custom'
 import globalState from '../worldstate/index';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
 import FireBallEffect from '../objects/fireBallEffect';
@@ -10,7 +10,10 @@ import IceSpikeEffect from '../objects/iceSpikeEffect';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
 import EnemyToken from '../objects/enemyToken';
+import RangedEnemyToken from '../objects/rangedEnemyToken';
+import MeleeEnemyToken from '../objects/meleeEnemyToken';
 import ItemToken from '../objects/itemToken';
+import Weapon from '../objects/weapon';
 import OverlayScreen from '../screens/overlayScreen'
 import StatScreen from '../screens/statScreen';
 import InventoryScreen from '../screens/inventoryScreen'
@@ -33,13 +36,21 @@ export default class MainScene extends Phaser.Scene {
   effects: Map<string, FireBall>;
   tileLayer: any;
   enemy: EnemyToken[];
-  item: ItemToken;
+  weapon: Weapon[];
   sportLight: Phaser.GameObjects.Light;
-  overlayScreens: {[name: string]: OverlayScreen} = {};
+  overlayScreens: {
+    inventory: InventoryScreen;
+    statScreen: StatScreen;
+  };
   lastCameraPosition: {x: number, y: number};
   abilityEffects: AbilityEffect[] = [];
   abilities: AbilityEffect[];
   alive:number;
+  isPaused = false;
+  healthBar: Phaser.GameObjects.Image;
+  abilty1Icon: Phaser.GameObjects.Image;
+  abilty2Icon: Phaser.GameObjects.Image;
+  abilty3Icon: Phaser.GameObjects.Image;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -51,6 +62,7 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.fadeIn(1000);
 
     this.enemy = [];
+    this.weapon = [];
     const [startX, startY] = this.drawRoom()
 
     this.mainCharacter = new PlayerCharacterToken(this, startX, startY);
@@ -58,23 +70,47 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.mainCharacter, false);
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
-    this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
-    this.item.setDepth(1);
-
     this.keyboardHelper = new KeyboardHelper(this);
     this.soundKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
     this.soundKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
     this.drawOverlayScreens();
 
-    // Spawn item in location
-    // const sprite = this.physics.add.sprite(
-    //   (this.cameras.main.width / 2) + (roomSize[0] / 4),
-    //   (this.cameras.main.height / 2) + (roomSize[1] / 4),
-    //   'test-items-spritesheet', 34
-    // );
-    // this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
-
     this.sound.play('testSound', {volume: 0.08, loop: true});
+
+    // GUI
+    const backpackIcon = this.add.image(this.cameras.main.width - 32, 53, 'icon-backpack');
+    backpackIcon.setScrollFactor(0);
+    backpackIcon.setInteractive();
+    backpackIcon.on('pointerdown', () => {
+      if (this.isPaused) {
+        this.physics.resume();
+        this.time.paused = false;
+      } else {
+        this.physics.pause();
+        this.time.paused = true;
+      }
+      this.isPaused = !this.isPaused;
+      this.overlayScreens.inventory.toggleVisible();
+      this.overlayScreens.statScreen.toggleVisible();
+    });
+
+    const heroIcon = this.add.image(32, 40, 'icon-hero');
+    heroIcon.setScrollFactor(0);
+
+    const guiBaseIcon = this.add.image(116, 50, 'icon-guibase');
+    guiBaseIcon.setScrollFactor(0);
+
+    this.healthBar = this.add.image(62, 36, 'icon-healthbar');
+    this.healthBar.setScrollFactor(0);
+    this.healthBar.setOrigin(0, 0.5);
+
+    this.abilty1Icon = this.add.image(72, 63, 'icon-abilities', 0);
+    this.abilty1Icon.setScrollFactor(0);
+    this.abilty2Icon = this.add.image(101, 63, 'icon-abilities', 1);
+    this.abilty2Icon.setScrollFactor(0);
+    this.abilty3Icon = this.add.image(130, 63, 'icon-abilities', 2);
+    this.abilty3Icon.setScrollFactor(0);
+
   }
 
   collectItem(player, item) {
@@ -105,12 +141,23 @@ export default class MainScene extends Phaser.Scene {
     this.tileLayer.setDepth(0);
     let npcCounter = 0;
     npcs.forEach((npc) => {
-      this.enemy[npcCounter] = new EnemyToken(
-        this,
-        npc.x,
-        npc.y,
-        npc.id
-      );
+      switch(npc.id) {
+        case 'red-link': {
+          this.enemy[npcCounter] =
+                new MeleeEnemyToken( this, npc.x, npc.y, npc.id);
+          break;
+        }
+        case 'red-ball': {
+          this.enemy[npcCounter] =
+                new RangedEnemyToken( this, npc.x, npc.y, npc.id);
+          break;
+        }
+        default: {
+          console.log("Unknown enemy.")
+          break;
+        }
+      }
+
       this.enemy[npcCounter].setDepth(1);
       this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
       npcCounter++;
@@ -129,15 +176,17 @@ export default class MainScene extends Phaser.Scene {
   }
 
   drawOverlayScreens() {
-    this.overlayScreens.statScreen = new StatScreen(this);
-    this.overlayScreens.statScreen.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
-    this.add.existing(this.overlayScreens.statScreen);
-    this.overlayScreens.statScreen.setVisible(false);
+    const statScreen = new StatScreen(this);
+    this.add.existing(statScreen);
+    statScreen.setVisible(false);
 
-    this.overlayScreens.inventory = new InventoryScreen(this);
-    this.overlayScreens.inventory.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
-    this.add.existing(this.overlayScreens.inventory);
-    this.overlayScreens.inventory.setVisible(false);
+    const inventory = new InventoryScreen(this);
+    this.add.existing(inventory);
+    inventory.setVisible(false);
+    this.overlayScreens = {
+      statScreen,
+      inventory
+    };
   }
 
   triggerAbility(origin: Character, type: AbilityType) {
@@ -183,8 +232,9 @@ export default class MainScene extends Phaser.Scene {
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalTime);
     });
-
-    this.item.update(globalState.playerCharacter);
+    this.weapon.forEach(curWeapon => {
+      curWeapon.update(globalState.playerCharacter);
+    });
 
     if(globalState.playerCharacter.health <= 0 && this.alive ===0){
       this.cameras.main.fadeOut(3000);
@@ -245,5 +295,13 @@ export default class MainScene extends Phaser.Scene {
     if (this.soundKey2.isDown) {
       this.sound.stopAll();
     };
+    this.overlayScreens.statScreen.update();
+
+    const healthRatio = globalState.playerCharacter.health / globalState.playerCharacter.maxHealth;
+    this.healthBar.scaleX = healthRatio * 98;
+
+    const [cooldown1, cooldown2] = this.keyboardHelper.getAbilityCooldowns(globalTime);
+    this.abilty1Icon.setAlpha(cooldown1);
+    this.abilty2Icon.setAlpha(cooldown2);
   }
 }
