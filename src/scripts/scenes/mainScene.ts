@@ -32,9 +32,6 @@ export default class MainScene extends Phaser.Scene {
   soundKey2: Phaser.Input.Keyboard.Key;
   keyboardHelper: KeyboardHelper;
   effects: Map<string, FireBall>;
-  fireballEffect: FireBallEffect | undefined;
-  dustnovaEffect: DustNovaEffect | undefined;
-  icespikeEffect: IceSpikeEffect | undefined;
   tileLayer: any;
   enemy: EnemyToken[];
   item: ItemToken;
@@ -42,13 +39,17 @@ export default class MainScene extends Phaser.Scene {
   overlayScreens: {[name: string]: OverlayScreen} = {};
   lastCameraPosition: {x: number, y: number};
   abilityEffects: AbilityEffect[] = [];
+  abilities: AbilityEffect[];
+  alive:number;
 
   constructor() {
     super({ key: 'MainScene' })
   }
 
   create() {
+    this.alive = 0;
     // tslint:disable-next-line:no-unused-expression
+    this.cameras.main.fadeIn(5000);
     this.mainCharacter =
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
@@ -96,7 +97,7 @@ export default class MainScene extends Phaser.Scene {
     const roomOriginY = (this.cameras.main.height / 2) - roomHeight / 2;
     this.tileLayer = map.createStaticLayer(
       0,
-      tiles,
+      [tiles],
       roomOriginX,
       roomOriginY
     );
@@ -140,18 +141,20 @@ export default class MainScene extends Phaser.Scene {
       this.enemy[npcCounter].setDepth(1);
       this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
       npcCounter++;
-    })
+    });
 
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
-    // const debugGraphics = this.add.graphics().setAlpha(0.75);
-    // layer.renderDebug(debugGraphics, {
-    //   tileColor: null, // Color of non-colliding tiles
-    //   collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), 
-      // Color of colliding tiles
-    //   faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-    // });
     return [roomWidth, roomHeight]
+  }
+
+  renderDebugGraphics() {
+    const debugGraphics = this.add.graphics().setAlpha(0.75);
+    this.tileLayer.renderDebug(debugGraphics, {
+      tileColor: null, // Color of non-colliding tiles
+      collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255),
+      faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+    });
   }
 
   drawOverlayScreens() {
@@ -169,7 +172,7 @@ export default class MainScene extends Phaser.Scene {
   triggerAbility(origin: Character, type: AbilityType) {
     // throw all projectiles
     const projectileData = Abilities[type].projectileData;
-    const facingVelocities = getVelocitiesForFacing(origin.currentFacing)!;
+    const facingVelocities = origin.getFacingVelocities();
 
     for (let i = 0; i < (Abilities[type].projectiles || 0); i++) {
       const effect = new projectileData!.effect(
@@ -204,16 +207,18 @@ export default class MainScene extends Phaser.Scene {
       this.sound.play(Abilities[type].sound!, {volume: Abilities[type].sfxVolume!});
     }
   }
-
+  
   update(globalTime, delta) {
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalTime);
     });
 
     this.item.update(globalState.playerCharacter);
-
-    if(globalState.playerCharacter.health <= 0){
+    
+    if(globalState.playerCharacter.health <= 0 && this.alive ===0){
+      this.cameras.main.fadeOut(3000);
       console.log("you died");
+      this.alive = 1;
       return;
     }
 
@@ -231,10 +236,6 @@ export default class MainScene extends Phaser.Scene {
 
     globalState.playerCharacter.x = this.mainCharacter.x;
     globalState.playerCharacter.y = this.mainCharacter.y;
-
-    if (this.fireballEffect) {
-      this.fireballEffect.update();
-    }
 
     const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
     castAbilities.forEach((ability) => {

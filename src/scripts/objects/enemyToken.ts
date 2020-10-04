@@ -25,7 +25,7 @@ export default abstract class EnemyToken extends CharacterToken {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.stateObject = new Enemy(tokenName, 10, 10, 35);
-    //this.body.setCircle(10, 10, 12);
+    this.body.setCircle(10, 10, 12);
     this.tokenName = tokenName;
 
     // switch (tokenName) {
@@ -93,7 +93,6 @@ export default abstract class EnemyToken extends CharacterToken {
       //   if (this.proximity < distance
       //       && distance < this.stateObject.vision
       //       && this.attackedAt + 100 < time) {
-
       //     const totalDistance = Math.abs(px - this.x) + Math.abs(py - this.y);
       //     const xSpeed = (px - this.x) / totalDistance * this.stateObject.movementSpeed;
       //     const ySpeed = (py - this.y) / totalDistance * this.stateObject.movementSpeed;
