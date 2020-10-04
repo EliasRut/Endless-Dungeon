@@ -22,9 +22,7 @@ export default class MainScene extends Phaser.Scene {
   downKey: Phaser.Input.Keyboard.Key;
   leftKey: Phaser.Input.Keyboard.Key;
   rightKey: Phaser.Input.Keyboard.Key;
-<<<<<<< HEAD
   weapon: Weapon;
-=======
   abilityKey1: Phaser.Input.Keyboard.Key;
   abilityKey2: Phaser.Input.Keyboard.Key;
   effects: Map<string, FireBall>;
@@ -33,7 +31,6 @@ export default class MainScene extends Phaser.Scene {
   tileLayer: any;
   enemy: EnemyToken;
   item: ItemToken;
->>>>>>> main
 
   constructor() {
     super({ key: 'MainScene' })
@@ -47,10 +44,6 @@ export default class MainScene extends Phaser.Scene {
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
 
-<<<<<<< HEAD
-    // this.weapon = new Weapon(this, this.cameras.main.width / 2 +5, this.cameras.main.height / 2+5);
-    // this.weapon.setDepth(2);
-=======
     this.cameras.main.startFollow(this.mainCharacter, false);
 
     this.enemy = new EnemyToken(this, this.cameras.main.width/2+20, this.cameras.main.height /2+20);
@@ -59,7 +52,6 @@ export default class MainScene extends Phaser.Scene {
     this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
     this.item.setDepth(1);
 
->>>>>>> main
     // const fireball =
       // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
 
