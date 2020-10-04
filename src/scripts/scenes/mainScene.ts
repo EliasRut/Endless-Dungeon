@@ -73,8 +73,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   drawRoom() {
-    const roomId = getUrlParam('roomName') || 'room-firstTest';
-    const room = this.cache.json.get(roomId) as Room;
+    const roomId = getUrlParam('roomName') || 'firstTest';
+    const room = this.cache.json.get(`room-${roomId}`) as Room;
     const roomTileset = room.tileset;
 
     const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
