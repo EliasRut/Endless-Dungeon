@@ -9,7 +9,16 @@ export const TILE_HEIGHT = 16;
 
 const corridorSize = 7;
 
-const CORRIDOR_UP = [ 8,  9, 32, 32, 32,  7,  8,];
+const CORRIDOR_UP = [ -1,  6, 32, 32, 32,  4, -1];
+const CORRIDOR_UP_LEFT = [
+  [  8,  8,  8,  8,  8, 12, -1],
+  [ 15, 15, 22, 15, 15,  4, -1],
+  [ 18, 18, 25, 18, 18,  4, -1],
+  [ 32, 32, 32, 32, 32,  4, -1],
+  [ 32, 32, 32, 32, 32,  4, -1],
+  [  2,  3, 32, 32, 32,  4, -1],
+  [ -1,  6, 32, 32, 32,  4, -1],
+];
 
 export const generateDungeon: (scene: Phaser.Scene) => [
     Phaser.Tilemaps.StaticTilemapLayer,
@@ -34,7 +43,7 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
     NpcPositioning[],
     number,
     number,
-  ] = (scene) => {
+  ] | false = (scene) => {
   const tilesUsed: boolean[][] = [];
   let tries = 0;
 
@@ -50,7 +59,8 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
   const roomOffsets: [number, number][] = [];
   const tileSetCollections: {[name: string]: number[]} = {};
   const tileSetGid: {[name: string]: number} = {};
-  rooms.forEach((room, roomIndex) => {
+  for (let roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
+    const room = rooms[roomIndex];
     let overlaps = false;
     let roomXOffset;
     let roomYOffset;
@@ -91,7 +101,7 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
       tileSetGid[room.tileset] = Object.keys(tileSetGid).length * 1000;
     }
     tileSetCollections[room.tileset].push(roomIndex);
-  });
+  }
 
   const npcs: NpcPositioning[] = [];
   const combinedLayout: number[][] = [];
@@ -123,16 +133,31 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
     });
   });
 
-  // rooms.forEach((room, index) => {
-  //   if (room.openings) {
-  //     const [roomX, roomY] = roomOffsets[index];
-  //     room.openings!.forEach(([openingX, openingY, openingDirection]) => {
-  //       const actualX = roomX + openingX;
-  //       const actualY = roomY + openingY;
+  rooms.forEach((room, index) => {
+    if (room.openings) {
+      const [roomX, roomY] = roomOffsets[index];
+      room.openings!.forEach(([openingY, openingX, openingDirection]) => {
+        if (openingDirection !== 'top') {
+          return;
+        }
+        const actualX = roomX + openingX;
+        const actualY = roomY + openingY;
 
-  //     });
-  //   }
-  // })
+        // for (let y = -1; y > -4 && (y + actualY > 0); y--) {
+        //   for (let x = 0; x < CORRIDOR_UP.length; x++) {
+        //     combinedLayout[y + actualY][x + actualX] = CORRIDOR_UP[x];
+        //   }
+        // }
+        for (let y = -1; y >= CORRIDOR_UP_LEFT.length * -1; y--) {
+          for (let x = 0; x < CORRIDOR_UP_LEFT[0].length; x++) {
+            const corY = y + CORRIDOR_UP_LEFT.length;
+            combinedLayout[y + actualY][x + actualX] = CORRIDOR_UP_LEFT[corY][x];
+          }
+        }
+        // CORRIDOR_UP_LEFT
+      });
+    }
+  });
 
   const map = scene.make.tilemap({
     data: combinedLayout,
