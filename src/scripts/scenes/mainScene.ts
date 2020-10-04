@@ -57,20 +57,7 @@ export default class MainScene extends Phaser.Scene {
     this.keyboardHelper = new KeyboardHelper(this);
 
     const roomSize = this.drawRoom()
-<<<<<<< HEAD
-
-    this.overlayScreens.statScreen = new StatScreen(this);
-    this.overlayScreens.statScreen.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
-    this.add.existing(this.overlayScreens.statScreen);
-    this.overlayScreens.statScreen.setVisible(false);
-
-    this.overlayScreens.inventory = new InventoryScreen(this);
-    this.overlayScreens.inventory.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
-    this.add.existing(this.overlayScreens.inventory);
-    this.overlayScreens.inventory.setVisible(false);
-=======
     this.drawOverlayScreens();
->>>>>>> 6c70a63ef9345a9c2e9a1101388ca4715f210441
 
     // Spawn item in location
     const sprite = this.physics.add.sprite(
@@ -118,7 +105,7 @@ export default class MainScene extends Phaser.Scene {
       this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
       npcCounter++;
     })
-  
+
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
     // const debugGraphics = this.add.graphics().setAlpha(0.75);

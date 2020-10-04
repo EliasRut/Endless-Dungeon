@@ -34,10 +34,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
       { frameWidth: 16, frameHeight: 16 });
 
-<<<<<<< HEAD
     this.load.bitmapFont('pixelfont', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
 
-=======
     // Find out which files we need by going through all rendered rooms
     const requiredTilesets = new Set<string>();
     const requiredNpcs = new Set<string>();
@@ -59,7 +57,6 @@ export default class PreloadScene extends Phaser.Scene {
       { frameWidth: 40, frameHeight: 40 });
       this.neededAnimations.push(npc);
     })
->>>>>>> 6c70a63ef9345a9c2e9a1101388ca4715f210441
   }
 
   create() {
