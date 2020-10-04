@@ -30,3 +30,6 @@ export const facingToSpriteNameMap = {
   [Facings.WEST]: 'w',
   [Facings.SOUTH_WEST]: 'sw',
 };
+
+export const ANIMATION_IDLE = 'idle';
+export const ANIMATION_WALK = 'walk';

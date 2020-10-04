@@ -16,18 +16,13 @@ import ItemToken from '../objects/itemToken';
 import OverlayScreen from '../screens/overlayScreen'
 import StatScreen from '../screens/statScreen';
 import InventoryScreen from '../screens/inventoryScreen'
+import KeyboardHelper from '../helpers/keyboardHelper'
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
   fpsText: Phaser.GameObjects.Text;
   mainCharacter: PlayerCharacterToken;
-  upKey: Phaser.Input.Keyboard.Key;
-  downKey: Phaser.Input.Keyboard.Key;
-  leftKey: Phaser.Input.Keyboard.Key;
-  rightKey: Phaser.Input.Keyboard.Key;
-  abilityKey1: Phaser.Input.Keyboard.Key;
-  abilityKey2: Phaser.Input.Keyboard.Key;
-  abilityKey3: Phaser.Input.Keyboard.Key;
+  keyboardHelper: KeyboardHelper;
   effects: Map<string, FireBall>;
   fireballEffect: FireBallEffect | undefined;
   dustnovaEffect: DustNovaEffect | undefined;
@@ -41,8 +36,6 @@ export default class MainScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MainScene' })
   }
-
-  preload() {}
 
   create() {
     // tslint:disable-next-line:no-unused-expression
@@ -59,30 +52,12 @@ export default class MainScene extends Phaser.Scene {
     this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
     this.item.setDepth(1);
 
-    // const fireball =
-      // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
-
     this.fpsText = new FpsText(this);
 
-    this.upKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    this.downKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-    this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
-    this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-    this.abilityKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
-    this.abilityKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
-    this.abilityKey3 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
+    this.keyboardHelper = new KeyboardHelper(this);
 
     this.drawRoom();
-
-    this.overlayScreens.statScreen = new StatScreen(this);
-    this.overlayScreens.statScreen.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
-    this.add.existing(this.overlayScreens.statScreen);
-    // this.overlayScreens.statScreen.setVisible(false);
-
-    this.overlayScreens.inventory = new InventoryScreen(this);
-    this.overlayScreens.inventory.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
-    this.add.existing(this.overlayScreens.inventory);
-    this.overlayScreens.inventory.setVisible(false);
+    this.drawOverlayScreens();
   }
 
   drawRoom() {
@@ -114,54 +89,20 @@ export default class MainScene extends Phaser.Scene {
     // });
   }
 
-  
+  drawOverlayScreens() {
+    this.overlayScreens.statScreen = new StatScreen(this);
+    this.overlayScreens.statScreen.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
+    this.add.existing(this.overlayScreens.statScreen);
+    // this.overlayScreens.statScreen.setVisible(false);
 
-  // drawStatScreen() {
-
-    // this.add.group()
-    // const leftBorderX = 16 + this.cameras.main.x;
-    // const topBorderY = 80 + this.cameras.main.y;
-    // const screenWidth = 200;
-    // const screenHeight = 224;
-    // const tileSize = 64;
-    // const rightBorderX = leftBorderX + screenWidth - tileSize;
-    // const bottomBorderY = topBorderY + screenHeight - tileSize;
-    // const middlePieceX = leftBorderX + tileSize;
-    // const middlePieceY = topBorderY + tileSize;
-
-    // const topLeftCorner = this.add.image(leftBorderX, topBorderY, 'screen-background', 0);
-    // const topRightCorner = this.add.image(rightBorderX, topBorderY, 'screen-background', 2);
-    // const bottomLeftCorner = this.add.image(leftBorderX, bottomBorderY, 'screen-background', 6);
-    // const bottomRightCorner = this.add.image(rightBorderX, bottomBorderY, 'screen-background', 8);
-
-    // const topBorder = this.add.image(middlePieceX, topBorderY, 'screen-background', 1);
-    // const bottomBorder = this.add.image(middlePieceX, bottomBorderY, 'screen-background', 7);
-
-    // const leftBorder = this.add.image(leftBorderX, middlePieceY, 'screen-background', 3);
-    // const rightBorder = this.add.image(rightBorderX, middlePieceY, 'screen-background', 5);
-
-    // const centerPiece = this.add.image(middlePieceX, middlePieceY, 'screen-background', 4);
-
-    // const pieces = [
-    //   topLeftCorner,
-    //   topRightCorner,
-    //   bottomLeftCorner,
-    //   bottomRightCorner,
-    //   topBorder,
-    //   bottomBorder,
-    //   leftBorder,
-    //   rightBorder,
-    //   centerPiece,
-    // ];
-    // pieces.forEach((piece) => {
-    //   piece.setDepth(3);
-    // })
-  // }
+    this.overlayScreens.inventory = new InventoryScreen(this);
+    this.overlayScreens.inventory.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
+    this.add.existing(this.overlayScreens.inventory);
+    this.overlayScreens.inventory.setVisible(false);
+  }
 
   update() {
     this.fpsText.update();
-    const lastPlayerX = globalState.playerCharacter.x;
-    const lastPlayerY = globalState.playerCharacter.y;
 
     this.enemy.update(globalState.playerCharacter);
     this.item.update(globalState.playerCharacter);
@@ -170,48 +111,14 @@ export default class MainScene extends Phaser.Scene {
       console.log("you died");
       return;
     }
-    
-    let yFacing = 0;
-    let xFacing = 0;
 
-    const speed = globalState.playerCharacter.movementSpeed * globalState.playerCharacter.slowFactor;
-
-    if (this.upKey.isDown)
-    {
-      yFacing = -1;
-      globalState.playerCharacter.y--;
-    }
-    else if (this.downKey.isDown)
-    {
-      yFacing = 1;
-      globalState.playerCharacter.y++;
-    }
-
-    if (this.leftKey.isDown)
-    {
-      xFacing = -1;
-      globalState.playerCharacter.x--;
-    }
-    else if (this.rightKey.isDown)
-    {
-      xFacing = 1;
-      globalState.playerCharacter.x++;
-    }
-
-    if (yFacing !== 0 || xFacing !== 0) {
-      const lastFacing = globalState.playerCharacter.currentFacing;
-      const newFacing = getFacing(xFacing, yFacing);
-
-      if (lastFacing !== newFacing || globalState.playerCharacter.isWalking === false) {
-        const characterDirection = facingToSpriteNameMap[newFacing];
-        this.mainCharacter.play(`player-walk-${characterDirection}`);
-        globalState.playerCharacter.currentFacing = newFacing;
-        globalState.playerCharacter.isWalking = true;
-      }
-    } else /* No movement keys pressed */ {
-      const characterDirection = facingToSpriteNameMap[globalState.playerCharacter.currentFacing];
-      this.mainCharacter.play(`player-character-idle-${characterDirection}`);
-      globalState.playerCharacter.isWalking = false;
+    const speed = globalState.playerCharacter.getSpeed();
+    const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing();
+    const newFacing = getFacing(xFacing, yFacing);
+    const hasMoved = xFacing !== 0 || yFacing !== 0;
+    const playerAnimation = globalState.playerCharacter.updateMovingState(hasMoved, newFacing);
+    if (playerAnimation) {
+      this.mainCharacter.play(playerAnimation);
     }
 
     this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
@@ -224,7 +131,7 @@ export default class MainScene extends Phaser.Scene {
       this.fireballEffect.update();
     }
 
-    if (this.abilityKey1.isDown && !this.fireballEffect) {
+    if (this.keyboardHelper.abilityKey1.isDown && !this.fireballEffect) {
       const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
       this.fireballEffect = new FireBallEffect(
         this,
@@ -251,7 +158,7 @@ export default class MainScene extends Phaser.Scene {
       this.icespikeEffect.update();
     }
 
-    if (this.abilityKey2.isDown && !this.icespikeEffect) {
+    if (this.keyboardHelper.abilityKey2.isDown && !this.icespikeEffect) {
       const iceSpikeVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
       this.icespikeEffect = new IceSpikeEffect(
         this,
@@ -277,7 +184,7 @@ export default class MainScene extends Phaser.Scene {
       });
     }
 
-    if (this.abilityKey3.isDown && !this.dustnovaEffect) {
+    if (this.keyboardHelper.abilityKey3.isDown && !this.dustnovaEffect) {
       const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
       this.dustnovaEffect = new DustNovaEffect(
         this,
