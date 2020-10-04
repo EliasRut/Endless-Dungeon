@@ -23,6 +23,7 @@ import Character from '../worldstate/Character';
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import CharacterToken from '../objects/characterToken';
 import { Faction } from '../helpers/constants';
+import { DUNGEON_HEIGHT, DUNGEON_WIDTH, generateDungeon, TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -58,33 +59,21 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.alive = 0;
     // tslint:disable-next-line:no-unused-expression
-    this.cameras.main.fadeIn(500);
-    this.mainCharacter =
-      new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
-    this.mainCharacter.setDepth(1);
-
-    this.lastCameraPosition = {x: 0, y: 0};
-    this.cameras.main.startFollow(this.mainCharacter, false);
+    this.cameras.main.fadeIn(1000);
 
     this.enemy = [];
     this.weapon = [];
+    const [startX, startY] = this.drawRoom()
 
-    //this.item = new Weapon(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50,31);
-    //this.item.setDepth(1);
+    this.mainCharacter = new PlayerCharacterToken(this, startX, startY);
+    this.mainCharacter.setDepth(1);
+    this.cameras.main.startFollow(this.mainCharacter, false);
+    this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
     this.keyboardHelper = new KeyboardHelper(this);
     this.soundKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
     this.soundKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
-    const roomSize = this.drawRoom()
     this.drawOverlayScreens();
-
-    // Spawn item in location
-    // const sprite = this.physics.add.sprite(
-    //   (this.cameras.main.width / 2) + (roomSize[0] / 4),
-    //   (this.cameras.main.height / 2) + (roomSize[1] / 4),
-    //   'test-items-spritesheet', 34
-    // );
-    // this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
 
     this.sound.play('testSound', {volume: 0.08, loop: true});
 
@@ -129,63 +118,52 @@ export default class MainScene extends Phaser.Scene {
   }
 
   drawRoom() {
-    const roomId = getUrlParam('roomName') || 'firstTest';
-    const room = this.cache.json.get(`room-${roomId}`) as Room;
-    const roomTileset = room.tileset;
+    // const roomId = getUrlParam('roomName') || 'firstTest';
+    // const room = this.cache.json.get(`room-${roomId}`) as Room;
+    // const roomTileset = room.tileset;
 
-    const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
-    const tiles = map.addTilesetImage(`${roomTileset}-image`, roomTileset, 16, 16, 1, 2);
-    const roomHeight = tiles.tileHeight * room.layout.length;
-    const roomWidth = tiles.tileWidth * room.layout[0].length;
+    // const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
+    // const tiles = map.addTilesetImage(`${roomTileset}-image`, roomTileset, 16, 16, 1, 2);
+    // const roomHeight = tiles.tileHeight * room.layout.length;
+    // const roomWidth = tiles.tileWidth * room.layout[0].length;
 
-    const roomOriginX = (this.cameras.main.width / 2) - roomWidth / 2;
-    const roomOriginY = (this.cameras.main.height / 2) - roomHeight / 2;
-    this.tileLayer = map.createStaticLayer(
-      0,
-      [tiles],
-      roomOriginX,
-      roomOriginY
-    );
-    this.tileLayer.setCollisionBetween(0, 31, true);
-    this.tileLayer.setCollisionBetween(40, 71, true);
+    // const roomOriginX = (this.cameras.main.width / 2) - roomWidth / 2;
+    // const roomOriginY = (this.cameras.main.height / 2) - roomHeight / 2;
+
+    const [
+      tileLayer,
+      npcs,
+      playerStartX,
+      playerStartY
+    ] = generateDungeon(this);
+    this.tileLayer = tileLayer;
+
     this.tileLayer.setDepth(0);
     let npcCounter = 0;
-    room.npcs?.forEach((npc) => {
-      const xCoord = roomOriginX + npc.x * tiles.tileWidth;
-      const yCoord = roomOriginY + npc.y * tiles.tileHeight;
-
+    npcs.forEach((npc) => {
       switch(npc.id) {
         case 'red-link': {
           this.enemy[npcCounter] =
-                new MeleeEnemyToken( this, xCoord, yCoord, npc.id);
+                new MeleeEnemyToken( this, npc.x, npc.y, npc.id);
           break;
         }
         case 'red-ball': {
           this.enemy[npcCounter] =
-                new RangedEnemyToken( this, xCoord, yCoord, npc.id);
+                new RangedEnemyToken( this, npc.x, npc.y, npc.id);
           break;
         }
         default: {
           console.log("Unknown enemy.")
           break;
         }
-
       }
 
-      // this.enemy[npcCounter] = new EnemyToken(
-      //   this,
-      //   roomOriginX + npc.x * tiles.tileWidth,
-      //   roomOriginY + npc.y * tiles.tileHeight,
-      //   npc.id
-      // );
       this.enemy[npcCounter].setDepth(1);
       this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
       npcCounter++;
     });
 
-    this.physics.add.collider(this.mainCharacter, this.tileLayer);
-
-    return [roomWidth, roomHeight]
+    return [playerStartX, playerStartY];
   }
 
   renderDebugGraphics() {
@@ -249,7 +227,7 @@ export default class MainScene extends Phaser.Scene {
       this.sound.play(Abilities[type].sound!, {volume: Abilities[type].sfxVolume!});
     }
   }
-  
+
   update(globalTime, delta) {
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalTime);
@@ -262,6 +240,7 @@ export default class MainScene extends Phaser.Scene {
       this.cameras.main.fadeOut(3000);
       console.log("you died");
       this.alive = 1;
+      // this.scene.pause();
       return;
     }
 
@@ -312,11 +291,10 @@ export default class MainScene extends Phaser.Scene {
     //     this.enemy[0].health = this.enemy[0].health - globalState.playerCharacter.damage;
     //   });
     // }
-    
+
     if (this.soundKey2.isDown) {
       this.sound.stopAll();
     };
-
     this.overlayScreens.statScreen.update();
 
     const healthRatio = globalState.playerCharacter.health / globalState.playerCharacter.maxHealth;
@@ -325,6 +303,5 @@ export default class MainScene extends Phaser.Scene {
     const [cooldown1, cooldown2] = this.keyboardHelper.getAbilityCooldowns(globalTime);
     this.abilty1Icon.setAlpha(cooldown1);
     this.abilty2Icon.setAlpha(cooldown2);
-    // this.abilty3Icon.tint = 0xffffff * cooldown3;
   }
 }

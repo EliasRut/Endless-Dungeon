@@ -45,7 +45,7 @@ export default abstract class EnemyToken extends CharacterToken {
     const sc = scene;
     
     const rndItem = Math.floor(Math.random() * 63); // todo calculate from tileset
-    const length = sc.weapon.push(new Weapon(sc, this.x, this.y,rndItem));
+    const length = sc.weapon.push(new Weapon(sc, this.x, this.y, rndItem));
     sc.weapon[length-1].setDepth(1);
   }
 
