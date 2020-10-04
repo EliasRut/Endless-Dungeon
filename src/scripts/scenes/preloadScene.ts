@@ -21,30 +21,25 @@ export default class PreloadScene extends Phaser.Scene {
       { frameWidth: 40, frameHeight: 40 });
 
     // Overlay screens
-
     this.load.spritesheet('screen-background', 'assets/img/screen-background.png',
       { frameWidth: 64, frameHeight: 64 });
-
-    // Tiles
-    this.load.image('test-tileset', 'assets/img/til_Dungeon-extruded.png');
 
     // Ability effects
     this.load.image('fire', 'assets/img/muzzleflash3.png');
     this.load.image('ice', 'assets/img/ice_spike.png');
     this.load.image('snow', 'assets/img/snowflake.png');
 
+    // Items
+    this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
+      { frameWidth: 16, frameHeight: 16 });
+
+    // Tiles
+    this.load.image('test-tileset', 'assets/img/til-dungeon-extruded.png');
+
     // NPCs
     this.neededAnimations.push('red-link');
     this.load.spritesheet('red-link', 'assets/img/red-link.png',
     { frameWidth: 40, frameHeight: 40 });
-
-    // Rooms
-    const roomId = getUrlParam('roomName') || 'room-firstTest';
-    this.load.json(roomId, `assets/rooms/${roomId}.json`);
-
-    // Items
-    this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
-      { frameWidth: 16, frameHeight: 16 });
   }
 
   create() {
