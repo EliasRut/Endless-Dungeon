@@ -69,7 +69,7 @@ export default abstract class EnemyToken extends CharacterToken {
 
     //check death
     if (this.stateObject.health <= 0){
-
+        console.log("dying enemy")
         this.destroy();
         return;
     }
