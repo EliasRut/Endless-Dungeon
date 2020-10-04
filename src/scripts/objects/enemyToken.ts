@@ -41,8 +41,8 @@ export default class Enemy extends NPC {
         this.emitter.startFollow(this.body.gameObject);
         this.emitter.start();
         break;
-      case 9:
-        this.proximity = 70;
+      case 9:        
+        this.proximity = 100;
         break;
     }
   }
@@ -63,7 +63,7 @@ export default class Enemy extends NPC {
         //damages & slows you if you're close
         if (distance < 30) {
           player.slowFactor = 0.5;
-          player.health -= 0.0;
+          player.health -= 0.01;
         }
         else {
           player.slowFactor = 1;
@@ -90,9 +90,30 @@ export default class Enemy extends NPC {
           this.emitter.setSpeedY(0);
           this.play(`red-link-idle-${facingToSpriteNameMap[this.lastFacing]}`);
         }
-        if(distance < this.proximity)
-        this.attack(player, time, playerToken);
+        break;
+        case 9:
+          if (this.proximity < distance && distance < this.vision && this.attackedAt + 100 < time) {
+
+            const xSpeed = (px - this.x) / (Math.abs(px - this.x) + Math.abs(py - this.y)) * this.movementSpeed;
+            const ySpeed = (py - this.y) / (Math.abs(px - this.x) + Math.abs(py - this.y)) * this.movementSpeed;
+            this.setVelocityX(xSpeed);
+            this.setVelocityY(ySpeed);
+            const newFacing = getFacing(xSpeed, ySpeed);
+            if (newFacing !== this.lastFacing) {
+              this.play(`red-link-walk-${facingToSpriteNameMap[newFacing]}`);
+            }
+            this.lastFacing = newFacing;
+          }
+          else {
+            this.setVelocityX(0);
+            this.setVelocityY(0);
+            this.play(`red-link-idle-${facingToSpriteNameMap[this.lastFacing]}`);
+          }
+          break;
     }
+    if(distance < this.proximity)
+        this.attack(player, time, playerToken);
+
   }
 
   //destroy the enemy
@@ -116,6 +137,7 @@ export default class Enemy extends NPC {
         }
         break;
       case 9:
+        console.log("range attacker");
         if (this.attackedAt + 5000 < time) {
           this.setVelocityX(0);
           this.setVelocityY(0);
