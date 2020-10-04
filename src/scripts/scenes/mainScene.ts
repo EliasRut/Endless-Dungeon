@@ -128,6 +128,30 @@ export default class MainScene extends Phaser.Scene {
     this.overlayScreens.inventory.setVisible(false);
   }
 
+  triggerAbility() {
+    // if (this.keyboardHelper.abilityKey1.isDown && !this.fireballEffect) {
+    //   const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
+    //   this.fireballEffect = new FireBallEffect(
+    //     this,
+    //     this.mainCharacter.x + (16 * fireballVelocities.x),
+    //     this.mainCharacter.y + (16 * fireballVelocities.y)
+    //   );
+    //   this.fireballEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
+    //   this.fireballEffect.body.velocity.normalize().scale(300);
+
+    //   this.physics.add.collider(this.fireballEffect, this.tileLayer, (effect) => {
+    //     effect.destroy();
+    //     this.fireballEffect = undefined;
+    //   });
+    //   this.physics.add.collider(this.fireballEffect, this.enemy, (effect, target) => {
+    //     effect.destroy();
+    //     this.fireballEffect = undefined;
+    //     const enemy = target as EnemyToken;
+    //     enemy.health = enemy.health - globalState.playerCharacter.damage;
+    //   });
+    // }
+  }
+
   update(globalTime, delta) {
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalState.playerCharacter)
