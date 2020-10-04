@@ -18,7 +18,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
     this.load.image('phaser-logo', 'assets/img/phaser-logo.png');
 
-    this.load.image('test-tileset', 'assets/img/til-test-extruded.png');
+    this.load.image('test-tileset', 'assets/img/til_Dungeon-extruded.png');
 
     this.load.image('fire', 'assets/img/muzzleflash3.png');
     this.load.image('ice', 'assets/img/ice_spike.png');
