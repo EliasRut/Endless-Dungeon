@@ -7,7 +7,7 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite {
     public movementSpeed = 35;
     public id = 0;
     public proximity = 15;
-    public attacking = 0;
+    public attackedAt = 0;
 
     public currentFacing: Facings = Facings.SOUTH;
     public isWalking = false;

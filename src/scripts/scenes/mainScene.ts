@@ -186,10 +186,11 @@ export default class MainScene extends Phaser.Scene {
     // })
   // }
 
-  update() {
+  update(globalTime, delta) {
+    //console.log(`${globalTime} time has passed, ${delta} since last time.`);
     this.fpsText.update();
     this.enemy.forEach(curEnemy => {
-      curEnemy.update(globalState.playerCharacter)
+      curEnemy.update(globalState.playerCharacter, globalTime, this.mainCharacter)
     });
     // this.enemy[0].update(globalState.playerCharacter);
     const lastPlayerX = globalState.playerCharacter.x;

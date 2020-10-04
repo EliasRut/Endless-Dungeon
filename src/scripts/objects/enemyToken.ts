@@ -2,13 +2,19 @@ import { Game } from "phaser";
 import { Facings, facingToSpriteNameMap } from "../helpers/constants";
 import NPC from "../worldstate/NPC"
 import Player from "../worldstate/PlayerCharacter"
-import { getFacing } from '../helpers/orientation';
+import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
+import FireBallEffect from '../objects/fireBallEffect';
+import globalState from "../worldstate";
+import PlayerCharacterToken from '../objects/playerCharacterToken'
+import MainScene from "../scenes/mainScene";
 
 export default class Enemy extends NPC {
+  fireballEffect: FireBallEffect | undefined;
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
   lastFacing: Facings = Facings.SOUTH;
+  scene: MainScene;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, definerID: number) {
+  constructor(scene: MainScene, x: number, y: number, definerID: number) {
   super(scene, x, y, 'red-link');
   scene.add.existing(this);
   scene.physics.add.existing(this);
@@ -41,7 +47,7 @@ export default class Enemy extends NPC {
     }
   }
   //update from main Scene
-  public update(player: Player) {
+  public update(player: Player, time: number, playerToken: PlayerCharacterToken) {
     //check death
     if(this.health <= 0){
         this.destroy();
@@ -57,13 +63,13 @@ export default class Enemy extends NPC {
         //damages & slows you if you're close
         if (distance < 30) {
           player.slowFactor = 0.5;
-          player.health -= 0.1;
+          player.health -= 0.0;
         }
         else {
           player.slowFactor = 1;
         }
         //follows you only if you're close enough, then runs straight at you.
-        if (this.proximity < distance && distance < this.vision) {
+        if (this.proximity < distance && distance < this.vision && this.attackedAt + 100 < time) {
 
           const xSpeed = (px - this.x) / (Math.abs(px - this.x) + Math.abs(py - this.y)) * this.movementSpeed;
           const ySpeed = (py - this.y) / (Math.abs(px - this.x) + Math.abs(py - this.y)) * this.movementSpeed;
@@ -85,7 +91,7 @@ export default class Enemy extends NPC {
           this.play(`red-link-idle-${facingToSpriteNameMap[this.lastFacing]}`);
         }
         if(distance < this.proximity)
-        this.attack(player);
+        this.attack(player, time, playerToken);
     }
   }
 
@@ -98,7 +104,43 @@ export default class Enemy extends NPC {
   }
 
   //attack out hero
-  attack(player: Player){
-
+  attack(player: Player, time: number, playerToken: PlayerCharacterToken) {
+    switch (this.id) {
+      case 10:
+        if (this.attackedAt + 3000 < time) {
+          this.setVelocityX(0);
+          this.setVelocityY(0);
+          this.attackedAt = time;
+          player.health -= 5;
+          console.log("player health=", player.health);
+        }
+        break;
+      case 9:
+        if (this.attackedAt + 5000 < time) {
+          this.setVelocityX(0);
+          this.setVelocityY(0);
+          this.attackedAt = time;
+          const fireballVelocities = getVelocitiesForFacing(this.currentFacing)!;
+          this.fireballEffect = new FireBallEffect(
+            this.scene,
+            this.x + (16 * fireballVelocities.x),
+            this.y + (16 * fireballVelocities.y)
+          );
+          this.fireballEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
+          this.fireballEffect.body.velocity.normalize().scale(300);
+    
+          this.scene.physics.add.collider(this.fireballEffect, this.scene.tileLayer, (effect) => {
+            effect.destroy();
+            this.fireballEffect = undefined;
+          });
+          this.scene.physics.add.collider(this.fireballEffect, playerToken, (effect, target) => {
+            effect.destroy();
+            this.fireballEffect = undefined;
+            player.health -= 5;
+          console.log("enemy health=", this.health);
+        });
+        break;
+      }
+    }
   }
 }
