@@ -36,15 +36,6 @@ export default abstract class EnemyToken extends CharacterToken {
     return Math.sqrt((this.x - px)*(this.x - px) + (this.y - py)*(this.y - py));
   }
 
-  healthCheck() {
-    //check death
-    if (this.stateObject.health <= 0){
-        console.log("dying enemy")
-        this.destroy();
-        return;
-    }
-  }
-
   //update from main Scene
   public abstract update(time: number,);
 
