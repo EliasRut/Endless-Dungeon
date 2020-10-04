@@ -10,6 +10,7 @@
         "no-bitwise": true,
         "no-conditional-assignment": false,
         "no-consecutive-blank-lines": true,
+        "no-shadowed-variable": false,
         "no-console": {
             "severity": "warning",
             "options": ["debug", "info", "log", "time", "timeEnd", "trace"]

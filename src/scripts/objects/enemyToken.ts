@@ -13,15 +13,16 @@ export default class Enemy extends NPC {
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
   lastFacing: Facings = Facings.SOUTH;
   scene: MainScene;
+  tokenName: string;
 
-  constructor(scene: MainScene, x: number, y: number, definerID: number) {
-  super(scene, x, y, 'red-link');
+  constructor(scene: MainScene, x: number, y: number, tokenName: string) {
+  super(scene, x, y, tokenName);
   scene.add.existing(this);
   scene.physics.add.existing(this);
-  this.id= definerID;
+  this.tokenName = tokenName;
 
-    switch (this.id) {
-      case 10:
+    switch (tokenName) {
+      case 'red-link':
         //cool effects!
         const particles = scene.add.particles('fire');
         particles.setDepth(1);
@@ -41,7 +42,7 @@ export default class Enemy extends NPC {
         this.emitter.startFollow(this.body.gameObject);
         this.emitter.start();
         break;
-      case 9:
+      case 'red-ball':
         this.proximity = 100;
         break;
     }
@@ -58,8 +59,8 @@ export default class Enemy extends NPC {
     const py = player.y;
     const distance = Math.sqrt((this.x - px)*(this.x - px) + (this.y - py)*(this.y - py));
 
-    switch (this.id) {
-      case 10:
+    switch (this.tokenName) {
+      case 'red-link':
         //damages & slows you if you're close
         if (distance < 30) {
           player.slowFactor = 0.5;
@@ -91,7 +92,7 @@ export default class Enemy extends NPC {
           this.play(`red-link-idle-${facingToSpriteNameMap[this.lastFacing]}`);
         }
         break;
-        case 9:
+        case 'red-ball':
           const xSpeed = (px - this.x) / (Math.abs(px - this.x) + Math.abs(py - this.y)) * this.movementSpeed;
           const ySpeed = (py - this.y) / (Math.abs(px - this.x) + Math.abs(py - this.y)) * this.movementSpeed;          
           const newFacing = getFacing(xSpeed, ySpeed);
@@ -117,7 +118,7 @@ export default class Enemy extends NPC {
 
   //destroy the enemy
   destroy() {
-    if (this.id === 10) {
+    if (this.tokenName === 'red-link') {
       this.emitter.stopFollow();
       this.emitter.stop();
     }
@@ -126,8 +127,8 @@ export default class Enemy extends NPC {
 
   //attack out hero
   attack(player: Player, time: number, playerToken: PlayerCharacterToken) {
-    switch (this.id) {
-      case 10:
+    switch (this.tokenName) {
+      case 'red-link':
         if (this.attackedAt + 3000 < time) {
           this.setVelocityX(0);
           this.setVelocityY(0);
@@ -136,7 +137,7 @@ export default class Enemy extends NPC {
           console.log("player health=", player.health);
         }
         break;
-      case 9:
+      case 'red-ball':
         console.log("range attacker");
         if (this.attackedAt + 5000 < time) {
           this.setVelocityX(0);

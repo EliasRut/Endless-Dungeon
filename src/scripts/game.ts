@@ -1,6 +1,7 @@
 import 'phaser'
 import MainScene from './scenes/mainScene'
 import PreloadScene from './scenes/preloadScene'
+import RoomLoaderScene from './scenes/roomLoader'
 
 const DEFAULT_WIDTH = 640
 const DEFAULT_HEIGHT = 360
@@ -17,7 +18,7 @@ const config: Phaser.Types.Core.GameConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT
   },
-  scene: [PreloadScene, MainScene],
+  scene: [RoomLoaderScene, PreloadScene, MainScene],
   // We are using Phasers arcade physics library
   physics: {
     default: 'arcade',
