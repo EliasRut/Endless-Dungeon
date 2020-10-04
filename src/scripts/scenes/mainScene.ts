@@ -36,11 +36,15 @@ export default class MainScene extends Phaser.Scene {
   enemy: EnemyToken[];
   item: ItemToken;
   sportLight: Phaser.GameObjects.Light;
-  overlayScreens: {[name: string]: OverlayScreen} = {};
+  overlayScreens: {
+    inventory: InventoryScreen;
+    statScreen: StatScreen;
+  };
   lastCameraPosition: {x: number, y: number};
   abilityEffects: AbilityEffect[] = [];
   abilities: AbilityEffect[];
   alive:number;
+  isPaused = false;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -77,6 +81,24 @@ export default class MainScene extends Phaser.Scene {
     // this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
 
     this.sound.play('testSound', {volume: 0.08, loop: true});
+
+    const backpackIcon = this.add.image(this.cameras.main.width - 32, 32, 'icon-backpack');
+    backpackIcon.setScrollFactor(0);
+    backpackIcon.setInteractive();
+    backpackIcon.on('pointerdown', () => {
+      if (this.isPaused) {
+        this.physics.resume();
+        this.time.paused = false;
+      } else {
+        this.physics.pause();
+        this.time.paused = true;
+      }
+      this.isPaused = !this.isPaused;
+      this.overlayScreens.inventory.toggleVisible();
+      this.overlayScreens.statScreen.toggleVisible();
+    });
+
+
   }
 
   collectItem(player, item) {
@@ -153,15 +175,17 @@ export default class MainScene extends Phaser.Scene {
   }
 
   drawOverlayScreens() {
-    this.overlayScreens.statScreen = new StatScreen(this);
-    this.overlayScreens.statScreen.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
-    this.add.existing(this.overlayScreens.statScreen);
-    this.overlayScreens.statScreen.setVisible(false);
+    const statScreen = new StatScreen(this);
+    this.add.existing(statScreen);
+    statScreen.setVisible(false);
 
-    this.overlayScreens.inventory = new InventoryScreen(this);
-    this.overlayScreens.inventory.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
-    this.add.existing(this.overlayScreens.inventory);
-    this.overlayScreens.inventory.setVisible(false);
+    const inventory = new InventoryScreen(this);
+    this.add.existing(inventory);
+    inventory.setVisible(false);
+    this.overlayScreens = {
+      statScreen,
+      inventory
+    };
   }
 
   triggerAbility(origin: Character, type: AbilityType) {
@@ -268,16 +292,7 @@ export default class MainScene extends Phaser.Scene {
     if (this.soundKey2.isDown) {
       this.sound.stopAll();
     };
-    
-    Object.values(this.overlayScreens).forEach((screen) => {
-      if (screen) {
-        screen.incXY(
-          globalState.playerCharacter.x - this.lastCameraPosition.x,
-          globalState.playerCharacter.y - this.lastCameraPosition.y
-        );
-      }
-    })
 
-    this.lastCameraPosition = {x: globalState.playerCharacter.x, y: globalState.playerCharacter.y};
+    this.overlayScreens.statScreen.update();
   }
 }
