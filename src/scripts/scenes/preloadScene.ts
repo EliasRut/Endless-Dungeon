@@ -21,6 +21,7 @@ export default class PreloadScene extends Phaser.Scene {
       { frameWidth: 40, frameHeight: 40 });
 
     // Overlay screens
+
     this.load.spritesheet('screen-background', 'assets/img/screen-background.png',
       { frameWidth: 64, frameHeight: 64 });
 
@@ -40,6 +41,10 @@ export default class PreloadScene extends Phaser.Scene {
     // Rooms
     const roomId = getUrlParam('roomName') || 'room-firstTest';
     this.load.json(roomId, `assets/rooms/${roomId}.json`);
+
+    // Items
+    this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
+      { frameWidth: 16, frameHeight: 16 });
   }
 
   create() {
