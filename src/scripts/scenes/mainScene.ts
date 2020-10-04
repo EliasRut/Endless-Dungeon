@@ -6,12 +6,13 @@ import { Room } from '../../../typings/custom'
 import globalState from '../worldstate/index';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
 import FireBallEffect from '../objects/fireBallEffect';
-import IceNovaEffect from '../objects/iceSpikeEffect';
-// import IceNovaEffect from '../objects/iceNovaEffect';
+// import IceNovaEffect from '../objects/iceSpikeEffect';
+import IceNovaEffect from '../objects/iceNovaEffect';
 import { facingToSpriteNameMap } from '../helpers/constants';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
 import EnemyToken from '../objects/enemyToken';
+import ItemToken from '../objects/itemToken';
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -28,6 +29,7 @@ export default class MainScene extends Phaser.Scene {
   icenovaEffect: IceNovaEffect | undefined;
   tileLayer: any;
   enemy: EnemyToken;
+  item: ItemToken;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -45,6 +47,9 @@ export default class MainScene extends Phaser.Scene {
 
     this.enemy = new EnemyToken(this, this.cameras.main.width/2+20, this.cameras.main.height /2+20);
     this.enemy.setDepth(1);
+
+    this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
+    this.item.setDepth(1);
 
     // const fireball =
       // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
@@ -92,11 +97,18 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     this.fpsText.update();
-    this.enemy.update(globalState.playerCharacter.x, globalState.playerCharacter.y);
+    this.enemy.update(globalState.playerCharacter);
+    this.item.update(globalState.playerCharacter);
+
+    if(globalState.playerCharacter.health <= 0){
+      console.log("you died");
+      return;
+    }
+    
     let yFacing = 0;
     let xFacing = 0;
 
-    const speed = 100;
+    const speed = globalState.playerCharacter.movementSpeed * globalState.playerCharacter.slowFactor;
 
     if (this.upKey.isDown)
     {
@@ -163,7 +175,9 @@ export default class MainScene extends Phaser.Scene {
       this.physics.add.collider(this.fireballEffect, this.enemy, (effect, enemy) => {
         effect.destroy();
         this.fireballEffect = undefined;
-        this.enemy.health = this.enemy.health - 3;
+        this.enemy.health = this.enemy.health - globalState.playerCharacter.damage;
+        console.log("damage dome =" ,globalState.playerCharacter.damage);
+        console.log("life remaining =" ,this.enemy.health);
       });
     }
 
@@ -176,7 +190,8 @@ export default class MainScene extends Phaser.Scene {
       this.icenovaEffect = new IceNovaEffect(
         this,
         this.mainCharacter.x + (16 * iceNovaVelocities.x),
-        this.mainCharacter.y + (16 * iceNovaVelocities.y)
+        this.mainCharacter.y + (16 * iceNovaVelocities.y),
+        globalState.playerCharacter.currentFacing
       );
       this.icenovaEffect.setVelocity(iceNovaVelocities.x, iceNovaVelocities.y);
       this.icenovaEffect.body.velocity.normalize().scale(300);
