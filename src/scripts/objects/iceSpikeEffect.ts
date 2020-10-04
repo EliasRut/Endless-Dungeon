@@ -14,9 +14,9 @@ export default class IceSpikeEffect extends AbilityEffect {
       scene.add.existing(this);
       this.setDepth(1);
       scene.physics.add.existing(this);
-      this.body.setCircle(3, 0, 0);
+      this.body.setCircle(14, 0, 6);
       this.body.setMass(1);
-  
+
       const facingVectors = getVelocitiesForFacing(facing);
 
       const snowParticles = scene.add.particles('snow');

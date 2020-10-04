@@ -30,9 +30,6 @@ export default class MainScene extends Phaser.Scene {
   soundKey2: Phaser.Input.Keyboard.Key;
   keyboardHelper: KeyboardHelper;
   effects: Map<string, FireBall>;
-  fireballEffect: FireBallEffect | undefined;
-  dustnovaEffect: DustNovaEffect | undefined;
-  icespikeEffect: IceSpikeEffect | undefined;
   tileLayer: any;
   enemy: EnemyToken[];
   item: ItemToken;
@@ -116,14 +113,16 @@ export default class MainScene extends Phaser.Scene {
 
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
-    // const debugGraphics = this.add.graphics().setAlpha(0.75);
-    // layer.renderDebug(debugGraphics, {
-    //   tileColor: null, // Color of non-colliding tiles
-    //   collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), 
-      // Color of colliding tiles
-    //   faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-    // });
     return [roomWidth, roomHeight]
+  }
+
+  renderDebugGraphics() {
+    const debugGraphics = this.add.graphics().setAlpha(0.75);
+    this.tileLayer.renderDebug(debugGraphics, {
+      tileColor: null, // Color of non-colliding tiles
+      collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255),
+      faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+    });
   }
 
   drawOverlayScreens() {
@@ -203,10 +202,6 @@ export default class MainScene extends Phaser.Scene {
 
     globalState.playerCharacter.x = this.mainCharacter.x;
     globalState.playerCharacter.y = this.mainCharacter.y;
-
-    if (this.fireballEffect) {
-      this.fireballEffect.update();
-    }
 
     const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
     castAbilities.forEach((ability) => {

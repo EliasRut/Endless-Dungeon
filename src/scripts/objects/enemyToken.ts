@@ -24,7 +24,7 @@ export default class EnemyToken extends CharacterToken {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.stateObject = new Enemy(tokenName, 10, 10, 35);
-    //this.body.setCircle(10, 10, 12);
+    this.body.setCircle(10, 10, 12);
     this.tokenName = tokenName;
 
     switch (tokenName) {
