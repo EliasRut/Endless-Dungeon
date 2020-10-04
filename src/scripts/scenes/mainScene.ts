@@ -1,6 +1,5 @@
 import 'phaser'
-import PlayerCharacterToken from '../objects/playerCharacterToken'
-import FpsText from '../objects/fpsText'
+import PlayerCharacterToken from '../objects/playerCharacterToken';
 import { getUrlParam } from '../helpers/browserState'
 import { Room, Weapon } from '../../../typings/custom'
 import globalState from '../worldstate/index';
@@ -8,7 +7,6 @@ import PlayerCharacter from '../worldstate/PlayerCharacter';
 import FireBallEffect from '../objects/fireBallEffect';
 import DustNovaEffect from '../objects/dustNovaEffect';
 import IceSpikeEffect from '../objects/iceSpikeEffect';
-import { facingToSpriteNameMap } from '../helpers/constants';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
 import EnemyToken from '../objects/enemyToken';
@@ -51,8 +49,6 @@ export default class MainScene extends Phaser.Scene {
 
     this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
     this.item.setDepth(1);
-
-    this.fpsText = new FpsText(this);
 
     this.keyboardHelper = new KeyboardHelper(this);
 
@@ -131,9 +127,6 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update(globalTime, delta) {
-    console.log(`${globalTime} time has passed, ${delta} since last time.`);
-    this.fpsText.update();
-
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalState.playerCharacter)
     });
