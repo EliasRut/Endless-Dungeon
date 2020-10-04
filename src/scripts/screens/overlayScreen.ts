@@ -25,6 +25,7 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
     const bottomRightCorner =
       new Phaser.GameObjects.Image(scene, rightBorderX, bottomBorderY, 'screen-background', 8);
 
+
     const topBorder =
       new Phaser.GameObjects.Image(scene, middlePieceX, topBorderY, 'screen-background', 1);
     topBorder.scaleX = xStretchFactor;
@@ -55,7 +56,10 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
       rightBorder,
       centerPiece,
     ];
-    pieces.forEach((piece) => piece.setDepth(3));
+    pieces.forEach((piece) => {
+      piece.setDepth(3);
+      piece.setScrollFactor(0);
+    });
     this.addMultiple(pieces, true);
   }
   
