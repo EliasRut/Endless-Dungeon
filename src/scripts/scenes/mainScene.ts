@@ -26,11 +26,8 @@ export default class MainScene extends Phaser.Scene {
   fireballEffect: FireBallEffect | undefined;
   tileLayer: any;
   enemy: EnemyToken;
-<<<<<<< HEAD
   item: ItemToken;
-=======
   sportLight: Phaser.GameObjects.Light;
->>>>>>> 42f8cf088daed3b015fc434a6a07f9431fe9d127
 
   constructor() {
     super({ key: 'MainScene' })
@@ -49,11 +46,8 @@ export default class MainScene extends Phaser.Scene {
     this.enemy = new EnemyToken(this, this.cameras.main.width/2+20, this.cameras.main.height /2+20);
     this.enemy.setDepth(1);
 
-<<<<<<< HEAD
     this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
     this.item.setDepth(1);
-=======
->>>>>>> 42f8cf088daed3b015fc434a6a07f9431fe9d127
     // const fireball =
       // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
 
