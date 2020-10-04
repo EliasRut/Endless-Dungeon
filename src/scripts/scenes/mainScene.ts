@@ -36,12 +36,14 @@ export default class MainScene extends Phaser.Scene {
   overlayScreens: {[name: string]: OverlayScreen} = {};
   lastCameraPosition: {x: number, y: number};
   abilities: AbilityEffect[];
+  alive:number;
 
   constructor() {
     super({ key: 'MainScene' })
   }
 
   create() {
+    this.alive = 0;
     // tslint:disable-next-line:no-unused-expression
     this.cameras.main.fadeIn(5000);
     this.mainCharacter =
@@ -158,18 +160,18 @@ export default class MainScene extends Phaser.Scene {
     //   });
     // }
   }
-
+  
   update(globalTime, delta) {
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalState.playerCharacter, globalTime, this.mainCharacter)
     });
 
     this.item.update(globalState.playerCharacter);
-    var test = 0;
-    if(globalState.playerCharacter.health <= 0 && test ===0){
+    
+    if(globalState.playerCharacter.health <= 0 && this.alive ===0){
       this.cameras.main.fadeOut(3000);
       console.log("you died");
-      test = 1;
+      this.alive = 1;
       return;
     }
 
