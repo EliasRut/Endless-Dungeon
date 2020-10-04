@@ -31,7 +31,7 @@ export default class IceNovaEffect extends Phaser.Physics.Arcade.Image {
         rotate: { min: -180, max: 180 },
         lifespan: { min: 700, max: 900 },
         frequency: 10,
-        blendMode: Phaser.BlendModes.ADD,
+        // blendMode: Phaser.BlendModes.ADD,
         maxParticles: 200,
         x: -8 * facingVectors.x,
         y: -8 * facingVectors.y

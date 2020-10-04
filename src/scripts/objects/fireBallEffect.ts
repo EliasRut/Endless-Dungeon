@@ -20,7 +20,7 @@ export default class FireBallEffect extends Phaser.Physics.Arcade.Image {
       // angle: { min: -85, max: -95 },
       rotate: { min: -180, max: 180 },
       lifespan: { min: 400, max: 600 },
-      blendMode: Phaser.BlendModes.ADD,
+      // blendMode: Phaser.BlendModes.ADD,
       frequency: 30,
       maxParticles: 200,
     });
