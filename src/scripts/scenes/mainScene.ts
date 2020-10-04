@@ -10,6 +10,8 @@ import IceSpikeEffect from '../objects/iceSpikeEffect';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import FireBall from '../abilities/fireBall'
 import EnemyToken from '../objects/enemyToken';
+import RangedEnemyToken from '../objects/rangedEnemyToken';
+import MeleeEnemyToken from '../objects/meleeEnemyToken';
 import ItemToken from '../objects/itemToken';
 import OverlayScreen from '../screens/overlayScreen'
 import StatScreen from '../screens/statScreen';
@@ -103,12 +105,38 @@ export default class MainScene extends Phaser.Scene {
     this.tileLayer.setDepth(0);
     let npcCounter = 0;
     room.npcs?.forEach((npc) => {
-      this.enemy[npcCounter] = new EnemyToken(
-        this,
-        roomOriginX + npc.x * tiles.tileWidth,
-        roomOriginY + npc.y * tiles.tileHeight,
-        npc.id
-      );
+      const xCoord = roomOriginX + npc.x * tiles.tileWidth;
+      const yCoord = roomOriginY + npc.y * tiles.tileHeight;
+
+      switch(npc.id) {
+        case 'red-link': {
+          this.enemy[npcCounter] = new MeleeEnemyToken(
+            this,
+            xCoord,
+            yCoord,
+            npc.id
+          );
+        }
+        case 'red-ball': {
+          this.enemy[npcCounter] = new RangedEnemyToken(
+            this,
+            xCoord,
+            yCoord,
+            npc.id
+          );
+        }
+        default: {
+          break;
+        }
+
+      }
+
+      // this.enemy[npcCounter] = new EnemyToken(
+      //   this,
+      //   roomOriginX + npc.x * tiles.tileWidth,
+      //   roomOriginY + npc.y * tiles.tileHeight,
+      //   npc.id
+      // );
       this.enemy[npcCounter].setDepth(1);
       this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
       npcCounter++;
