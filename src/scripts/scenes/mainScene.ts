@@ -321,9 +321,9 @@ export default class MainScene extends Phaser.Scene {
     }
 
     if (this.soundKey1.isDown) {
-      this.sound.play('testSound', {volume: 0.5});
+      this.sound.play('testSound', {volume: 0.4, loop: true});
     };
-
+    
     if (this.soundKey2.isDown) {
       this.sound.stopAll();
     };
@@ -337,7 +337,6 @@ export default class MainScene extends Phaser.Scene {
       }
     })
 
-   }
     this.lastCameraPosition = {x: globalState.playerCharacter.x, y: globalState.playerCharacter.y};
   }
 }
