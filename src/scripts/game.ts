@@ -8,7 +8,7 @@ const DEFAULT_HEIGHT = 360
 // This is the configuration for Phaser
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  backgroundColor: '#1a1a1a',
+  backgroundColor: '#020202',
   scale: {
     parent: 'phaser-game',
     mode: Phaser.Scale.FIT,
@@ -24,6 +24,11 @@ const config: Phaser.Types.Core.GameConfig = {
     arcade: {
       debug: false,
     }
+  },
+  render: {
+    antialias: false,
+    pixelArt: true,
+    roundPixels: false
   }
 }
 
