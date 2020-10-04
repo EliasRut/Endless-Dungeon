@@ -21,6 +21,7 @@ export default class RoomLoaderScene extends Phaser.Scene {
     } else {
       this.usedRooms.push('firstTest');
       this.usedRooms.push('secondTest');
+      this.usedRooms.push('startRoom');
     }
 
     this.usedRooms.forEach((roomId) => {
