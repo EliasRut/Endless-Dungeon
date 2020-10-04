@@ -5,7 +5,7 @@ import globalState from "../worldstate";
 import Enemy from "../worldstate/Enemy";
 import EnemyToken from "./enemyToken";
 
-export default class MeleeEnemyToken extends EnemyToken {
+export default class RangedEnemyToken extends EnemyToken {
 
   constructor(scene: MainScene, x: number, y: number, tokenName: string) {
     super(scene,x,y,tokenName);

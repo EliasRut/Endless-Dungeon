@@ -1,6 +1,9 @@
 import { Game } from "phaser";
 import { Facings, facingToSpriteNameMap } from "../helpers/constants";
+<<<<<<< HEAD
 // import NPC from "../worldstate/NPC"
+=======
+>>>>>>> 553083d0c67dc75c7f1e46d5dde16dad7d998179
 import Player from "../worldstate/PlayerCharacter"
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import CharacterToken from './characterToken';
@@ -11,7 +14,7 @@ import PlayerCharacterToken from '../objects/playerCharacterToken'
 import MainScene from "../scenes/mainScene";
 import { AbilityType } from "../abilities/abilityData";
 import PlayerCharacter from "../worldstate/PlayerCharacter";
-import ItemToken from "./itemToken";
+import Weapon from "./weapon";
 
 export default abstract class EnemyToken extends CharacterToken {
   fireballEffect: FireBallEffect | undefined;
@@ -46,8 +49,8 @@ export default abstract class EnemyToken extends CharacterToken {
     const sc = scene;
     
     const rndItem = Math.floor(Math.random() * 63); // todo calculate from tileset
-    sc.item = new ItemToken(sc, this.x, this.y,rndItem);
-    sc.item.setDepth(1);
+    const length = sc.weapon.push(new Weapon(sc, this.x, this.y,rndItem));
+    sc.weapon[length-1].setDepth(1);
   }
 
   //update from main Scene

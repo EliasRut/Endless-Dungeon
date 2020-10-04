@@ -1,7 +1,7 @@
 import 'phaser'
 import PlayerCharacterToken from '../objects/playerCharacterToken';
 import { getUrlParam } from '../helpers/browserState'
-import { Room, Weapon } from '../../../typings/custom'
+import { Room} from '../../../typings/custom'
 import globalState from '../worldstate/index';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
 import FireBallEffect from '../objects/fireBallEffect';
@@ -13,6 +13,7 @@ import EnemyToken from '../objects/enemyToken';
 import RangedEnemyToken from '../objects/rangedEnemyToken';
 import MeleeEnemyToken from '../objects/meleeEnemyToken';
 import ItemToken from '../objects/itemToken';
+import Weapon from '../objects/weapon';
 import OverlayScreen from '../screens/overlayScreen'
 import StatScreen from '../screens/statScreen';
 import InventoryScreen from '../screens/inventoryScreen'
@@ -34,7 +35,7 @@ export default class MainScene extends Phaser.Scene {
   effects: Map<string, FireBall>;
   tileLayer: any;
   enemy: EnemyToken[];
-  item: ItemToken;
+  weapon: Weapon[];
   sportLight: Phaser.GameObjects.Light;
   overlayScreens: {
     inventory: InventoryScreen;
@@ -66,9 +67,10 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.mainCharacter, false);
 
     this.enemy = [];
+    this.weapon = [];
 
-    this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50,39);
-    this.item.setDepth(1);
+    //this.item = new Weapon(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50,31);
+    //this.item.setDepth(1);
 
     this.keyboardHelper = new KeyboardHelper(this);
     this.soundKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
@@ -252,9 +254,10 @@ export default class MainScene extends Phaser.Scene {
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalTime);
     });
+    this.weapon.forEach(curWeapon => {
+      curWeapon.update(globalState.playerCharacter);
+    });
 
-    this.item.update(globalState.playerCharacter);
-    
     if(globalState.playerCharacter.health <= 0 && this.alive ===0){
       this.cameras.main.fadeOut(3000);
       console.log("you died");
