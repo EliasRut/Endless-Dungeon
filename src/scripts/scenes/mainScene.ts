@@ -28,7 +28,7 @@ export default class MainScene extends Phaser.Scene {
   fireballEffect: FireBallEffect | undefined;
   icenovaEffect: IceNovaEffect | undefined;
   tileLayer: any;
-  enemy: EnemyToken;
+  enemy: EnemyToken[];
   item: ItemToken;
   sportLight: Phaser.GameObjects.Light;
 
@@ -46,8 +46,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.cameras.main.startFollow(this.mainCharacter, false);
 
-    this.enemy = new EnemyToken(this, this.cameras.main.width/2+20, this.cameras.main.height /2+20);
-    this.enemy.setDepth(1);
+    this.enemy = [];
 
     this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
     this.item.setDepth(1);
@@ -75,17 +74,29 @@ export default class MainScene extends Phaser.Scene {
     const tiles = map.addTilesetImage('test-tileset-image', 'test-tileset', 16, 16, 1, 2);
     const roomHeight = tiles.tileHeight * room.layout.length;
     const roomWidth = tiles.tileWidth * room.layout[0].length;
+
+    const roomOriginX = (this.cameras.main.width / 2) - roomWidth / 2;
+    const roomOriginY = (this.cameras.main.height / 2) - roomHeight / 2;
     this.tileLayer = map.createStaticLayer(
       0,
       tiles,
-      (this.cameras.main.width / 2) - roomWidth / 2,
-      (this.cameras.main.height / 2) - roomHeight / 2
+      roomOriginX,
+      roomOriginY
     );
     this.tileLayer.setCollisionBetween(0, 31, true);
     this.tileLayer.setDepth(0);
-
+    let npcCounter = 0;
+    for (let y = 0; y < room.npcs.length; y++) {
+      for (let x = 0; x < room.npcs[0].length; x++) {
+        if (room.npcs[y][x] !== 0) {
+          this.enemy[npcCounter]=new EnemyToken(this,roomOriginX+x*tiles.tileWidth,roomOriginY+y*tiles.tileHeight, room.npcs[y][x]);
+          this.enemy[npcCounter].setDepth(1);
+          this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
+          npcCounter++;
+        }
+      }
+    }
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
-    this.physics.add.collider(this.enemy, this.tileLayer);
 
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
     // layer.renderDebug(debugGraphics, {
@@ -98,7 +109,10 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     this.fpsText.update();
-    this.enemy.update(globalState.playerCharacter);
+    this.enemy.forEach(curEnemy => {
+      curEnemy.update(globalState.playerCharacter)
+    });
+    // this.enemy[0].update(globalState.playerCharacter);
     this.item.update(globalState.playerCharacter);
 
     if(globalState.playerCharacter.health <= 0){
@@ -109,7 +123,7 @@ export default class MainScene extends Phaser.Scene {
     let yFacing = 0;
     let xFacing = 0;
 
-    const speed = globalState.playerCharacter.movementSpeed * globalState.playerCharacter.slowFactor;
+    const speed = globalState.playerCharacter.movementSpeed*globalState.playerCharacter.slowFactor;
 
     if (this.upKey.isDown)
     {
@@ -176,9 +190,7 @@ export default class MainScene extends Phaser.Scene {
       this.physics.add.collider(this.fireballEffect, this.enemy, (effect, enemy) => {
         effect.destroy();
         this.fireballEffect = undefined;
-        this.enemy.health = this.enemy.health - globalState.playerCharacter.damage;
-        console.log("damage dome =" ,globalState.playerCharacter.damage);
-        console.log("life remaining =" ,this.enemy.health);
+        this.enemy[0].health = this.enemy[0].health - globalState.playerCharacter.damage;
       });
     }
 
@@ -203,7 +215,7 @@ export default class MainScene extends Phaser.Scene {
         });
       });
       this.physics.add.collider(this.icenovaEffect, this.enemy, (effect, enemy) => {
-        this.enemy.health = this.enemy.health - 3;
+        this.enemy[0].health = this.enemy[0].health - 3;
         const castEffect = (effect as IceNovaEffect);
         castEffect.attachToEnemy(enemy);
         castEffect.destroy(() => {
