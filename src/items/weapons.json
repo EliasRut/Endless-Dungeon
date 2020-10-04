@@ -1,0 +1,10 @@
+{
+    "itemgroup": "weapons",
+    "abilities": [
+        "damage",
+        "cooldown",
+        "durability",
+        "ranged"
+    ],
+    "tile": [[37]]
+}

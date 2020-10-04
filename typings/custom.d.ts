@@ -4,3 +4,9 @@ export interface Room {
 	overlay?: number[][];
 	npcs: number[][]; //place npcs in room
 }
+
+export interface Weapon {
+	itemgroup: string;
+	abilities: string[];
+	tile: number[][];
+}
