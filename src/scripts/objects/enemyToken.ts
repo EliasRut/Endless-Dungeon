@@ -11,6 +11,7 @@ import PlayerCharacterToken from '../objects/playerCharacterToken'
 import MainScene from "../scenes/mainScene";
 import { AbilityType } from "../abilities/abilityData";
 import PlayerCharacter from "../worldstate/PlayerCharacter";
+import ItemToken from "./itemToken";
 
 export default abstract class EnemyToken extends CharacterToken {
   fireballEffect: FireBallEffect | undefined;
@@ -34,6 +35,19 @@ export default abstract class EnemyToken extends CharacterToken {
     const px = player.x;
     const py = player.y;
     return Math.sqrt((this.x - px)*(this.x - px) + (this.y - py)*(this.y - py));
+  }
+
+  dropItem(player: PlayerCharacter, scene: MainScene) {
+    if(this.scene === undefined) { 
+      // TODO find out when this happens
+      console.log("scene undefined")
+      return;
+    }
+    const sc = scene;
+    
+    const rndItem = Math.floor(Math.random() * 63); // todo calculate from tileset
+    sc.item = new ItemToken(sc, this.x, this.y,rndItem);
+    sc.item.setDepth(1);
   }
 
   //update from main Scene

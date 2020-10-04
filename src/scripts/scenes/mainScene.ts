@@ -59,7 +59,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.enemy = [];
 
-    this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50);
+    this.item = new ItemToken(this, this.cameras.main.width/2-80, this.cameras.main.height /2-50,39);
     this.item.setDepth(1);
 
     this.keyboardHelper = new KeyboardHelper(this);
@@ -69,12 +69,12 @@ export default class MainScene extends Phaser.Scene {
     this.drawOverlayScreens();
 
     // Spawn item in location
-    const sprite = this.physics.add.sprite(
-      (this.cameras.main.width / 2) + (roomSize[0] / 4),
-      (this.cameras.main.height / 2) + (roomSize[1] / 4),
-      'test-items-spritesheet', 34
-    );
-    this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
+    // const sprite = this.physics.add.sprite(
+    //   (this.cameras.main.width / 2) + (roomSize[0] / 4),
+    //   (this.cameras.main.height / 2) + (roomSize[1] / 4),
+    //   'test-items-spritesheet', 34
+    // );
+    // this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
 
     this.sound.play('testSound', {volume: 0.08, loop: true});
   }
