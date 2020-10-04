@@ -4,6 +4,8 @@ import { getRotationInRadiansForFacing, getVelocitiesForFacing } from "../helper
 export default class IceNovaEffect extends Phaser.Physics.Arcade.Image {
     snowEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
     spikeEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
+    stuckEnemy?: Phaser.Physics.Arcade.Body;
+    stuckEnemyOffset?: {x, y};
     constructor(scene: Phaser.Scene, x: number, y: number, facing: Facings) {
       super(scene, x, y, 'ice');
       this.setScale(0.5);
@@ -56,7 +58,15 @@ export default class IceNovaEffect extends Phaser.Physics.Arcade.Image {
       this.spikeEmitter.start();
     }
 
-    destroy() {
+    attachToEnemy(enemy: Phaser.GameObjects.GameObject) {
+      this.stuckEnemy = enemy.body as Phaser.Physics.Arcade.Body;
+      this.stuckEnemyOffset = {
+        x: this.stuckEnemy.position.x - this.body.x,
+        y: this.stuckEnemy.position.y - this.body.y
+      };
+    }
+
+    destroy(callback) {
       // this.snowEmitter.stopFollow();
       this.snowEmitter.setEmitterAngle({min: -180, max: 180});
       this.snowEmitter.setSpeed({min:10, max: 120});
@@ -78,6 +88,16 @@ export default class IceNovaEffect extends Phaser.Physics.Arcade.Image {
       setTimeout(() => {
         this.snowEmitter.stop();
         super.destroy();
+        callback();
       }, 2000);
+    }
+
+    update() {
+      if (this.stuckEnemy) {
+        this.setPosition(
+          this.stuckEnemy.position.x - this.stuckEnemyOffset!.x,
+          this.stuckEnemy.position.y - this.stuckEnemyOffset!.y
+        );
+      }
     }
   }

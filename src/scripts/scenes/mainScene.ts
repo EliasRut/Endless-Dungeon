@@ -71,7 +71,7 @@ export default class MainScene extends Phaser.Scene {
     const room = this.cache.json.get(roomId) as Room;
 
     const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
-    const tiles = map.addTilesetImage('test-tileset');
+    const tiles = map.addTilesetImage('test-tileset-image', 'test-tileset', 16, 16, 1, 2);
     const roomHeight = tiles.tileHeight * room.layout.length;
     const roomWidth = tiles.tileWidth * room.layout[0].length;
     this.tileLayer = map.createStaticLayer(
@@ -197,13 +197,17 @@ export default class MainScene extends Phaser.Scene {
       this.icenovaEffect.body.velocity.normalize().scale(300);
 
       this.physics.add.collider(this.icenovaEffect, this.tileLayer, (effect) => {
-        effect.destroy();
-        this.icenovaEffect = undefined;
+        (effect as IceNovaEffect).destroy(() => {
+          this.icenovaEffect = undefined;
+        });
       });
       this.physics.add.collider(this.icenovaEffect, this.enemy, (effect, enemy) => {
-        effect.destroy();
-        this.icenovaEffect = undefined;
         this.enemy.health = this.enemy.health - 3;
+        const castEffect = (effect as IceNovaEffect);
+        castEffect.attachToEnemy(enemy);
+        castEffect.destroy(() => {
+          this.icenovaEffect = undefined;
+        });
       });
     }
 
