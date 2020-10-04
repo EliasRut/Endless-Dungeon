@@ -2,7 +2,7 @@ import 'phaser'
 import PlayerCharacterToken from '../objects/playerCharacterToken'
 import FpsText from '../objects/fpsText'
 import { getUrlParam } from '../helpers/browserState'
-import { Room } from '../../../typings/custom'
+import { Room, Weapon } from '../../../typings/custom'
 import globalState from '../worldstate/index';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
 import FireBall from '../objects/fireBall';
@@ -17,6 +17,7 @@ export default class MainScene extends Phaser.Scene {
   downKey: Phaser.Input.Keyboard.Key;
   leftKey: Phaser.Input.Keyboard.Key;
   rightKey: Phaser.Input.Keyboard.Key;
+  weapon: Weapon;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -29,6 +30,8 @@ export default class MainScene extends Phaser.Scene {
     this.mainCharacter =
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
+    // this.weapon = new Weapon(this, this.cameras.main.width / 2 +5, this.cameras.main.height / 2+5);
+    // this.weapon.setDepth(2);
     // const fireball =
       // new FireBall(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.fpsText = new FpsText(this);
@@ -39,6 +42,20 @@ export default class MainScene extends Phaser.Scene {
     this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
     this.drawRoom()
+
+    const itemId =  'weapons';
+    const item = this.cache.json.get(itemId) as Weapon;
+
+    const map = this.make.tilemap({data: item.tile, tileWidth: 16, tileHeight: 16});
+    const tiles = map.addTilesetImage('test-items');
+    const layer = map.createStaticLayer(
+      1,
+      tiles,
+      (this.cameras.main.width / 2) + 10,
+      (this.cameras.main.height / 2) + 10
+    );
+    layer.setDepth(1);
+
 
   }
 
