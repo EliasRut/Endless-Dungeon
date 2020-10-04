@@ -8,7 +8,7 @@ const DEFAULT_HEIGHT = 720
 // This is the configuration for Phaser
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  backgroundColor: '#1a1a1a',
+  backgroundColor: '#FFFFFF', //'#1a1a1a',
   scale: {
     parent: 'phaser-game',
     mode: Phaser.Scale.FIT,

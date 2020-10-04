@@ -30,6 +30,7 @@ export default class MainScene extends Phaser.Scene {
     this.mainCharacter =
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
+
     // this.weapon = new Weapon(this, this.cameras.main.width / 2 +5, this.cameras.main.height / 2+5);
     // this.weapon.setDepth(2);
     // const fireball =
@@ -41,20 +42,24 @@ export default class MainScene extends Phaser.Scene {
     this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
     this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
-    this.drawRoom()
+    // this.drawRoom()
 
-    const itemId =  'weapons';
-    const item = this.cache.json.get(itemId) as Weapon;
+    // const itemId =  'weapons';
+    // const item = this.cache.json.get(itemId) as Weapon;
+    // this.add.tileSprite(120,120,16,16,'test-items')
+    const sprite = this.add.sprite(120, 120, 'test-items-spritesheet', 8);
+    // sprite.frame = new Phaser.Textures.Frame('test-items',)
 
-    const map = this.make.tilemap({data: item.tile, tileWidth: 16, tileHeight: 16});
-    const tiles = map.addTilesetImage('test-items');
-    const layer = map.createStaticLayer(
-      1,
-      tiles,
-      (this.cameras.main.width / 2) + 10,
-      (this.cameras.main.height / 2) + 10
-    );
-    layer.setDepth(1);
+    // const map = this.make.tilemap({data: [[3]], tileWidth: 16, tileHeight: 16});
+    // const tiles = map.addTilesetImage('test-items');
+    
+    // const layer = map.createStaticLayer(
+    //   0,
+    //   tiles, 120,120
+    //   // (this.cameras.main.width / 2) + 10,
+    //   // (this.cameras.main.height / 2) + 10
+    // );
+    // layer.setDepth(0);
 
 
   }
