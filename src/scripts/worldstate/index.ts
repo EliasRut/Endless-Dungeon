@@ -1,3 +1,4 @@
+import { Room } from "../../../typings/custom";
 import Dungeon from "./Dungeon";
 import PlayerCharacter from "./PlayerCharacter";
 
@@ -11,6 +12,7 @@ import PlayerCharacter from "./PlayerCharacter";
 export class WorldState {
   public playerCharacter: PlayerCharacter;
   public dungeon: Dungeon;
+  public availableRooms: Room[] = [];
 
   constructor() {
     this.playerCharacter = new PlayerCharacter();
