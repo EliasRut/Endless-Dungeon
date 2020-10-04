@@ -68,6 +68,8 @@ export default class MainScene extends Phaser.Scene {
       'test-items-spritesheet', 34
     );
     this.physics.add.overlap(this.mainCharacter,sprite,this.collectItem,undefined,this);
+
+    this.sound.play('testSound', {volume: 0.08, loop: true});
   }
 
   collectItem(player, item) {
@@ -188,6 +190,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     if (this.keyboardHelper.abilityKey1.isDown && !this.fireballEffect) {
+      this.sound.play('sound-fireball', {volume: 0.2});
       const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
       this.fireballEffect = new FireBallEffect(
         this,
@@ -200,12 +203,14 @@ export default class MainScene extends Phaser.Scene {
       this.physics.add.collider(this.fireballEffect, this.tileLayer, (effect) => {
         effect.destroy();
         this.fireballEffect = undefined;
+        this.sound.play('sound-fireball-explosion', {volume: 0.4});
       });
       this.physics.add.collider(this.fireballEffect, this.enemy, (effect, target) => {
         effect.destroy();
         this.fireballEffect = undefined;
         const enemy = target as EnemyToken;
         enemy.health = enemy.health - globalState.playerCharacter.damage;
+        this.sound.play('sound-fireball-explosion', {volume: 0.4});
       });
     }
 
@@ -214,6 +219,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     if (this.keyboardHelper.abilityKey2.isDown && !this.icespikeEffect) {
+      this.sound.play('sound-icespike', {volume: 0.3});
       const iceSpikeVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
       this.icespikeEffect = new IceSpikeEffect(
         this,
@@ -225,11 +231,13 @@ export default class MainScene extends Phaser.Scene {
       this.icespikeEffect.body.velocity.normalize().scale(300);
 
       this.physics.add.collider(this.icespikeEffect, this.tileLayer, (effect) => {
+        this.sound.play('sound-icespike-hit', {volume: 0.2});
         (effect as IceSpikeEffect).destroy(() => {
           this.icespikeEffect = undefined;
         });
       });
       this.physics.add.collider(this.icespikeEffect, this.enemy, (effect, target) => {
+        this.sound.play('sound-icespike-hit', {volume: 0.2});
         const enemy = target as EnemyToken;
         enemy.health = enemy.health - globalState.playerCharacter.damage;
         const castEffect = (effect as IceSpikeEffect);
@@ -260,10 +268,6 @@ export default class MainScene extends Phaser.Scene {
         this.enemy[0].health = this.enemy[0].health - globalState.playerCharacter.damage;
       });
     }
-
-    if (this.soundKey1.isDown) {
-      this.sound.play('testSound', {volume: 0.4, loop: true});
-    };
     
     if (this.soundKey2.isDown) {
       this.sound.stopAll();

@@ -35,7 +35,11 @@ export default class PreloadScene extends Phaser.Scene {
       { frameWidth: 16, frameHeight: 16 });
 
     // load test music
-    this.load.audio('testSound', 'assets/sounds/testSound.MP3')
+    this.load.audio('testSound', 'assets/sounds/testSound.MP3');
+    this.load.audio('sound-fireball', 'assets/sounds/fireball.wav');
+    this.load.audio('sound-icespike', 'assets/sounds/icespike.wav');
+    this.load.audio('sound-icespike-hit', 'assets/sounds/icespike-hit.wav');
+    this.load.audio('sound-fireball-explosion', 'assets/sounds/fireball-explosion.wav');
     this.load.bitmapFont('pixelfont', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
 
     // Find out which files we need by going through all rendered rooms
