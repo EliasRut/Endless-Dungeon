@@ -41,7 +41,7 @@ export default class Enemy extends NPC {
         this.emitter.startFollow(this.body.gameObject);
         this.emitter.start();
         break;
-      case 9:        
+      case 9:
         this.proximity = 100;
         break;
     }
@@ -92,17 +92,16 @@ export default class Enemy extends NPC {
         }
         break;
         case 9:
+          const xSpeed = (px - this.x) / (Math.abs(px - this.x) + Math.abs(py - this.y)) * this.movementSpeed;
+          const ySpeed = (py - this.y) / (Math.abs(px - this.x) + Math.abs(py - this.y)) * this.movementSpeed;          
+          const newFacing = getFacing(xSpeed, ySpeed);
+          if (newFacing !== this.lastFacing) {
+            this.play(`red-link-walk-${facingToSpriteNameMap[newFacing]}`);
+          }
+          this.lastFacing = newFacing;
           if (this.proximity < distance && distance < this.vision && this.attackedAt + 100 < time) {
-
-            const xSpeed = (px - this.x) / (Math.abs(px - this.x) + Math.abs(py - this.y)) * this.movementSpeed;
-            const ySpeed = (py - this.y) / (Math.abs(px - this.x) + Math.abs(py - this.y)) * this.movementSpeed;
             this.setVelocityX(xSpeed);
             this.setVelocityY(ySpeed);
-            const newFacing = getFacing(xSpeed, ySpeed);
-            if (newFacing !== this.lastFacing) {
-              this.play(`red-link-walk-${facingToSpriteNameMap[newFacing]}`);
-            }
-            this.lastFacing = newFacing;
           }
           else {
             this.setVelocityX(0);
@@ -118,9 +117,10 @@ export default class Enemy extends NPC {
 
   //destroy the enemy
   destroy() {
-    this.emitter.stopFollow();
-    this.emitter.stop();
-
+    if (this.id === 10) {
+      this.emitter.stopFollow();
+      this.emitter.stop();
+    }
     super.destroy();
   }
 
@@ -142,7 +142,7 @@ export default class Enemy extends NPC {
           this.setVelocityX(0);
           this.setVelocityY(0);
           this.attackedAt = time;
-          const fireballVelocities = getVelocitiesForFacing(this.currentFacing)!;
+          const fireballVelocities = getVelocitiesForFacing(this.lastFacing)!;
           this.fireballEffect = new FireBallEffect(
             this.scene,
             this.x + (16 * fireballVelocities.x),
@@ -150,7 +150,6 @@ export default class Enemy extends NPC {
           );
           this.fireballEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
           this.fireballEffect.body.velocity.normalize().scale(300);
-    
           this.scene.physics.add.collider(this.fireballEffect, this.scene.tileLayer, (effect) => {
             effect.destroy();
             this.fireballEffect = undefined;
