@@ -29,6 +29,8 @@ export default class Character {
   public updateMovingState (hasMoved: boolean, facing: Facings) {
     if (!hasMoved) {
       const characterDirection = facingToSpriteNameMap[this.currentFacing];
+      // this.currentFacing = facing;
+      this.isWalking = hasMoved;
       return `${this.animationBase}-${ANIMATION_IDLE}-${characterDirection}`;
     }
     if (facing === this.currentFacing && this.isWalking) {
