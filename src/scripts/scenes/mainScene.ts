@@ -46,6 +46,9 @@ export default class MainScene extends Phaser.Scene {
   alive:number;
   isPaused = false;
   healthBar: Phaser.GameObjects.Image;
+  abilty1Icon: Phaser.GameObjects.Image;
+  abilty2Icon: Phaser.GameObjects.Image;
+  abilty3Icon: Phaser.GameObjects.Image;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -54,7 +57,7 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.alive = 0;
     // tslint:disable-next-line:no-unused-expression
-    this.cameras.main.fadeIn(5);
+    this.cameras.main.fadeIn(500);
     this.mainCharacter =
       new PlayerCharacterToken(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
     this.mainCharacter.setDepth(1);
@@ -106,16 +109,16 @@ export default class MainScene extends Phaser.Scene {
     const guiBaseIcon = this.add.image(116, 50, 'icon-guibase');
     guiBaseIcon.setScrollFactor(0);
 
-    this.healthBar = this.add.image(62, 35, 'icon-healthbar');
+    this.healthBar = this.add.image(62, 36, 'icon-healthbar');
     this.healthBar.setScrollFactor(0);
     this.healthBar.setOrigin(0, 0.5);
 
-    const abilty1Icon = this.add.image(72, 63, 'icon-abilities', 0);
-    abilty1Icon.setScrollFactor(0);
-    const abilty2Icon = this.add.image(101, 63, 'icon-abilities', 1);
-    abilty2Icon.setScrollFactor(0);
-    const abilty3Icon = this.add.image(130, 63, 'icon-abilities', 2);
-    abilty3Icon.setScrollFactor(0);
+    this.abilty1Icon = this.add.image(72, 63, 'icon-abilities', 0);
+    this.abilty1Icon.setScrollFactor(0);
+    this.abilty2Icon = this.add.image(101, 63, 'icon-abilities', 1);
+    this.abilty2Icon.setScrollFactor(0);
+    this.abilty3Icon = this.add.image(130, 63, 'icon-abilities', 2);
+    this.abilty3Icon.setScrollFactor(0);
 
   }
 
@@ -315,5 +318,10 @@ export default class MainScene extends Phaser.Scene {
 
     const healthRatio = globalState.playerCharacter.health / globalState.playerCharacter.maxHealth;
     this.healthBar.scaleX = healthRatio * 98;
+
+    const [cooldown1, cooldown2] = this.keyboardHelper.getAbilityCooldowns(globalTime);
+    this.abilty1Icon.setAlpha(cooldown1);
+    this.abilty2Icon.setAlpha(cooldown2);
+    // this.abilty3Icon.tint = 0xffffff * cooldown3;
   }
 }

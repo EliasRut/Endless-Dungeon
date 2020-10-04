@@ -25,6 +25,7 @@ export default class PlayerCharacter extends Character {
   }
 
   public updateStats(){
+    this.maxHealth = 100 + this.itemHealth;
     this.health = 100 + this.itemHealth;
     this.movementSpeed = 200 + this.itemMovementSpeed;
     this.damage = 1 * this.weaponDamage * this.mainStat;

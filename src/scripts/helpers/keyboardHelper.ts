@@ -61,6 +61,26 @@ export default class KeyboardHelper {
     ].filter((ability) => !!ability) as AbilityType[];
   }
 
+  getAbilityCooldown(abilityKey: AbilityKey, gameTime: number) {
+    const ability = AbilityKeyMapping[abilityKey] as AbilityType;
+    const abilityData = Abilities[ability];
+    const lastCasted = globalState.playerCharacter.abilityCastTime[abilityKey];
+    const readyAt = lastCasted + (abilityData.cooldownMs || 0);
+    if (readyAt <= gameTime) {
+      return 1;
+    }
+    const timeEllapsed = gameTime - lastCasted;
+    return timeEllapsed / (abilityData.cooldownMs || Infinity);
+  }
+
+  getAbilityCooldowns(gameTime: number) {
+    return [
+      this.getAbilityCooldown(AbilityKey.ONE, gameTime),
+      this.getAbilityCooldown(AbilityKey.TWO, gameTime),
+      // this.getAbilityCooldown(AbilityKey.THREE, gameTime),
+    ];
+  }
+
   castIfPressed(abilityKey: AbilityKey, gameTime: number) {
     const relevantKey = this.getRelevantKeyForEnum(abilityKey);
     if (!relevantKey.isDown) {
