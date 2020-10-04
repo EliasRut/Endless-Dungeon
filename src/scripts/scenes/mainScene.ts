@@ -78,7 +78,7 @@ export default class MainScene extends Phaser.Scene {
     this.overlayScreens.statScreen = new StatScreen(this);
     this.overlayScreens.statScreen.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);
     this.add.existing(this.overlayScreens.statScreen);
-    // this.overlayScreens.statScreen.setVisible(false);
+    this.overlayScreens.statScreen.setVisible(false);
 
     this.overlayScreens.inventory = new InventoryScreen(this);
     this.overlayScreens.inventory.incXY(-this.cameras.main.width/2, -this.cameras.main.height /2);

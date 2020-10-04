@@ -40,6 +40,8 @@ export default class PreloadScene extends Phaser.Scene {
     // this.load.json(itemId, `assets/items/${itemId}.json`);
     // console.log(this.cache.json.get(itemId));
 
+    this.load.bitmapFont('pixelfont', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
+
   }
 
   create() {
