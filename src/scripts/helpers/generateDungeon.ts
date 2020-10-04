@@ -10,6 +10,15 @@ export const TILE_HEIGHT = 16;
 const corridorSize = 7;
 
 const CORRIDOR_UP = [ -1,  6, 32, 32, 32,  4, -1];
+const CORRIDOR_UP_RIGHT = [
+  [ -1,  13, 8,  8,  8,  8,  8],
+  [ -1,  6, 15, 15, 22, 15, 15],
+  [ -1,  6, 18, 18, 25, 18, 18],
+  [ -1,  6, 32, 32, 32, 32, 32],
+  [ -1,  6, 32, 32, 32, 32, 32],
+  [ -1,  6, 32, 32, 32,  1,  2],
+  [ -1,  6, 32, 32, 32,  4, -1],
+];
 const CORRIDOR_UP_LEFT = [
   [  8,  8,  8,  8,  8, 12, -1],
   [ 15, 15, 22, 15, 15,  4, -1],
@@ -148,10 +157,10 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
         //     combinedLayout[y + actualY][x + actualX] = CORRIDOR_UP[x];
         //   }
         // }
-        for (let y = -1; y >= CORRIDOR_UP_LEFT.length * -1; y--) {
-          for (let x = 0; x < CORRIDOR_UP_LEFT[0].length; x++) {
-            const corY = y + CORRIDOR_UP_LEFT.length;
-            combinedLayout[y + actualY][x + actualX] = CORRIDOR_UP_LEFT[corY][x];
+        for (let y = -1; y >= CORRIDOR_UP_RIGHT.length * -1; y--) {
+          for (let x = 0; x < CORRIDOR_UP_RIGHT[0].length; x++) {
+            const corY = y + CORRIDOR_UP_RIGHT.length;
+            combinedLayout[y + actualY][x + actualX] = CORRIDOR_UP_RIGHT[corY][x];
           }
         }
         // CORRIDOR_UP_LEFT
