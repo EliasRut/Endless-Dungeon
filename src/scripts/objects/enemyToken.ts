@@ -8,13 +8,14 @@ export default class Enemy extends NPC {
   emitter: Phaser.GameObjects.Particles.ParticleEmitter;
   lastFacing: Facings = Facings.SOUTH;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, definerID: number) {
   super(scene, x, y, 'red-link');
   scene.add.existing(this);
   scene.physics.add.existing(this);
-  this.enemy = 1;
-  //this.body.setCircle(10, 10, 12);
+  this.id= definerID;
 
+  switch (this.id){
+    case 10:
     //cool effects!
     const particles = scene.add.particles('fire');
     particles.setDepth(1);
@@ -33,19 +34,26 @@ export default class Enemy extends NPC {
     });
     this.emitter.startFollow(this.body.gameObject);
     this.emitter.start();
+    break;
+    case 9:
+      this.proximity= 30;
   }
-
+}
   //update from main Scene
   public update(player: Player) {
+    //check death
     if(this.health <= 0){
         this.destroy();
         return;
     }
+    //calc distance to player
     const px = player.x;
     const py = player.y;
     const distance = Math.sqrt((this.x - px)*(this.x - px) + (this.y - py)*(this.y - py));
 
-    //damages you if you're close
+    switch (this.id){
+      case 10:
+    //damages & slows you if you're close
     if (distance < 30){
         player.slowFactor = 0.5;
         player.health -= 0.1;
@@ -54,7 +62,7 @@ export default class Enemy extends NPC {
         player.slowFactor = 1;
     }
     //follows you only if you're close enough, then runs straight at you.
-    if(distance < this.vision){
+    if(this.proximity < distance && distance < this.vision){
 
         const xSpeed = (px-this.x)/(Math.abs(px-this.x)+Math.abs(py-this.y))*this.movementSpeed;
         const ySpeed = (py-this.y)/(Math.abs(px-this.x)+Math.abs(py-this.y))*this.movementSpeed;
@@ -76,6 +84,7 @@ export default class Enemy extends NPC {
       this.play(`red-link-idle-${facingToSpriteNameMap[this.lastFacing]}`);
     }
   }
+}
 
   //destroy the enemy
   destroy() {
