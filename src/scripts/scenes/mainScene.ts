@@ -105,7 +105,7 @@ export default class MainScene extends Phaser.Scene {
       this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
       npcCounter++;
     })
-  
+
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
