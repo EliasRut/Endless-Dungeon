@@ -21,6 +21,9 @@ import AbilityEffect from '../objects/abilityEffect';
 export default class MainScene extends Phaser.Scene {
   fpsText: Phaser.GameObjects.Text;
   mainCharacter: PlayerCharacterToken;
+
+  soundKey1: Phaser.Input.Keyboard.Key;
+  soundKey2: Phaser.Input.Keyboard.Key;
   keyboardHelper: KeyboardHelper;
   effects: Map<string, FireBall>;
   fireballEffect: FireBallEffect | undefined;
@@ -53,7 +56,8 @@ export default class MainScene extends Phaser.Scene {
     this.item.setDepth(1);
 
     this.keyboardHelper = new KeyboardHelper(this);
-
+    this.soundKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+    this.soundKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
     const roomSize = this.drawRoom()
     this.drawOverlayScreens();
 
@@ -257,6 +261,14 @@ export default class MainScene extends Phaser.Scene {
       });
     }
 
+    if (this.soundKey1.isDown) {
+      this.sound.play('testSound', {volume: 0.4, loop: true});
+    };
+    
+    if (this.soundKey2.isDown) {
+      this.sound.stopAll();
+    };
+    
     Object.values(this.overlayScreens).forEach((screen) => {
       if (screen) {
         screen.incXY(
@@ -265,6 +277,7 @@ export default class MainScene extends Phaser.Scene {
         );
       }
     })
+
     this.lastCameraPosition = {x: globalState.playerCharacter.x, y: globalState.playerCharacter.y};
   }
 }
