@@ -19,9 +19,9 @@ export default class StatScreen extends OverlayScreen {
     // const lableStat: Phaser.Types.GameObjects.Text.TextStyle = { fontFamily: 'Arial', fontSize: '12px', color: '#333' }
 
     const currentHealth = Math.round(globalState.playerCharacter.health);
-    const maxHealth = globalState.playerCharacter.maxHealth;
-    const currentDamage = globalState.playerCharacter.damage;
-    const currentMovSpeed = globalState.playerCharacter.movementSpeed;
+    const maxHealth = Math.round(globalState.playerCharacter.maxHealth);
+    const currentDamage = Math.round(globalState.playerCharacter.damage);
+    const currentMovSpeed = Math.round(globalState.playerCharacter.movementSpeed);
 
     const lableHealth = new Phaser.GameObjects.BitmapText(scene, 54, 150, 'pixelfont', "Health", 10);
     this.lableHealthValue = new Phaser.GameObjects.BitmapText(scene, 136, 150, 'pixelfont', `${currentHealth}/${maxHealth}`, 10); 
@@ -57,9 +57,9 @@ export default class StatScreen extends OverlayScreen {
 
   update () {
     const player = globalState.playerCharacter;
-    this.lableHealthValue.setText(`${Math.round(player.health)}/${player.maxHealth}`);
-    this.lableDamageValue.setText(`${player.damage}`);
-    this.lableMovSpeedValue.setText(`${player.movementSpeed}`);
+    this.lableHealthValue.setText(`${Math.round(player.health)}/${Math.round(player.maxHealth)}`);
+    this.lableDamageValue.setText(`${Math.round(player.damage)}`);
+    this.lableMovSpeedValue.setText(`${Math.round(player.movementSpeed)}`);
   }
 
 }

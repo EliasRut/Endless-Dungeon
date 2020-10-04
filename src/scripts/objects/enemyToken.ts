@@ -1,9 +1,5 @@
 import { Game } from "phaser";
 import { Facings, facingToSpriteNameMap } from "../helpers/constants";
-<<<<<<< HEAD
-// import NPC from "../worldstate/NPC"
-=======
->>>>>>> 553083d0c67dc75c7f1e46d5dde16dad7d998179
 import Player from "../worldstate/PlayerCharacter"
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
 import CharacterToken from './characterToken';
