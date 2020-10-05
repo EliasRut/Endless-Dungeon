@@ -29,6 +29,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('fire', 'assets/img/muzzleflash3.png');
     this.load.image('ice', 'assets/img/ice_spike.png');
     this.load.image('snow', 'assets/img/snowflake.png');
+    this.load.image('rock', 'assets/img/rock.png');
+    this.load.image('wind', 'assets/img/wind-gust.png');
 
     // GUI
     this.load.image('icon-backpack', 'assets/img/backpack-icon.png');
@@ -50,6 +52,9 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.audio('sound-icespike', 'assets/sounds/icespike.wav');
     this.load.audio('sound-icespike-hit', 'assets/sounds/icespike-hit.wav');
     this.load.audio('sound-fireball-explosion', 'assets/sounds/fireball-explosion.wav');
+    this.load.audio('sound-wind', 'assets/sounds/wind.wav');
+
+    // load font
     this.load.bitmapFont('pixelfont', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
 
     // Find out which files we need by going through all rendered rooms

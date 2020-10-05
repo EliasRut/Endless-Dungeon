@@ -1,9 +1,12 @@
 import AbilityEffect from '../objects/abilityEffect';
 import FireBallEffect from '../objects/fireBallEffect';
 import IceSpikeEffect from '../objects/iceSpikeEffect';
+import DustNovaEffect from '../objects/dustNovaEffect';
+
 interface ProjectileData {
   spread?: [number, number];
   velocity: number;
+  drag?: number;
   xOffset: number;
   yOffset: number;
   effect: typeof AbilityEffect;
@@ -21,7 +24,8 @@ interface AbilityData {
 
 export const enum AbilityType {
   FIREBALL = 'fireball',
-  ICESPIKE = 'icespike'
+  ICESPIKE = 'icespike',
+  DUSTNOVA = 'dustnova'
 }
 
 export const Abilities: {[type: string]: AbilityData} = {
@@ -29,8 +33,8 @@ export const Abilities: {[type: string]: AbilityData} = {
     projectiles: 1,
     projectileData: {
       velocity: 300,
-      xOffset: 16,
-      yOffset: 16,
+      xOffset: 32,
+      yOffset: 32,
       effect: FireBallEffect,
       collisionSound: 'sound-fireball-explosion',
       sfxVolume: 0.4
@@ -51,6 +55,22 @@ export const Abilities: {[type: string]: AbilityData} = {
     },
     sound: 'sound-icespike',
     sfxVolume: 0.3,
+    cooldownMs: 1200
+  },
+  [AbilityType.DUSTNOVA]: {
+    projectiles: 32,
+    projectileData: {
+      spread: [-1, 1],
+      velocity: 150,
+      drag: 200,
+      xOffset: 20,
+      yOffset: 20,
+      effect: DustNovaEffect,
+      // collisionSound: 'sound-wind',
+      // sfxVolume: 0.4
+    },
+    sound: 'sound-wind',
+    sfxVolume: 1.4,
     cooldownMs: 1200
   }
 }

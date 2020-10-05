@@ -58,6 +58,7 @@ export default class KeyboardHelper {
     return [
       this.castIfPressed(AbilityKey.ONE, gameTime),
       this.castIfPressed(AbilityKey.TWO, gameTime),
+      this.castIfPressed(AbilityKey.THREE, gameTime),
     ].filter((ability) => !!ability) as AbilityType[];
   }
 
@@ -77,7 +78,7 @@ export default class KeyboardHelper {
     return [
       this.getAbilityCooldown(AbilityKey.ONE, gameTime),
       this.getAbilityCooldown(AbilityKey.TWO, gameTime),
-      // this.getAbilityCooldown(AbilityKey.THREE, gameTime),
+      this.getAbilityCooldown(AbilityKey.THREE, gameTime),
     ];
   }
 
