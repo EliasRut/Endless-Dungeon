@@ -54,32 +54,32 @@
   ],
   "npcs": [
     {
-      "id": "red-link",
+      "id": "red-ball",
       "x": 3,
       "y": 5
     },
     {
-      "id": "red-link",
+      "id": "red-ball",
       "x": 22,
       "y": 5
     },
     {
-      "id": "red-link",
+      "id": "red-ball",
       "x": 3,
       "y": 21
     },
     {
-      "id": "red-link",
+      "id": "red-ball",
       "x": 22,
       "y": 21
     },
     {
-      "id": "red-link",
+      "id": "red-ball",
       "x": 3,
       "y": 37
     },
     {
-      "id": "red-link",
+      "id": "red-ball",
       "x": 22,
       "y": 37
     }
