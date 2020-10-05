@@ -1,5 +1,5 @@
 import { GameObjects } from "phaser";
-import { NpcPositioning } from "../../../typings/custom";
+import { NpcPositioning, OpeningDirection } from "../../../typings/custom";
 import globalState from "../worldstate";
 
 export const DUNGEON_WIDTH = 128;
@@ -9,8 +9,6 @@ export const DUNGEON_BLOCKS_Y = DUNGEON_HEIGHT / 8;
 export const TILE_WIDTH = 16;
 export const TILE_HEIGHT = 16;
 export const BLOCK_SIZE = 8;
-
-const corridorSize = 7;
 
 const TILED_PATH = [
   [32, 32, 32, 32, 32, 32, 32, 32],
@@ -23,25 +21,135 @@ const TILED_PATH = [
   [32, 32, 32, 32, 32, 32, 32, 32],
 ];
 
-const CORRIDOR_UP = [ -1,  6, 32, 32, 32,  4, -1];
+const CORRIDOR_UP = [
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+];
+const CORRIDOR_LEFT = [
+  [  8,  8,  8,  8,  8,  8,  8,  8],
+  [ 15, 15, 22, 15, 15, 15, 22, 15],
+  [ 18, 18, 25, 18, 18, 18, 25, 18],
+  [ 32, 32, 38, 32, 32, 32, 38, 32],
+  [ 32, 32, 32, 32, 32, 32, 32, 32],
+  [ 32, 32, 32, 32, 32, 32, 32, 32],
+  [ 32, 32, 32, 32, 32, 32, 32, 32],
+  [  2,  2,  2,  2,  2,  2,  2,  2],
+];
 const CORRIDOR_UP_RIGHT = [
-  [ -1,  13, 8,  8,  8,  8,  8],
-  [ -1,  6, 15, 15, 22, 15, 15],
-  [ -1,  6, 18, 18, 25, 18, 18],
-  [ -1,  6, 32, 32, 32, 32, 32],
-  [ -1,  6, 32, 32, 32, 32, 32],
-  [ -1,  6, 32, 32, 32,  1,  2],
-  [ -1,  6, 32, 32, 32,  4, -1],
+  [ 13,  8,  8,  8,  8,  8,  8,  8],
+  [  6, 15, 15, 15, 15, 22, 15, 15],
+  [  6, 18, 18, 18, 18, 25, 18, 18],
+  [  6, 32, 32, 32, 32, 38, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32,  1],
 ];
 const CORRIDOR_UP_LEFT = [
-  [  8,  8,  8,  8,  8, 12, -1],
-  [ 15, 15, 22, 15, 15,  4, -1],
-  [ 18, 18, 25, 18, 18,  4, -1],
-  [ 32, 32, 32, 32, 32,  4, -1],
-  [ 32, 32, 32, 32, 32,  4, -1],
-  [  2,  3, 32, 32, 32,  4, -1],
-  [ -1,  6, 32, 32, 32,  4, -1],
+  [  8,  8,  8,  8,  8,  8,  8, 12],
+  [ 15, 15, 22, 15, 15, 15, 15, 4],
+  [ 18, 18, 25, 18, 18, 18, 18, 4],
+  [ 32, 32, 38, 32, 32, 32, 32, 4],
+  [ 32, 32, 32, 32, 32, 32, 32, 4],
+  [ 32, 32, 32, 32, 32, 32, 32, 4],
+  [ 32, 32, 32, 32, 32, 32, 32, 4],
+  [  3, 32, 32, 32, 32, 32, 32, 4],
 ];
+const CORRIDOR_DOWN_RIGHT = [
+  [  6, 32, 32, 32, 32, 32, 32,  7],
+  [  6, 32, 32, 32, 32, 32, 32, 14],
+  [  6, 32, 32, 32, 32, 32, 32, 17],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [ 11,  2,  2,  2,  2,  2,  2,  2],
+];
+const CORRIDOR_DOWN_LEFT = [
+  [   9, 32, 32, 32, 32, 32, 32,  4],
+  [  16, 32, 32, 32, 32, 32, 32,  4],
+  [  19, 32, 32, 32, 32, 32, 32,  4],
+  [  32, 32, 32, 32, 32, 32, 32,  4],
+  [  32, 32, 32, 32, 32, 32, 32,  4],
+  [  32, 32, 32, 32, 32, 32, 32,  4],
+  [  32, 32, 32, 32, 32, 32, 32,  4],
+  [   2,  2,  2,  2,  2,  2,  2, 10],
+];
+const T_CROSSING_TOP_LEFT_BOTTOM = [
+  [   9, 32, 32, 32, 32, 32, 32,  4],
+  [  16, 32, 32, 32, 32, 32, 32,  4],
+  [  19, 32, 32, 32, 32, 32, 32,  4],
+  [  32, 32, 32, 32, 32, 32, 32,  4],
+  [  32, 32, 32, 32, 32, 32, 32,  4],
+  [  32, 32, 32, 32, 32, 32, 32,  4],
+  [  32, 32, 32, 32, 32, 32, 32,  4],
+  [   3, 32, 32, 32, 32, 32, 32,  4],
+];
+const T_CROSSING_TOP_LEFT_RIGHT = [
+  [  9, 32, 32, 32, 32, 32, 32,  7],
+  [ 16, 32, 32, 32, 32, 32, 32, 14],
+  [ 19, 32, 32, 32, 32, 32, 32, 17],
+  [ 32, 32, 32, 32, 32, 32, 32, 32],
+  [ 32, 32, 32, 32, 32, 32, 32, 32],
+  [ 32, 32, 32, 32, 32, 32, 32, 32],
+  [ 32, 32, 32, 32, 32, 32, 32, 32],
+  [ 2,  2,  2,  2,  2,  2,  2,  2],
+];
+const T_CROSSING_TOP_RIGHT_BOTTOM = [
+  [  6, 32, 32, 32, 32, 32, 32,  7],
+  [  6, 32, 32, 32, 32, 32, 32, 14],
+  [  6, 32, 32, 32, 32, 32, 32, 17],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32,  1],
+];
+const T_CROSSING_LEFT_RIGHT_BOTTOM = [
+  [  8,  8,  8,  8,  8,  8,  8,  8],
+  [ 15, 15, 22, 15, 15, 15, 22, 15],
+  [ 18, 18, 25, 18, 18, 18, 25, 18],
+  [ 32, 32, 38, 32, 32, 32, 38, 32],
+  [ 32, 32, 32, 32, 32, 32, 32, 32],
+  [ 32, 32, 32, 32, 32, 32, 32, 32],
+  [ 32, 32, 32, 32, 32, 32, 32, 32],
+  [  3, 32, 32, 32, 32, 32, 32,  1],
+];
+const CROSSWAY = [
+  [   9, 32, 32, 32, 32, 32, 32,  7],
+  [  16, 32, 32, 32, 32, 32, 32, 14],
+  [  19, 32, 32, 32, 32, 32, 32, 17],
+  [  32, 32, 32, 32, 32, 32, 32, 32],
+  [  32, 32, 32, 32, 32, 32, 32, 32],
+  [  32, 32, 32, 32, 32, 32, 32, 32],
+  [  32, 32, 32, 32, 32, 32, 32, 32],
+  [   3, 32, 32, 32, 32, 32, 32,  1],
+];
+
+const CORRIDOR_LAYOUTS = {
+  1: TILED_PATH,
+  2: TILED_PATH,
+  3: CORRIDOR_DOWN_LEFT,
+  4: TILED_PATH,
+  5: CORRIDOR_UP,
+  6: CORRIDOR_UP_LEFT,
+  7: T_CROSSING_TOP_LEFT_BOTTOM,
+  8: TILED_PATH,
+  9: CORRIDOR_DOWN_RIGHT,
+  10: CORRIDOR_LEFT,
+  11: T_CROSSING_TOP_LEFT_RIGHT,
+  12: CORRIDOR_UP_RIGHT,
+  13: T_CROSSING_TOP_RIGHT_BOTTOM,
+  14: T_CROSSING_LEFT_RIGHT_BOTTOM,
+  15: CROSSWAY,
+}
+
 
 export const generateDungeon: (scene: Phaser.Scene) => [
     Phaser.Tilemaps.StaticTilemapLayer,
@@ -52,7 +160,7 @@ export const generateDungeon: (scene: Phaser.Scene) => [
   let restarts = 0;
   let dungeon;
   do {
-    if (restarts > 10) {
+    if (restarts > 100) {
       throw new Error('Failed to generate the dungeon!');
     }
     dungeon = tryToGenerateDungeon(scene);
@@ -93,7 +201,7 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
     const roomHeight = Math.ceil(room.layout.length / BLOCK_SIZE);
     do {
       roomXBlockOffset = 1 + Math.floor(Math.random() * (DUNGEON_BLOCKS_X - roomWidth - 2));
-      roomYBlockOffset = 1 + Math.floor(Math.random() * (DUNGEON_BLOCKS_Y - roomWidth - 2));
+      roomYBlockOffset = 1 + Math.floor(Math.random() * (DUNGEON_BLOCKS_Y - roomHeight - 2));
 
       for (let y = -1; y <= roomHeight; y ++) {
         const rowIndex = y + roomYBlockOffset;
@@ -116,8 +224,8 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
 
     // We have found a position for this room.
     roomOffsets.push([
-      roomXBlockOffset,
-      roomYBlockOffset
+      roomYBlockOffset,
+      roomXBlockOffset
     ]);
     for (let y = 0; y < roomHeight; y ++) {
       const rowIndex = y + roomYBlockOffset;
@@ -133,6 +241,20 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
     tileSetCollections[room.tileset].push(roomIndex);
   }
 
+    rooms.forEach((room, roomIndex) => {
+      const [roomYBlockOffset, roomXBlockOffset] = roomOffsets[roomIndex];
+      console.log(`Placed room ${room.name} at [${roomYBlockOffset}, ${roomXBlockOffset}]`);
+    })
+
+    let debugOutput = 'tiles used for rooms';
+    for (let y = 0; y < DUNGEON_BLOCKS_Y; y++) {
+      for (let x = 0; x < DUNGEON_BLOCKS_X; x++) {
+        debugOutput += tilesUsed[y][x] ? 'X' : ' ';
+      }
+      debugOutput += '\n';
+    }
+    console.log(debugOutput);
+
   // All rooms have been positioned.
 
   const npcs: NpcPositioning[] = [];
@@ -146,7 +268,7 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
   Object.keys(tileSetCollections).map((tileSetName) => {
     const gid = tileSetGid[tileSetName];
     tileSetCollections[tileSetName].forEach((roomIndex) => {
-      const [roomXBlockOffset, roomYBlockOffset] = roomOffsets[roomIndex];
+      const [roomYBlockOffset, roomXBlockOffset] = roomOffsets[roomIndex];
       const roomLayout = rooms[roomIndex].layout;
 
       for (let y = 0; y < roomLayout.length; y++) {
@@ -176,21 +298,39 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
   }
 
   // Construct path.
-  const visitedRooms = [startRoomIndex];
-  while (visitedRooms.length < rooms.length) {
-    const sourceRoomIndex = visitedRooms[Math.floor(Math.random() * visitedRooms.length)];
-    const sourceRoom = rooms[startRoomIndex];
-    const sourceOpening =
-      sourceRoom.openings[Math.floor(Math.random() * sourceRoom.openings.length)];
+  let numOpenings = 1;
+  const visitedOpenings: [number, number, number, OpeningDirection][] = 
+    [[startRoomIndex, ...rooms[startRoomIndex].openings[0]]];
+  const targetOpenings: [number, number, number, OpeningDirection][] = [];
 
-    const possibleTargets = rooms
-      .map((_, index) => index)
-      .filter((_, index) => !visitedRooms.includes(index));
-    const targetRoomIndex =
-      possibleTargets[Math.floor(Math.random() * possibleTargets.length)];
+  rooms[startRoomIndex].openings.slice(1).forEach((opening) => {
+    numOpenings++;
+    targetOpenings.push([startRoomIndex, ...opening]);
+  });
+  rooms.forEach((room, roomIndex) => {
+    if (roomIndex === startRoomIndex) {
+      return;
+    }
+    room.openings.forEach((opening) => {
+      numOpenings++;
+      targetOpenings.push([roomIndex, ...opening]);
+    })
+  });
+
+  let pathIndex = 1;
+  while (visitedOpenings.length < numOpenings) {
+    const source = visitedOpenings[Math.floor(Math.random() * visitedOpenings.length)];
+    const sourceRoomIndex = source[0];
+    const sourceRoom = rooms[startRoomIndex];
+    const sourceOpening = source.slice(1) as [number, number, OpeningDirection];
+
+    // const possibleTargets = rooms
+    //   .map((_, index) => index)
+    //   .filter((_, index) => !visitedRooms.includes(index));
+    const target = targetOpenings[Math.floor(Math.random() * targetOpenings.length)];
+    const targetRoomIndex = target[0];
     const targetRoom = rooms[targetRoomIndex];
-    const targetOpening =
-      targetRoom.openings[Math.floor(Math.random() * targetRoom.openings.length)];
+    const targetOpening = target.slice(1) as [number, number, OpeningDirection];
     const targetCoordinates = [
       roomOffsets[targetRoomIndex][0] + targetOpening[0],
       roomOffsets[targetRoomIndex][1] + targetOpening[1]
@@ -198,9 +338,51 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
 
     const currentBlockY = roomOffsets[sourceRoomIndex][0] + sourceOpening[0];
     const currentBlockX = roomOffsets[sourceRoomIndex][1] + sourceOpening[1];
+    let zeroStepY = currentBlockY;
+    let zeroStepX = currentBlockX;
+    switch (sourceOpening[2]) {
+      case 'top':
+        zeroStepY++;
+        break;
+      case 'right':
+        zeroStepX--;
+        break;
+      case 'bottom':
+        zeroStepY--;
+        break;
+      case 'left':
+        zeroStepX++;
+        break;
+    }
+    let lastStepY = targetCoordinates[0];
+    let lastStepX = targetCoordinates[1];
+    switch (targetOpening[2]) {
+      case 'top':
+        lastStepY++;
+        break;
+      case 'right':
+        lastStepX--;
+        break;
+      case 'bottom':
+        lastStepY--;
+        break;
+      case 'left':
+        lastStepX++;
+        break;
+    }
 
-    let foundPath: [number, number][] | false = false;
-    const nextExplorations: [number, number][][] = [[[currentBlockY, currentBlockX]]];
+    let foundPath: [number, number][] | undefined;
+    const nextExplorations: [number, number][][] = [[
+      [zeroStepY, zeroStepX],
+      [currentBlockY, currentBlockX]
+    ]];
+    const exploredBlocks: boolean[][] = [];
+    for (let y = 0; y < DUNGEON_HEIGHT / 8; y++) {
+      exploredBlocks[y] = [];
+      for (let x = 0; x < DUNGEON_WIDTH / 8; x++) {
+        exploredBlocks[y][x] = tilesUsed[y][x];
+      }
+    }
     const makeStep = () => {
       if (nextExplorations.length === 0) {
         throw new Error("Failed to build a way. This should not have happened.");
@@ -210,9 +392,13 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
         return;
       }
       const [curY, curX] = history[history.length - 1];
-      if (curY < 0 || curY > DUNGEON_BLOCKS_Y || curX < 0 || curX > DUNGEON_BLOCKS_X) {
+      if (curY < 0 || curY >= DUNGEON_BLOCKS_Y || curX < 0 || curX >= DUNGEON_BLOCKS_X) {
         return;
       }
+      if (exploredBlocks[curY][curX]) {
+        return;
+      }
+      exploredBlocks[curY][curX] = true;
       if (targetCoordinates[0] === curY && targetCoordinates[1] === curX) {
         foundPath = [...history];
         return;
@@ -224,26 +410,56 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
       nextExplorations.push([...history, [curY + 1, curX]]);
       nextExplorations.push([...history, [curY, curX - 1]]);
       nextExplorations.push([...history, [curY, curX + 1]]);
+    }
+    while (!foundPath) {
       makeStep();
     }
-    makeStep();
-    if (!foundPath) {
-      throw new Error("Failed to build a way. This should not have happened.");
+
+    foundPath = [...foundPath, [lastStepY, lastStepX]];
+
+    for (let pathStep = 1; pathStep < foundPath.length - 1; pathStep++) {
+      const prevStepY = foundPath[pathStep - 1][0];
+      const prevStepX = foundPath[pathStep - 1][1];
+      const curStepY = foundPath[pathStep][0];
+      const curStepX = foundPath[pathStep][1];
+      const nextStepY = foundPath[pathStep + 1][0];
+      const nextStepX = foundPath[pathStep + 1][1];
+      const newValue =
+        ((prevStepY < curStepY || nextStepY < curStepY) ? 1 : 0) +
+        ((prevStepX < curStepX || nextStepX < curStepX) ? 2 : 0) +
+        ((prevStepY > curStepY || nextStepY > curStepY) ? 4 : 0) +
+        ((prevStepX > curStepX || nextStepX > curStepX) ? 8 : 0);
+      blocksUsed[curStepY][curStepX] = blocksUsed[curStepY][curStepX] | newValue;
     }
 
-    (foundPath as [number, number][]).forEach(([pathY, pathX]) => {
-      blocksUsed[pathY][pathX] = 1;
-    });
-
-    visitedRooms.push(targetRoomIndex);
+    console.log(`Build a way from ${sourceRoom.name} to ${targetRoom.name}: ${JSON.stringify(foundPath)}`);
+    const entryPosition = visitedOpenings.findIndex((opening) => {
+      return opening[0] === target[0] &&
+          opening[1] === target[1] &&
+          opening[2] === target[2] &&
+          opening[3] === target[3];
+    })
+    if (entryPosition === -1) {
+      visitedOpenings.push(target);
+    }
   }
+
+  debugOutput = 'blocks used:\n';
+  for (let y = 0; y < DUNGEON_BLOCKS_Y; y++) {
+    for (let x = 0; x < DUNGEON_BLOCKS_X; x++) {
+      debugOutput += blocksUsed[y][x] ? blocksUsed[y][x] : (tilesUsed[y][x] ? 'X' : ' ');
+    }
+    debugOutput += '\n';
+  }
+  console.log(debugOutput);
 
   for (let blockY = 0; blockY < DUNGEON_HEIGHT / 8; blockY++) {
     for (let blockX = 0; blockX < DUNGEON_WIDTH / 8; blockX++) {
       if (blocksUsed[blockY][blockX]) {
+        const blockLayout = CORRIDOR_LAYOUTS[blocksUsed[blockY][blockX]];
         for (let y = 0; y < BLOCK_SIZE; y++) {
           for (let x = 0; x < BLOCK_SIZE; x++) {
-            combinedLayout[blockY * BLOCK_SIZE + y][blockX * BLOCK_SIZE + x] = 32;
+            combinedLayout[blockY * BLOCK_SIZE + y][blockX * BLOCK_SIZE + x] = blockLayout[y][x];
           }
         }
       }
@@ -307,7 +523,7 @@ const tryToGenerateDungeon: (scene: Phaser.Scene) => [
     tilesLayer.setCollisionBetween(gid + 40, gid + 71, true);
   });
 
-  const [startRoomBlockX, startRoomBlockY] = roomOffsets[startRoomIndex];
+  const [startRoomBlockY, startRoomBlockX] = roomOffsets[startRoomIndex];
   const startRoomHeight = rooms[startRoomIndex].layout.length * TILE_HEIGHT;
   const startRoomWidth = rooms[startRoomIndex].layout[0].length * TILE_WIDTH;
   return [

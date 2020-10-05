@@ -21,6 +21,7 @@ export interface Room {
 	npcs?: NpcPositioning[]; //place npcs in room
 	items?: ItemsPositioning[]; //place npcs in room
 	openings: Opening[];
+	name: string;
 }
 
 export interface Weapon {

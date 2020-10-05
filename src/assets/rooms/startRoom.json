@@ -1,4 +1,5 @@
 {
+  "name": "startRoom",
   "startRoom": true,
   "tileset": "dungeon",
   "openings": [
