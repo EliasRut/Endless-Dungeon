@@ -8,7 +8,7 @@ import FireBallEffect from '../objects/fireBallEffect';
 import DustNovaEffect from '../objects/dustNovaEffect';
 import IceSpikeEffect from '../objects/iceSpikeEffect';
 import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
-import FireBall from '../abilities/fireBall'
+// import FireBall from '../abilities/fireBall'
 import EnemyToken from '../objects/enemyToken';
 import RangedEnemyToken from '../objects/rangedEnemyToken';
 import MeleeEnemyToken from '../objects/meleeEnemyToken';
@@ -33,7 +33,7 @@ export default class MainScene extends Phaser.Scene {
   soundKey1: Phaser.Input.Keyboard.Key;
   soundKey2: Phaser.Input.Keyboard.Key;
   keyboardHelper: KeyboardHelper;
-  effects: Map<string, FireBall>;
+  // effects: Map<string, FireBall>;
   tileLayer: any;
   enemy: EnemyToken[];
   weapon: Weapon[];
@@ -193,17 +193,38 @@ export default class MainScene extends Phaser.Scene {
     // throw all projectiles
     const projectileData = Abilities[type].projectileData;
     const facingVelocities = origin.getFacingVelocities();
-
-    for (let i = 0; i < (Abilities[type].projectiles || 0); i++) {
-      const effect = new projectileData!.effect(
-        this,
-        origin.x + facingVelocities.x * projectileData!.xOffset,
-        origin.y + facingVelocities.y * projectileData!.yOffset,
-        '',
-        origin.currentFacing
-      );
-      effect.setVelocity(facingVelocities.x, facingVelocities.y);
-      effect.body.velocity.normalize().scale(projectileData!.velocity);
+    const numProjectiles =  (Abilities[type].projectiles || 0);
+    for (let i = 0; i < numProjectiles; i++) {
+      const spread = projectileData?.spread ? projectileData!.spread : [0, 0];
+      const spreadDistance = spread[1] - spread[0];
+      let effect;
+      if (spreadDistance) {
+        const currentSpread = spread[0] + spreadDistance * (i / numProjectiles);
+        const xMultiplier = Math.sin(currentSpread * Math.PI);
+        const yMultiplier = Math.cos(currentSpread * Math.PI);
+        effect = new projectileData!.effect(
+          this,
+          origin.x + xMultiplier * projectileData!.xOffset,
+          origin.y + yMultiplier * projectileData!.yOffset,
+          '',
+          origin.currentFacing
+        );
+        effect.setVelocity(xMultiplier, yMultiplier);
+        effect.body.velocity.scale(projectileData!.velocity);
+      } else {
+        effect = new projectileData!.effect(
+          this,
+          origin.x + facingVelocities.x * projectileData!.xOffset,
+          origin.y + facingVelocities.y * projectileData!.yOffset,
+          '',
+          origin.currentFacing
+        );
+        effect.setVelocity(facingVelocities.x, facingVelocities.y);
+        effect.body.velocity.normalize().scale(projectileData!.velocity);
+      }
+      if (projectileData?.drag) {
+        effect.setDrag(projectileData.drag);
+      }
 
       this.physics.add.collider(effect, this.tileLayer, () => {
         effect.destroy();
@@ -300,8 +321,9 @@ export default class MainScene extends Phaser.Scene {
     const healthRatio = globalState.playerCharacter.health / globalState.playerCharacter.maxHealth;
     this.healthBar.scaleX = healthRatio * 98;
 
-    const [cooldown1, cooldown2] = this.keyboardHelper.getAbilityCooldowns(globalTime);
+    const [cooldown1, cooldown2, cooldown3] = this.keyboardHelper.getAbilityCooldowns(globalTime);
     this.abilty1Icon.setAlpha(cooldown1);
     this.abilty2Icon.setAlpha(cooldown2);
+    this.abilty3Icon.setAlpha(cooldown3);
   }
 }
