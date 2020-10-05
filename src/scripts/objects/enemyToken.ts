@@ -39,7 +39,6 @@ export default abstract class EnemyToken extends CharacterToken {
   dropItem(player: PlayerCharacter, scene: MainScene) {
     if(this.scene === undefined) { 
       // TODO find out when this happens
-      console.log("scene undefined")
       return;
     }
     const sc = scene;

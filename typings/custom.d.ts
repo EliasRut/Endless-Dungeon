@@ -20,7 +20,7 @@ export interface Room {
 	overlay?: number[][];
 	npcs?: NpcPositioning[]; //place npcs in room
 	items?: ItemsPositioning[]; //place npcs in room
-	openings?: Opening[];
+	openings: Opening[];
 }
 
 export interface Weapon {
