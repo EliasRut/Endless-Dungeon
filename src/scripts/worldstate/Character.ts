@@ -8,6 +8,7 @@ export default abstract class Character {
   public damage: number;
   public movementSpeed: number;
   public slowFactor: number = 1;
+  public attackTime: number;
 
   public currentFacing: Facings = Facings.SOUTH;
   public isWalking = false;
@@ -15,7 +16,7 @@ export default abstract class Character {
   public x = 0;
   public y = 0;
   public vision = 0;
-
+  
   public faction: Faction;
 
   constructor(

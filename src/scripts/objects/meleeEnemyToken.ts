@@ -26,7 +26,7 @@ export default class MeleeEnemyToken extends EnemyToken {
     });
     this.emitter.startFollow(this.body.gameObject);
     this.emitter.start();
-    this.proximity = 15;
+    this.proximity = 15; //how close the enemy comes
   }
 
   public update(time: number) {
@@ -53,10 +53,12 @@ export default class MeleeEnemyToken extends EnemyToken {
         else {
           player.slowFactor = 1;
         }
-        //follows you only if you're close enough, then runs straight at you.
+
+        //follows you only if you're close enough, then runs straight at you, stop when close enough (proximity)
         if (this.proximity < distance
             && distance < this.stateObject.vision
-            && this.attackedAt + 100 < time) {
+            && this.attackedAt + this.stateObject.attackTime < time
+            && this.checkLoS(player)) {
 
           const totalDistance = Math.abs(px - this.x) + Math.abs(py - this.y);
           const xSpeed = (px - this.x) / totalDistance * this.stateObject.movementSpeed;
@@ -82,7 +84,7 @@ export default class MeleeEnemyToken extends EnemyToken {
             this.play(animation);
           }
         }
-    if(distance < this.proximity) {
+    if(distance <= this.proximity) {
       this.attack(time);
     }
     this.stateObject.x = this.body.x;
@@ -100,7 +102,7 @@ export default class MeleeEnemyToken extends EnemyToken {
   attack(time: number) {
     const player = globalState.playerCharacter;
 
-    if (this.attackedAt + 3000 < time) {
+    if (this.attackedAt + this.stateObject.attackTime < time) {
         this.setVelocityX(0);
         this.setVelocityY(0);
         this.attackedAt = time;
