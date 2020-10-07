@@ -23,7 +23,10 @@ import Character from '../worldstate/Character';
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import CharacterToken from '../objects/characterToken';
 import { Faction } from '../helpers/constants';
-import { DUNGEON_HEIGHT, DUNGEON_WIDTH, generateDungeon, TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
+import DungeonGenerator from '../helpers/generateDungeon';
+import FpsText from '../objects/fpsText';
+import { fullColorHex } from '../helpers/colors';
+import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -34,7 +37,6 @@ export default class MainScene extends Phaser.Scene {
   soundKey2: Phaser.Input.Keyboard.Key;
   keyboardHelper: KeyboardHelper;
   // effects: Map<string, FireBall>;
-  tileLayer: any;
   enemy: EnemyToken[];
   weapon: Weapon[];
   sportLight: Phaser.GameObjects.Light;
@@ -51,6 +53,8 @@ export default class MainScene extends Phaser.Scene {
   abilty1Icon: Phaser.GameObjects.Image;
   abilty2Icon: Phaser.GameObjects.Image;
   abilty3Icon: Phaser.GameObjects.Image;
+  tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+  lastLightLevel: number = 255;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -78,6 +82,8 @@ export default class MainScene extends Phaser.Scene {
     this.sound.play('testSound', {volume: 0.08, loop: true});
 
     // GUI
+    this.fpsText = new FpsText(this);
+
     const backpackIcon = this.add.image(this.cameras.main.width - 32, 53, 'icon-backpack');
     backpackIcon.setScrollFactor(0);
     backpackIcon.setInteractive();
@@ -129,13 +135,14 @@ export default class MainScene extends Phaser.Scene {
 
     // const roomOriginX = (this.cameras.main.width / 2) - roomWidth / 2;
     // const roomOriginY = (this.cameras.main.height / 2) - roomHeight / 2;
+    const dungeonGenerator = new DungeonGenerator();
 
     const [
       tileLayer,
       npcs,
       playerStartX,
       playerStartY
-    ] = generateDungeon(this);
+    ] = dungeonGenerator.generateDungeon(this);
     this.tileLayer = tileLayer;
 
     this.tileLayer.setDepth(0);
@@ -250,6 +257,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update(globalTime, delta) {
+    this.fpsText.update();
+
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalTime);
     });
@@ -325,5 +334,28 @@ export default class MainScene extends Phaser.Scene {
     this.abilty1Icon.setAlpha(cooldown1);
     this.abilty2Icon.setAlpha(cooldown2);
     this.abilty3Icon.setAlpha(cooldown3);
+
+    // if (Math.random() * this.lastLightLevel < 100) {
+    //   if (this.lastLightLevel < 255) {
+    //     this.lastLightLevel++;
+    //   }
+    // } else {
+    //   if (this.lastLightLevel > 0) {
+    //     this.lastLightLevel--;
+    //   }
+    // }
+    // const tint = parseInt(fullColorHex(this.lastLightLevel, this.lastLightLevel, this.lastLightLevel), 16);
+    this.tileLayer.forEachTile((tile) => tile.tint = 0x000000);
+    const playerX = Math.round(globalState.playerCharacter.x / TILE_WIDTH);
+    const playerY = Math.round(globalState.playerCharacter.y / TILE_HEIGHT);
+    for (let x = -5; x < 5; x++) {
+      for (let y = -5; y < 5; y++) {
+        const tile = this.tileLayer.getTileAt(playerX + x, playerY + y);
+        if (tile) {
+          tile.tint = 0xffffff;
+        }
+      }
+    }
+
   }
 }

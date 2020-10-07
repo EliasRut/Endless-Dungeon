@@ -1,4 +1,5 @@
-import { Facings, Faction } from "../helpers/constants";
+import { AbilityType } from "../abilities/abilityData";
+import { AbilityKey, Facings, Faction } from "../helpers/constants";
 import Character from './Character';
 
 // This class handles the players character and all mechanical events associated with it.
@@ -23,6 +24,12 @@ export default class PlayerCharacter extends Character {
     super('player', 100, 1, 200);
     this.faction = Faction.PLAYER;
   }
+
+  public abilityKeyMapping = {
+    [AbilityKey.ONE]: AbilityType.FIREBALL,
+    [AbilityKey.TWO]: AbilityType.ICESPIKE,
+    [AbilityKey.THREE]: AbilityType.DUSTNOVA,
+  };
 
   public updateStats(){
     this.maxHealth = 100 + this.itemHealth;

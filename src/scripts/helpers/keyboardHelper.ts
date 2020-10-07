@@ -1,6 +1,6 @@
 import { Abilities, AbilityType } from "../abilities/abilityData";
 import globalState from "../worldstate";
-import { AbilityKey, AbilityKeyMapping } from './constants';
+import { AbilityKey } from './constants';
 
 export default class KeyboardHelper {
   upKey: Phaser.Input.Keyboard.Key;
@@ -63,7 +63,7 @@ export default class KeyboardHelper {
   }
 
   getAbilityCooldown(abilityKey: AbilityKey, gameTime: number) {
-    const ability = AbilityKeyMapping[abilityKey] as AbilityType;
+    const ability = globalState.playerCharacter.abilityKeyMapping[abilityKey] as AbilityType;
     const abilityData = Abilities[ability];
     const lastCasted = globalState.playerCharacter.abilityCastTime[abilityKey];
     const readyAt = lastCasted + (abilityData.cooldownMs || 0);
@@ -87,7 +87,7 @@ export default class KeyboardHelper {
     if (!relevantKey.isDown) {
       return false;
     }
-    const ability = AbilityKeyMapping[abilityKey] as AbilityType;
+    const ability = globalState.playerCharacter.abilityKeyMapping[abilityKey] as AbilityType;
     const abilityData = Abilities[ability];
     const lastCasted = globalState.playerCharacter.abilityCastTime[abilityKey];
     const readyAt = lastCasted + (abilityData.cooldownMs || 0);

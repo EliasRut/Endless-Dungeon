@@ -48,9 +48,3 @@ export const enum AbilityKey {
   THREE = 2,
   FOUR = 3
 };
-
-export const AbilityKeyMapping = {
-  [AbilityKey.ONE]: AbilityType.FIREBALL,
-  [AbilityKey.TWO]: AbilityType.ICESPIKE,
-  [AbilityKey.THREE]: AbilityType.DUSTNOVA,
-};
