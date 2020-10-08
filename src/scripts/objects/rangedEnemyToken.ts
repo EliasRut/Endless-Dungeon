@@ -10,7 +10,7 @@ export default class RangedEnemyToken extends EnemyToken {
   constructor(scene: MainScene, x: number, y: number, tokenName: string) {
     super(scene,x,y,tokenName);
 
-        this.proximity = 100;
+        this.proximity = 100; //how close the enemy comes.
   }
 
   public update(time: number,) {
@@ -36,31 +36,31 @@ export default class RangedEnemyToken extends EnemyToken {
         const xSpeed = xFactor * this.stateObject.movementSpeed;
         const ySpeed = yFactor * this.stateObject.movementSpeed;
         const newFacing = getFacing(xSpeed, ySpeed);
-        const animation = this.stateObject.updateMovingState(true, newFacing);
-
-        if (animation) {
-            this.play(animation);
-        }
-
-        this.stateObject.currentFacing = newFacing;
 
         if (this.proximity < distance
             && distance < this.stateObject.vision
-            && this.attackedAt + 100 < time) {
+            && this.attackedAt + this.stateObject.attackTime < time
+            &&this.checkLoS(player)) {
                 this.setVelocityX(xSpeed);
                 this.setVelocityY(ySpeed);
+                this.stateObject.currentFacing = newFacing;
+                const animation = this.stateObject.updateMovingState(true, newFacing);
+
+                if (animation) {
+                    this.play(animation);
+                }
         } else {
             this.setVelocityX(0);
             this.setVelocityY(0);
-            const animation = 
-                this.stateObject.updateMovingState(false, this.stateObject.currentFacing);
+             const animation = 
+                 this.stateObject.updateMovingState(false, this.stateObject.currentFacing);
 
             if (animation) {
                 this.play(animation);
             }
         }
 
-        if(distance < this.proximity) {
+        if(distance <= this.proximity && this.checkLoS(player)) {
         this.attack(time);
         }
 
@@ -70,9 +70,7 @@ export default class RangedEnemyToken extends EnemyToken {
 
     attack(time) {
     const player = globalState.playerCharacter;
-
-        console.log("range attacker");
-        if (this.attackedAt + 5000 < time) {
+        if (this.attackedAt + this.stateObject.attackTime < time) {
           this.setVelocityX(0);
           this.setVelocityY(0);
           this.attackedAt = time;

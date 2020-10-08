@@ -35,6 +35,21 @@ export default abstract class EnemyToken extends CharacterToken {
     const py = player.y;
     return Math.sqrt((this.x - px)*(this.x - px) + (this.y - py)*(this.y - py));
   }
+  public checkLoS(player: PlayerCharacter) {
+    var ray = new Phaser.Geom.Line(this.x, this.y, player.x, player.y);
+    var tiles = this.scene.tileLayer.getTilesWithinShape(ray);
+    for (let i = 0; i < tiles.length - 1; i++) {
+      if (tiles[i].canCollide === true) {
+        break;
+      }
+      if (i === tiles.length - 2) {
+        console.log("check lose true");
+        return true;
+      }
+    }
+    console.log("check los false");
+    return false;
+  }
 
   dropItem(player: PlayerCharacter, scene: MainScene) {
     if(this.scene === undefined) { 
@@ -42,7 +57,6 @@ export default abstract class EnemyToken extends CharacterToken {
       return;
     }
     const sc = scene;
-    
     const rndItem = Math.floor(Math.random() * 63); // todo calculate from tileset
     const length = sc.weapon.push(new Weapon(sc, this.x, this.y, rndItem));
     sc.weapon[length-1].setDepth(1);
