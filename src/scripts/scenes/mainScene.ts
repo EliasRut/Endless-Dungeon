@@ -335,27 +335,37 @@ export default class MainScene extends Phaser.Scene {
     this.abilty2Icon.setAlpha(cooldown2);
     this.abilty3Icon.setAlpha(cooldown3);
 
-    // if (Math.random() * this.lastLightLevel < 100) {
-    //   if (this.lastLightLevel < 255) {
-    //     this.lastLightLevel++;
-    //   }
-    // } else {
-    //   if (this.lastLightLevel > 0) {
-    //     this.lastLightLevel--;
-    //   }
-    // }
-    // const tint = parseInt(fullColorHex(this.lastLightLevel, this.lastLightLevel, this.lastLightLevel), 16);
+    this.updateDynamicLighting();
+  }
+
+  updateDynamicLighting() {
+    // Color everything black by default
     this.tileLayer.forEachTile((tile) => tile.tint = 0x000000);
-    const playerX = Math.round(globalState.playerCharacter.x / TILE_WIDTH);
-    const playerY = Math.round(globalState.playerCharacter.y / TILE_HEIGHT);
-    for (let x = -5; x < 5; x++) {
-      for (let y = -5; y < 5; y++) {
-        const tile = this.tileLayer.getTileAt(playerX + x, playerY + y);
+    // We have a slight offset on the player token, not yet sure why
+    const playerTokenX = globalState.playerCharacter.x - 5;
+    const playerTokenY = globalState.playerCharacter.y;
+    // Get the tile the player token is on
+    const playerTileX = Math.round(playerTokenX / TILE_WIDTH);
+    const playerTileY = Math.round(playerTokenY / TILE_HEIGHT);
+    // We calculate darkness values for 32x32 tiles, seems to be enough visually speaking
+    for (let x = -16; x < 16; x++) {
+      for (let y = -16; y < 16; y++) {
+        const tile = this.tileLayer.getTileAt(playerTileX + x, playerTileY + y);
+        // This prevents us from getting Runtime exceptions when we try to set values for a non
+        // existing tile, like -1/-1
         if (tile) {
-          tile.tint = 0xffffff;
+          const distanceX = playerTokenX - tile.pixelX;
+          const distanceY = playerTokenY - tile.pixelY;
+          // Good old pythagoras for getting actual distance to the tile
+          const distance = Math.hypot(distanceX, distanceY);
+          // This will be a factor between 0 and 1
+          const distanceNormalized = Math.max(0, 255 - distance) / 255;
+          // We multiply by 300 to have a bit larger well-lit radius
+          const d = Math.min(255, Math.round(distanceNormalized  * 300));
+          // This will give us a hex value of 0xdddddd, so a greyscale lighting factor
+          tile.tint = 0x010000 * d + 0x000100 * d + 0x000001 * d;
         }
       }
     }
-
   }
 }
