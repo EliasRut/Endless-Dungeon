@@ -32,9 +32,11 @@ export default class FireBallEffect extends AbilityEffect {
 
   destroy() {
     this.emitter.stopFollow();
-    this.emitter.setEmitterAngle({min: -180, max: 180});
-    this.emitter.setSpeed(100);
-    this.emitter.explode(10, this.body.x, this.body.y);
+    if (this.body) {
+      this.emitter.setEmitterAngle({min: -180, max: 180});
+      this.emitter.setSpeed(100);
+      this.emitter.explode(10, this.body.x, this.body.y);
+    }
 
     super.destroy();
   }

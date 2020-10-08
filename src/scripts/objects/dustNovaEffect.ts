@@ -38,6 +38,5 @@ export default class DustNovaEffect extends AbilityEffect {
     this.emitter.stop();
 
     super.destroy();
-    debugger;
   }
 }

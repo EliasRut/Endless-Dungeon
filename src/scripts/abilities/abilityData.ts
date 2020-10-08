@@ -12,6 +12,7 @@ interface ProjectileData {
   effect: typeof AbilityEffect;
   collisionSound?: string;
   sfxVolume?: number;
+  delay?: number;
 }
 
 interface AbilityData {
@@ -37,7 +38,7 @@ export const Abilities: {[type: string]: AbilityData} = {
       yOffset: 32,
       effect: FireBallEffect,
       collisionSound: 'sound-fireball-explosion',
-      sfxVolume: 0.4
+      sfxVolume: 0.4,
     },
     sound: 'sound-fireball',
     sfxVolume: 0.2,
@@ -46,7 +47,7 @@ export const Abilities: {[type: string]: AbilityData} = {
   [AbilityType.ICESPIKE]: {
     projectiles: 1,
     projectileData: {
-      velocity: 300,
+      velocity: 400,
       xOffset: 16,
       yOffset: 16,
       effect: IceSpikeEffect,

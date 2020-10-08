@@ -7,7 +7,7 @@ import PlayerCharacter from '../worldstate/PlayerCharacter';
 import FireBallEffect from '../objects/fireBallEffect';
 import DustNovaEffect from '../objects/dustNovaEffect';
 import IceSpikeEffect from '../objects/iceSpikeEffect';
-import { getFacing, getVelocitiesForFacing } from '../helpers/orientation';
+import { getFacing, getRotationInRadiansForFacing, getVelocitiesForFacing } from '../helpers/orientation';
 // import FireBall from '../abilities/fireBall'
 import EnemyToken from '../objects/enemyToken';
 import RangedEnemyToken from '../objects/rangedEnemyToken';
@@ -36,7 +36,7 @@ export default class MainScene extends Phaser.Scene {
   soundKey1: Phaser.Input.Keyboard.Key;
   soundKey2: Phaser.Input.Keyboard.Key;
   keyboardHelper: KeyboardHelper;
-  // effects: Map<string, FireBall>;
+
   enemy: EnemyToken[];
   weapon: Weapon[];
   sportLight: Phaser.GameObjects.Light;
@@ -47,7 +47,7 @@ export default class MainScene extends Phaser.Scene {
   lastCameraPosition: {x: number, y: number};
   abilityEffects: AbilityEffect[] = [];
   abilities: AbilityEffect[];
-  alive:number;
+  alive: number;
   isPaused = false;
   healthBar: Phaser.GameObjects.Image;
   abilty1Icon: Phaser.GameObjects.Image;
@@ -124,17 +124,6 @@ export default class MainScene extends Phaser.Scene {
   }
 
   drawRoom() {
-    // const roomId = getUrlParam('roomName') || 'firstTest';
-    // const room = this.cache.json.get(`room-${roomId}`) as Room;
-    // const roomTileset = room.tileset;
-
-    // const map = this.make.tilemap({data: room.layout, tileWidth: 16, tileHeight: 16});
-    // const tiles = map.addTilesetImage(`${roomTileset}-image`, roomTileset, 16, 16, 1, 2);
-    // const roomHeight = tiles.tileHeight * room.layout.length;
-    // const roomWidth = tiles.tileWidth * room.layout[0].length;
-
-    // const roomOriginX = (this.cameras.main.width / 2) - roomWidth / 2;
-    // const roomOriginY = (this.cameras.main.height / 2) - roomHeight / 2;
     const dungeonGenerator = new DungeonGenerator();
 
     const [
@@ -197,41 +186,33 @@ export default class MainScene extends Phaser.Scene {
   }
 
   triggerAbility(origin: Character, type: AbilityType) {
-    // throw all projectiles
+    // We allow for multiple projectiles per ability.
+    // Let's get the data for ability projectiles first.
     const projectileData = Abilities[type].projectileData;
-    const facingVelocities = origin.getFacingVelocities();
+    // Since we're allowing projectiles to have a spread, we'll be using radians for easier math
+    const facingRotation = getRotationInRadiansForFacing(origin.currentFacing);
     const numProjectiles =  (Abilities[type].projectiles || 0);
-    for (let i = 0; i < numProjectiles; i++) {
+    const fireProjectile = (projectileIndex: number) => {
+      // Spread multiple projectiles over an arc on a circle
       const spread = projectileData?.spread ? projectileData!.spread : [0, 0];
+      // The total arc we want to cover
       const spreadDistance = spread[1] - spread[0];
-      let effect;
-      if (spreadDistance) {
-        const currentSpread = spread[0] + spreadDistance * (i / numProjectiles);
-        const xMultiplier = Math.sin(currentSpread * Math.PI);
-        const yMultiplier = Math.cos(currentSpread * Math.PI);
-        effect = new projectileData!.effect(
-          this,
-          origin.x + xMultiplier * projectileData!.xOffset,
-          origin.y + yMultiplier * projectileData!.yOffset,
-          '',
-          origin.currentFacing
-        );
-        effect.setVelocity(xMultiplier, yMultiplier);
-        effect.body.velocity.scale(projectileData!.velocity);
-      } else {
-        effect = new projectileData!.effect(
-          this,
-          origin.x + facingVelocities.x * projectileData!.xOffset,
-          origin.y + facingVelocities.y * projectileData!.yOffset,
-          '',
-          origin.currentFacing
-        );
-        effect.setVelocity(facingVelocities.x, facingVelocities.y);
-        effect.body.velocity.normalize().scale(projectileData!.velocity);
-      }
-      if (projectileData?.drag) {
-        effect.setDrag(projectileData.drag);
-      }
+      // The current point in the arc we are at
+      const currentSpread = spread[0] + spreadDistance * (projectileIndex / numProjectiles);
+      // We want to combine the arc position with the characters facing to allow cone-like effects
+      const yMultiplier = -Math.cos(currentSpread * Math.PI + facingRotation);
+      const xMultiplier = Math.sin(currentSpread * Math.PI + facingRotation);
+      const effect = new projectileData!.effect(
+        this,
+        origin.x + xMultiplier * projectileData!.xOffset,
+        origin.y + yMultiplier * projectileData!.yOffset,
+        '',
+        origin.currentFacing
+      );
+      effect.setVelocity(xMultiplier, yMultiplier);
+      effect.body.velocity.scale(projectileData!.velocity);
+
+      effect.setDrag(projectileData!.drag || 0);
 
       this.physics.add.collider(effect, this.tileLayer, () => {
         effect.destroy();
@@ -251,6 +232,16 @@ export default class MainScene extends Phaser.Scene {
       });
       this.abilityEffects.push(effect);
     }
+    // Go through all projectiles the ability should launch
+    for (let i = 0; i < numProjectiles; i++) {
+      // If the ability uses time delayed casting, use a timeout for each of them
+      if (projectileData?.delay) {
+        setTimeout(() => fireProjectile(i), i * projectileData.delay);
+      } else { // If not, we can cast them immediately
+        fireProjectile(i);
+      }
+    }
+    // We just want to play the ability sound once, not once for each projectile
     if (Abilities[type].sound) {
       this.sound.play(Abilities[type].sound!, {volume: Abilities[type].sfxVolume!});
     }
@@ -300,27 +291,6 @@ export default class MainScene extends Phaser.Scene {
     this.abilityEffects.forEach((effect) => {
       effect.update();
     });
-
-    // if (this.keyboardHelper.abilityKey3.isDown && !this.dustnovaEffect) {
-    //   const fireballVelocities = getVelocitiesForFacing(globalState.playerCharacter.currentFacing)!;
-    //   this.dustnovaEffect = new DustNovaEffect(
-    //     this,
-    //     this.mainCharacter.x + (16 * fireballVelocities.x),
-    //     this.mainCharacter.y + (16 * fireballVelocities.y)
-    //   );
-    //   this.dustnovaEffect.setVelocity(fireballVelocities.x, fireballVelocities.y);
-    //   this.dustnovaEffect.body.velocity.normalize().scale(300);
-
-    //   this.physics.add.collider(this.dustnovaEffect, this.tileLayer, (effect) => {
-    //     effect.destroy();
-    //     this.dustnovaEffect = undefined;
-    //   });
-    //   this.physics.add.collider(this.dustnovaEffect, this.enemy, (effect, enemy) => {
-    //     effect.destroy();
-    //     this.dustnovaEffect = undefined;
-    //     this.enemy[0].health = this.enemy[0].health - globalState.playerCharacter.damage;
-    //   });
-    // }
 
     if (this.soundKey2.isDown) {
       this.sound.stopAll();
