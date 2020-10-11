@@ -63,7 +63,7 @@ export const Abilities: {[type: string]: AbilityData} = {
     projectileData: {
       spread: [-1, 1],
       velocity: 150,
-      drag: 200,
+      // drag: 200,
       xOffset: 20,
       yOffset: 20,
       effect: DustNovaEffect,

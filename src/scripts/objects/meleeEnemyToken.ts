@@ -30,7 +30,7 @@ export default class MeleeEnemyToken extends EnemyToken {
   }
 
   public update(time: number) {
-        // super.update(time);
+        super.update(time);
 
         const player = globalState.playerCharacter;
 

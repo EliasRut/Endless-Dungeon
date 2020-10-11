@@ -22,11 +22,13 @@ import AbilityEffect from '../objects/abilityEffect';
 import Character from '../worldstate/Character';
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import CharacterToken from '../objects/characterToken';
-import { Faction } from '../helpers/constants';
-import DungeonGenerator from '../helpers/generateDungeon';
+import { Faction, VISITED_TILE_TINT } from '../helpers/constants';
+import DungeonGenerator, { DUNGEON_BLOCKS_Y, DUNGEON_HEIGHT } from '../helpers/generateDungeon';
 import FpsText from '../objects/fpsText';
 import { fullColorHex } from '../helpers/colors';
-import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
+import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_BLOCKS_X, DUNGEON_WIDTH } from '../helpers/generateDungeon';
+
+const visibleTiles: boolean[][] = [];
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -56,6 +58,12 @@ export default class MainScene extends Phaser.Scene {
   tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
   lastLightLevel: number = 255;
 
+  lightingLevels: number[][] = [];
+
+  isBlockingTile: boolean[][] = [];
+  updatedTiles: [number, number][] = [];
+  visitedTiles: number[][] = [];
+
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -67,7 +75,9 @@ export default class MainScene extends Phaser.Scene {
 
     this.enemy = [];
     this.weapon = [];
-    const [startX, startY] = this.drawRoom()
+    const [startX, startY] = this.drawRoom();
+
+    this.prepareDynamicLighting();
 
     this.mainCharacter = new PlayerCharacterToken(this, startX, startY);
     this.mainCharacter.setDepth(1);
@@ -77,46 +87,12 @@ export default class MainScene extends Phaser.Scene {
     this.keyboardHelper = new KeyboardHelper(this);
     this.soundKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
     this.soundKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
+    
     this.drawOverlayScreens();
 
+    this.drawGUI();
+
     this.sound.play('testSound', {volume: 0.08, loop: true});
-
-    // GUI
-    this.fpsText = new FpsText(this);
-
-    const backpackIcon = this.add.image(this.cameras.main.width - 32, 53, 'icon-backpack');
-    backpackIcon.setScrollFactor(0);
-    backpackIcon.setInteractive();
-    backpackIcon.on('pointerdown', () => {
-      if (this.isPaused) {
-        this.physics.resume();
-        this.time.paused = false;
-      } else {
-        this.physics.pause();
-        this.time.paused = true;
-      }
-      this.isPaused = !this.isPaused;
-      this.overlayScreens.inventory.toggleVisible();
-      this.overlayScreens.statScreen.toggleVisible();
-    });
-
-    const heroIcon = this.add.image(32, 40, 'icon-hero');
-    heroIcon.setScrollFactor(0);
-
-    const guiBaseIcon = this.add.image(116, 50, 'icon-guibase');
-    guiBaseIcon.setScrollFactor(0);
-
-    this.healthBar = this.add.image(62, 36, 'icon-healthbar');
-    this.healthBar.setScrollFactor(0);
-    this.healthBar.setOrigin(0, 0.5);
-
-    this.abilty1Icon = this.add.image(72, 63, 'icon-abilities', 0);
-    this.abilty1Icon.setScrollFactor(0);
-    this.abilty2Icon = this.add.image(101, 63, 'icon-abilities', 1);
-    this.abilty2Icon.setScrollFactor(0);
-    this.abilty3Icon = this.add.image(130, 63, 'icon-abilities', 2);
-    this.abilty3Icon.setScrollFactor(0);
-
   }
 
   collectItem(player, item) {
@@ -160,6 +136,91 @@ export default class MainScene extends Phaser.Scene {
     });
 
     return [playerStartX, playerStartY];
+  }
+
+  prepareDynamicLighting() {
+    this.tileLayer.forEachTile((tile) => tile.tint = 0x000000);
+    for (let x = 0; x < DUNGEON_WIDTH; x++) {
+        this.isBlockingTile[x] = [];
+        this.visitedTiles[x] = [];
+      for (let y = 0; y < DUNGEON_HEIGHT; y++) {
+        this.visitedTiles[x][y] = 0;
+        const tile = this.tileLayer.getTileAt(x, y);
+        if (!tile) {
+          this.isBlockingTile[x][y] = true;
+        } else {
+          const tileIdNormalized = tile.index % 1000;
+          this.isBlockingTile[x][y] = tileIdNormalized < 15 ||
+            (tileIdNormalized >= 45 && tileIdNormalized < 60);
+        }
+      }
+    }
+
+    for (let x = 0; x < 18 * 16; x++) {
+      this.lightingLevels[x] = [];
+      for (let y = 0; y < 18 * 16; y++) {
+        // Good old pythagoras for getting actual distance to the tile
+        const distance = Math.hypot(x, y);
+        // This will be a factor between 0 and 1
+        const distanceNormalized = Math.max(0, 255 - distance) / 255;
+        // We multiply by 300 to have a bit larger well-lit radius
+        const d = Math.min(255, Math.round(distanceNormalized  * 300));
+        // This will give us a hex value of 0xdddddd, so a greyscale lighting factor
+        this.lightingLevels[x][y] = Math.max(VISITED_TILE_TINT,
+          0x010000 * d + 0x000100 * d + 0x000001 * d);
+      }
+    }
+
+    for (let x = 0; x < 32; x++) {
+      visibleTiles[x] = [];
+      for (let y = 0; y < 32; y++) {
+        visibleTiles[x][y] = false;
+      }
+    }
+  }
+
+  drawGUI() {
+    // GUI
+    this.fpsText = new FpsText(this);
+
+    const backpackIcon = this.add.image(this.cameras.main.width - 32, 53, 'icon-backpack');
+    backpackIcon.setScrollFactor(0);
+    backpackIcon.setInteractive();
+    backpackIcon.on('pointerdown', () => {
+      if (this.isPaused) {
+        this.physics.resume();
+        this.time.paused = false;
+      } else {
+        this.physics.pause();
+        this.time.paused = true;
+      }
+      this.isPaused = !this.isPaused;
+      this.overlayScreens.inventory.toggleVisible();
+      this.overlayScreens.statScreen.toggleVisible();
+    });
+
+    const heroIcon = this.add.image(32, 40, 'icon-hero');
+    heroIcon.setScrollFactor(0);
+    heroIcon.setDepth(2);
+
+    const guiBaseIcon = this.add.image(116, 50, 'icon-guibase');
+    guiBaseIcon.setScrollFactor(0);
+    guiBaseIcon.setDepth(2);
+
+    this.healthBar = this.add.image(62, 36, 'icon-healthbar');
+    this.healthBar.setScrollFactor(0);
+    this.healthBar.setOrigin(0, 0.5);
+    this.healthBar.setDepth(2);
+
+    this.abilty1Icon = this.add.image(72, 63, 'icon-abilities', 0);
+    this.abilty1Icon.setScrollFactor(0);
+    this.abilty1Icon.setDepth(2);
+    this.abilty2Icon = this.add.image(101, 63, 'icon-abilities', 1);
+    this.abilty2Icon.setScrollFactor(0);
+    this.abilty2Icon.setDepth(2);
+    this.abilty3Icon = this.add.image(130, 63, 'icon-abilities', 2);
+    this.abilty3Icon.setScrollFactor(0);
+    this.abilty3Icon.setDepth(2);
   }
 
   renderDebugGraphics() {
@@ -250,13 +311,6 @@ export default class MainScene extends Phaser.Scene {
   update(globalTime, delta) {
     this.fpsText.update();
 
-    this.enemy.forEach(curEnemy => {
-      curEnemy.update(globalTime);
-    });
-    this.weapon.forEach(curWeapon => {
-      curWeapon.update(globalState.playerCharacter);
-    });
-
     if(globalState.playerCharacter.health <= 0 && this.alive ===0){
       this.cameras.main.fadeOut(3000);
       console.log("you died");
@@ -277,8 +331,8 @@ export default class MainScene extends Phaser.Scene {
     this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
     this.mainCharacter.body.velocity.normalize().scale(speed);
 
-    globalState.playerCharacter.x = this.mainCharacter.x;
-    globalState.playerCharacter.y = this.mainCharacter.y;
+    globalState.playerCharacter.x = Math.round(this.mainCharacter.x);
+    globalState.playerCharacter.y = Math.round(this.mainCharacter.y);
 
     const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
     castAbilities.forEach((ability) => {
@@ -306,11 +360,23 @@ export default class MainScene extends Phaser.Scene {
     this.abilty3Icon.setAlpha(cooldown3);
 
     this.updateDynamicLighting();
+
+    this.enemy.forEach(curEnemy => {
+      curEnemy.update(globalTime);
+    });
+    this.weapon.forEach(curWeapon => {
+      curWeapon.update(globalState.playerCharacter);
+    });
   }
 
+  // Used only for performance debugging
+  dynamicLightingTimes: number[] = [];
+  reducedLightingArray: number[][] = [];
+
   updateDynamicLighting() {
-    // Color everything black by default
-    this.tileLayer.forEachTile((tile) => tile.tint = 0x000000);
+    // Take time for benchmarking
+    const beforeDynamicLighting = window.performance.now();
+
     // We have a slight offset on the player token, not yet sure why
     const playerTokenX = globalState.playerCharacter.x - 5;
     const playerTokenY = globalState.playerCharacter.y;
@@ -318,23 +384,102 @@ export default class MainScene extends Phaser.Scene {
     const playerTileX = Math.round(playerTokenX / TILE_WIDTH);
     const playerTileY = Math.round(playerTokenY / TILE_HEIGHT);
     // We calculate darkness values for 32x32 tiles, seems to be enough visually speaking
-    for (let x = -16; x < 16; x++) {
-      for (let y = -16; y < 16; y++) {
-        const tile = this.tileLayer.getTileAt(playerTileX + x, playerTileY + y);
-        // This prevents us from getting Runtime exceptions when we try to set values for a non
-        // existing tile, like -1/-1
+    const lowerBoundX = Math.min(16, playerTileX) * -1;
+    const upperBoundX = Math.min(16, 127 - playerTileX);
+    const lowerBoundY = Math.min(16, playerTileY) * -1;
+    const upperBoundY = Math.min(16, 127 - playerTileY);
+
+    // The player character tile is always fully lit
+    const playerTile = this.tileLayer.getTileAt(playerTileX, playerTileY);
+    playerTile.tint = 0xffffff;
+
+    for (let x = 0; x < 32; x++) {
+      for (let y = 0; y < 32; y++) {
+        visibleTiles[x][y] = false;
+      }
+    }
+
+    for (let xVect = -14; xVect < 14; xVect++) {
+      for (let yVect = -14; yVect < 14; yVect++) {
+        this.castLightingRay(
+          playerTileX,
+          playerTileY,
+          xVect / 14,
+          yVect / 14,
+          14
+        );
+      }
+    }
+
+    for (let x = lowerBoundX; x < upperBoundX; x++) {
+      for (let y = lowerBoundY; y < upperBoundY; y++) {
+        const tileX = playerTileX + x;
+        const tileY = playerTileY + y;
+        const tile = this.tileLayer.getTileAt(tileX, tileY);
+
+        // Not all fields have tiles, black fields have no tile
         if (tile) {
-          const distanceX = playerTokenX - tile.pixelX;
-          const distanceY = playerTokenY - tile.pixelY;
-          // Good old pythagoras for getting actual distance to the tile
-          const distance = Math.hypot(distanceX, distanceY);
-          // This will be a factor between 0 and 1
-          const distanceNormalized = Math.max(0, 255 - distance) / 255;
-          // We multiply by 300 to have a bit larger well-lit radius
-          const d = Math.min(255, Math.round(distanceNormalized  * 300));
-          // This will give us a hex value of 0xdddddd, so a greyscale lighting factor
-          tile.tint = 0x010000 * d + 0x000100 * d + 0x000001 * d;
+          const distanceX = Math.abs(playerTokenX - tile.pixelX);
+          const distanceY = Math.abs(playerTokenY - tile.pixelY);
+          // Visited Tiles is either VISITED_TILE_TINT or 0 for each tile
+          this.visitedTiles[tileX][tileY] = Math.max(
+            VISITED_TILE_TINT * (visibleTiles[x + 16][y + 16] as unknown as number),
+            this.visitedTiles[tileX][tileY]
+          );
+
+          // That is: lightingLevel for the distance if it is currently visible, 
+          // VISITED_TILE_TINT if it has been visited before,
+          // black otherwise
+          tile.tint = visibleTiles[x + 16][y + 16] as unknown as number *
+            this.lightingLevels[distanceX][distanceY] +
+            (1 - (visibleTiles[x + 16][y + 16] as unknown as number)) *
+              this.visitedTiles[tileX][tileY];
         }
+      }
+    }
+
+    this.dynamicLightingTimes.push(window.performance.now() - beforeDynamicLighting);
+    if (this.dynamicLightingTimes.length >= 600) {
+      const avg = this.dynamicLightingTimes.reduce((sum, value) => sum + value)
+        / this.dynamicLightingTimes.length;
+      console.log(`Dynamic lighting took on avg ${avg} ms`);
+      this.dynamicLightingTimes = [];
+    }
+  }
+
+  // This is a bit performance optimized :D
+  castLightingRay = (
+    originX: number,
+    originY: number,
+    vectorX: number,
+    vectorY: number,
+    steps: number
+  ) => {
+    let x = 0;
+    let y = 0;
+    let xDelta = 0;
+    let yDelta = 0;
+    // Basically, we don't want to have to deal with decimal values, so multiply by 10000 and round
+    const xThreshold = 10000;
+    const yThreshold = 10000;
+    const xStepDiff = vectorX < 0 ? -1 : 1;
+    const yStepDiff = vectorY < 0 ? -1 : 1;
+    const vectorXAbs = Math.abs(Math.round(vectorX * 10000));
+    const vectorYAbs = Math.abs(Math.round(vectorY * 10000));
+    // We don't want to multiply if we can prevent it, but we want to have if statements even less
+    // So what we end up doing is using the boolean-as-a-number trick and multiply where we have to
+    for (let i = 1; i <= steps; i++) {
+      xDelta += vectorXAbs;
+      yDelta += vectorYAbs;
+      x += (xDelta >= xThreshold) as unknown as number * xStepDiff;
+      y += (yDelta >= yThreshold) as unknown as number * yStepDiff;
+      xDelta -= (xDelta >= xThreshold) as unknown as number * xThreshold;
+      yDelta -= (yDelta >= yThreshold) as unknown as number * yThreshold;
+
+      visibleTiles[x + 16][y + 16] = true;
+      if (this.isBlockingTile[x + originX][y + originY]) {
+        // Break actually stops this ray from being casted
+        break;
       }
     }
   }
