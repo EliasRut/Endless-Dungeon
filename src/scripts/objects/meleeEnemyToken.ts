@@ -26,7 +26,7 @@ export default class MeleeEnemyToken extends EnemyToken {
     });
     this.emitter.startFollow(this.body.gameObject);
     this.emitter.start();
-    this.proximity = 15; //how close the enemy comes
+    this.attackRange = 15; //how close the enemy comes
   }
 
   public update(time: number) {
@@ -41,9 +41,9 @@ export default class MeleeEnemyToken extends EnemyToken {
             return;
         }
 
-        const px = player.x;
-        const py = player.y;
-        const distance = this.getDistance(player);
+        const tx = this.target.x;
+        const ty = this.target.y;
+        const distance = this.getDistance(tx, ty);
 
         // damages & slows you if you're close
         if (distance < 30) {
@@ -55,14 +55,13 @@ export default class MeleeEnemyToken extends EnemyToken {
         }
 
         //follows you only if you're close enough, then runs straight at you, stop when close enough (proximity)
-        if (this.proximity < distance
-            && distance < this.stateObject.vision
-            && this.attackedAt + this.stateObject.attackTime < time
-            && this.checkLoS(player)) {
+        if (this.aggro
+          && this.attackedAt + this.stateObject.attackTime < time
+          && this.attackRange < distance) {
 
-          const totalDistance = Math.abs(px - this.x) + Math.abs(py - this.y);
-          const xSpeed = (px - this.x) / totalDistance * this.stateObject.movementSpeed;
-          const ySpeed = (py - this.y) / totalDistance * this.stateObject.movementSpeed;
+          const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
+          const xSpeed = (tx - this.x) / totalDistance * this.stateObject.movementSpeed;
+          const ySpeed = (ty - this.y) / totalDistance * this.stateObject.movementSpeed;
           this.setVelocityX(xSpeed);
           this.setVelocityY(ySpeed);
           this.emitter.setSpeedX(xSpeed);
@@ -78,13 +77,13 @@ export default class MeleeEnemyToken extends EnemyToken {
           this.setVelocityY(0);
           this.emitter.setSpeedX(0);
           this.emitter.setSpeedY(0);
-          const animation = 
+          const animation =
             this.stateObject.updateMovingState(false, this.stateObject.currentFacing);
           if (animation) {
             this.play(animation);
           }
         }
-    if(distance <= this.proximity) {
+    if(distance <= this.attackRange) {
       this.attack(time);
     }
     this.stateObject.x = this.body.x;

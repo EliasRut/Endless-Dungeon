@@ -186,6 +186,7 @@ export default class MainScene extends Phaser.Scene {
     const backpackIcon = this.add.image(this.cameras.main.width - 32, 53, 'icon-backpack');
     backpackIcon.setScrollFactor(0);
     backpackIcon.setInteractive();
+    backpackIcon.setDepth(2);
     backpackIcon.on('pointerdown', () => {
       if (this.isPaused) {
         this.physics.resume();
