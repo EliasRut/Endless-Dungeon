@@ -134,17 +134,17 @@ const CROSSWAY = [
 ];
 
 const CORRIDOR_LAYOUTS = {
-  1: TILED_PATH,
-  2: TILED_PATH,
+  1: TILED_PATH, // North - Binary 0001
+  2: TILED_PATH, // East - Binary 0010
   3: CORRIDOR_DOWN_LEFT,
-  4: TILED_PATH,
+  4: TILED_PATH, // South - Binary 0100
   5: CORRIDOR_UP,
   6: CORRIDOR_UP_LEFT,
   7: T_CROSSING_TOP_LEFT_BOTTOM,
-  8: TILED_PATH,
+  8: TILED_PATH, // West - Binary 1000
   9: CORRIDOR_DOWN_RIGHT,
-  10: CORRIDOR_LEFT,
-  11: T_CROSSING_TOP_LEFT_RIGHT,
+  10: CORRIDOR_LEFT, // East + West
+  11: T_CROSSING_TOP_LEFT_RIGHT,  // East + West + North
   12: CORRIDOR_UP_RIGHT,
   13: T_CROSSING_TOP_RIGHT_BOTTOM,
   14: T_CROSSING_LEFT_RIGHT_BOTTOM,
@@ -164,13 +164,8 @@ export default class DungeonGenerator {
   combinedLayout: number[][];
   blocksUsed: number[][];
   tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-  // const rooms = globalState.availableRooms;
-  // const startRoomIndex = Math.max(0, rooms.findIndex((room) => room.startRoom));
-  // const roomOffsets: [number, number][] = [];
-  // const tileSetCollections: {[name: string]: number[]} = {};
-  // const tileSetGid: {[name: string]: number} = {};
 
-public generateDungeon: (scene: Phaser.Scene) => [
+  public generateDungeon: (scene: Phaser.Scene) => [
       Phaser.Tilemaps.DynamicTilemapLayer,
       NpcPositioning[],
       number,
@@ -388,7 +383,7 @@ public generateDungeon: (scene: Phaser.Scene) => [
         gid
       );
     });
-    this.tileLayer = map.createDynamicLayer(0, tileSets, 0, 0 );
+    this.tileLayer = map.createDynamicLayer(0, tileSets, 0, 0);
     this.tileLayer.setCollisionBetween(0, (Object.keys(this.tileSetGid).length + 1) * 1000, false);
     Object.keys(this.tileSetCollections).map((tileSetName) => {
       const gid = this.tileSetGid[tileSetName];

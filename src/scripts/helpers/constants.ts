@@ -49,4 +49,4 @@ export const enum AbilityKey {
   FOUR = 3
 };
 
-export const VISITED_TILE_TINT = 0x444444;
+export const VISITED_TILE_TINT = 0x333333;
