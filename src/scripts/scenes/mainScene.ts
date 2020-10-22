@@ -1,20 +1,12 @@
 import 'phaser'
 import PlayerCharacterToken from '../objects/playerCharacterToken';
-import { getUrlParam } from '../helpers/browserState'
-import { Room} from '../../../typings/custom'
 import globalState from '../worldstate/index';
-import PlayerCharacter from '../worldstate/PlayerCharacter';
-import FireBallEffect from '../objects/fireBallEffect';
-import DustNovaEffect from '../objects/dustNovaEffect';
-import IceSpikeEffect from '../objects/iceSpikeEffect';
-import { getFacing, getRotationInRadiansForFacing, getVelocitiesForFacing } from '../helpers/orientation';
+import { getFacing, getRotationInRadiansForFacing } from '../helpers/orientation';
 // import FireBall from '../abilities/fireBall'
 import EnemyToken from '../objects/enemyToken';
 import RangedEnemyToken from '../objects/rangedEnemyToken';
 import MeleeEnemyToken from '../objects/meleeEnemyToken';
-import ItemToken from '../objects/itemToken';
 import Weapon from '../objects/weapon';
-import OverlayScreen from '../screens/overlayScreen'
 import StatScreen from '../screens/statScreen';
 import InventoryScreen from '../screens/inventoryScreen'
 import KeyboardHelper from '../helpers/keyboardHelper'
@@ -23,10 +15,9 @@ import Character from '../worldstate/Character';
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import CharacterToken from '../objects/characterToken';
 import { Faction, VISITED_TILE_TINT } from '../helpers/constants';
-import DungeonGenerator, { DUNGEON_BLOCKS_Y, DUNGEON_HEIGHT } from '../helpers/generateDungeon';
+import DungeonGenerator, { DUNGEON_HEIGHT } from '../helpers/generateDungeon';
 import FpsText from '../objects/fpsText';
-import { fullColorHex } from '../helpers/colors';
-import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_BLOCKS_X, DUNGEON_WIDTH } from '../helpers/generateDungeon';
+import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_WIDTH } from '../helpers/generateDungeon';
 
 const visibleTiles: boolean[][] = [];
 
