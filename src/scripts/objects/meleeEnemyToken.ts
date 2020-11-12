@@ -36,7 +36,7 @@ export default class MeleeEnemyToken extends EnemyToken {
 
         // check death
         if (this.stateObject.health <= 0){
-            this.dropItem(player,this.scene);
+            this.dropItem();
             this.destroy();
             return;
         }
@@ -54,7 +54,8 @@ export default class MeleeEnemyToken extends EnemyToken {
           player.slowFactor = 1;
         }
 
-        //follows you only if you're close enough, then runs straight at you, stop when close enough (proximity)
+        // follows you only if you're close enough, then runs straight at you,
+        // stop when close enough (proximity)
         if (this.aggro
           && this.attackedAt + this.stateObject.attackTime < time
           && this.attackRange < distance) {
@@ -91,7 +92,6 @@ export default class MeleeEnemyToken extends EnemyToken {
   }
 
   destroy() {
-
     this.emitter.stopFollow();
     this.emitter.stop();
 

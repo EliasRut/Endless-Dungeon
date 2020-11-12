@@ -10,4 +10,7 @@ export default class AbilityEffect extends Phaser.Physics.Arcade.Sprite {
       this.destroyed = true;
       super.destroy();
     }
+
+    // tslint:disable-next-line: no-empty
+    static onCast() {}
   }

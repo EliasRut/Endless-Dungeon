@@ -21,8 +21,8 @@ import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_WIDTH } from '../helpers/generateDunge
 
 const visibleTiles: boolean[][] = [];
 
-const sightRadius = 18;
-const lightRadius = 10;
+const sightRadius = 12;
+const lightRadius = 8;
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -49,6 +49,7 @@ export default class MainScene extends Phaser.Scene {
   abilty1Icon: Phaser.GameObjects.Image;
   abilty2Icon: Phaser.GameObjects.Image;
   abilty3Icon: Phaser.GameObjects.Image;
+  abilty4Icon: Phaser.GameObjects.Image;
   tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
   lastLightLevel: number = 255;
 
@@ -219,6 +220,9 @@ export default class MainScene extends Phaser.Scene {
     this.abilty3Icon = this.add.image(130, 63, 'icon-abilities', 2);
     this.abilty3Icon.setScrollFactor(0);
     this.abilty3Icon.setDepth(2);
+    this.abilty4Icon = this.add.image(159, 63, 'icon-abilities', 2);
+    this.abilty4Icon.setScrollFactor(0);
+    this.abilty4Icon.setDepth(2);
   }
 
   renderDebugGraphics() {
@@ -317,14 +321,20 @@ export default class MainScene extends Phaser.Scene {
       return;
     }
 
-    const speed = globalState.playerCharacter.getSpeed();
+    const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
+    const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalTime);
+    const isCasting = msSinceLastCast < 250;
+
     const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing();
     const newFacing = getFacing(xFacing, yFacing);
-    const hasMoved = xFacing !== 0 || yFacing !== 0;
+
+    const hasMoved = isCasting ? false : (xFacing !== 0 || yFacing !== 0);
     const playerAnimation = globalState.playerCharacter.updateMovingState(hasMoved, newFacing);
     if (playerAnimation) {
       this.mainCharacter.play(playerAnimation);
     }
+
+    const speed = isCasting ? 0 : globalState.playerCharacter.getSpeed();
 
     this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
     this.mainCharacter.body.velocity.normalize().scale(speed);
@@ -332,7 +342,6 @@ export default class MainScene extends Phaser.Scene {
     globalState.playerCharacter.x = Math.round(this.mainCharacter.x);
     globalState.playerCharacter.y = Math.round(this.mainCharacter.y);
 
-    const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
     castAbilities.forEach((ability) => {
       this.triggerAbility(globalState.playerCharacter, ability);
     });
@@ -352,10 +361,16 @@ export default class MainScene extends Phaser.Scene {
     const healthRatio = globalState.playerCharacter.health / globalState.playerCharacter.maxHealth;
     this.healthBar.scaleX = Math.max(0, healthRatio * 98);
 
-    const [cooldown1, cooldown2, cooldown3] = this.keyboardHelper.getAbilityCooldowns(globalTime);
+    const [
+      cooldown1,
+      cooldown2,
+      cooldown3,
+      cooldown4
+    ] = this.keyboardHelper.getAbilityCooldowns(globalTime);
     this.abilty1Icon.setAlpha(cooldown1);
     this.abilty2Icon.setAlpha(cooldown2);
     this.abilty3Icon.setAlpha(cooldown3);
+    this.abilty4Icon.setAlpha(cooldown4);
 
     this.updateDynamicLighting();
 

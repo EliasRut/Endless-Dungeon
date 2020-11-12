@@ -2,6 +2,8 @@ import AbilityEffect from '../objects/abilityEffect';
 import FireBallEffect from '../objects/fireBallEffect';
 import IceSpikeEffect from '../objects/iceSpikeEffect';
 import DustNovaEffect from '../objects/dustNovaEffect';
+import RoundHouseKickEffect from '../objects/roundHouseKickEffect';
+import HealingLightEffect from '../objects/healingLightEffect';
 
 interface ProjectileData {
   spread?: [number, number];
@@ -26,7 +28,9 @@ interface AbilityData {
 export const enum AbilityType {
   FIREBALL = 'fireball',
   ICESPIKE = 'icespike',
-  DUSTNOVA = 'dustnova'
+  DUSTNOVA = 'dustnova',
+  ROUND_HOUSE_KICK = 'roundhousekick',
+  HEALING_LIGHT = 'healinglight',
 }
 
 export const Abilities: {[type: string]: AbilityData} = {
@@ -67,6 +71,36 @@ export const Abilities: {[type: string]: AbilityData} = {
       xOffset: 20,
       yOffset: 20,
       effect: DustNovaEffect,
+      // collisionSound: 'sound-wind',
+      // sfxVolume: 0.4
+    },
+    sound: 'sound-wind',
+    sfxVolume: 1.4,
+    cooldownMs: 1200
+  },
+  [AbilityType.ROUND_HOUSE_KICK]: {
+    projectiles: 16,
+    projectileData: {
+      spread: [-0.4, 0.4],
+      velocity: 50,
+      xOffset: 25,
+      yOffset: 25,
+      effect: RoundHouseKickEffect,
+      delay: 12,
+      // collisionSound: 'sound-wind',
+      // sfxVolume: 0.4
+    },
+    sound: 'sound-wind',
+    sfxVolume: 1.4,
+    cooldownMs: 1200
+  },
+  [AbilityType.HEALING_LIGHT]: {
+    projectiles: 1,
+    projectileData: {
+      velocity: 0,
+      xOffset: 0,
+      yOffset: 0,
+      effect: HealingLightEffect,
       // collisionSound: 'sound-wind',
       // sfxVolume: 0.4
     },

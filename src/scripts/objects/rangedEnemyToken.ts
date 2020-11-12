@@ -20,7 +20,7 @@ export default class RangedEnemyToken extends EnemyToken {
 
     // check death
     if (this.stateObject.health <= 0){
-      this.dropItem(player,this.scene);
+      this.dropItem();
       this.destroy();
       return;
     }
@@ -75,7 +75,7 @@ export default class RangedEnemyToken extends EnemyToken {
       this.setVelocityX(0);
       this.setVelocityY(0);
       this.attackedAt = time;
-      this.scene.triggerAbility(this.stateObject, AbilityType.ICESPIKE);
+      this.scene.triggerAbility(this.stateObject, AbilityType.FIREBALL);
     }
   }
 }

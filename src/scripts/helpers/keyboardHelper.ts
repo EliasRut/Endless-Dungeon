@@ -28,8 +28,6 @@ export default class KeyboardHelper {
     let yFacing = 0;
     let xFacing = 0;
 
-    const speed = globalState.playerCharacter.getSpeed();
-
     if (this.upKey.isDown) {
       yFacing = -1;
     } else if (this.downKey.isDown) {
@@ -59,6 +57,7 @@ export default class KeyboardHelper {
       this.castIfPressed(AbilityKey.ONE, gameTime),
       this.castIfPressed(AbilityKey.TWO, gameTime),
       this.castIfPressed(AbilityKey.THREE, gameTime),
+      this.castIfPressed(AbilityKey.FOUR, gameTime),
     ].filter((ability) => !!ability) as AbilityType[];
   }
 
@@ -74,11 +73,23 @@ export default class KeyboardHelper {
     return timeEllapsed / (abilityData.cooldownMs || Infinity);
   }
 
+  getMsSinceLastCast(gameTime: number) {
+    const lastCast = [
+      globalState.playerCharacter.abilityCastTime[AbilityKey.ONE],
+      globalState.playerCharacter.abilityCastTime[AbilityKey.TWO],
+      globalState.playerCharacter.abilityCastTime[AbilityKey.THREE],
+      globalState.playerCharacter.abilityCastTime[AbilityKey.FOUR]
+    ].reduce((max, value) => Math.max(max, value), 0);
+
+    return gameTime - lastCast;
+  }
+
   getAbilityCooldowns(gameTime: number) {
     return [
       this.getAbilityCooldown(AbilityKey.ONE, gameTime),
       this.getAbilityCooldown(AbilityKey.TWO, gameTime),
       this.getAbilityCooldown(AbilityKey.THREE, gameTime),
+      this.getAbilityCooldown(AbilityKey.FOUR, gameTime),
     ];
   }
 
