@@ -2,6 +2,7 @@ import { GameObjects } from "phaser";
 import { NpcPositioning, OpeningDirection, Room } from "../../../typings/custom";
 import globalState from "../worldstate";
 import MainScene from '../scenes/mainScene';
+import RoomPositioning from '../worldstate/RoomPositioning';
 
 export const DUNGEON_WIDTH = 128;
 export const DUNGEON_BLOCKS_X = DUNGEON_WIDTH / 8;
@@ -168,6 +169,7 @@ export default class DungeonGenerator {
   public generateDungeon: (scene: Phaser.Scene) => [
       Phaser.Tilemaps.DynamicTilemapLayer,
       NpcPositioning[],
+      RoomPositioning[],
       number,
       number,
     ] = (scene) => {
@@ -219,6 +221,13 @@ export default class DungeonGenerator {
     return [
       this.tileLayer,
       this.npcs,
+      this.rooms.map((room, index) => {
+        return {
+          roomName: room.name,
+          y: this.roomOffsets[index][0] * BLOCK_SIZE,
+          x: this.roomOffsets[index][1] * BLOCK_SIZE
+        }
+      }),
       cameraOffsetX,
       cameraOffsetY
     ];
@@ -365,35 +374,6 @@ export default class DungeonGenerator {
     for (let roomIndex = 0; roomIndex < this.rooms.length; roomIndex++) {
       this.drawRoom(roomIndex);
     }
-  }
-
-  private createTileLayer(scene: Phaser.Scene) {
-    const map = scene.make.tilemap({
-      data: this.combinedLayout,
-      tileWidth: TILE_WIDTH,
-      tileHeight: TILE_HEIGHT
-    });
-    const tileSets = Object.keys(this.tileSetCollections).map((tileSetName) => {
-      const gid = this.tileSetGid[tileSetName];
-      return map.addTilesetImage(
-        `${tileSetName}-image`,
-        tileSetName,
-        TILE_WIDTH,
-        TILE_HEIGHT,
-        1,
-        2,
-        gid
-      );
-    });
-    this.tileLayer = map.createDynamicLayer(0, tileSets, 0, 0);
-    this.tileLayer.setCollisionBetween(0, (Object.keys(this.tileSetGid).length + 1) * 1000, false);
-    Object.keys(this.tileSetCollections).map((tileSetName) => {
-      const gid = this.tileSetGid[tileSetName];
-
-      // Add tile collision for all tilesets for tile numbers 0-31 and 40-71.
-      this.tileLayer.setCollisionBetween(gid, gid + 31, true);
-      this.tileLayer.setCollisionBetween(gid + 40, gid + 71, true);
-    });
   }
 
   private getExtraStepForOpening(y: number, x: number, openingDirection: OpeningDirection) {
@@ -586,6 +566,35 @@ export default class DungeonGenerator {
         }
       }
     }
+  }
+
+  private createTileLayer(scene: Phaser.Scene) {
+    const map = scene.make.tilemap({
+      data: this.combinedLayout,
+      tileWidth: TILE_WIDTH,
+      tileHeight: TILE_HEIGHT
+    });
+    const tileSets = Object.keys(this.tileSetCollections).map((tileSetName) => {
+      const gid = this.tileSetGid[tileSetName];
+      return map.addTilesetImage(
+        `${tileSetName}-image`,
+        tileSetName,
+        TILE_WIDTH,
+        TILE_HEIGHT,
+        1,
+        2,
+        gid
+      );
+    });
+    this.tileLayer = map.createDynamicLayer(0, tileSets, 0, 0);
+    this.tileLayer.setCollisionBetween(0, (Object.keys(this.tileSetGid).length + 1) * 1000, false);
+    Object.keys(this.tileSetCollections).map((tileSetName) => {
+      const gid = this.tileSetGid[tileSetName];
+
+      // Add tile collision for all tilesets for tile numbers 0-31 and 40-71.
+      this.tileLayer.setCollisionBetween(gid, gid + 31, true);
+      this.tileLayer.setCollisionBetween(gid + 40, gid + 71, true);
+    });
   }
 
   private getStartRoomCameraOffsets() {
