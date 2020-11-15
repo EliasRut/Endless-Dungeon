@@ -60,6 +60,8 @@ export default class MainScene extends Phaser.Scene {
   updatedTiles: [number, number][] = [];
   visitedTiles: number[][] = [];
 
+  useDynamicLighting = false;
+
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -73,7 +75,11 @@ export default class MainScene extends Phaser.Scene {
     this.weapon = [];
     const [startX, startY] = this.drawRoom();
 
-    this.prepareDynamicLighting();
+    this.useDynamicLighting = globalState.currentLevel !== 'town';
+
+    if (this.useDynamicLighting) {
+      this.prepareDynamicLighting();
+    }
 
     this.mainCharacter = new PlayerCharacterToken(this, startX, startY);
     this.mainCharacter.setDepth(1);
@@ -376,7 +382,9 @@ export default class MainScene extends Phaser.Scene {
     this.abilty3Icon.setAlpha(cooldown3);
     this.abilty4Icon.setAlpha(cooldown4);
 
-    this.updateDynamicLighting();
+    if (this.useDynamicLighting) {
+      this.updateDynamicLighting();
+    }
 
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalTime);
