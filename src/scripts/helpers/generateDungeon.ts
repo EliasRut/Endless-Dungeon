@@ -1,9 +1,9 @@
 import { GameObjects } from "phaser";
-import { NpcPositioning, OpeningDirection, Room } from "../../../typings/custom";
+import { MapConnection, NpcPositioning, OpeningDirection, Room } from "../../../typings/custom";
 import globalState from "../worldstate";
 import MainScene from '../scenes/mainScene';
+import DungeonLevel from "../worldstate/DungeonLevel";
 import RoomGenerator from './generateRoom';
-import { SSL_OP_NO_COMPRESSION } from "constants";
 
 export const DUNGEON_WIDTH = 128;
 export const DUNGEON_BLOCKS_X = DUNGEON_WIDTH / 8;
@@ -179,15 +179,15 @@ export default class DungeonGenerator {
   blocksUsed: number[][];
   tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
-  public generateDungeon: (scene: Phaser.Scene) => [
-      Phaser.Tilemaps.DynamicTilemapLayer,
-      NpcPositioning[],
-      number,
-      number,
-    ] = (scene) => {
+  public generateLevel: (id: string, rooms: string[]) => DungeonLevel = (id, rooms) => {
+    this.rooms = rooms.map(
+      (roomName) => globalState.availableRooms.find(
+        (availableRoom) => availableRoom.name === roomName)!
+    );
+
     const roomGen = new RoomGenerator();
-    this.rooms = globalState.availableRooms;
-    this.rooms.push(roomGen.generateRoom(scene,this.rooms[0].tileset));
+    this.rooms.push(roomGen.generateRoom(this.rooms[0].tileset));
+
     this.startRoomIndex = Math.max(0, this.rooms.findIndex((room) => room.startRoom));
     this.roomOffsets = [];
     this.tileSetCollections = {};
@@ -228,16 +228,42 @@ export default class DungeonGenerator {
 
     this.drawTilesForPaths();
 
-    this.createTileLayer(scene);
-
     const [cameraOffsetX, cameraOffsetY] = this.getStartRoomCameraOffsets();
 
-    return [
-      this.tileLayer,
-      this.npcs,
-      cameraOffsetX,
-      cameraOffsetY
-    ];
+    const tilesets = Object.keys(this.tileSetGid)
+      .sort((keyA, keyB) => this.tileSetGid[keyA] - this.tileSetGid[keyB]);
+
+    const roomPositions = this.rooms.map((room, index) => {
+      return {
+        roomName: room.name,
+        y: this.roomOffsets[index][0] * BLOCK_SIZE,
+        x: this.roomOffsets[index][1] * BLOCK_SIZE
+      };
+    });
+
+    const connections: MapConnection[] = [];
+    this.rooms.forEach((room, index) => {
+      (room.connections || []).forEach((connection) => {
+        const y = connection.y + this.roomOffsets[index][0] * BLOCK_SIZE;
+        const x = connection.x + this.roomOffsets[index][1] * BLOCK_SIZE;
+        connections.push({
+          x: x * TILE_WIDTH,
+          y: y * TILE_HEIGHT,
+          targetMap: connection.targetMap
+        });
+      });
+    });
+
+    return {
+      id,
+      startPositionX: cameraOffsetX,
+      startPositionY: cameraOffsetY,
+      rooms: roomPositions,
+      tilesets,
+      layout: this.combinedLayout,
+      npcs: this.npcs,
+      connections
+    }
   }
 
   private findRoomPlacement() {
@@ -383,35 +409,6 @@ export default class DungeonGenerator {
     }
   }
 
-  private createTileLayer(scene: Phaser.Scene) {
-    const map = scene.make.tilemap({
-      data: this.combinedLayout,
-      tileWidth: TILE_WIDTH,
-      tileHeight: TILE_HEIGHT
-    });
-    const tileSets = Object.keys(this.tileSetCollections).map((tileSetName) => {
-      const gid = this.tileSetGid[tileSetName];
-      return map.addTilesetImage(
-        `${tileSetName}-image`,
-        tileSetName,
-        TILE_WIDTH,
-        TILE_HEIGHT,
-        1,
-        2,
-        gid
-      );
-    });
-    this.tileLayer = map.createDynamicLayer(0, tileSets, 0, 0);
-    this.tileLayer.setCollisionBetween(0, (Object.keys(this.tileSetGid).length + 1) * 1000, false);
-    Object.keys(this.tileSetCollections).map((tileSetName) => {
-      const gid = this.tileSetGid[tileSetName];
-
-      // Add tile collision for all tilesets for tile numbers 0-31 and 40-71.
-      this.tileLayer.setCollisionBetween(gid, gid + 31, true);
-      this.tileLayer.setCollisionBetween(gid + 40, gid + 71, true);
-    });
-  }
-
   private getExtraStepForOpening(y: number, x: number, openingDirection: OpeningDirection) {
     switch (openingDirection) {
       case 'top':
@@ -432,6 +429,11 @@ export default class DungeonGenerator {
       for (let x = 0; x < DUNGEON_WIDTH / 8; x++) {
         this.blocksUsed[y][x] = 0;
       }
+    }
+
+    // Don't draw paths if we only have 1 room.
+    if (this.rooms.length === 1 && this.rooms[0].openings.length === 0) {
+      return;
     }
 
     // Construct path.
