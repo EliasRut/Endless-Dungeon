@@ -1,0 +1,8 @@
+{
+    "title": "Third Side Quest",
+    "description": "This is a side quest where you have to do absoultey nothing ",
+    "task": "TestTask",
+    "enemyType": "red-link",
+    "theme": 1,
+    "rooms": [ "crypta", "idontknow" ]
+}
