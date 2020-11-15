@@ -82,6 +82,11 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   create() {
+    const mapToEditId = getUrlParam('editMap');
+    if (mapToEditId) {
+      this.scene.start('MapEditor');
+      return;
+    }
 
     // Create character animations
     for (let directionIndex = 0; directionIndex < 8; directionIndex++) {
