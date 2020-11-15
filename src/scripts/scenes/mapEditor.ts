@@ -199,6 +199,8 @@ export default class MapEditor extends Phaser.Scene {
       const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
       if (clickedTile) {
         this.selectedId = clickedTile.index;
+        this.libraryLayer.forEachTile(tile => tile.tint = 0xffffff);
+        clickedTile.tint = 0xaaaaaa;
       }
     });
     this.libraryLayer.setScrollFactor(0, 0);
@@ -237,7 +239,6 @@ export default class MapEditor extends Phaser.Scene {
         // map.replaceByIndex()
         clickedTile.index = this.selectedId;
 
-        // clickedTile.tint = 0xff0000;
         this.tileLayer.update();
       }
     })
