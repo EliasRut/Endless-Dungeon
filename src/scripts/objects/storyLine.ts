@@ -37,10 +37,12 @@ export default class StoryLine {
         for (let sideQuest of loadedVariableMainQuests) {
             if (this.storyLineData.themes.find(theme => {
                 return theme == sideQuest.theme;
-            })) {
+            }) != null) {
                 qualifiedSideQuests.push(sideQuest);
             }
         }
+
+        console.log(qualifiedSideQuests);
 
         for (let i in this.storyLineData.mainQuests) {
             if (this.storyLineData.mainQuests[i].title == 'variableMainQuest') {

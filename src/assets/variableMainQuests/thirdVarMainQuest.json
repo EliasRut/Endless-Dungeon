@@ -5,7 +5,6 @@
     "enemyType": "red-link",
     "theme": 4,
     "rooms": [
-        "room1",
-        "room3"
+        "firstTest"
     ]
 }

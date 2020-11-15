@@ -17,13 +17,7 @@ export class WorldState {
   public availableTilesets: string[] = [];
   public currentLevel: string = 'town';
   public roomAssignment: {[name: string]: string[]} = {
-    'town': ['town'],
-    'dungeon': [
-      'firstTest',
-      'secondTest',
-      'thirdTest',
-      'startRoom'
-    ]
+    'town': ['town']
   };
 
   constructor() {

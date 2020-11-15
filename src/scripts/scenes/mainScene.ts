@@ -75,6 +75,8 @@ export default class MainScene extends Phaser.Scene {
     // tslint:disable-next-line:no-unused-expression
     this.cameras.main.fadeIn(1000);
 
+    this.generateStory();
+
     this.enemy = [];
     this.weapon = [];
     const [startX, startY] = this.drawRoom();
@@ -530,9 +532,25 @@ export default class MainScene extends Phaser.Scene {
   }
 
   generateStory() {
-    this.storyLine = new StoryLine();
-    console.log(this.storyLine);
-    this.sideQuestLog = new SideQuestLog(this.storyLine.storyLineData.mainQuests.length, this.storyLine.storyLineData.themes);
-    console.log(this.sideQuestLog);
+    if(!this.storyLine) {
+      this.storyLine = new StoryLine();
+      console.log(this.storyLine);
+      const mainQuests = this.storyLine.storyLineData.mainQuests;
+      this.sideQuestLog = new SideQuestLog(mainQuests.length, this.storyLine.storyLineData.themes);
+      console.log(this.sideQuestLog);
+
+      for(let i = 0; i < mainQuests.length; i++) {
+        console.log(i);
+        const sideQuestRooms: string[] = [];
+        for(let sideQuest of this.sideQuestLog.sideQuests) {
+          if(sideQuest.level == i) {
+            sideQuestRooms.concat(sideQuest.rooms);
+          }
+        }
+        globalState.roomAssignment['dungeonLvl' + i] = mainQuests[i].rooms.concat(sideQuestRooms);
+      }
+
+      console.log(globalState.roomAssignment);
+    }
   }
 }

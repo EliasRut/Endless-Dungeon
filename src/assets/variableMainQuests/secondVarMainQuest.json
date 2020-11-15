@@ -5,7 +5,6 @@
     "enemyType": "red-ball",
     "theme": 0,
     "rooms": [
-        "room2",
-        "room5"
+        "firstTest"
     ]
 }

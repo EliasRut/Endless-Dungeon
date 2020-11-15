@@ -8,7 +8,9 @@
             "enemyType": "red-link",
             "rooms": [
                 "startRoom",
-                "firstTest"
+                "firstTest",
+                "secondTest",
+                "thirdTest"
             ]
         },
         {
