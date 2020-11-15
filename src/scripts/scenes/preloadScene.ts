@@ -1,6 +1,7 @@
 import { getUrlParam } from "../helpers/browserState";
 import { spriteDirectionList } from "../helpers/constants";
 import globalState from "../worldstate";
+import DungeonGenerator from '../helpers/generateDungeon';
 
 /*
   The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -121,6 +122,14 @@ export default class PreloadScene extends Phaser.Scene {
         });
       });
     }
+
+    // Construct dungeon for this map
+    const dungeonLevel = new DungeonGenerator().generateLevel(
+      globalState.currentLevel,
+      globalState.roomAssignment[globalState.currentLevel]
+    );
+
+    globalState.dungeon.levels.set(globalState.currentLevel, dungeonLevel);
 
     this.scene.start('MainScene');
   }

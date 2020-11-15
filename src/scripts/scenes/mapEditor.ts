@@ -1,5 +1,6 @@
 import 'phaser'
 import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
+import PositionText from '../objects/positionText';
 import globalState from '../worldstate';
 
 const visibleTiles: boolean[][] = [];
@@ -21,14 +22,17 @@ export default class MapEditor extends Phaser.Scene {
   sKey: Phaser.Input.Keyboard.Key;
   dKey: Phaser.Input.Keyboard.Key;
 
-  cameraPositionX: number = 0; 
+  cameraPositionX: number = 0;
   cameraPositionY: number = 0;
+
+  positionText: PositionText;
 
   constructor() {
     super({ key: 'MapEditor' })
   }
 
   create() {
+    this.positionText = new PositionText(this);
     const mapEditorMenuElement = document.getElementById('mapEditorMenu') as HTMLDivElement;
     mapEditorMenuElement.style.display = 'flex';
 
@@ -253,6 +257,14 @@ export default class MapEditor extends Phaser.Scene {
   }
 
   update(globalTime, delta) {
+
+    const pointerPosX = this.input.activePointer.worldX;
+    const tileX = Math.floor((pointerPosX - this.tileLayer.x) / 16);
+    const pointerPosY = this.input.activePointer.worldY;
+    const tileY = Math.floor((pointerPosY - this.tileLayer.y) / 16);
+
+    this.positionText.update(tileY, tileX);
+
     if (document.activeElement && document.activeElement.nodeName === 'INPUT') {
       return;
     }
