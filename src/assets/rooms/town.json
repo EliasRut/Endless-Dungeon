@@ -118,10 +118,10 @@
 ],
 	"npcs": [],
 	"items": [],
-	"scripts": {},
 	"connections": [{
 		"y": 62,
 		"x": 77,
 		"targetMap": "dungeon"
-	}]
+	}],
+  "scripts": {}
 }

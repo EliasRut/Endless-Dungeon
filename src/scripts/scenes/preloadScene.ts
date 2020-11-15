@@ -66,7 +66,7 @@ export default class PreloadScene extends Phaser.Scene {
 
     // Find out which files we need by going through all rendered rooms
     const requiredNpcs = new Set<string>();
-    globalState.availableRooms.forEach((room) => {
+    Object.values(globalState.availableRooms).forEach((room) => {
       if (!globalState.availableTilesets.includes(room.tileset)) {
         globalState.availableTilesets.push(room.tileset);
       }
@@ -131,7 +131,7 @@ export default class PreloadScene extends Phaser.Scene {
     // Construct dungeon for this map
     const dungeonLevel = new DungeonGenerator().generateLevel(
       globalState.currentLevel,
-      globalState.roomAssignment[globalState.currentLevel]
+      globalState.roomAssignment[globalState.currentLevel].rooms
     );
 
     globalState.dungeon.levels.set(globalState.currentLevel, dungeonLevel);

@@ -24,16 +24,19 @@ export default class RoomPreloaderScene extends Phaser.Scene {
     const requestedRoomId = getUrlParam('roomName');
     if (requestedRoomId) {
       this.usedRooms.push(requestedRoomId);
-      globalState.roomAssignment = {[`${requestedRoomId}`]: [requestedRoomId]};
+      globalState.roomAssignment = {[`${requestedRoomId}`]: {
+        dynamicLighting: false,
+        rooms: [requestedRoomId]
+      }};
       globalState.currentLevel = requestedRoomId;
     } else {
-      this.usedRooms.push(...globalState.roomAssignment[globalState.currentLevel]);
+      this.usedRooms.push(...globalState.roomAssignment[globalState.currentLevel].rooms);
     }
 
     const mapToEditId = getUrlParam('editMap');
     if (mapToEditId) {
-      Object.values(globalState.roomAssignment).forEach((roomList) => {
-        roomList.forEach((room) => {
+      Object.values(globalState.roomAssignment).forEach((assignment) => {
+        assignment.rooms.forEach((room) => {
           if (!this.usedRooms.includes(room)) {
             this.usedRooms.push(room);
           }
@@ -51,7 +54,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
   create() {
     this.usedRooms.forEach((usedRoom) => {
       const room = this.cache.json.get(`room-${usedRoom}`) as Room;
-      globalState.availableRooms.push(room);
+      globalState.availableRooms[room.name] = room;
     });
 
     this.scene.start('PreloadScene');

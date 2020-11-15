@@ -180,9 +180,7 @@ export default class DungeonGenerator {
 
   public generateLevel: (id: string, rooms: string[]) => DungeonLevel = (id, rooms) => {
     this.rooms = rooms.map(
-      (roomName) => globalState.availableRooms.find(
-        (availableRoom) => availableRoom.name === roomName)!
-    );
+      (roomName) => globalState.availableRooms[roomName]);
     this.startRoomIndex = Math.max(0, this.rooms.findIndex((room) => room.startRoom));
     this.roomOffsets = [];
     this.tileSetCollections = {};
@@ -232,7 +230,9 @@ export default class DungeonGenerator {
       return {
         roomName: room.name,
         y: this.roomOffsets[index][0] * BLOCK_SIZE,
-        x: this.roomOffsets[index][1] * BLOCK_SIZE
+        x: this.roomOffsets[index][1] * BLOCK_SIZE,
+        width: room.layout[0].length,
+        height: room.layout.length
       };
     });
 

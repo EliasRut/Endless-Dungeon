@@ -19,6 +19,7 @@ import DungeonGenerator, { DUNGEON_HEIGHT } from '../helpers/generateDungeon';
 import FpsText from '../objects/fpsText';
 import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_WIDTH } from '../helpers/generateDungeon';
 import { generateTilemap } from '../helpers/drawDungeon';
+import { ScriptEntry } from '../../../typings/custom';
 
 const visibleTiles: boolean[][] = [];
 
@@ -62,6 +63,12 @@ export default class MainScene extends Phaser.Scene {
 
   useDynamicLighting = false;
 
+  currentRoom?: string;
+  runningScript?: ScriptEntry[];
+  scriptStep?: number;
+  scriptSubStep?: number;
+  scriptStepStartMs?: number;
+
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -75,7 +82,7 @@ export default class MainScene extends Phaser.Scene {
     this.weapon = [];
     const [startX, startY] = this.drawRoom();
 
-    this.useDynamicLighting = globalState.currentLevel !== 'town';
+    this.useDynamicLighting = globalState.roomAssignment[globalState.currentLevel].dynamicLighting;
 
     if (this.useDynamicLighting) {
       this.prepareDynamicLighting();
@@ -319,6 +326,90 @@ export default class MainScene extends Phaser.Scene {
     }
   }
 
+  findCurrentRoom() {
+    const rooms = globalState.dungeon.levels.get(globalState.currentLevel)?.rooms;
+    const currentRoom = rooms?.find((room) => {
+      return room.x * TILE_WIDTH < globalState.playerCharacter.x &&
+        (room.x + room.width) * TILE_WIDTH > globalState.playerCharacter.x &&
+        room.y * TILE_HEIGHT < globalState.playerCharacter.y &&
+        (room.y + room.height) * TILE_HEIGHT > globalState.playerCharacter.y;
+    });
+    if (currentRoom) {
+      this.currentRoom = currentRoom.roomName;
+    } else {
+      this.currentRoom = undefined;
+    }
+  }
+
+  handleScriptStep(globalTime) {
+    const currentStep = this.runningScript![this.scriptStep!];
+    if (!currentStep) {
+      this.runningScript = undefined;
+      this.scriptStep = undefined;
+      return;
+    }
+    switch (currentStep.type) {
+      case "wait": {
+        if (!this.scriptStepStartMs) {
+          this.scriptStepStartMs = globalTime;
+        } else if ((this.scriptStepStartMs + currentStep.time) < globalTime) {
+          this.scriptStep = this.scriptStep! + 1;
+          this.scriptStepStartMs = undefined;
+        }
+        break;
+      }
+      case "dialog": {
+        if (!this.scriptStepStartMs) {
+          this.scriptStepStartMs = globalTime;
+          this.scriptSubStep = 0;
+          console.log(currentStep.text[this.scriptSubStep!]);
+        } else if ((this.scriptStepStartMs + 2000) < globalTime) {
+          this.scriptSubStep = this.scriptSubStep! + 1;
+          if (currentStep.text.length <= this.scriptSubStep) {
+            this.scriptSubStep = this.scriptStep! + 1;
+            this.scriptSubStep = undefined;
+            this.scriptStepStartMs = undefined;
+          }
+        }
+        break;
+      }
+      case "animation": {
+        if (!this.scriptStepStartMs) {
+          this.scriptStepStartMs = globalTime;
+          console.log(`Playing animation ${currentStep.animation}`);
+        } else if ((this.scriptStepStartMs + currentStep.duration) < globalTime) {
+          this.scriptStep = this.scriptStep! + 1;
+          this.scriptStepStartMs = undefined;
+        }
+      }
+    }
+  }
+
+  handleScripts(globalTime) {
+    if (!this.runningScript) {
+      const lastRoomName = this.currentRoom;
+      this.findCurrentRoom();
+      if (lastRoomName !== this.currentRoom) {
+        console.log(`Changed room from ${lastRoomName} to ${this.currentRoom}.`);
+
+        if (lastRoomName &&
+            globalState.availableRooms[lastRoomName].scripts.onExit) {
+          console.log(`Room ${lastRoomName} has an exit condition.`);
+          this.runningScript = globalState.availableRooms[lastRoomName].scripts.onExit;
+          this.scriptStep = 0;
+        } else if (this.currentRoom &&
+            globalState.availableRooms[this.currentRoom].scripts.onEntry) {
+          console.log(`Room ${this.currentRoom} has an entry condition.`);
+          this.runningScript = globalState.availableRooms[this.currentRoom].scripts.onEntry;
+          this.scriptStep = 0;
+        }
+      }
+    }
+    if (this.runningScript) {
+      this.handleScriptStep(globalTime);
+    }
+  }
+
   update(globalTime, delta) {
     this.fpsText.update();
 
@@ -402,6 +493,8 @@ export default class MainScene extends Phaser.Scene {
         this.scene.start('RoomPreloaderScene');
       }
     });
+
+    this.handleScripts(globalTime);
   }
 
   // Used only for performance debugging

@@ -116,11 +116,9 @@ export default abstract class EnemyToken extends CharacterToken {
         this.lastUpdate = time;
         this.target.x = player.x;
         this.target.y = player.y;
-        console.log("aggro'd");
       }
       else if(this.aggro
         && this.lastUpdate + this.aggroLinger < time){
-        console.log("lost aggro");
         this.aggro = false;
       }
     }

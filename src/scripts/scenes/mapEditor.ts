@@ -41,10 +41,10 @@ export default class MapEditor extends Phaser.Scene {
       roomsDropdown.remove(0);
     }
 
-    globalState.availableRooms.forEach((room) => {
+    Object.keys(globalState.availableRooms).forEach((roomName) => {
       const newOption = document.createElement('option');
-      newOption.value = room.name;
-      newOption.innerText = room.name;
+      newOption.value = roomName;
+      newOption.innerText = roomName;
       roomsDropdown.appendChild(newOption);
     })
 
@@ -65,7 +65,7 @@ export default class MapEditor extends Phaser.Scene {
       const roomsDropdown = document.getElementById('roomDropdown') as HTMLSelectElement;
       const roomName = roomsDropdown.value;
 
-      const selectedRoom = globalState.availableRooms.find((room) => room.name === roomName)!;
+      const selectedRoom = globalState.availableRooms[roomName]!;
       const roomNameElement = document.getElementById('roomName') as HTMLInputElement;
       roomNameElement.value = selectedRoom.name;
 
@@ -170,8 +170,8 @@ export default class MapEditor extends Phaser.Scene {
     const tileSetImage = this.textures.get(this.tileSetName).source[0];
     const imageWidth = tileSetImage.width;
     const imageHeight = tileSetImage.height;
-    const widthInTiles = Math.floor(imageWidth / TILE_WIDTH);
-    const heightInTiles = Math.floor(imageHeight / TILE_HEIGHT);
+    const widthInTiles = Math.ceil(imageWidth / TILE_WIDTH);
+    const heightInTiles = Math.ceil(imageHeight / TILE_HEIGHT);
 
     for (let y = 0; y < heightInTiles; y++) {
       data[y] = [];

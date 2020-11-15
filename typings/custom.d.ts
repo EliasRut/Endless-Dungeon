@@ -21,6 +21,43 @@ export interface ItemsPositioning {
 export type OpeningDirection = "top" | "left" | "right" | "bottom";
 export type Opening = [number, number, OpeningDirection];
 
+export interface ScriptWait {
+	type: "wait";
+	time: number
+}
+
+export interface ScriptDialog {
+	type: "dialog";
+	portrait: string;
+	text: string[];
+}
+
+export interface ScriptAnimation {
+	type: "animation";
+	target: string;
+	animation: string;
+	duration: number;
+}
+
+export interface ScriptSceneChange {
+	type: "sceneChange";
+	target: string;
+}
+
+export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange;
+
+export interface Scripting {
+	onEntry?: ScriptEntry[];
+	onExit?: ScriptEntry[];
+	onClear?: ScriptEntry[];
+	onProximity?: {
+		x: number;
+		y: number;
+		radius: number;
+		steps: ScriptEntry[];
+	}
+}
+
 export interface Room {
 	startRoom?: boolean;
 	tileset: string; 
@@ -31,6 +68,7 @@ export interface Room {
 	items?: ItemsPositioning[]; //place npcs in room
 	openings: Opening[];
 	name: string;
+	scripts: Scripting;
 }
 
 export interface Weapon {

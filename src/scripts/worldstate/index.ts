@@ -2,6 +2,7 @@ import { Room } from "../../../typings/custom";
 import Dungeon from "./Dungeon";
 import DungeonLevel from "./DungeonLevel";
 import PlayerCharacter from "./PlayerCharacter";
+import RoomAssignment from './RoomAssignment';
 
 /*
   This file contains the full, current game state. It is intended to handle all information that
@@ -13,17 +14,27 @@ import PlayerCharacter from "./PlayerCharacter";
 export class WorldState {
   public playerCharacter: PlayerCharacter;
   public dungeon: Dungeon;
-  public availableRooms: Room[] = [];
+  public availableRooms: {[name: string]: Room} = {};
   public availableTilesets: string[] = [];
   public currentLevel: string = 'town';
-  public roomAssignment: {[name: string]: string[]} = {
-    'town': ['town'],
-    'dungeon': [
-      'firstTest',
-      'secondTest',
-      'thirdTest',
-      'startRoom'
-    ]
+  public roomAssignment: {[name: string]: RoomAssignment} = {
+    'intro_dormRoom': {
+      dynamicLighting: false,
+      rooms: ['intro_dormRoom']
+    },
+    'town': {
+      dynamicLighting: false,
+      rooms: ['town']
+    },
+    'dungeon': {
+      dynamicLighting: true,
+      rooms: [
+        'firstTest',
+        'secondTest',
+        'thirdTest',
+        'startRoom'
+      ]
+    }
   };
 
   constructor() {

@@ -2,5 +2,7 @@
 export default class RoomPositioning {
   x: number;
   y: number;
+  width: number;
+  height: number;
   roomName: string;
 };
