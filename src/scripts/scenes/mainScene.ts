@@ -19,10 +19,8 @@ import DungeonGenerator, { DUNGEON_HEIGHT } from '../helpers/generateDungeon';
 import FpsText from '../objects/fpsText';
 import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_WIDTH } from '../helpers/generateDungeon';
 import { generateTilemap } from '../helpers/drawDungeon';
-
 import StoryLine from '../objects/storyLine';
 import SideQuestLog from '../objects/sideQuestLog';
-import { Room } from '../../../typings/custom';
 
 const visibleTiles: boolean[][] = [];
 
@@ -45,7 +43,7 @@ export default class MainScene extends Phaser.Scene {
     inventory: InventoryScreen;
     statScreen: StatScreen;
   };
-  lastCameraPosition: { x: number, y: number };
+  lastCameraPosition: {x: number, y: number};
   abilityEffects: AbilityEffect[] = [];
   abilities: AbilityEffect[];
   alive: number;
@@ -78,7 +76,6 @@ export default class MainScene extends Phaser.Scene {
 
     this.enemy = [];
     this.weapon = [];
-    this.generateStory();
     const [startX, startY] = this.drawRoom();
 
     this.prepareDynamicLighting();
@@ -96,62 +93,39 @@ export default class MainScene extends Phaser.Scene {
 
     this.drawGUI();
 
-    this.sound.play('testSound', { volume: 0.08, loop: true });
+    this.sound.play('testSound', {volume: 0.08, loop: true});
   }
 
   collectItem(player, item) {
     item.disableBody(true, true);
   }
 
-  getRooms() {
-    console.log(this);
-    const roomNames = ['startRoom','firstTest'];//this.sideQuestLog.sideQuests[0].rooms.concat(this.storyLine.storyLineData.mainQuests[0].rooms);
-    const roomsOfLevel = globalState.availableRooms.filter(room => {
-      const name = roomNames.find(roomName => {
-        return room.name == roomName;
-      })
-
-      return name ? true : false;
-    });
-
-    console.log(roomsOfLevel);
-    return roomsOfLevel;
-  }
-
   drawRoom() {
-    const dungeonGenerator = new DungeonGenerator();
     const dungeonLevel = globalState.dungeon.levels.get(globalState.currentLevel);
     if (!dungeonLevel) {
       throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
     }
-    console.log(this);
+
     const {
       startPositionX,
       startPositionY,
       npcs
     } = dungeonLevel;
-    const [
-      tileLayer,
-      npcs,
-      playerStartX,
-      playerStartY
-    ] = dungeonGenerator.generateDungeon(this, (this) => this.getRooms);
-    this.tileLayer = tileLayer;
 
     this.tileLayer = generateTilemap(this, dungeonLevel);
 
     this.tileLayer.setDepth(0);
     let npcCounter = 0;
     npcs.forEach((npc) => {
-      switch (npc.id) {
+      switch(npc.id) {
         case 'red-link': {
           this.enemy[npcCounter] =
-            new MeleeEnemyToken(this, npc.x, npc.y, npc.id);
+                new MeleeEnemyToken( this, npc.x, npc.y, npc.id);
           break;
         }
         case 'red-ball': {
           this.enemy[npcCounter] =
-            new RangedEnemyToken(this, npc.x, npc.y, npc.id);
+                new RangedEnemyToken( this, npc.x, npc.y, npc.id);
           break;
         }
         default: {
@@ -171,8 +145,8 @@ export default class MainScene extends Phaser.Scene {
   prepareDynamicLighting() {
     this.tileLayer.forEachTile((tile) => tile.tint = 0x000000);
     for (let x = 0; x < DUNGEON_WIDTH; x++) {
-      this.isBlockingTile[x] = [];
-      this.visitedTiles[x] = [];
+        this.isBlockingTile[x] = [];
+        this.visitedTiles[x] = [];
       for (let y = 0; y < DUNGEON_HEIGHT; y++) {
         this.visitedTiles[x][y] = 0;
         const tile = this.tileLayer.getTileAt(x, y);
@@ -289,7 +263,7 @@ export default class MainScene extends Phaser.Scene {
     const projectileData = Abilities[type].projectileData;
     // Since we're allowing projectiles to have a spread, we'll be using radians for easier math
     const facingRotation = getRotationInRadiansForFacing(origin.currentFacing);
-    const numProjectiles = (Abilities[type].projectiles || 0);
+    const numProjectiles =  (Abilities[type].projectiles || 0);
     const fireProjectile = (projectileIndex: number) => {
       // Spread multiple projectiles over an arc on a circle
       const spread = projectileData?.spread ? projectileData!.spread : [0, 0];
@@ -315,7 +289,7 @@ export default class MainScene extends Phaser.Scene {
       this.physics.add.collider(effect, this.tileLayer, () => {
         effect.destroy();
         if (projectileData?.collisionSound) {
-          this.sound.play(projectileData.collisionSound!, { volume: projectileData.sfxVolume! });
+          this.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
         }
       });
 
@@ -325,7 +299,7 @@ export default class MainScene extends Phaser.Scene {
         const enemy = target as CharacterToken;
         enemy.stateObject.health -= origin.damage;
         if (projectileData?.collisionSound) {
-          this.sound.play(projectileData.collisionSound!, { volume: projectileData.sfxVolume! });
+          this.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
         }
       });
       this.abilityEffects.push(effect);
@@ -341,14 +315,14 @@ export default class MainScene extends Phaser.Scene {
     }
     // We just want to play the ability sound once, not once for each projectile
     if (Abilities[type].sound) {
-      this.sound.play(Abilities[type].sound!, { volume: Abilities[type].sfxVolume! });
+      this.sound.play(Abilities[type].sound!, {volume: Abilities[type].sfxVolume!});
     }
   }
 
   update(globalTime, delta) {
     this.fpsText.update();
 
-    if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
+    if(globalState.playerCharacter.health <= 0 && this.alive ===0){
       this.cameras.main.fadeOut(1000);
       console.log("you died");
       this.alive = 1;
@@ -484,8 +458,8 @@ export default class MainScene extends Phaser.Scene {
           // Visited Tiles is either VISITED_TILE_TINT or 0 for each tile
           this.visitedTiles[tileX][tileY] = Math.max(
             VISITED_TILE_TINT *
-            ((visibleTiles[x + sightRadius][y + sightRadius] &&
-              (Math.hypot(distanceX, distanceY) <= (lightRadius * 16))) as unknown as number),
+              ((visibleTiles[x + sightRadius][y + sightRadius] &&
+                (Math.hypot(distanceX, distanceY) <= (lightRadius * 16))) as unknown as number),
             this.visitedTiles[tileX][tileY]
           );
           //
@@ -495,9 +469,9 @@ export default class MainScene extends Phaser.Scene {
           // black otherwise
           tile.tint = Math.max(
             visibleTiles[x + sightRadius][y + sightRadius] as unknown as number *
-            this.lightingLevels[distanceX][distanceY],
+              this.lightingLevels[distanceX][distanceY],
             this.visitedTiles[tileX][tileY] +
-            (visibleTiles[x + sightRadius][y + sightRadius] as unknown as number)
+              (visibleTiles[x + sightRadius][y + sightRadius] as unknown as number)
           );
         }
       }
@@ -555,5 +529,4 @@ export default class MainScene extends Phaser.Scene {
     this.sideQuestLog = new SideQuestLog(this.storyLine.storyLineData.mainQuests.length, this.storyLine.storyLineData.themes);
     console.log(this.sideQuestLog);
   }
-
 }
