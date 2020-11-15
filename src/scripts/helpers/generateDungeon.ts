@@ -1,8 +1,8 @@
 import { GameObjects } from "phaser";
-import { NpcPositioning, OpeningDirection, Room } from "../../../typings/custom";
+import { MapConnection, NpcPositioning, OpeningDirection, Room } from "../../../typings/custom";
 import globalState from "../worldstate";
 import MainScene from '../scenes/mainScene';
-import RoomPositioning from '../worldstate/RoomPositioning';
+import DungeonLevel from "../worldstate/DungeonLevel";
 
 export const DUNGEON_WIDTH = 128;
 export const DUNGEON_BLOCKS_X = DUNGEON_WIDTH / 8;
@@ -11,6 +11,17 @@ export const DUNGEON_BLOCKS_Y = DUNGEON_HEIGHT / 8;
 export const TILE_WIDTH = 16;
 export const TILE_HEIGHT = 16;
 export const BLOCK_SIZE = 8;
+
+const PATH_CAP = [
+  [13,  8,  8,  8,  8,  8,  8, 12],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+];
 
 const TILED_PATH = [
   [32, 32, 32, 32, 32, 32, 32, 32],
@@ -150,6 +161,7 @@ const CORRIDOR_LAYOUTS = {
   13: T_CROSSING_TOP_RIGHT_BOTTOM,
   14: T_CROSSING_LEFT_RIGHT_BOTTOM,
   15: CROSSWAY,
+  16: PATH_CAP,
 }
 
 export default class DungeonGenerator {
@@ -166,14 +178,11 @@ export default class DungeonGenerator {
   blocksUsed: number[][];
   tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
-  public generateDungeon: (scene: Phaser.Scene) => [
-      Phaser.Tilemaps.DynamicTilemapLayer,
-      NpcPositioning[],
-      RoomPositioning[],
-      number,
-      number,
-    ] = (scene) => {
-    this.rooms = globalState.availableRooms;
+  public generateLevel: (id: string, rooms: string[]) => DungeonLevel = (id, rooms) => {
+    this.rooms = rooms.map(
+      (roomName) => globalState.availableRooms.find(
+        (availableRoom) => availableRoom.name === roomName)!
+    );
     this.startRoomIndex = Math.max(0, this.rooms.findIndex((room) => room.startRoom));
     this.roomOffsets = [];
     this.tileSetCollections = {};
@@ -214,23 +223,42 @@ export default class DungeonGenerator {
 
     this.drawTilesForPaths();
 
-    this.createTileLayer(scene);
-
     const [cameraOffsetX, cameraOffsetY] = this.getStartRoomCameraOffsets();
 
-    return [
-      this.tileLayer,
-      this.npcs,
-      this.rooms.map((room, index) => {
-        return {
-          roomName: room.name,
-          y: this.roomOffsets[index][0] * BLOCK_SIZE,
-          x: this.roomOffsets[index][1] * BLOCK_SIZE
-        }
-      }),
-      cameraOffsetX,
-      cameraOffsetY
-    ];
+    const tilesets = Object.keys(this.tileSetGid)
+      .sort((keyA, keyB) => this.tileSetGid[keyA] - this.tileSetGid[keyB]);
+
+    const roomPositions = this.rooms.map((room, index) => {
+      return {
+        roomName: room.name,
+        y: this.roomOffsets[index][0] * BLOCK_SIZE,
+        x: this.roomOffsets[index][1] * BLOCK_SIZE
+      };
+    });
+
+    const connections: MapConnection[] = [];
+    this.rooms.forEach((room, index) => {
+      (room.connections || []).forEach((connection) => {
+        const y = connection.y + this.roomOffsets[index][0] * BLOCK_SIZE;
+        const x = connection.x + this.roomOffsets[index][1] * BLOCK_SIZE;
+        connections.push({
+          x: x * TILE_WIDTH,
+          y: y * TILE_HEIGHT,
+          targetMap: connection.targetMap
+        });
+      });
+    });
+
+    return {
+      id,
+      startPositionX: cameraOffsetX,
+      startPositionY: cameraOffsetY,
+      rooms: roomPositions,
+      tilesets,
+      layout: this.combinedLayout,
+      npcs: this.npcs,
+      connections
+    }
   }
 
   private findRoomPlacement() {
@@ -238,9 +266,9 @@ export default class DungeonGenerator {
 
     // We initialize the array of arrays once and then only reset it's values in 
     // tryRoomPlacement for performance reasons.
-    for (let y = 0; y < DUNGEON_HEIGHT / 8; y++) {
+    for (let y = 0; y < DUNGEON_BLOCKS_Y; y++) {
       this.tilesUsed[y] = [];
-      for (let x = 0; x < DUNGEON_WIDTH / 8; x++) {
+      for (let x = 0; x < DUNGEON_BLOCKS_X; x++) {
         this.tilesUsed[y][x] = false;
       }
     }
@@ -398,13 +426,20 @@ export default class DungeonGenerator {
       }
     }
 
+    // Don't draw paths if we only have 1 room.
+    if (this.rooms.length === 1 && this.rooms[0].openings.length === 0) {
+      return;
+    }
+
     // Construct path.
-    let numOpenings = 1;
+    let numOpenings = 0;
     const visitedOpenings: [number, number, number, OpeningDirection][] =
       [[this.startRoomIndex, ...this.rooms[this.startRoomIndex].openings[0]]];
     const targetOpenings: [number, number, number, OpeningDirection][] = [];
 
-    this.rooms[this.startRoomIndex].openings.slice(1).forEach((opening) => {
+    // 0: do not skip, 1: skip
+    const skipFirstRoom = this.rooms[this.startRoomIndex].openings.length === 1 ? 0 : 1;
+    this.rooms[this.startRoomIndex].openings.splice(skipFirstRoom).forEach((opening) => {
       numOpenings++;
       targetOpenings.push([this.startRoomIndex, ...opening]);
     });
@@ -418,7 +453,7 @@ export default class DungeonGenerator {
       })
     });
 
-    while (visitedOpenings.length < numOpenings) {
+    do {
       const source = visitedOpenings[Math.floor(Math.random() * visitedOpenings.length)];
       const sourceRoomIndex = source[0];
       const sourceRoom = this.rooms[this.startRoomIndex];
@@ -432,6 +467,8 @@ export default class DungeonGenerator {
         this.roomOffsets[targetRoomIndex][0] + targetOpening[0],
         this.roomOffsets[targetRoomIndex][1] + targetOpening[1]
       ];
+
+      const isSingleton = JSON.stringify(source) === JSON.stringify(target) && numOpenings === 1;
 
       const currentBlockY = this.roomOffsets[sourceRoomIndex][0] + sourceOpening[0];
       const currentBlockX = this.roomOffsets[sourceRoomIndex][1] + sourceOpening[1];
@@ -520,7 +557,7 @@ export default class DungeonGenerator {
         const nextStepX = foundPath[pathStep + 1][1];
         // We are using a good binary encounted value. 1, 2, 4 and 8 each are a single 1 in a binary
         // encoded number, so 0001 = 1, 0010 = 2, 0011 = 3, ..., 1000 = 8, ..., 1111 = 15
-        const newValue =
+        const newValue = isSingleton ? 16 : // Special case for single room with single opening.
           ((prevStepY < curStepY || nextStepY < curStepY) ? 1 : 0) +
           ((prevStepX < curStepX || nextStepX < curStepX) ? 2 : 0) +
           ((prevStepY > curStepY || nextStepY > curStepY) ? 4 : 0) +
@@ -545,15 +582,16 @@ export default class DungeonGenerator {
             opening[3] === target[3];
       })
       // If findIndex doesn't find anything, it'll be -1
-      if (entryPosition === -1) {
+      if (entryPosition === -1 || isSingleton) {
         visitedOpenings.push(target);
       }
-    }
+
+    } while (visitedOpenings.length < numOpenings) ;
   }
 
   private drawTilesForPaths() {
-    for (let blockY = 0; blockY < DUNGEON_HEIGHT / 8; blockY++) {
-      for (let blockX = 0; blockX < DUNGEON_WIDTH / 8; blockX++) {
+    for (let blockY = 0; blockY < DUNGEON_BLOCKS_Y; blockY++) {
+      for (let blockX = 0; blockX < DUNGEON_BLOCKS_X; blockX++) {
         if (this.blocksUsed[blockY][blockX]) {
           const blockLayout = CORRIDOR_LAYOUTS[this.blocksUsed[blockY][blockX]];
           for (let y = 0; y < BLOCK_SIZE; y++) {
@@ -566,35 +604,6 @@ export default class DungeonGenerator {
         }
       }
     }
-  }
-
-  private createTileLayer(scene: Phaser.Scene) {
-    const map = scene.make.tilemap({
-      data: this.combinedLayout,
-      tileWidth: TILE_WIDTH,
-      tileHeight: TILE_HEIGHT
-    });
-    const tileSets = Object.keys(this.tileSetCollections).map((tileSetName) => {
-      const gid = this.tileSetGid[tileSetName];
-      return map.addTilesetImage(
-        `${tileSetName}-image`,
-        tileSetName,
-        TILE_WIDTH,
-        TILE_HEIGHT,
-        1,
-        2,
-        gid
-      );
-    });
-    this.tileLayer = map.createDynamicLayer(0, tileSets, 0, 0);
-    this.tileLayer.setCollisionBetween(0, (Object.keys(this.tileSetGid).length + 1) * 1000, false);
-    Object.keys(this.tileSetCollections).map((tileSetName) => {
-      const gid = this.tileSetGid[tileSetName];
-
-      // Add tile collision for all tilesets for tile numbers 0-31 and 40-71.
-      this.tileLayer.setCollisionBetween(gid, gid + 31, true);
-      this.tileLayer.setCollisionBetween(gid + 40, gid + 71, true);
-    });
   }
 
   private getStartRoomCameraOffsets() {

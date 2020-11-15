@@ -18,6 +18,7 @@ import { Faction, VISITED_TILE_TINT } from '../helpers/constants';
 import DungeonGenerator, { DUNGEON_HEIGHT } from '../helpers/generateDungeon';
 import FpsText from '../objects/fpsText';
 import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_WIDTH } from '../helpers/generateDungeon';
+import { generateTilemap } from '../helpers/drawDungeon';
 
 const visibleTiles: boolean[][] = [];
 
@@ -95,15 +96,18 @@ export default class MainScene extends Phaser.Scene {
   }
 
   drawRoom() {
-    const dungeonGenerator = new DungeonGenerator();
+    const dungeonLevel = globalState.dungeon.levels.get(globalState.currentLevel);
+    if (!dungeonLevel) {
+      throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
+    }
 
-    const [
-      tileLayer,
-      npcs,
-      playerStartX,
-      playerStartY
-    ] = dungeonGenerator.generateDungeon(this);
-    this.tileLayer = tileLayer;
+    const {
+      startPositionX,
+      startPositionY,
+      npcs
+    } = dungeonLevel;
+
+    this.tileLayer = generateTilemap(this, dungeonLevel);
 
     this.tileLayer.setDepth(0);
     let npcCounter = 0;
@@ -130,7 +134,7 @@ export default class MainScene extends Phaser.Scene {
       npcCounter++;
     });
 
-    return [playerStartX, playerStartY];
+    return [startPositionX, startPositionY];
   }
 
   prepareDynamicLighting() {
@@ -379,6 +383,18 @@ export default class MainScene extends Phaser.Scene {
     });
     this.weapon.forEach(curWeapon => {
       curWeapon.update(globalState.playerCharacter);
+    });
+
+    // Check if the player is close to a connection point and move them if so 
+      //     globalState.currentLevel = globalState.currentLevel === 'town' ? 'dungeon' : 'town';
+
+    globalState.dungeon.levels.get(globalState.currentLevel)?.connections.forEach((connection) => {
+      if (Math.hypot(
+            connection.x - globalState.playerCharacter.x,
+            connection.y - globalState.playerCharacter.y) < 32) {
+        globalState.currentLevel = connection.targetMap;
+        this.scene.start('RoomPreloaderScene');
+      }
     });
   }
 
