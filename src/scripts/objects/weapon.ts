@@ -14,11 +14,7 @@ export default class Weapon extends ItemToken {
       Math.random() * 100,
       Math.random() + 1,
       Math.floor(Math.random() * 64)
-    );
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
-
-    // this.body.setCircle(10, 10, 12);
+    );    
   }
   destroy() {
     super.destroy();

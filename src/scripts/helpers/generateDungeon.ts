@@ -3,6 +3,7 @@ import { MapConnection, NpcPositioning, OpeningDirection, Room } from "../../../
 import globalState from "../worldstate";
 import MainScene from '../scenes/mainScene';
 import DungeonLevel from "../worldstate/DungeonLevel";
+// import RoomGenerator from './generateRoom';
 
 export const DUNGEON_WIDTH = 128;
 export const DUNGEON_BLOCKS_X = DUNGEON_WIDTH / 8;
@@ -179,8 +180,13 @@ export default class DungeonGenerator {
   tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
   public generateLevel: (id: string, rooms: string[]) => DungeonLevel = (id, rooms) => {
-    this.rooms = rooms.map(
-      (roomName) => globalState.availableRooms[roomName]);
+    this.rooms = rooms.map((roomName) => globalState.availableRooms[roomName]);
+
+    // if(id !== 'town') {
+    //   const roomGen = new RoomGenerator();
+    //   this.rooms.push(roomGen.generateRoom(this.rooms[0].tileset));
+    // }
+
     this.startRoomIndex = Math.max(0, this.rooms.findIndex((room) => room.startRoom));
     this.roomOffsets = [];
     this.tileSetCollections = {};
