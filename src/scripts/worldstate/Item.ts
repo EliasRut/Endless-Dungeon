@@ -1,35 +1,46 @@
 // This class handles the items.
 import PlayerCharacter from '../worldstate/PlayerCharacter';
-export default class Item {
-    public itemHealth = 10;
-    public weaponDamage = 1;
-    public itemMovementSpeed = 0;
+
+export interface ItemStats {
+  maxHealth?: number;
+  damage?: number;
+  movementSpeed?: number;
+  mainStat?: number;
+}
+
+export default class Item implements ItemStats {
+    public maxHealth = 10;
+    public damage = 1;
+    public movementSpeed = 0;
     public mainStat = 1;
 
+    public iconFrame = 0;
+
     constructor(
-        itemHealth: number,
-        weaponDamage: number,
-        itemMovementSpeed: number,
-        mainStat: number
+        maxHealth: number,
+        damage: number,
+        movementSpeed: number,
+        mainStat: number,
+        iconFrame: number
       ) {
-      this.itemHealth = itemHealth;
-      this.weaponDamage = weaponDamage;
-      this.itemMovementSpeed = itemMovementSpeed;
+      this.maxHealth = maxHealth;
+      this.damage = damage;
+      this.movementSpeed = movementSpeed;
       this.mainStat = mainStat;
+      this.iconFrame = iconFrame;
     }
-    public equip(player: PlayerCharacter){
-        player.itemHealth = this.itemHealth;
-        player.weaponDamage = this.weaponDamage;
-        player.itemMovementSpeed = this.itemMovementSpeed;
-        player.mainStat = this.mainStat;
-        player.updateStats();
+    public equip(player: PlayerCharacter) {
+      console.log(`Equipping item ${JSON.stringify(this)}.`);
+      player.items.push(this);
+      player.updateStats();
     }
 
     public unequip(player: PlayerCharacter){
-        player.itemHealth = 0;
-        player.weaponDamage = 1;
-        player.itemMovementSpeed = 0;
-        player.mainStat = 1;
+      console.log(`Unequipping item ${JSON.stringify(this)}.`);
+      const itemIndex = player.items.findIndex((item) => item === this);
+      if (itemIndex > -1) {
+        player.items.splice(itemIndex, 1);
         player.updateStats();
+      }
     }
   };

@@ -16,7 +16,7 @@ export default abstract class Character {
   public x = 0;
   public y = 0;
   public vision = 0;
-  
+
   public faction: Faction;
 
   constructor(

@@ -80,15 +80,14 @@ export default abstract class EnemyToken extends CharacterToken {
     // return false;
   }
 
-  dropItem(player: PlayerCharacter, scene: MainScene) {
-    if(this.scene === undefined) { 
+  dropItem() {
+    if(this.scene === undefined) {
       // TODO find out when this happens
       return;
     }
-    const sc = scene;
     const rndItem = Math.floor(Math.random() * 63); // todo calculate from tileset
-    const length = sc.weapon.push(new Weapon(sc, this.x, this.y, rndItem));
-    sc.weapon[length-1].setDepth(1);
+    const length = this.scene.weapon.push(new Weapon(this.scene, this.x, this.y, rndItem));
+    this.scene.weapon[length-1].setDepth(1);
   }
 
   private getOccupiedTile() {

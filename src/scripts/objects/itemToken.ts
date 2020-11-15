@@ -4,6 +4,7 @@ import Player from "../worldstate/PlayerCharacter"
 
 export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
   stateObject: Item;
+  isDestroyed = false;
   constructor(scene: Phaser.Scene, x: number, y: number, icon: number) {
   super(scene, x, y, 'test-items-spritesheet', icon);
   scene.add.existing(this);
@@ -12,13 +13,15 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
   public update(player: Player) {
     const px = player.x;
     const py = player.y;
-    const distance = Math.sqrt((this.x - px)*(this.x - px) + (this.y - py)*(this.y - py));
-    if (distance < 30){
-        this.stateObject.equip(player);
-        this.destroy();
+    const distance = Math.hypot(this.x - px, this.y - py);
+    if (distance < 30 && !this.isDestroyed){
+      this.stateObject.equip(player);
+      this.destroy();
     }
-} 
-destroy(){
-  super.destroy();
-}
+  }
+
+  destroy(){
+    this.isDestroyed = true;
+    super.destroy(true);
+  }
 }

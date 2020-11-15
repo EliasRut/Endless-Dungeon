@@ -20,35 +20,35 @@ export default class RangedEnemyToken extends EnemyToken {
 
     // check death
     if (this.stateObject.health <= 0){
-      this.dropItem(player,this.scene);
+      this.dropItem();
       this.destroy();
       return;
     }
 
-      const tx = this.target.x;
-      const ty = this.target.y;
-      const distance = this.getDistance(tx, ty);
+    const tx = this.target.x;
+    const ty = this.target.y;
+    const distance = this.getDistance(tx, ty);
 
-      const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
-      const xFactor = (tx - this.x) / totalDistance;
-      const yFactor = (ty - this.y) / totalDistance;
-      (this.stateObject as Enemy).exactTargetXFactor = xFactor;
-      (this.stateObject as Enemy).exactTargetYFactor = yFactor;
-      const xSpeed = xFactor * this.stateObject.movementSpeed;
-      const ySpeed = yFactor * this.stateObject.movementSpeed;
-      const newFacing = getFacing(xSpeed, ySpeed);
+    const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
+    const xFactor = (tx - this.x) / totalDistance;
+    const yFactor = (ty - this.y) / totalDistance;
+    (this.stateObject as Enemy).exactTargetXFactor = xFactor;
+    (this.stateObject as Enemy).exactTargetYFactor = yFactor;
+    const xSpeed = xFactor * this.stateObject.movementSpeed;
+    const ySpeed = yFactor * this.stateObject.movementSpeed;
+    const newFacing = getFacing(xSpeed, ySpeed);
 
-      if(this.aggro){
+    if(this.aggro) {
       if (this.attackedAt + this.stateObject.attackTime < time
         && this.attackRange < distance) {
 
-          this.setVelocityX(xSpeed);
-          this.setVelocityY(ySpeed);
-          const animation = this.stateObject.updateMovingState(true, newFacing);
+        this.setVelocityX(xSpeed);
+        this.setVelocityY(ySpeed);
+        const animation = this.stateObject.updateMovingState(true, newFacing);
 
-          if (animation) {
-            this.play(animation);
-          }
+        if (animation) {
+          this.play(animation);
+        }
       } else {
         this.setVelocityX(0);
         this.setVelocityY(0);
@@ -70,13 +70,12 @@ export default class RangedEnemyToken extends EnemyToken {
     }
   }
 
-    attack(time) {
-    const player = globalState.playerCharacter;
-      if (this.attackedAt + this.stateObject.attackTime < time) {
-        this.setVelocityX(0);
-        this.setVelocityY(0);
-        this.attackedAt = time;
-        this.scene.triggerAbility(this.stateObject, AbilityType.ICESPIKE);
-      }
+  attack(time) {
+    if (this.attackedAt + this.stateObject.attackTime < time) {
+      this.setVelocityX(0);
+      this.setVelocityY(0);
+      this.attackedAt = time;
+      this.scene.triggerAbility(this.stateObject, AbilityType.FIREBALL);
     }
+  }
 }
