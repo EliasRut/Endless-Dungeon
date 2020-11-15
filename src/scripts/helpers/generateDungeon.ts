@@ -2,6 +2,7 @@ import { GameObjects } from "phaser";
 import { NpcPositioning, OpeningDirection, Room } from "../../../typings/custom";
 import globalState from "../worldstate";
 import MainScene from '../scenes/mainScene';
+import RoomGenerator from './generateRoom';
 import { SSL_OP_NO_COMPRESSION } from "constants";
 
 export const DUNGEON_WIDTH = 128;
@@ -184,7 +185,9 @@ export default class DungeonGenerator {
       number,
       number,
     ] = (scene) => {
+    const roomGen = new RoomGenerator();
     this.rooms = globalState.availableRooms;
+    this.rooms.push(roomGen.generateRoom(scene,this.rooms[0].tileset));
     this.startRoomIndex = Math.max(0, this.rooms.findIndex((room) => room.startRoom));
     this.roomOffsets = [];
     this.tileSetCollections = {};
