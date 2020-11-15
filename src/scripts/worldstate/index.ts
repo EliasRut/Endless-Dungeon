@@ -32,10 +32,12 @@ export class WorldState {
   }
 
   storeState() {
+    // tslint:disable-next-line: no-console
     console.log('Storing state.');
   }
 
   loadState() {
+    // tslint:disable-next-line: no-console
     console.log('Loading state.');
   }
 }

@@ -62,6 +62,7 @@ export default class MainScene extends Phaser.Scene {
   updatedTiles: [number, number][] = [];
   visitedTiles: number[][] = [];
 
+  useDynamicLighting = false;
   storyLine: StoryLine;
   sideQuestLog: SideQuestLog;
 
@@ -78,7 +79,11 @@ export default class MainScene extends Phaser.Scene {
     this.weapon = [];
     const [startX, startY] = this.drawRoom();
 
-    this.prepareDynamicLighting();
+    this.useDynamicLighting = globalState.currentLevel !== 'town';
+
+    if (this.useDynamicLighting) {
+      this.prepareDynamicLighting();
+    }
 
     this.mainCharacter = new PlayerCharacterToken(this, startX, startY);
     this.mainCharacter.setDepth(1);
@@ -129,8 +134,7 @@ export default class MainScene extends Phaser.Scene {
           break;
         }
         default: {
-          console.log("Unknown enemy.")
-          break;
+          throw new Error(`Map called for unknown enemy "${npc.id}".`);
         }
       }
 
@@ -324,6 +328,7 @@ export default class MainScene extends Phaser.Scene {
 
     if(globalState.playerCharacter.health <= 0 && this.alive ===0){
       this.cameras.main.fadeOut(1000);
+      // tslint:disable-next-line: no-console
       console.log("you died");
       this.alive = 1;
       // this.scene.pause();
@@ -381,7 +386,9 @@ export default class MainScene extends Phaser.Scene {
     this.abilty3Icon.setAlpha(cooldown3);
     this.abilty4Icon.setAlpha(cooldown4);
 
-    this.updateDynamicLighting();
+    if (this.useDynamicLighting) {
+      this.updateDynamicLighting();
+    }
 
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalTime);
@@ -390,9 +397,7 @@ export default class MainScene extends Phaser.Scene {
       curWeapon.update(globalState.playerCharacter);
     });
 
-    // Check if the player is close to a connection point and move them if so 
-      //     globalState.currentLevel = globalState.currentLevel === 'town' ? 'dungeon' : 'town';
-
+    // Check if the player is close to a connection point and move them if so
     globalState.dungeon.levels.get(globalState.currentLevel)?.connections.forEach((connection) => {
       if (Math.hypot(
             connection.x - globalState.playerCharacter.x,
@@ -464,7 +469,7 @@ export default class MainScene extends Phaser.Scene {
           );
           //
 
-          // That is: lightingLevel for the distance if it is currently visible, 
+          // That is: lightingLevel for the distance if it is currently visible,
           // VISITED_TILE_TINT if it has been visited before,
           // black otherwise
           tile.tint = Math.max(
@@ -481,6 +486,7 @@ export default class MainScene extends Phaser.Scene {
     if (this.dynamicLightingTimes.length >= 600) {
       const avg = this.dynamicLightingTimes.reduce((sum, value) => sum + value)
         / this.dynamicLightingTimes.length;
+      // tslint:disable-next-line: no-console
       console.log(`Dynamic lighting took on avg ${avg} ms`);
       this.dynamicLightingTimes = [];
     }
