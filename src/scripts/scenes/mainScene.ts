@@ -120,7 +120,7 @@ export default class MainScene extends Phaser.Scene {
           break;
         }
         default: {
-          console.log("Unknown enemy.")
+          console.error("Unknown enemy.")
           break;
         }
       }
