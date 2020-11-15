@@ -1,5 +1,6 @@
 import Item from "../worldstate/Item"
 import MainScene from "../scenes/mainScene";
+import globalState from "../worldstate";
 
 export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
   stateObject: Item;
@@ -17,7 +18,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
       const distance = Math.hypot(this.x - px, this.y - py);
       //if you run over item, put into inventory
       if (distance < 30) {
-        if (scene.inventory.sortIntoInventory(this)) {          
+        if (globalState.inventory.sortIntoInventory(this)) {          
           scene.overlayScreens.inventory.add(this, false);
           this.setVisible(false);
           this.setDepth(7);
@@ -25,9 +26,9 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
           this.setInteractive();
           this.on('pointerdown', () => {
             if(this.itemLocation > 0 && this.itemLocation < 81){
-              scene.inventory.equip(this);
+              globalState.inventory.equip(this);
             } else if(this.itemLocation > 80){
-              scene.inventory.unequip(this);
+              globalState.inventory.unequip(this);
             }
           })
         }

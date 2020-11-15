@@ -37,7 +37,6 @@ export default class MainScene extends Phaser.Scene {
   keyboardHelper: KeyboardHelper;
 
   enemy: EnemyToken[];
-  inventory: Inventory;
   groundItem: Weapon[];
   sportLight: Phaser.GameObjects.Light;
   overlayScreens: {
@@ -95,7 +94,6 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.mainCharacter, false);
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
-    this.inventory = new Inventory(this);
     const rndItem = Math.floor(Math.random() * 63); // todo calculate from tileset
     const length = this.groundItem.push(new Weapon(this, startX-30, startY-30, rndItem));
     this.groundItem[length-1].setDepth(1);
@@ -276,7 +274,7 @@ export default class MainScene extends Phaser.Scene {
     this.overlayScreens = {
       statScreen,
       inventory
-    };    
+    };
   }
 
   triggerAbility(origin: Character, type: AbilityType) {
@@ -358,9 +356,12 @@ export default class MainScene extends Phaser.Scene {
 
   handleScriptStep(globalTime) {
     const currentStep = this.runningScript![this.scriptStep!];
+    let cleanUpStep = false;
     if (!currentStep) {
       this.runningScript = undefined;
       this.scriptStep = undefined;
+      this.isPaused = false;
+      this.physics.resume();
       return;
     }
     switch (currentStep.type) {
@@ -368,8 +369,7 @@ export default class MainScene extends Phaser.Scene {
         if (!this.scriptStepStartMs) {
           this.scriptStepStartMs = globalTime;
         } else if ((this.scriptStepStartMs + currentStep.time) < globalTime) {
-          this.scriptStep = this.scriptStep! + 1;
-          this.scriptStepStartMs = undefined;
+          cleanUpStep = true;
         }
         break;
       }
@@ -381,9 +381,7 @@ export default class MainScene extends Phaser.Scene {
         } else if ((this.scriptStepStartMs + 2000) < globalTime) {
           this.scriptSubStep = this.scriptSubStep! + 1;
           if (currentStep.text.length <= this.scriptSubStep) {
-            this.scriptSubStep = this.scriptStep! + 1;
-            this.scriptSubStep = undefined;
-            this.scriptStepStartMs = undefined;
+            cleanUpStep = true;
           }
         }
         break;
@@ -393,10 +391,19 @@ export default class MainScene extends Phaser.Scene {
           this.scriptStepStartMs = globalTime;
           console.log(`Playing animation ${currentStep.animation}`);
         } else if ((this.scriptStepStartMs + currentStep.duration) < globalTime) {
-          this.scriptStep = this.scriptStep! + 1;
-          this.scriptStepStartMs = undefined;
+          cleanUpStep = true;
         }
+        break;
       }
+      case "sceneChange": {
+        globalState.currentLevel = currentStep.target;
+        this.scene.start('RoomPreloaderScene');
+      }
+    }
+    if (cleanUpStep) {
+      this.scriptStep = this.scriptStep! + 1;
+      this.scriptSubStep = undefined;
+      this.scriptStepStartMs = undefined;
     }
   }
 
@@ -421,6 +428,9 @@ export default class MainScene extends Phaser.Scene {
       }
     }
     if (this.runningScript) {
+      this.isPaused = true;
+      this.physics.pause();
+
       this.handleScriptStep(globalTime);
     }
   }
@@ -434,6 +444,12 @@ export default class MainScene extends Phaser.Scene {
       console.log("you died");
       this.alive = 1;
       // this.scene.pause();
+      return;
+    }
+
+    this.handleScripts(globalTime);
+
+    if (this.isPaused) {
       return;
     }
 
@@ -508,8 +524,6 @@ export default class MainScene extends Phaser.Scene {
         this.scene.start('RoomPreloaderScene');
       }
     });
-
-    this.handleScripts(globalTime);
   }
 
   // Used only for performance debugging

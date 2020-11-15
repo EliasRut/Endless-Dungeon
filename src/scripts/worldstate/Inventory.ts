@@ -3,7 +3,6 @@ import MainScene from "../scenes/mainScene";
 import globalState from '../worldstate/index';
 
 export default class Inventory {
-    public scene: MainScene
     public itemOffsetX = 0;
     public itemOffsetY = 0;
     public xBoxes = 8; //starts left
@@ -19,8 +18,7 @@ export default class Inventory {
     public belt;
     public gloves;
     public boots;
-    constructor(scene: MainScene) {
-        this.scene = scene;
+    constructor() {
         this.bag = [];
         for (let x = 0; x < this.xBoxes; x++) {  
             this.bag[x] = [];                                  

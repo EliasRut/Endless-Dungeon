@@ -1,6 +1,7 @@
 import { Room } from "../../../typings/custom";
 import Dungeon from "./Dungeon";
 import DungeonLevel from "./DungeonLevel";
+import Inventory from "./Inventory";
 import PlayerCharacter from "./PlayerCharacter";
 import RoomAssignment from './RoomAssignment';
 
@@ -36,10 +37,12 @@ export class WorldState {
       ]
     }
   };
+  public inventory: Inventory;
 
   constructor() {
     this.playerCharacter = new PlayerCharacter();
     this.dungeon = new Dungeon();
+    this.inventory = new Inventory();
   }
 
   storeState() {
