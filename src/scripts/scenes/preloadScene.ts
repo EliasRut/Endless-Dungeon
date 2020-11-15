@@ -14,6 +14,13 @@ export default class PreloadScene extends Phaser.Scene {
 
   neededAnimations = ['player'];
 
+  init() {
+    const text = new Phaser.GameObjects.Text(this,
+      this.cameras.main.centerX,
+      this.cameras.main.centerY, 'Loading ...', { color: 'white', fontSize: '26px' });
+    this.add.existing(text);
+  }
+
   preload() {
     // Empty tile
     this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');

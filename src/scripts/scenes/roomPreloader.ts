@@ -12,6 +12,13 @@ export default class RoomPreloaderScene extends Phaser.Scene {
   }
   usedRooms: string[] = [];
 
+  init() {
+    const text = new Phaser.GameObjects.Text(this,
+      this.cameras.main.centerX,
+      this.cameras.main.centerY, 'Loading ...', { color: 'white', fontSize: '26px' });
+    this.add.existing(text);
+  }
+
   preload() {
     // Rooms
     const requestedRoomId = getUrlParam('roomName');
