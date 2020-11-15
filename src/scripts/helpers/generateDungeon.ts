@@ -2,6 +2,7 @@ import { GameObjects } from "phaser";
 import { NpcPositioning, OpeningDirection, Room } from "../../../typings/custom";
 import globalState from "../worldstate";
 import MainScene from '../scenes/mainScene';
+import { SSL_OP_NO_COMPRESSION } from "constants";
 
 export const DUNGEON_WIDTH = 128;
 export const DUNGEON_BLOCKS_X = DUNGEON_WIDTH / 8;
@@ -10,6 +11,17 @@ export const DUNGEON_BLOCKS_Y = DUNGEON_HEIGHT / 8;
 export const TILE_WIDTH = 16;
 export const TILE_HEIGHT = 16;
 export const BLOCK_SIZE = 8;
+
+const PATH_CAP = [
+  [  8,  8,  8,  8,  8,  8,  8,  8],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+  [ 6, 32, 32, 32, 32, 32, 32,  4],
+];
 
 const TILED_PATH = [
   [32, 32, 32, 32, 32, 32, 32, 32],
@@ -149,6 +161,7 @@ const CORRIDOR_LAYOUTS = {
   13: T_CROSSING_TOP_RIGHT_BOTTOM,
   14: T_CROSSING_LEFT_RIGHT_BOTTOM,
   15: CROSSWAY,
+  16: PATH_CAP,
 }
 
 export default class DungeonGenerator {
@@ -229,9 +242,9 @@ export default class DungeonGenerator {
 
     // We initialize the array of arrays once and then only reset it's values in 
     // tryRoomPlacement for performance reasons.
-    for (let y = 0; y < DUNGEON_HEIGHT / 8; y++) {
+    for (let y = 0; y < DUNGEON_BLOCKS_Y; y++) {
       this.tilesUsed[y] = [];
-      for (let x = 0; x < DUNGEON_WIDTH / 8; x++) {
+      for (let x = 0; x < DUNGEON_BLOCKS_X; x++) {
         this.tilesUsed[y][x] = false;
       }
     }
@@ -417,12 +430,14 @@ export default class DungeonGenerator {
     }
 
     // Construct path.
-    let numOpenings = 1;
+    let numOpenings = 0;
     const visitedOpenings: [number, number, number, OpeningDirection][] =
       [[this.startRoomIndex, ...this.rooms[this.startRoomIndex].openings[0]]];
     const targetOpenings: [number, number, number, OpeningDirection][] = [];
 
-    this.rooms[this.startRoomIndex].openings.slice(1).forEach((opening) => {
+    // 0: do not skip, 1: skip
+    const skipFirstRoom = this.rooms[this.startRoomIndex].openings.length === 1 ? 0 : 1;
+    this.rooms[this.startRoomIndex].openings.splice(skipFirstRoom).forEach((opening) => {
       numOpenings++;
       targetOpenings.push([this.startRoomIndex, ...opening]);
     });
@@ -436,7 +451,7 @@ export default class DungeonGenerator {
       })
     });
 
-    while (visitedOpenings.length < numOpenings) {
+    do {
       const source = visitedOpenings[Math.floor(Math.random() * visitedOpenings.length)];
       const sourceRoomIndex = source[0];
       const sourceRoom = this.rooms[this.startRoomIndex];
@@ -450,6 +465,8 @@ export default class DungeonGenerator {
         this.roomOffsets[targetRoomIndex][0] + targetOpening[0],
         this.roomOffsets[targetRoomIndex][1] + targetOpening[1]
       ];
+
+      const isSingleton = JSON.stringify(source) === JSON.stringify(target) && numOpenings === 1;
 
       const currentBlockY = this.roomOffsets[sourceRoomIndex][0] + sourceOpening[0];
       const currentBlockX = this.roomOffsets[sourceRoomIndex][1] + sourceOpening[1];
@@ -538,7 +555,7 @@ export default class DungeonGenerator {
         const nextStepX = foundPath[pathStep + 1][1];
         // We are using a good binary encounted value. 1, 2, 4 and 8 each are a single 1 in a binary
         // encoded number, so 0001 = 1, 0010 = 2, 0011 = 3, ..., 1000 = 8, ..., 1111 = 15
-        const newValue =
+        const newValue = isSingleton ? 16 : // Special case for single room with single opening.
           ((prevStepY < curStepY || nextStepY < curStepY) ? 1 : 0) +
           ((prevStepX < curStepX || nextStepX < curStepX) ? 2 : 0) +
           ((prevStepY > curStepY || nextStepY > curStepY) ? 4 : 0) +
@@ -563,15 +580,16 @@ export default class DungeonGenerator {
             opening[3] === target[3];
       })
       // If findIndex doesn't find anything, it'll be -1
-      if (entryPosition === -1) {
+      if (entryPosition === -1 || isSingleton) {
         visitedOpenings.push(target);
       }
-    }
+
+    } while (visitedOpenings.length < numOpenings) ;
   }
 
   private drawTilesForPaths() {
-    for (let blockY = 0; blockY < DUNGEON_HEIGHT / 8; blockY++) {
-      for (let blockX = 0; blockX < DUNGEON_WIDTH / 8; blockX++) {
+    for (let blockY = 0; blockY < DUNGEON_BLOCKS_Y; blockY++) {
+      for (let blockX = 0; blockX < DUNGEON_BLOCKS_X; blockX++) {
         if (this.blocksUsed[blockY][blockX]) {
           const blockLayout = CORRIDOR_LAYOUTS[this.blocksUsed[blockY][blockX]];
           for (let y = 0; y < BLOCK_SIZE; y++) {
