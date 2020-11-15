@@ -12,15 +12,6 @@ export default class RoomPreloaderScene extends Phaser.Scene {
   }
   usedRooms: string[] = [];
 
-    //   'town', {
-    //   id: 'town',
-    //   rooms: [{roomName: 'town', x: 8, y: 8}],
-    //   tilesets: ['town'],
-    //   layout: 
-    //   npcs: NpcPositioning[];
-    //   connections: MapConnection[];
-    // }
-
   preload() {
     // Rooms
     const requestedRoomId = getUrlParam('roomName');
