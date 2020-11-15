@@ -30,7 +30,7 @@ export default class PlayerCharacter extends Character {
 
   public abilityKeyMapping = {
     [AbilityKey.ONE]: AbilityType.FIREBALL,
-    [AbilityKey.TWO]: AbilityType.HEALING_LIGHT,
+    [AbilityKey.TWO]: AbilityType.ICESPIKE,
     [AbilityKey.THREE]: AbilityType.DUSTNOVA,
     [AbilityKey.FOUR]: AbilityType.ROUND_HOUSE_KICK,
   };
