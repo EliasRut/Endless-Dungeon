@@ -44,7 +44,18 @@ export interface ScriptSceneChange {
 	target: string;
 }
 
-export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange;
+export interface ScriptFadeIn {
+	type: "fadeIn";
+	time: number;
+}
+
+export interface ScriptFadeOut {
+	type: "fadeOut";
+	time: number;
+}
+
+export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange |
+	ScriptFadeIn | ScriptFadeOut;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];

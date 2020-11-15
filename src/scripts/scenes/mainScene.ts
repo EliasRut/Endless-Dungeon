@@ -21,6 +21,7 @@ import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_WIDTH } from '../helpers/generateDunge
 import Inventory from '../worldstate/Inventory';
 import { generateTilemap } from '../helpers/drawDungeon';
 import { ScriptEntry } from '../../../typings/custom';
+import DialogScreen from '../screens/dialogScreen';
 
 const visibleTiles: boolean[][] = [];
 
@@ -38,10 +39,11 @@ export default class MainScene extends Phaser.Scene {
 
   enemy: EnemyToken[];
   groundItem: Weapon[];
-  sportLight: Phaser.GameObjects.Light;
+
   overlayScreens: {
     inventory: InventoryScreen;
     statScreen: StatScreen;
+    dialogScreen: DialogScreen;
   };
   lastCameraPosition: {x: number, y: number};
   abilityEffects: AbilityEffect[] = [];
@@ -69,6 +71,7 @@ export default class MainScene extends Phaser.Scene {
   scriptStep?: number;
   scriptSubStep?: number;
   scriptStepStartMs?: number;
+  scriptAnimationFallback?: string;
 
   constructor() {
     super({ key: 'MainScene' })
@@ -271,9 +274,14 @@ export default class MainScene extends Phaser.Scene {
     const inventory = new InventoryScreen(this);
     this.add.existing(inventory);
     inventory.setVisible(false);
+
+    const dialogScreen = new DialogScreen(this);
+    this.add.existing(dialogScreen);
+    dialogScreen.setVisible(false);
     this.overlayScreens = {
       statScreen,
-      inventory
+      inventory,
+      dialogScreen
     };
   }
 
@@ -373,15 +381,38 @@ export default class MainScene extends Phaser.Scene {
         }
         break;
       }
+      case "fadeIn": {
+        if (!this.scriptStepStartMs) {
+          this.scriptStepStartMs = globalTime;
+          this.cameras.main.fadeIn(currentStep.time);
+        } else if ((this.scriptStepStartMs + currentStep.time) < globalTime) {
+          cleanUpStep = true;
+        }
+        break;
+      }
+      case "fadeOut": {
+        if (!this.scriptStepStartMs) {
+          this.scriptStepStartMs = globalTime;
+          this.cameras.main.fadeOut(currentStep.time);
+        } else if ((this.scriptStepStartMs + currentStep.time) < globalTime) {
+          cleanUpStep = true;
+        }
+        break;
+      }
       case "dialog": {
         if (!this.scriptStepStartMs) {
           this.scriptStepStartMs = globalTime;
           this.scriptSubStep = 0;
-          console.log(currentStep.text[this.scriptSubStep!]);
-        } else if ((this.scriptStepStartMs + 2000) < globalTime) {
+          this.overlayScreens.dialogScreen.setText(currentStep.text[this.scriptSubStep!]);
+          this.overlayScreens.dialogScreen.setVisible(true);
+        } else if ((this.scriptStepStartMs + 5000) < globalTime) {
           this.scriptSubStep = this.scriptSubStep! + 1;
           if (currentStep.text.length <= this.scriptSubStep) {
+            this.overlayScreens.dialogScreen.setVisible(false);
             cleanUpStep = true;
+          } else {
+            this.overlayScreens.dialogScreen.setText(currentStep.text[this.scriptSubStep!]);
+            this.scriptStepStartMs = globalTime;
           }
         }
         break;
@@ -390,20 +421,28 @@ export default class MainScene extends Phaser.Scene {
         if (!this.scriptStepStartMs) {
           this.scriptStepStartMs = globalTime;
           console.log(`Playing animation ${currentStep.animation}`);
+          if (currentStep.target === 'player') {
+            this.scriptAnimationFallback = this.mainCharacter.anims.currentAnim.key;
+            this.mainCharacter.play(currentStep.animation);
+          }
         } else if ((this.scriptStepStartMs + currentStep.duration) < globalTime) {
           cleanUpStep = true;
+          this.mainCharacter.play(this.scriptAnimationFallback!);
         }
         break;
       }
       case "sceneChange": {
+        cleanUpStep = true;
         globalState.currentLevel = currentStep.target;
         this.scene.start('RoomPreloaderScene');
+        break;
       }
     }
     if (cleanUpStep) {
       this.scriptStep = this.scriptStep! + 1;
       this.scriptSubStep = undefined;
       this.scriptStepStartMs = undefined;
+      this.scriptAnimationFallback = undefined;
     }
   }
 

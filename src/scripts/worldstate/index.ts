@@ -23,6 +23,10 @@ export class WorldState {
       dynamicLighting: false,
       rooms: ['intro_dormRoom']
     },
+    'intro_ceremony': {
+      dynamicLighting: false,
+      rooms: ['intro_ceremony']
+    },
     'town': {
       dynamicLighting: false,
       rooms: ['town']

@@ -1,5 +1,5 @@
 {
-	"name": "intro_dormRoom",
+	"name": "intro_ceremony",
 	"tileset": "dungeon",
 	"openings": [],
 	"layout": [
@@ -21,37 +21,6 @@
 		[ 0,  0,  0, 11,  2,  2,  2, 44,  2,  2, 44,  2,  2, 44,  2,  2, 44,  2,  2,  2, 10,  0,  0,  0]
 	],
 	"scripts": {
-		"onEntry": [
-			{
-				"type": "fadeIn",
-				"time": 2000
-			},
-			{
-				"type": "wait",
-				"time": 1000
-			}, {
-				"type": "dialog",
-				"portrait": "player_happy",
-				"text": ["Finally, today is the day I've waited for so long!"]
-			}, {
-				"type": "animation",
-				"target": "player",
-				"animation": "player-walk-s",
-				"duration": 2000
-			}, {
-				"type": "dialog",
-				"portrait": "player_excited",
-				"text": [
-					"Today I become a WIZARD!",
-					"I can hardly await my ceremony."
-				]
-			}, {
-				"type": "fadeOut",
-				"time": 2000
-			}, {
-				"type": "sceneChange",
-				"target": "intro_ceremony"
-			}
-		]
+		"onEntry": []
 	}
 }
