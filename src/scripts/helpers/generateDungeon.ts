@@ -352,9 +352,11 @@ export default class DungeonGenerator {
 
     for (let y = 0; y < roomLayout.length; y++) {
       for (let x = 0; x < roomLayout[y].length; x++) {
-        const actualY = y + roomYBlockOffset * BLOCK_SIZE;
-        const actualX = x + roomXBlockOffset * BLOCK_SIZE;
-        this.combinedLayout[actualY][actualX] = gid + roomLayout[y][x];
+        if (roomLayout[y][x] > 0) {
+          const actualY = y + roomYBlockOffset * BLOCK_SIZE;
+          const actualX = x + roomXBlockOffset * BLOCK_SIZE;
+          this.combinedLayout[actualY][actualX] = gid + roomLayout[y][x];
+        }
       }
     }
   }

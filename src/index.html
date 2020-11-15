@@ -48,25 +48,30 @@
     </script> -->
   </head>
   <body>
-    <div id="phaser-game"></div>
-    <div id="mapEditorMenu" style="position: absolute; top: 0; left: 0; right: 0; z-index: 1000; display: none; background-color: white; flex-direction: column; font-family: Calibri; padding: 8px 8px 12px 8px;">
-      <div style="display: flex; flex-direction: row; justify-content: space-between;padding: 4px 12px;">
-        <div>
-          Load room:
-          <select id="roomDropdown"><option>Loading...</option></select>
-          <button id="loadRoomButton">Load</button>
+    <div style="display: flex; height: 100%; width: 100%; flex-direction: column;">
+      <div id="mapEditorMenu" style="display: none; background-color: black; color: white; flex-direction: column; font-family: Calibri; padding: 8px 8px 12px 8px;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between;padding: 4px 12px;">
+          <div>
+            Load room:
+            <select id="roomDropdown"><option>Loading...</option></select>
+            <button id="loadRoomButton">Load</button>
+          </div>
+          <div>
+            <button id="exportButton">Export</button>
+          </div>
         </div>
-        <div>
-          <button id="exportButton">Export</button>
+        <div style="display: flex; flex-direction: row; justify-content: space-between;padding: 4px 12px;">
+          <div>Room Name <input id="roomName" /></div>
+          <div>
+            TileSet
+            <select id="tilesetDropdown"><option>Loading...</option></select>
+          </div>
+          <div>Room Width <input id="roomWidth" width=4 style="width: 50px;" /></div>
+          <div>Room Height <input id="roomHeight" width=4 style="width: 50px;" /></div>
+          <div><button id="goButton">Go</button></div>
         </div>
       </div>
-      <div style="display: flex; flex-direction: row; justify-content: space-between;padding: 4px 12px;">
-        <div>Room Name <input id="roomName" /></div>
-        <div>TileSet <select id="tileset"><option value="dungeon">default dungeon set</option></select></div>
-        <div>Room Width <input id="roomWidth" width=4 style="width: 50px;" /></div>
-        <div>Room Height <input id="roomHeight" width=4 style="width: 50px;" /></div>
-        <div><button id="goButton">Go</button></div>
-      </div>
+      <div id="phaser-game"></div>
     </div>
     <a id="downloadAnchorElem" style="display:none"></a>
   </body>

@@ -14,6 +14,7 @@ export default class MapEditor extends Phaser.Scene {
   selectedId = 32;
 
   tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+  libraryLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
   wKey: Phaser.Input.Keyboard.Key;
   aKey: Phaser.Input.Keyboard.Key;
@@ -30,7 +31,7 @@ export default class MapEditor extends Phaser.Scene {
   create() {
     const mapEditorMenuElement = document.getElementById('mapEditorMenu') as HTMLDivElement;
     mapEditorMenuElement.style.display = 'flex';
-    
+
     const roomsDropdown = document.getElementById('roomDropdown') as HTMLSelectElement;
     while (roomsDropdown.firstChild) {
       roomsDropdown.remove(0);
@@ -43,6 +44,18 @@ export default class MapEditor extends Phaser.Scene {
       roomsDropdown.appendChild(newOption);
     })
 
+    const tilesetDropdown = document.getElementById('tilesetDropdown') as HTMLSelectElement;
+    while (tilesetDropdown.firstChild) {
+      tilesetDropdown.remove(0);
+    }
+
+    globalState.availableTilesets.forEach((tileset) => {
+      const newOption = document.createElement('option');
+      newOption.value = tileset;
+      newOption.innerText = tileset;
+      tilesetDropdown.appendChild(newOption);
+    })
+
     const loadButtonElement = document.getElementById('loadRoomButton') as HTMLButtonElement;
     loadButtonElement.onclick = () => {
       const roomsDropdown = document.getElementById('roomDropdown') as HTMLSelectElement;
@@ -51,12 +64,16 @@ export default class MapEditor extends Phaser.Scene {
       const selectedRoom = globalState.availableRooms.find((room) => room.name === roomName)!;
       const roomNameElement = document.getElementById('roomName') as HTMLInputElement;
       roomNameElement.value = selectedRoom.name;
-      const tilesetElement = document.getElementById('tileset') as HTMLSelectElement;
+
+      const tilesetElement = document.getElementById('tilesetDropdown') as HTMLSelectElement;
       tilesetElement.value = selectedRoom.tileset
+
       const roomHeightElement = document.getElementById('roomHeight') as HTMLInputElement;
       roomHeightElement.value = `${selectedRoom.layout.length}`;
       const roomWidthElement = document.getElementById('roomWidth') as HTMLInputElement;
       roomWidthElement.value = `${selectedRoom.layout[0].length}`;
+
+      this.roomLayout = [];
       this.applyConfiguration();
       for (let y = 0; y < selectedRoom.layout.length; y++) {
         for (let x = 0; x < selectedRoom.layout[y].length; x++) {
@@ -85,7 +102,7 @@ export default class MapEditor extends Phaser.Scene {
       const roomNameElement = document.getElementById('roomName') as HTMLInputElement;
       const roomNameValue = roomNameElement.value;
 
-      const tilesetElement = document.getElementById('tileset') as HTMLSelectElement;
+      const tilesetElement = document.getElementById('tilesetDropdown') as HTMLSelectElement;
       const tilesetValue = tilesetElement.value;
 
       let fileRows = '{\n' +
@@ -117,7 +134,7 @@ export default class MapEditor extends Phaser.Scene {
     const roomNameValue = roomNameElement.value;
     this.roomName = roomNameValue;
 
-    const tilesetElement = document.getElementById('tileset') as HTMLSelectElement;
+    const tilesetElement = document.getElementById('tilesetDropdown') as HTMLSelectElement;
     const tilesetValue = tilesetElement.value;
     this.tileSetName = tilesetValue;
     const roomWidthElement = document.getElementById('roomWidth') as HTMLInputElement;
@@ -141,6 +158,9 @@ export default class MapEditor extends Phaser.Scene {
   }
 
   drawTileSet() {
+    if (this.libraryLayer) {
+      this.libraryLayer.destroy(true);
+    }
     const data: number[][] = [];
 
     const tileSetImage = this.textures.get(this.tileSetName).source[0];
@@ -168,24 +188,26 @@ export default class MapEditor extends Phaser.Scene {
       1,
       2
     );
-    const libraryLayer = map.createDynamicLayer(0, tileSet, 0, 0).setInteractive();
-    libraryLayer.setDepth(1);
-    libraryLayer.on('pointerdown', (pointer) => {
+    this.libraryLayer = map.createDynamicLayer(0, tileSet, 0, 0).setInteractive();
+    this.libraryLayer.setDepth(1);
+    this.libraryLayer.on('pointerdown', (pointer) => {
       console.log(pointer);
-      const clickX = pointer.downX - libraryLayer.x;
-      const clickY = pointer.downY - libraryLayer.y;
+      const clickX = pointer.downX - this.libraryLayer.x;
+      const clickY = pointer.downY - this.libraryLayer.y;
       const tileX = Math.floor(clickX / TILE_WIDTH);
       const tileY = Math.floor(clickY / TILE_HEIGHT);
-      const clickedTile = libraryLayer.getTileAt(tileX, tileY);
+      const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
       if (clickedTile) {
         this.selectedId = clickedTile.index;
       }
     });
-    libraryLayer.setScrollFactor(0, 0);
+    this.libraryLayer.setScrollFactor(0, 0);
   }
 
-
   drawRoom() {
+    if (this.tileLayer) {
+      this.tileLayer.destroy(true);
+    }
     const map = this.make.tilemap({
       data: this.roomLayout,
       tileWidth: TILE_WIDTH,
@@ -199,13 +221,14 @@ export default class MapEditor extends Phaser.Scene {
       1,
       2
     );
-    this.tileLayer = 
+    this.tileLayer =
       map.createDynamicLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2)
       .setInteractive();
     this.tileLayer.on('pointerdown', (pointer) => {
-      console.log(pointer);
-      const clickX = pointer.downX - this.cameras.main.centerX + this.cameraPositionX - this.tileLayer.x;
-      const clickY = pointer.downY - this.cameras.main.centerY + this.cameraPositionY - this.tileLayer.y;
+      const clickX = 
+        pointer.downX - this.cameras.main.centerX + this.cameraPositionX - this.tileLayer.x;
+      const clickY = 
+        pointer.downY - this.cameras.main.centerY + this.cameraPositionY - this.tileLayer.y;
       const tileX = Math.floor(clickX / TILE_WIDTH);
       const tileY = Math.floor(clickY / TILE_HEIGHT);
       const clickedTile = this.tileLayer.getTileAt(tileX, tileY);
@@ -234,16 +257,16 @@ export default class MapEditor extends Phaser.Scene {
       return;
     }
       if (this.sKey.isDown) {
-      this.cameraPositionY = this.cameraPositionY - 10;
-    }
-    if (this.dKey.isDown) {
-      this.cameraPositionX = this.cameraPositionX - 10;
-    }
-    if (this.wKey.isDown) {
       this.cameraPositionY = this.cameraPositionY + 10;
     }
-    if (this.aKey.isDown) {
+    if (this.dKey.isDown) {
       this.cameraPositionX = this.cameraPositionX + 10;
+    }
+    if (this.wKey.isDown) {
+      this.cameraPositionY = this.cameraPositionY - 10;
+    }
+    if (this.aKey.isDown) {
+      this.cameraPositionX = this.cameraPositionX - 10;
     }
     this.cameras.main.centerOn(this.cameraPositionX, this.cameraPositionY);
   }
