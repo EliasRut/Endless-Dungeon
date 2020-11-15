@@ -123,7 +123,7 @@ export default class MapEditor extends Phaser.Scene {
         `\t"scripts": {}\n` +
         `}`;
 
-      const dataStr = "data:text/json;charset=utf-8," + 
+      const dataStr = "data:text/json;charset=utf-8," +
         encodeURIComponent(fileRows);
       const dlAnchorElem = document.getElementById('downloadAnchorElem') as HTMLLinkElement;
       dlAnchorElem.setAttribute("href",     dataStr     );
@@ -195,7 +195,6 @@ export default class MapEditor extends Phaser.Scene {
     this.libraryLayer = map.createDynamicLayer(0, tileSet, 0, 0).setInteractive();
     this.libraryLayer.setDepth(1);
     this.libraryLayer.on('pointerdown', (pointer) => {
-      console.log(pointer);
       const clickX = pointer.downX - this.libraryLayer.x;
       const clickY = pointer.downY - this.libraryLayer.y;
       const tileX = Math.floor(clickX / TILE_WIDTH);
@@ -229,9 +228,9 @@ export default class MapEditor extends Phaser.Scene {
       map.createDynamicLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2)
       .setInteractive();
     this.tileLayer.on('pointerdown', (pointer) => {
-      const clickX = 
+      const clickX =
         pointer.downX - this.cameras.main.centerX + this.cameraPositionX - this.tileLayer.x;
-      const clickY = 
+      const clickY =
         pointer.downY - this.cameras.main.centerY + this.cameraPositionY - this.tileLayer.y;
       const tileX = Math.floor(clickX / TILE_WIDTH);
       const tileY = Math.floor(clickY / TILE_HEIGHT);
