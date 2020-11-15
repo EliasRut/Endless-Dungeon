@@ -19,6 +19,7 @@ import DungeonGenerator, { DUNGEON_HEIGHT } from '../helpers/generateDungeon';
 import FpsText from '../objects/fpsText';
 import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_WIDTH } from '../helpers/generateDungeon';
 import Inventory from '../worldstate/Inventory';
+import { generateTilemap } from '../helpers/drawDungeon';
 
 const visibleTiles: boolean[][] = [];
 
@@ -61,6 +62,8 @@ export default class MainScene extends Phaser.Scene {
   updatedTiles: [number, number][] = [];
   visitedTiles: number[][] = [];
 
+  useDynamicLighting = false;
+
   constructor() {
     super({ key: 'MainScene' })
   }
@@ -74,7 +77,11 @@ export default class MainScene extends Phaser.Scene {
     this.groundItem = [];
     const [startX, startY] = this.drawRoom();
 
-    this.prepareDynamicLighting();
+    this.useDynamicLighting = globalState.currentLevel !== 'town';
+
+    if (this.useDynamicLighting) {
+      this.prepareDynamicLighting();
+    }
 
     this.mainCharacter = new PlayerCharacterToken(this, startX, startY);
     this.mainCharacter.setDepth(1);
@@ -110,15 +117,18 @@ export default class MainScene extends Phaser.Scene {
   }
 
   drawRoom() {
-    const dungeonGenerator = new DungeonGenerator();
+    const dungeonLevel = globalState.dungeon.levels.get(globalState.currentLevel);
+    if (!dungeonLevel) {
+      throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
+    }
 
-    const [
-      tileLayer,
-      npcs,
-      playerStartX,
-      playerStartY
-    ] = dungeonGenerator.generateDungeon(this);
-    this.tileLayer = tileLayer;
+    const {
+      startPositionX,
+      startPositionY,
+      npcs
+    } = dungeonLevel;
+
+    this.tileLayer = generateTilemap(this, dungeonLevel);
 
     this.tileLayer.setDepth(0);
     let npcCounter = 0;
@@ -135,8 +145,7 @@ export default class MainScene extends Phaser.Scene {
           break;
         }
         default: {
-          console.log("Unknown enemy.")
-          break;
+          throw new Error(`Map called for unknown enemy "${npc.id}".`);
         }
       }
 
@@ -145,7 +154,7 @@ export default class MainScene extends Phaser.Scene {
       npcCounter++;
     });
 
-    return [playerStartX, playerStartY];
+    return [startPositionX, startPositionY];
   }
 
   prepareDynamicLighting() {
@@ -330,6 +339,7 @@ export default class MainScene extends Phaser.Scene {
 
     if(globalState.playerCharacter.health <= 0 && this.alive ===0){
       this.cameras.main.fadeOut(1000);
+      // tslint:disable-next-line: no-console
       console.log("you died");
       this.alive = 1;
       // this.scene.pause();
@@ -387,13 +397,25 @@ export default class MainScene extends Phaser.Scene {
     this.abilty3Icon.setAlpha(cooldown3);
     this.abilty4Icon.setAlpha(cooldown4);
 
-    this.updateDynamicLighting();
+    if (this.useDynamicLighting) {
+      this.updateDynamicLighting();
+    }
 
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalTime);
     });
     this.groundItem.forEach(curItem => { //TODO: remove items that are picked up
       curItem.update(this);
+    });
+
+    // Check if the player is close to a connection point and move them if so
+    globalState.dungeon.levels.get(globalState.currentLevel)?.connections.forEach((connection) => {
+      if (Math.hypot(
+            connection.x - globalState.playerCharacter.x,
+            connection.y - globalState.playerCharacter.y) < 32) {
+        globalState.currentLevel = connection.targetMap;
+        this.scene.start('RoomPreloaderScene');
+      }
     });
   }
 
@@ -458,7 +480,7 @@ export default class MainScene extends Phaser.Scene {
           );
           //
 
-          // That is: lightingLevel for the distance if it is currently visible, 
+          // That is: lightingLevel for the distance if it is currently visible,
           // VISITED_TILE_TINT if it has been visited before,
           // black otherwise
           tile.tint = Math.max(
@@ -475,6 +497,7 @@ export default class MainScene extends Phaser.Scene {
     if (this.dynamicLightingTimes.length >= 600) {
       const avg = this.dynamicLightingTimes.reduce((sum, value) => sum + value)
         / this.dynamicLightingTimes.length;
+      // tslint:disable-next-line: no-console
       console.log(`Dynamic lighting took on avg ${avg} ms`);
       this.dynamicLightingTimes = [];
     }

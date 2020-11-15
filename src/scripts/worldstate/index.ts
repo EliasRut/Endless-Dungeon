@@ -1,5 +1,6 @@
 import { Room } from "../../../typings/custom";
 import Dungeon from "./Dungeon";
+import DungeonLevel from "./DungeonLevel";
 import PlayerCharacter from "./PlayerCharacter";
 
 /*
@@ -13,10 +14,31 @@ export class WorldState {
   public playerCharacter: PlayerCharacter;
   public dungeon: Dungeon;
   public availableRooms: Room[] = [];
+  public availableTilesets: string[] = [];
+  public currentLevel: string = 'town';
+  public roomAssignment: {[name: string]: string[]} = {
+    'town': ['town'],
+    'dungeon': [
+      'firstTest',
+      'secondTest',
+      'thirdTest',
+      'startRoom'
+    ]
+  };
 
   constructor() {
     this.playerCharacter = new PlayerCharacter();
     this.dungeon = new Dungeon();
+  }
+
+  storeState() {
+    // tslint:disable-next-line: no-console
+    console.log('Storing state.');
+  }
+
+  loadState() {
+    // tslint:disable-next-line: no-console
+    console.log('Loading state.');
   }
 }
 

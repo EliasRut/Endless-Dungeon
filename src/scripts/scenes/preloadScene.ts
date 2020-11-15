@@ -1,6 +1,7 @@
 import { getUrlParam } from "../helpers/browserState";
 import { spriteDirectionList } from "../helpers/constants";
 import globalState from "../worldstate";
+import DungeonGenerator from '../helpers/generateDungeon';
 
 /*
   The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -12,6 +13,13 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   neededAnimations = ['player'];
+
+  init() {
+    const text = new Phaser.GameObjects.Text(this,
+      this.cameras.main.centerX,
+      this.cameras.main.centerY, 'Loading ...', { color: 'white', fontSize: '26px' });
+    this.add.existing(text);
+  }
 
   preload() {
     // Empty tile
@@ -45,8 +53,6 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
       { frameWidth: 16, frameHeight: 16 });
 
-    console.log(this.textures.list)
-
     // load test music
     this.load.audio('testSound', 'assets/sounds/testSound.MP3');
     this.load.audio('sound-fireball', 'assets/sounds/fireball.wav');
@@ -59,17 +65,18 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.bitmapFont('pixelfont', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
 
     // Find out which files we need by going through all rendered rooms
-    const requiredTilesets = new Set<string>();
     const requiredNpcs = new Set<string>();
     globalState.availableRooms.forEach((room) => {
-      requiredTilesets.add(room.tileset);
+      if (!globalState.availableTilesets.includes(room.tileset)) {
+        globalState.availableTilesets.push(room.tileset);
+      }
       room.npcs?.forEach((npc) => {
         requiredNpcs.add(npc.id);
       })
     })
 
     // Tiles
-    requiredTilesets.forEach((tileSet) => {
+    globalState.availableTilesets.forEach((tileSet) => {
       this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
     })
 
@@ -82,6 +89,11 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   create() {
+    const mapToEditId = getUrlParam('editMap');
+    if (mapToEditId) {
+      this.scene.start('MapEditor');
+      return;
+    }
 
     // Create character animations
     for (let directionIndex = 0; directionIndex < 8; directionIndex++) {
@@ -115,6 +127,14 @@ export default class PreloadScene extends Phaser.Scene {
         });
       });
     }
+
+    // Construct dungeon for this map
+    const dungeonLevel = new DungeonGenerator().generateLevel(
+      globalState.currentLevel,
+      globalState.roomAssignment[globalState.currentLevel]
+    );
+
+    globalState.dungeon.levels.set(globalState.currentLevel, dungeonLevel);
 
     this.scene.start('MainScene');
   }
