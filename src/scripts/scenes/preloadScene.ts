@@ -59,17 +59,18 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.bitmapFont('pixelfont', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
 
     // Find out which files we need by going through all rendered rooms
-    const requiredTilesets = new Set<string>();
     const requiredNpcs = new Set<string>();
     globalState.availableRooms.forEach((room) => {
-      requiredTilesets.add(room.tileset);
+      if (!globalState.availableTilesets.includes(room.tileset)) {
+        globalState.availableTilesets.push(room.tileset);
+      }
       room.npcs?.forEach((npc) => {
         requiredNpcs.add(npc.id);
       })
     })
 
     // Tiles
-    requiredTilesets.forEach((tileSet) => {
+    globalState.availableTilesets.forEach((tileSet) => {
       this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
     })
 
@@ -82,6 +83,11 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   create() {
+    const mapToEditId = getUrlParam('editMap');
+    if (mapToEditId) {
+      this.scene.start('MapEditor');
+      return;
+    }
 
     // Create character animations
     for (let directionIndex = 0; directionIndex < 8; directionIndex++) {

@@ -28,6 +28,12 @@ export default class RoomLoaderScene extends Phaser.Scene {
     this.usedRooms.forEach((roomId) => {
       this.load.json(`room-${roomId}`, `assets/rooms/${roomId}.json`);
     })
+
+    const mapToEditId = getUrlParam('editMap');
+    if (mapToEditId) {
+      // We need to load all tilesets if we are going to use the map editor
+      globalState.availableTilesets.push('dungeon', 'dungeon-blue', 'town');
+    }
   }
 
   create() {

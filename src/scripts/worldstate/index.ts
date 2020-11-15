@@ -13,6 +13,7 @@ export class WorldState {
   public playerCharacter: PlayerCharacter;
   public dungeon: Dungeon;
   public availableRooms: Room[] = [];
+  public availableTilesets: string[] = [];
 
   constructor() {
     this.playerCharacter = new PlayerCharacter();
