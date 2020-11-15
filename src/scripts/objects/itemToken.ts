@@ -1,27 +1,41 @@
-import { Game } from "phaser";
 import Item from "../worldstate/Item"
-import Player from "../worldstate/PlayerCharacter"
+import MainScene from "../scenes/mainScene";
 
 export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
   stateObject: Item;
-  isDestroyed = false;
+  public itemLocation = 0; //0 is ground, 1-80 are inventory slots, 80+ are equipped
+
   constructor(scene: Phaser.Scene, x: number, y: number, icon: number) {
-  super(scene, x, y, 'test-items-spritesheet', icon);
-  scene.add.existing(this);
-  scene.physics.add.existing(this);
+    super(scene, x, y, 'test-items-spritesheet', icon);
+    scene.add.existing(this);
   }
-  public update(player: Player) {
-    const px = player.x;
-    const py = player.y;
-    const distance = Math.hypot(this.x - px, this.y - py);
-    if (distance < 30 && !this.isDestroyed){
-      this.stateObject.equip(player);
-      this.destroy();
+
+  public update(scene: MainScene) {
+    if (this.itemLocation === 0) {
+      const px = scene.mainCharacter.x;
+      const py = scene.mainCharacter.y;
+      const distance = Math.hypot(this.x - px, this.y - py);
+      //if you run over item, put into inventory
+      if (distance < 30) {
+        if (scene.inventory.sortIntoInventory(this)) {          
+          scene.overlayScreens.inventory.add(this, false);
+          this.setVisible(false);
+          this.setDepth(7);
+          this.setScrollFactor(0);
+          this.setInteractive();
+          this.on('pointerdown', () => {
+            if(this.itemLocation > 0 && this.itemLocation < 81){
+              scene.inventory.equip(this);
+            } else if(this.itemLocation > 80){
+              scene.inventory.unequip(this);
+            }
+          })
+        }
+      }
     }
   }
 
-  destroy(){
-    this.isDestroyed = true;
+  destroy() {    
     super.destroy(true);
   }
 }

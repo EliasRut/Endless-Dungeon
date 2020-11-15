@@ -18,6 +18,7 @@ import { Faction, VISITED_TILE_TINT } from '../helpers/constants';
 import DungeonGenerator, { DUNGEON_HEIGHT } from '../helpers/generateDungeon';
 import FpsText from '../objects/fpsText';
 import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_WIDTH } from '../helpers/generateDungeon';
+import Inventory from '../worldstate/Inventory';
 
 const visibleTiles: boolean[][] = [];
 
@@ -34,7 +35,8 @@ export default class MainScene extends Phaser.Scene {
   keyboardHelper: KeyboardHelper;
 
   enemy: EnemyToken[];
-  weapon: Weapon[];
+  inventory: Inventory;
+  groundItem: Weapon[];
   sportLight: Phaser.GameObjects.Light;
   overlayScreens: {
     inventory: InventoryScreen;
@@ -69,7 +71,7 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.fadeIn(1000);
 
     this.enemy = [];
-    this.weapon = [];
+    this.groundItem = [];
     const [startX, startY] = this.drawRoom();
 
     this.prepareDynamicLighting();
@@ -79,6 +81,11 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.mainCharacter, false);
     this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
+    this.inventory = new Inventory(this);
+    const rndItem = Math.floor(Math.random() * 63); // todo calculate from tileset
+    const length = this.groundItem.push(new Weapon(this, startX-30, startY-30, rndItem));
+    this.groundItem[length-1].setDepth(1);
+
     this.keyboardHelper = new KeyboardHelper(this);
     this.soundKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
     this.soundKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
@@ -86,7 +93,15 @@ export default class MainScene extends Phaser.Scene {
     this.drawOverlayScreens();
 
     this.drawGUI();
+    var pointers = this.input.activePointer;
+    this.input.on('pointerdown', function (pointer) {
+      console.log("mouse x", pointers.x)
+      console.log("mouse y", pointers.y)
+});
 
+
+// console.log("mouse x", this.input.activePointer.x)
+// debugger;
     this.sound.play('testSound', {volume: 0.08, loop: true});
   }
 
@@ -245,7 +260,7 @@ export default class MainScene extends Phaser.Scene {
     this.overlayScreens = {
       statScreen,
       inventory
-    };
+    };    
   }
 
   triggerAbility(origin: Character, type: AbilityType) {
@@ -377,8 +392,8 @@ export default class MainScene extends Phaser.Scene {
     this.enemy.forEach(curEnemy => {
       curEnemy.update(globalTime);
     });
-    this.weapon.forEach(curWeapon => {
-      curWeapon.update(globalState.playerCharacter);
+    this.groundItem.forEach(curItem => { //TODO: remove items that are picked up
+      curItem.update(this);
     });
   }
 

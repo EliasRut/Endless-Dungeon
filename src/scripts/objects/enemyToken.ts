@@ -86,8 +86,8 @@ export default abstract class EnemyToken extends CharacterToken {
       return;
     }
     const rndItem = Math.floor(Math.random() * 63); // todo calculate from tileset
-    const length = this.scene.weapon.push(new Weapon(this.scene, this.x, this.y, rndItem));
-    this.scene.weapon[length-1].setDepth(1);
+    const length = this.scene.groundItem.push(new Weapon(this.scene, this.x, this.y, rndItem));
+    this.scene.groundItem[length-1].setDepth(1);
   }
 
   private getOccupiedTile() {
