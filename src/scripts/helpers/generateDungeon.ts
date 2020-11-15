@@ -185,8 +185,10 @@ export default class DungeonGenerator {
         (availableRoom) => availableRoom.name === roomName)!
     );
 
-    // const roomGen = new RoomGenerator();
-    // this.rooms.push(roomGen.generateRoom(this.rooms[0].tileset));
+    if(id !== 'town') {
+      const roomGen = new RoomGenerator();
+      this.rooms.push(roomGen.generateRoom(this.rooms[0].tileset));
+    }
 
     this.startRoomIndex = Math.max(0, this.rooms.findIndex((room) => room.startRoom));
     this.roomOffsets = [];
