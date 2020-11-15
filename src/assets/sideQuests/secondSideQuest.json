@@ -4,5 +4,5 @@
     "task": "TestTask",
     "enemyType": "red-link",
     "theme": 1,
-    "rooms": [ "wood", "idontknow" ]
+    "rooms": [ "secondTest", "thirdTest" ]
 }

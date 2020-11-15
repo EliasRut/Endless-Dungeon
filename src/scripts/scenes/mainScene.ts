@@ -21,6 +21,7 @@ import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_WIDTH } from '../helpers/generateDunge
 
 import StoryLine from '../objects/storyLine';
 import SideQuestLog from '../objects/sideQuestLog';
+import { Room } from '../../../typings/custom';
 
 const visibleTiles: boolean[][] = [];
 
@@ -101,15 +102,30 @@ export default class MainScene extends Phaser.Scene {
     item.disableBody(true, true);
   }
 
+  getRooms() {
+    console.log(this);
+    const roomNames = ['startRoom','firstTest'];//this.sideQuestLog.sideQuests[0].rooms.concat(this.storyLine.storyLineData.mainQuests[0].rooms);
+    const roomsOfLevel = globalState.availableRooms.filter(room => {
+      const name = roomNames.find(roomName => {
+        return room.name == roomName;
+      })
+
+      return name ? true : false;
+    });
+
+    console.log(roomsOfLevel);
+    return roomsOfLevel;
+  }
+
   drawRoom() {
     const dungeonGenerator = new DungeonGenerator();
-
+    console.log(this);
     const [
       tileLayer,
       npcs,
       playerStartX,
       playerStartY
-    ] = dungeonGenerator.generateDungeon(this);
+    ] = dungeonGenerator.generateDungeon(this, (this) => this.getRooms);
     this.tileLayer = tileLayer;
 
     this.tileLayer.setDepth(0);
@@ -515,4 +531,5 @@ export default class MainScene extends Phaser.Scene {
     this.sideQuestLog = new SideQuestLog(this.storyLine.storyLineData.mainQuests.length, this.storyLine.storyLineData.themes);
     console.log(this.sideQuestLog);
   }
+
 }

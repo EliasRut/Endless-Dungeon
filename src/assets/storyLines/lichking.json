@@ -7,8 +7,8 @@
             "task": "TestTask",
             "enemyType": "red-link",
             "rooms": [
-                "room1",
-                "room3"
+                "startRoom",
+                "firstTest"
             ]
         },
         {
@@ -17,8 +17,8 @@
             "task": "TestTask",
             "enemyType": "red-link",
             "rooms": [
-                "room1",
-                "room3"
+                "firstTest",
+                "secondTest"
             ]
         },
         {
@@ -26,10 +26,7 @@
             "description": "",
             "task": "",
             "enemyType": "",
-            "rooms": [
-                "",
-                ""
-            ]
+            "rooms": []
         },
         {
             "title": "House of the Gerrald the legend keeper4",
@@ -37,8 +34,8 @@
             "task": "TestTask",
             "enemyType": "red-ball",
             "rooms": [
-                "room1",
-                "room3"
+                "firstTest",
+                "secondTest"
             ]
         },
         {
@@ -46,10 +43,7 @@
             "description": "",
             "task": "",
             "enemyType": "",
-            "rooms": [
-                "",
-                ""
-            ]
+            "rooms": []
         }
     ],
     "themes": [

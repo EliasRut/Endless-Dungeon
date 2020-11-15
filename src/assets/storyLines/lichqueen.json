@@ -7,8 +7,8 @@
             "task": "TestTask",
             "enemyType": "red-link",
             "rooms": [
-                "room1",
-                "room3"
+                "firstTest",
+                "startRoom"
             ]
         },
         {
