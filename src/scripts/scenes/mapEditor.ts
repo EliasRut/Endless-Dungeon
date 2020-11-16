@@ -3,7 +3,7 @@ import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
 import PositionText from '../objects/positionText';
 import globalState from '../worldstate';
 
-const visibleTiles: boolean[][] = [];
+const TILE_SPACING = 2;
 
 // The main scene handles the actual game play.
 export default class MapEditor extends Phaser.Scene {
@@ -170,8 +170,8 @@ export default class MapEditor extends Phaser.Scene {
     const tileSetImage = this.textures.get(this.tileSetName).source[0];
     const imageWidth = tileSetImage.width;
     const imageHeight = tileSetImage.height;
-    const widthInTiles = Math.ceil(imageWidth / TILE_WIDTH);
-    const heightInTiles = Math.ceil(imageHeight / TILE_HEIGHT);
+    const widthInTiles = Math.ceil(imageWidth / (TILE_WIDTH + TILE_SPACING));
+    const heightInTiles = Math.ceil(imageHeight / (TILE_HEIGHT + TILE_SPACING));
 
     for (let y = 0; y < heightInTiles; y++) {
       data[y] = [];
