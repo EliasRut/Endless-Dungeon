@@ -13,15 +13,48 @@ export const TILE_WIDTH = 16;
 export const TILE_HEIGHT = 16;
 export const BLOCK_SIZE = 8;
 
-const PATH_CAP = [
-  [13,  8,  8,  8,  8,  8,  8, 12],
-  [ 6, 32, 32, 32, 32, 32, 32,  4],
-  [ 6, 32, 32, 32, 32, 32, 32,  4],
-  [ 6, 32, 32, 32, 32, 32, 32,  4],
-  [ 6, 32, 32, 32, 32, 32, 32,  4],
-  [ 6, 32, 32, 32, 32, 32, 32,  4],
-  [ 6, 32, 32, 32, 32, 32, 32,  4],
-  [ 6, 32, 32, 32, 32, 32, 32,  4],
+const CAP_NORTH = [
+  [ 13,  8,  8,  8,  8,  8,  8, 12],
+  [  6, 15, 22, 15, 15, 22, 15,  4],
+  [  6, 18, 25, 18, 18, 25, 18,  4],
+  [  6, 32, 39, 32, 32, 39, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+];
+
+const CAP_SOUTH = [
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [  6, 32, 32, 32, 32, 32, 32,  4],
+  [ 11,  2,  2,  2,  2,  2,  2, 10],
+];
+
+const CAP_EAST = [
+  [  8,  8,  8,  8,  8,  8,  8, 12],
+  [ 15, 15, 22, 15, 15, 15, 22,  4],
+  [ 18, 18, 25, 18, 18, 18, 25,  4],
+  [ 32, 32, 39, 32, 32, 32, 39,  4],
+  [ 32, 32, 32, 32, 32, 32, 32,  4],
+  [ 32, 32, 32, 32, 32, 32, 32,  4],
+  [ 32, 32, 32, 32, 32, 32, 32,  4],
+  [  2,  2,  2,  2,  2,  2,  2, 10],
+];
+
+const CAP_WEST = [
+  [ 13,  8,  8,  8,  8,  8,  8,  8],
+  [  6, 15, 22, 15, 15, 15, 22, 15],
+  [  6, 18, 25, 18, 18, 18, 25, 18],
+  [  6, 32, 39, 32, 32, 32, 39, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [  6, 32, 32, 32, 32, 32, 32, 32],
+  [ 11,  2,  2,  2,  2,  2,  2,  2],
 ];
 
 const TILED_PATH = [
@@ -147,14 +180,14 @@ const CROSSWAY = [
 ];
 
 const CORRIDOR_LAYOUTS = {
-  1: TILED_PATH, // North - Binary 0001
-  2: TILED_PATH, // East - Binary 0010
+  1: CAP_NORTH, // North - Binary 0001
+  2: CAP_EAST, // East - Binary 0010
   3: CORRIDOR_DOWN_LEFT,
-  4: TILED_PATH, // South - Binary 0100
+  4: CAP_SOUTH, // South - Binary 0100
   5: CORRIDOR_UP,
   6: CORRIDOR_UP_LEFT,
   7: T_CROSSING_TOP_LEFT_BOTTOM,
-  8: TILED_PATH, // West - Binary 1000
+  8: CAP_WEST, // West - Binary 1000
   9: CORRIDOR_DOWN_RIGHT,
   10: CORRIDOR_LEFT, // East + West
   11: T_CROSSING_TOP_LEFT_RIGHT,  // East + West + North
@@ -162,7 +195,6 @@ const CORRIDOR_LAYOUTS = {
   13: T_CROSSING_TOP_RIGHT_BOTTOM,
   14: T_CROSSING_LEFT_RIGHT_BOTTOM,
   15: CROSSWAY,
-  16: PATH_CAP,
 }
 
 export default class DungeonGenerator {
@@ -432,20 +464,19 @@ export default class DungeonGenerator {
       }
     }
 
-    // Don't draw paths if we only have 1 room.
-    if (this.rooms.length === 1 && this.rooms[0].openings.length === 0) {
+    // Don't draw paths if our start room doesn't have any openings
+    if (this.rooms[this.startRoomIndex].openings.length === 0) {
       return;
     }
 
     // Construct path.
-    let numOpenings = 0;
+    let numOpenings = 1;
     const visitedOpenings: [number, number, number, OpeningDirection][] =
       [[this.startRoomIndex, ...this.rooms[this.startRoomIndex].openings[0]]];
     const targetOpenings: [number, number, number, OpeningDirection][] = [];
 
     // 0: do not skip, 1: skip
-    const skipFirstRoom = this.rooms[this.startRoomIndex].openings.length === 1 ? 0 : 1;
-    this.rooms[this.startRoomIndex].openings.splice(skipFirstRoom).forEach((opening) => {
+    this.rooms[this.startRoomIndex].openings.slice(1).forEach((opening) => {
       numOpenings++;
       targetOpenings.push([this.startRoomIndex, ...opening]);
     });
@@ -459,7 +490,23 @@ export default class DungeonGenerator {
       })
     });
 
-    do {
+    // Special case dungeons with a single room with a single exit
+    if (targetOpenings.length === 0) {
+      const opening = this.rooms[this.startRoomIndex].openings[0];
+      const targetCoordinates = [
+        this.roomOffsets[this.startRoomIndex][0] + opening[0],
+        this.roomOffsets[this.startRoomIndex][1] + opening[1]
+      ]
+
+      this.blocksUsed[targetCoordinates[0]][targetCoordinates[1]] =
+        (opening[2] === 'top' ? 1 : 0) +
+        (opening[2] === 'right' ? 2 : 0) +
+        (opening[2] === 'bottom' ? 4 : 0) +
+        (opening[2] === 'left' ? 8 : 0);
+      return;
+    }
+
+    while (visitedOpenings.length < numOpenings) {
       const source = visitedOpenings[Math.floor(Math.random() * visitedOpenings.length)];
       const sourceRoomIndex = source[0];
       const sourceRoom = this.rooms[this.startRoomIndex];
@@ -473,8 +520,6 @@ export default class DungeonGenerator {
         this.roomOffsets[targetRoomIndex][0] + targetOpening[0],
         this.roomOffsets[targetRoomIndex][1] + targetOpening[1]
       ];
-
-      const isSingleton = JSON.stringify(source) === JSON.stringify(target) && numOpenings === 1;
 
       const currentBlockY = this.roomOffsets[sourceRoomIndex][0] + sourceOpening[0];
       const currentBlockX = this.roomOffsets[sourceRoomIndex][1] + sourceOpening[1];
@@ -563,7 +608,7 @@ export default class DungeonGenerator {
         const nextStepX = foundPath[pathStep + 1][1];
         // We are using a good binary encounted value. 1, 2, 4 and 8 each are a single 1 in a binary
         // encoded number, so 0001 = 1, 0010 = 2, 0011 = 3, ..., 1000 = 8, ..., 1111 = 15
-        const newValue = isSingleton ? 16 : // Special case for single room with single opening.
+        const newValue =
           ((prevStepY < curStepY || nextStepY < curStepY) ? 1 : 0) +
           ((prevStepX < curStepX || nextStepX < curStepX) ? 2 : 0) +
           ((prevStepY > curStepY || nextStepY > curStepY) ? 4 : 0) +
@@ -588,11 +633,10 @@ export default class DungeonGenerator {
             opening[3] === target[3];
       })
       // If findIndex doesn't find anything, it'll be -1
-      if (entryPosition === -1 || isSingleton) {
+      if (entryPosition === -1) {
         visitedOpenings.push(target);
       }
-
-    } while (visitedOpenings.length < numOpenings) ;
+    }
   }
 
   private drawTilesForPaths() {
