@@ -475,7 +475,6 @@ export default class DungeonGenerator {
       [[this.startRoomIndex, ...this.rooms[this.startRoomIndex].openings[0]]];
     const targetOpenings: [number, number, number, OpeningDirection][] = [];
 
-    // 0: do not skip, 1: skip
     this.rooms[this.startRoomIndex].openings.slice(1).forEach((opening) => {
       numOpenings++;
       targetOpenings.push([this.startRoomIndex, ...opening]);
