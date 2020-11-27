@@ -1,0 +1,10 @@
+{
+    "title": "Second variable main quest",
+    "description": "This is the second side quest where you have to do absoultey nothing ",
+    "task": "TestTask",
+    "enemyType": "red-ball",
+    "theme": 0,
+    "rooms": [
+        "firstTest"
+    ]
+}

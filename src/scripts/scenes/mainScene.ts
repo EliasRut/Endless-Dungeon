@@ -20,7 +20,9 @@ import FpsText from '../objects/fpsText';
 import { TILE_WIDTH, TILE_HEIGHT, DUNGEON_WIDTH } from '../helpers/generateDungeon';
 import Inventory from '../worldstate/Inventory';
 import { generateTilemap } from '../helpers/drawDungeon';
+import StoryLine from '../objects/storyLine';
 import { ScriptEntry } from '../../../typings/custom';
+import SideQuestLog from '../objects/sideQuestLog';
 import DialogScreen from '../screens/dialogScreen';
 
 const visibleTiles: boolean[][] = [];
@@ -65,6 +67,8 @@ export default class MainScene extends Phaser.Scene {
   visitedTiles: number[][] = [];
 
   useDynamicLighting = false;
+  storyLine: StoryLine;
+  sideQuestLog: SideQuestLog;
 
   currentRoom?: string;
   runningScript?: ScriptEntry[];
@@ -81,6 +85,8 @@ export default class MainScene extends Phaser.Scene {
     this.alive = 0;
     // tslint:disable-next-line:no-unused-expression
     this.cameras.main.fadeIn(1000);
+
+    this.generateStory();
 
     this.enemy = [];
     this.groundItem = [];
@@ -683,6 +689,29 @@ export default class MainScene extends Phaser.Scene {
         // Break actually stops this ray from being casted
         break;
       }
+    }
+  }
+
+  generateStory() {
+    if(!this.storyLine) {
+      this.storyLine = new StoryLine();
+      console.log(this.storyLine);
+      const mainQuests = this.storyLine.storyLineData.mainQuests;
+      this.sideQuestLog = new SideQuestLog(mainQuests.length, this.storyLine.storyLineData.themes);
+      console.log(this.sideQuestLog);
+
+      for(let i = 0; i < mainQuests.length; i++) {
+        console.log(i);
+        const sideQuestRooms: string[] = [];
+        for(let sideQuest of this.sideQuestLog.sideQuests) {
+          if(sideQuest.level == i) {
+            sideQuestRooms.concat(sideQuest.rooms);
+          }
+        }
+        globalState.roomAssignment['dungeonLvl' + i] = mainQuests[i].rooms.concat(sideQuestRooms);
+      }
+
+      console.log(globalState.roomAssignment);
     }
   }
 }

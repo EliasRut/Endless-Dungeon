@@ -1,0 +1,55 @@
+{
+    "title": "Legends of the Lich King",
+    "mainQuests": [
+        {
+            "title": "House of the Gerrald the legend keeper",
+            "description": "Test",
+            "task": "TestTask",
+            "enemyType": "red-link",
+            "rooms": [
+                "startRoom",
+                "firstTest",
+                "secondTest",
+                "thirdTest"
+            ]
+        },
+        {
+            "title": "House of the Gerrald the legend keeper2",
+            "description": "Test",
+            "task": "TestTask",
+            "enemyType": "red-link",
+            "rooms": [
+                "firstTest",
+                "secondTest"
+            ]
+        },
+        {
+            "title": "variableMainQuest",
+            "description": "",
+            "task": "",
+            "enemyType": "",
+            "rooms": []
+        },
+        {
+            "title": "House of the Gerrald the legend keeper4",
+            "description": "Test",
+            "task": "TestTask",
+            "enemyType": "red-ball",
+            "rooms": [
+                "firstTest",
+                "secondTest"
+            ]
+        },
+        {
+            "title": "variableMainQuest",
+            "description": "",
+            "task": "",
+            "enemyType": "",
+            "rooms": []
+        }
+    ],
+    "themes": [
+        1,
+        4
+    ]
+}

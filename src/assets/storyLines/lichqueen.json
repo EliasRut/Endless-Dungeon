@@ -1,0 +1,38 @@
+{
+    "title": "Legends of the Lich Queen",
+    "mainQuests": [
+        {
+            "title": "House of the Esmeralda the legend keeper",
+            "description": "Test",
+            "task": "TestTask",
+            "enemyType": "red-link",
+            "rooms": [
+                "firstTest",
+                "startRoom"
+            ]
+        },
+        {
+            "title": "variableMainQuest",
+            "description": "",
+            "task": "",
+            "enemyType": "",
+            "rooms": [
+                "",
+                ""
+            ]
+        },
+        {
+            "title": "House of the Esmeralda the legend keeper2",
+            "description": "Test",
+            "task": "TestTask",
+            "enemyType": "red-link",
+            "rooms": [
+                "startRoom",
+                "secondTest"
+            ]
+        }
+    ],
+    "themes": [
+        0
+    ]
+}

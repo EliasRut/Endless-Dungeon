@@ -121,7 +121,7 @@
 	"connections": [{
 		"y": 62,
 		"x": 77,
-		"targetMap": "dungeon"
+		"targetMap": "dungeonLvl0"
 	}],
   "scripts": {}
 }
