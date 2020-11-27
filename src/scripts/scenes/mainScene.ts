@@ -701,17 +701,17 @@ export default class MainScene extends Phaser.Scene {
       console.log(this.sideQuestLog);
 
       for(let i = 0; i < mainQuests.length; i++) {
-        console.log(i);
         const sideQuestRooms: string[] = [];
-        for(let sideQuest of this.sideQuestLog.sideQuests) {
-          if(sideQuest.level == i) {
+        for(const sideQuest of this.sideQuestLog.sideQuests) {
+          if(sideQuest.level === i) {
             sideQuestRooms.concat(sideQuest.rooms);
           }
         }
-        globalState.roomAssignment['dungeonLvl' + i] = mainQuests[i].rooms.concat(sideQuestRooms);
+        globalState.roomAssignment['dungeonLvl' + i] = {
+          dynamicLighting: true,
+          rooms: mainQuests[i].rooms.concat(sideQuestRooms)
+        };
       }
-
-      console.log(globalState.roomAssignment);
     }
   }
 }

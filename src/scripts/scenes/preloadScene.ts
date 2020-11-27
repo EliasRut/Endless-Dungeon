@@ -128,9 +128,6 @@ export default class PreloadScene extends Phaser.Scene {
       });
     }
 
-    console.log(globalState.currentLevel);
-    console.log(globalState.dungeon.levels);
-
     // Construct dungeon for this map
     const dungeonLevel = new DungeonGenerator().generateLevel(
       globalState.currentLevel,

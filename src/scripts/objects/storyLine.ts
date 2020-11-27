@@ -8,13 +8,13 @@ import StoryLineData, { QuestTheme } from "../models/StoryLineData";
 import lichKingStoryLineData from '../../assets/storyLines/lichking.json';
 import lichQueenStoryLineData from '../../assets/storyLines/lichqueen.json';
 
-let loadedVariableMainQuests: VariableMainQuest[] = [
+const loadedVariableMainQuests: VariableMainQuest[] = [
     firstQuest,
     secondQuest,
     thirdQuest
 ]
 
-let loadedStorylineData: StoryLineData[] = [
+const loadedStorylineData: StoryLineData[] = [
     lichKingStoryLineData,
     lichQueenStoryLineData
 ]
@@ -28,24 +28,22 @@ export default class StoryLine {
     }
 
     drawRndStoryLine() {
-        console.log(loadedStorylineData);
-        this.storyLineData =  loadedStorylineData[Math.floor(Math.random() * loadedStorylineData.length)];
+        this.storyLineData =
+            loadedStorylineData[Math.floor(Math.random() * loadedStorylineData.length)];
     }
 
     drawVariableMainQuests() {
-        let qualifiedSideQuests: Quest[] = [];
-        for (let sideQuest of loadedVariableMainQuests) {
+        const qualifiedSideQuests: Quest[] = [];
+        for (const sideQuest of loadedVariableMainQuests) {
             if (this.storyLineData.themes.find(theme => {
-                return theme == sideQuest.theme;
+                return theme === sideQuest.theme;
             }) != null) {
                 qualifiedSideQuests.push(sideQuest);
             }
         }
 
-        console.log(qualifiedSideQuests);
-
-        for (let i in this.storyLineData.mainQuests) {
-            if (this.storyLineData.mainQuests[i].title == 'variableMainQuest') {
+        for (const i in this.storyLineData.mainQuests) {
+            if (this.storyLineData.mainQuests[i].title === 'variableMainQuest') {
                 const randomNumber = Math.floor(Math.random() * qualifiedSideQuests.length);
                 this.storyLineData.mainQuests[i] = qualifiedSideQuests.splice(randomNumber, 1)[0];
             }
