@@ -3,6 +3,7 @@ import { MapConnection, NpcPositioning, OpeningDirection, Room } from "../../../
 import globalState from "../worldstate";
 import MainScene from '../scenes/mainScene';
 import DungeonLevel from "../worldstate/DungeonLevel";
+import RoomGenerator from "./generateRoom";
 // import RoomGenerator from './generateRoom';
 
 export const DUNGEON_WIDTH = 128;
@@ -216,7 +217,9 @@ export default class DungeonGenerator {
 
     // if(id !== 'town') {
     //   const roomGen = new RoomGenerator();
-    //   this.rooms.push(roomGen.generateRoom(this.rooms[0].tileset));
+    //   const genericRoom = roomGen.generateRoom(this.rooms[0].tileset);
+    //   this.rooms.push(genericRoom);
+    //   globalState.availableRooms[genericRoom.name] = genericRoom;
     // }
 
     this.startRoomIndex = Math.max(0, this.rooms.findIndex((room) => room.startRoom));

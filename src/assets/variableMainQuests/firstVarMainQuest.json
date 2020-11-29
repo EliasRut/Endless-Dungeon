@@ -1,0 +1,10 @@
+{
+    "title": "First Varialbe Main Quest",
+    "description": "This is the variable main quest where you have to do absoultey nothing ",
+    "task": "TestTask",
+    "enemyType": "red-link",
+    "theme": 1,
+    "rooms": [
+        "firstTest"
+    ]
+}

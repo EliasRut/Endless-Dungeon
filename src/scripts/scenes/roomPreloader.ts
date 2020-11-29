@@ -1,5 +1,6 @@
 import { Room } from "../../../typings/custom";
 import { getUrlParam } from "../helpers/browserState";
+import RoomGenerator from "../helpers/generateRoom";
 import globalState from "../worldstate";
 
 /*
@@ -49,6 +50,15 @@ export default class RoomPreloaderScene extends Phaser.Scene {
     this.usedRooms.forEach((roomId) => {
       this.load.json(`room-${roomId}`, `assets/rooms/${roomId}.json`);
     })
+
+    if(requestedRoomId != undefined) {
+      const roomGen = new RoomGenerator();
+      const genericRoom = roomGen.generateRoom('dungeon');
+      // globalState.availableRooms[genericRoom.name] = genericRoom;
+      globalState.roomAssignment[requestedRoomId].rooms.push(genericRoom.name)
+      this.usedRooms.push(genericRoom.name);
+      this.cache.json.add(`room-${genericRoom.name}`,genericRoom);
+    }
   }
 
   create() {
@@ -56,6 +66,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
       const room = this.cache.json.get(`room-${usedRoom}`) as Room;
       globalState.availableRooms[room.name] = room;
     });
+
 
     this.scene.start('PreloadScene');
   }
