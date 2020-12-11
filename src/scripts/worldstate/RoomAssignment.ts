@@ -1,4 +1,4 @@
 export default interface RoomAssignment {
-  dynamicLighting: boolean;
-  rooms: string[];
+	dynamicLighting: boolean;
+	rooms: string[];
 }

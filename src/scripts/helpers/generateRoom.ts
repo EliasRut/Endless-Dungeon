@@ -66,7 +66,6 @@ const BOTTOM_OPENING = [
   [ 0,  0,  0,  0]
 ];
 
-
 export default class RoomGenerator {
   minSize: number = 4;
   maxSize: number = 2*this.minSize;
@@ -86,15 +85,14 @@ export default class RoomGenerator {
     const roomName: string = "awsomeRoom"+(Math.floor(Math.random() * 1000));
     console.log("Creating "+roomName+" of size "+roomHeight+"x"+roomWidth);
 
-    let room: number[][] = [];
-
+    const room: number[][] = [];
 
     // Draw the outer walls of the room
     for (let y = 0; y < roomHeight; y++) {
         room[y] = [];
       for (let x = 0; x < roomWidth; x++) {
           room[y][x] = FLOOR;
-          
+
           if(y === 0) {
               room[y][x] = 8;
           } else if(x === 0) {
@@ -113,25 +111,24 @@ export default class RoomGenerator {
      * 2 == south
      * 3 == west
      */
-    const roomOrientation = 0; //(Math.random() * 100) % 4;
+    const roomOrientation = 0; // (Math.random() * 100) % 4;
     const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'}
-    
+
     switch(roomOrientation) {
-      case 0: 
+      case 0:
         const startIndex = Math.max(0,(room[0].length/2)-4);
         for(let i=startIndex;i < Math.min(room[0].length,startIndex + 6);i++) {
             room[0][i] = 32;
         }
         break;
-      // case 1: 
+      // case 1:
       //   break;
-      // case 2: 
+      // case 2:
       //   break;
-      // case 3: 
+      // case 3:
       //   break;
       default:
     }
-
 
     let debugOutput = '';
     for(let i=0;i<room.length;i++) {
@@ -145,7 +142,6 @@ export default class RoomGenerator {
     }
 
     console.log(debugOutput)
-
 
     const ret: {tileset: string,
                 layout: number[][],

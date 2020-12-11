@@ -1,24 +1,24 @@
-import { Facings, Faction } from "../helpers/constants";
-import Character from "./Character";
+import { Facings, Faction } from '../helpers/constants';
+import Character from './Character';
 // This class handles the players character and all mechanical events associated with it.
 export default class Enemy extends Character {
-    public vision = 250;
-    public attackTime = 2000;
-    public exactTargetXFactor = 0;
-    public exactTargetYFactor = 0;
+	public vision = 250;
+	public attackTime = 2000;
+	public exactTargetXFactor = 0;
+	public exactTargetYFactor = 0;
 
-    constructor(
-      animationBase: string,
-      health: number = 100,
-      damage: number = 10,
-      movementSpeed: number = 100
-    ) {
-      super(animationBase, health, damage, movementSpeed);
+	constructor(
+		animationBase: string,
+		health: number = 100,
+		damage: number = 10,
+		movementSpeed: number = 100
+	) {
+		super(animationBase, health, damage, movementSpeed);
 
-      this.faction = Faction.ENEMIES;
-    }
+		this.faction = Faction.ENEMIES;
+	}
 
-    getFacingVelocities() {
-      return {x: this.exactTargetXFactor, y: this.exactTargetYFactor};
-    }
-  };
+	getFacingVelocities() {
+		return {x: this.exactTargetXFactor, y: this.exactTargetYFactor};
+	}
+}
