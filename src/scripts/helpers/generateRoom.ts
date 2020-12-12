@@ -139,7 +139,6 @@ export default class RoomGenerator {
 
   private roomSize(min: number, max: number) {
       const factor = Math.max(min,(Math.floor(Math.random() * 100)) % max)
-      console.log(factor);
     return factor;
   }
 
@@ -148,7 +147,6 @@ export default class RoomGenerator {
     const roomWidth = this.roomSize(this.minSize,this.maxSize);
 
     const roomName: string = "awsomeRoom"+(Math.floor(Math.random() * 1000));
-    console.log("Creating "+roomName+" of size "+roomHeight+"x"+roomWidth);
 
     let room: number[][] = [];
 
@@ -183,6 +181,19 @@ export default class RoomGenerator {
     const roomOrientation =  (Math.floor(Math.random() * 10)) % 4;
     const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'}
     let orientation: [[number,number,string]] = [[0,0,'']];
+
+    let h1: string = "";
+    let w1: string = "";
+
+    if([1,3].includes(roomOrientation) && roomHeight < 3) {
+      h1 = "(+"+(3-roomHeight)+")"
+    }
+
+    if([0,2].includes(roomOrientation) && roomWidth < 3) {
+      w1 = "(+"+(3-roomWidth)+")"
+    }
+
+    console.log("Creating "+roomName+" of size "+roomHeight+h1+"x"+roomWidth+w1);
 
     console.log(roomWidth/2)
     switch(roomOrientation) {
