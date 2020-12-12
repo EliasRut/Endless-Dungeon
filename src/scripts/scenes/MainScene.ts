@@ -63,6 +63,8 @@ export default class MainScene extends Phaser.Scene {
 	avatar: Avatar;
 	backpackIcon: BackpackIcon;
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
 	useDynamicLighting = false;
 	storyLine: StoryLine;
@@ -93,6 +95,7 @@ export default class MainScene extends Phaser.Scene {
 		this.mainCharacter.setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.cameras.main.startFollow(this.mainCharacter, false);
 		this.physics.add.collider(this.mainCharacter, this.tileLayer);
+		this.physics.add.collider(this.mainCharacter, this.decorationLayer);
 
 		const rndItem = Math.floor(Math.random() * NUM_ITEM_ICONS); // todo calculate from tileset
 		const length = this.groundItem.push(new WeaponToken(
@@ -123,6 +126,7 @@ export default class MainScene extends Phaser.Scene {
 		this.npcMap[id] = spawnNpc(this, type, id, x, y);
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.physics.add.collider(this.npcMap[id], this.tileLayer);
+		this.physics.add.collider(this.npcMap[id], this.decorationLayer);
 		this.npcMap[id].script = script;
 	}
 
@@ -138,9 +142,20 @@ export default class MainScene extends Phaser.Scene {
 			npcs
 		} = dungeonLevel;
 
-		this.tileLayer = generateTilemap(this, dungeonLevel);
+		const [
+			tileLayer,
+			decorationLayer,
+			overlayLayer
+		] = generateTilemap(this, dungeonLevel);
+
+		this.tileLayer = tileLayer;
+		this.decorationLayer = decorationLayer;
+		this.overlayLayer = overlayLayer;
 
 		this.tileLayer.setDepth(UiDepths.BASE_TILE_LAYER);
+		this.decorationLayer.setDepth(UiDepths.DECORATION_TILE_LAYER);
+		this.overlayLayer.setDepth(UiDepths.OVERLAY_TILE_LAYER);
+
 		npcs.forEach((npc) => {
 			this.addNpc(npc.id, npc.type, npc.x, npc.y, npc.script);
 		});

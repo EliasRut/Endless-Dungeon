@@ -53,6 +53,12 @@ export default class AbilityHelper {
 					this.scene.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
 				}
 			});
+			this.scene.physics.add.collider(effect, this.scene.decorationLayer, () => {
+				effect.destroy();
+				if (projectileData?.collisionSound) {
+					this.scene.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
+				}
+			});
 
 			const targetTokens = origin.faction === Faction.PLAYER ?
 				Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES) :

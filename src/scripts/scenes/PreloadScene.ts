@@ -70,6 +70,12 @@ export default class PreloadScene extends Phaser.Scene {
 			if (!globalState.availableTilesets.includes(room.tileset)) {
 				globalState.availableTilesets.push(room.tileset);
 			}
+			if (room.decorationTileset && !globalState.availableTilesets.includes(room.decorationTileset)) {
+				globalState.availableTilesets.push(room.decorationTileset);
+			}
+			if (room.overlayTileset && !globalState.availableTilesets.includes(room.overlayTileset)) {
+				globalState.availableTilesets.push(room.overlayTileset);
+			}
 			room.npcs?.forEach((npc) => {
 				requiredNpcs.add(npc.type);
 			});

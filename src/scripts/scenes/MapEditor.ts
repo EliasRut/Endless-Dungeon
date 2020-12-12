@@ -36,7 +36,7 @@ export default class MapEditor extends Phaser.Scene {
 
 	mapEditorMenuElement: HTMLDivElement;
 	roomsDropdownElement: HTMLSelectElement;
-	tilesetDrodpwonElement: HTMLSelectElement;
+	tilesetDropdownElement: HTMLSelectElement;
 	loadButtonElement: HTMLButtonElement;
 	roomNameElement: HTMLInputElement;
 	roomHeightElement: HTMLInputElement;
@@ -46,7 +46,7 @@ export default class MapEditor extends Phaser.Scene {
 		super({ key: 'MapEditor' });
 		this.mapEditorMenuElement = document.getElementById('mapEditorMenu') as HTMLDivElement;
 		this.roomsDropdownElement = document.getElementById('roomDropdown') as HTMLSelectElement;
-		this.tilesetDrodpwonElement = document.getElementById('tilesetDropdown') as HTMLSelectElement;
+		this.tilesetDropdownElement = document.getElementById('tilesetDropdown') as HTMLSelectElement;
 		this.loadButtonElement = document.getElementById('loadRoomButton') as HTMLButtonElement;
 		this.roomNameElement = document.getElementById('roomName') as HTMLInputElement;
 		this.roomHeightElement = document.getElementById('roomHeight') as HTMLInputElement;
@@ -68,15 +68,15 @@ export default class MapEditor extends Phaser.Scene {
 			this.roomsDropdownElement.appendChild(newOption);
 		});
 
-		while (this.tilesetDrodpwonElement.firstChild) {
-			this.tilesetDrodpwonElement.remove(0);
+		while (this.tilesetDropdownElement.firstChild) {
+			this.tilesetDropdownElement.remove(0);
 		}
 
 		globalState.availableTilesets.forEach((tileset) => {
 			const newOption = document.createElement('option');
 			newOption.value = tileset;
 			newOption.innerText = tileset;
-			this.tilesetDrodpwonElement.appendChild(newOption);
+			this.tilesetDropdownElement.appendChild(newOption);
 		});
 
 		this.loadButtonElement.onclick = () => {
@@ -117,8 +117,7 @@ export default class MapEditor extends Phaser.Scene {
 
 		const exportButtonElement = document.getElementById('exportButton') as HTMLButtonElement;
 		exportButtonElement.onclick = () => {
-			const roomNameElement = document.getElementById('roomName') as HTMLInputElement;
-			const roomNameValue = roomNameElement.value;
+			const roomNameValue = this.roomNameElement.value;
 
 			const tilesetElement = document.getElementById('tilesetDropdown') as HTMLSelectElement;
 			const tilesetValue = tilesetElement.value;
@@ -147,18 +146,13 @@ export default class MapEditor extends Phaser.Scene {
 	}
 
 	applyConfiguration() {
-		const roomNameElement = document.getElementById('roomName') as HTMLInputElement;
-		const roomNameValue = roomNameElement.value;
+		const roomNameValue = this.roomNameElement.value;
 		this.roomName = roomNameValue;
 
-		const tilesetElement = document.getElementById('tilesetDropdown') as HTMLSelectElement;
-		const tilesetValue = tilesetElement.value;
-		this.tileSetName = tilesetValue;
-		const roomWidthElement = document.getElementById('roomWidth') as HTMLInputElement;
-		const roomWidthValue = parseInt(roomWidthElement.value, 10) || ROOM_DEFAULT_WIDTH;
+		this.tileSetName = this.tilesetDropdownElement.value;
+		const roomWidthValue = parseInt(this.roomWidthElement.value, 10) || ROOM_DEFAULT_WIDTH;
 		const roomWidth = roomWidthValue > 0 ? roomWidthValue : ROOM_DEFAULT_WIDTH;
-		const roomHeightElement = document.getElementById('roomHeight') as HTMLInputElement;
-		const roomHeightValue = parseInt(roomHeightElement.value, 10) || ROOM_DEFAULT_HEIGHT;
+		const roomHeightValue = parseInt(this.roomHeightElement.value, 10) || ROOM_DEFAULT_HEIGHT;
 		const roomHeight = roomHeightValue > 0 ? roomHeightValue : ROOM_DEFAULT_HEIGHT;
 
 		const newRoomLayout: number[][] = [];
