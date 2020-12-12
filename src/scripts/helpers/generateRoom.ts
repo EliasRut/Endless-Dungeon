@@ -132,8 +132,8 @@ const BOTTOM_LEFT_CORNER = [
 ];
 
 export default class RoomGenerator {
-  minSize: number = 2;
-  maxSize: number = 2*this.minSize;
+  minSize: number = 1;
+  maxSize: number = 3*this.minSize;
 
   blocksUsed: number[][];
 
@@ -180,8 +180,7 @@ export default class RoomGenerator {
      * 2 == south
      * 3 == west
      */
-    let orient = 3//Math.floor(Math.random()*10) % 4;
-    const roomOrientation = orient; //(Math.random() * 100) % 4;
+    const roomOrientation =  (Math.floor(Math.random() * 10)) % 4;
     const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'}
     let orientation: [[number,number,string]] = [[0,0,'']];
 
