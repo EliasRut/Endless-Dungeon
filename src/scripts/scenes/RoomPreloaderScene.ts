@@ -44,7 +44,14 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 				});
 			});
 			// We need to load all tilesets if we are going to use the map editor
-			globalState.availableTilesets.push('dungeon', 'dungeon-blue', 'town');
+			globalState.availableTilesets.push(
+				'dungeon',
+				'dungeon-blue',
+				'town',
+				'dungeon-overlay',
+				'dungeon-decoration',
+				'town-overlay'
+				);
 		}
 
 		this.usedRooms.forEach((roomId) => {

@@ -48,30 +48,70 @@
     </script> -->
   </head>
   <body>
-    <div style="display: flex; height: 100%; width: 100%; flex-direction: column;">
-      <div id="mapEditorMenu" style="display: none; background-color: black; color: white; flex-direction: column; font-family: Calibri; padding: 8px 8px 12px 8px;">
-        <div style="display: flex; flex-direction: row; justify-content: space-between;padding: 4px 12px;">
-          <div>
-            Load room:
-            <select id="roomDropdown"><option>Loading...</option></select>
-            <button id="loadRoomButton">Load</button>
-          </div>
-          <div>
-            <button id="exportButton">Export</button>
+    <div style="display: flex; height: 100%; width: 100%; flex-direction: row;">
+      <div id="mapEditorMenu" style="display: none; background-color: black; color: white; flex-direction: column; font-family: Calibri; padding: 24px">
+        <div>
+          <div>Load room:</div>
+          <select
+            style="width: 140px"
+            id="roomDropdown"
+          ><option>Loading...</option></select>
+          <div style="margin-top: 18px">
+            <button style="width: 120px; margin: 0 10px; padding: 8px;" id="loadRoomButton">Load</button>
           </div>
         </div>
-        <div style="display: flex; flex-direction: row; justify-content: space-between;padding: 4px 12px;">
-          <div>Room Name <input id="roomName" /></div>
-          <div>
-            TileSet
-            <select id="tilesetDropdown"><option>Loading...</option></select>
-          </div>
-          <div>Room Width <input id="roomWidth" width=4 style="width: 50px;" /></div>
-          <div>Room Height <input id="roomHeight" width=4 style="width: 50px;" /></div>
-          <div><button id="goButton">Go</button></div>
+        <div style="margin-top: 48px">
+          <div>Room Name</div>
+          <input style="width: 140px" id="roomName" />
+        </div>
+        <div style="margin-top: 12px">
+          <div>Room Width</div>
+          <input style="width: 140px" id="roomWidth" width=4 />
+        </div>
+        <div style="margin-top: 12px">
+          <div>Room Height</div>
+          <input style="width: 140px" id="roomHeight" width=4 />
+        </div>
+        <div style="margin-top: 12px">
+          <div>Base TileSet</div>
+          <select
+            style="width: 140px"
+            id="tilesetDropdown"
+          ><option>Loading...</option></select>
+        </div>
+        <div style="margin-top: 12px">
+          <div>Decoration TileSet</div>
+          <select
+            style="width: 140px"
+            id="tilesetDecorationDropdown"
+          ><option>Loading...</option></select>
+        </div>
+        <div style="margin-top: 12px">
+          <div>Overlay TileSet</div>
+          <select
+            style="width: 140px"
+            id="tilesetOverlayDropdown"
+          ><option>Loading...</option></select>
+        </div>
+        <div style="margin-top: 18px">
+          <button style="width: 120px; margin: 0 10px; padding: 8px;" id="goButton">Go</button>
+        </div>
+        <div style="margin-top: 48px">
+          <div>Selected Layer</div>
+          <select
+            style="width: 140px"
+            id="activeLayerDropdown"
+          >
+            <option value="base">Base Layer</option>
+            <option value="decoration">Decoration Layer</option>
+            <option value="overlay">Overlay Layer</option>
+          </select>
+        </div>
+        <div style="margin-top: 60px">
+          <button style="width: 120px; margin: 0 10px; padding: 8px;" id="exportButton">Export</button>
         </div>
       </div>
-      <div id="phaser-game"></div>
+      <div id="phaser-game" style="flex-grow: 1"></div>
     </div>
     <a id="downloadAnchorElem" style="display:none"></a>
   </body>
