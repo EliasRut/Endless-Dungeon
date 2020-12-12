@@ -196,8 +196,7 @@ export default class RoomGenerator {
 		 * 2 == south ^= bottom
 		 * 3 == west ^= left
 		 */
-		let orient = 1
-		const roomOrientation = orient// (Math.floor(Math.random() * 10)) % 4;
+		const roomOrientation = (Math.floor(Math.random() * 10)) % 4;
 		const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'};
 		const orientation: [[number,number,string]] = [[0,0,'']];
 
