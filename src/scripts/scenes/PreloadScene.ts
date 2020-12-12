@@ -138,12 +138,15 @@ export default class PreloadScene extends Phaser.Scene {
 		}
 
 		// Construct dungeon for this map
-		const dungeonLevel = new DungeonGenerator().generateLevel(
-			globalState.currentLevel,
-			globalState.roomAssignment[globalState.currentLevel].rooms
-		);
+		if (!globalState.dungeon.levels[globalState.currentLevel]) {
 
-		globalState.dungeon.levels.set(globalState.currentLevel, dungeonLevel);
+			const dungeonLevel = new DungeonGenerator().generateLevel(
+				globalState.currentLevel,
+				globalState.roomAssignment[globalState.currentLevel].rooms
+			);
+
+			globalState.dungeon.levels[globalState.currentLevel] = dungeonLevel;
+		}
 
 		this.scene.start('MainScene');
 	}

@@ -23,6 +23,11 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 	preload() {
 		// Rooms
 		const requestedRoomId = getUrlParam('roomName');
+		const mapToEditId = getUrlParam('editMap');
+		if (globalState.loadGame) {
+			globalState.loadState();
+		}
+
 		if (requestedRoomId) {
 			this.usedRooms.push(requestedRoomId);
 			globalState.roomAssignment = {[`${requestedRoomId}`]: {
@@ -34,7 +39,6 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 			this.usedRooms.push(...globalState.roomAssignment[globalState.currentLevel].rooms);
 		}
 
-		const mapToEditId = getUrlParam('editMap');
 		if (mapToEditId) {
 			Object.values(globalState.roomAssignment).forEach((assignment) => {
 				assignment.rooms.forEach((room) => {
