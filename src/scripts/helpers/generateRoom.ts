@@ -234,19 +234,19 @@ export default class RoomGenerator {
 				     room[0][i] = 32;
 				 }
 				*/
-				orientation.push([-1, (roomWidth/2), orientationMap[roomOrientation]]);
+				orientation.push([-1, Math.ceil(roomWidth/2), orientationMap[roomOrientation]]);
 				break;
 			case 1:
 				room = layoutLeftRightEntrance(roomHeight,roomWidth,RIGHT);
-				orientation.push([(roomHeight/2), roomWidth, orientationMap[roomOrientation]]);
+				orientation.push([Math.ceil(roomHeight/2), roomWidth, orientationMap[roomOrientation]]);
 				break;
 			case 2:
 				room = layoutTopBottomEntrance(roomHeight,roomWidth,BOTTOM);
-				orientation.push([roomHeight, (roomWidth/2), orientationMap[roomOrientation]]);
+				orientation.push([roomHeight, Math.ceil(roomWidth/2), orientationMap[roomOrientation]]);
 				break;
 			case 3:
 				room = layoutLeftRightEntrance(roomHeight,roomWidth,LEFT);
-				orientation.push([roomHeight/2,-1, orientationMap[roomOrientation]]);
+				orientation.push([Math.ceil(roomHeight/2),-1, orientationMap[roomOrientation]]);
 				break;
 			default:
 		}
