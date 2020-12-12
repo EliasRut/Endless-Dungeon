@@ -26,7 +26,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
 
 		// Player
-		this.load.spritesheet('player', 'assets/img/main-character.png',
+		this.load.spritesheet('player', 'assets/sprites/main-character.png',
 			{ frameWidth: 40, frameHeight: 40 });
 
 		// Overlay screens
@@ -75,7 +75,7 @@ export default class PreloadScene extends Phaser.Scene {
 			});
 			room.usedNpcTypes?.forEach((npcType) => {
 				requiredNpcs.add(npcType);
-			})
+			});
 		});
 
 		// Tiles
@@ -85,7 +85,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// NPCs
 		requiredNpcs.forEach((npc) => {
-		this.load.spritesheet(npc, `assets/img/${npc}.png`,
+		this.load.spritesheet(npc, `assets/sprites/${npc}.png`,
 			{ frameWidth: 40, frameHeight: 40 });
 			this.neededAnimations.push(npc);
 		});

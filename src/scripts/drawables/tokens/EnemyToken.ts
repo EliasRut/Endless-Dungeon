@@ -1,4 +1,4 @@
-import { UiDepths, VISITED_TILE_TINT } from '../../helpers/constants';
+import { Faction, UiDepths, VISITED_TILE_TINT } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
 import FireBallEffect from '../effects/FireBallEffect';
@@ -29,8 +29,8 @@ export default abstract class EnemyToken extends CharacterToken {
 	aggro: boolean = false;
 	target: Phaser.Geom.Point;
 
-	constructor(scene: MainScene, x: number, y: number, tokenName: string) {
-		super(scene, x, y, tokenName);
+	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
+		super(scene, x, y, tokenName, tokenName, id);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.stateObject = new Enemy(
@@ -41,7 +41,7 @@ export default abstract class EnemyToken extends CharacterToken {
 		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 		this.tokenName = tokenName;
 		this.target = new Phaser.Geom.Point(0, 0);
-
+		this.faction = Faction.ENEMIES;
 	}
 
 	public getDistance(px: number, py: number) {
@@ -103,6 +103,8 @@ export default abstract class EnemyToken extends CharacterToken {
 
 	// destroy the enemy
 	destroy() {
+		delete (this.scene.npcMap[this.id]);
+
 		super.destroy();
 	}
 

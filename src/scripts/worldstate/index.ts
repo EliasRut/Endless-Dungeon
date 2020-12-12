@@ -1,4 +1,5 @@
 import { Room } from '../../../typings/custom';
+import Character from './Character';
 import Dungeon from './Dungeon';
 import DungeonLevel from './DungeonLevel';
 import Inventory from './Inventory';
@@ -14,10 +15,11 @@ import RoomAssignment from './RoomAssignment';
 // This is the world state typing.
 export class WorldState {
 	public playerCharacter: PlayerCharacter;
+	public npcs: {[id: string]: Character} = {};
 	public dungeon: Dungeon;
 	public availableRooms: {[name: string]: Room} = {};
 	public availableTilesets: string[] = [];
-	public currentLevel: string = 'intro_ceremony';
+	public currentLevel: string = 'town';
 	public roomAssignment: {[name: string]: RoomAssignment} = {
 		'intro_dormRoom': {
 			dynamicLighting: false,

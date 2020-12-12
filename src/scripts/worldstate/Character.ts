@@ -7,7 +7,7 @@ import {
 } from '../helpers/constants';
 import { getVelocitiesForFacing } from '../helpers/orientation';
 
-export default abstract class Character {
+export default class Character {
 	private animationBase: string;
 	public maxHealth: number;
 	public health: number;

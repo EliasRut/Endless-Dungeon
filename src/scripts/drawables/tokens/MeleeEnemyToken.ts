@@ -12,8 +12,8 @@ const REGULAR_ATTACK_RANGE = 15;
 
 export default class MeleeEnemyToken extends EnemyToken {
 
-	constructor(scene: MainScene, x: number, y: number, tokenName: string) {
-		super(scene,x,y,tokenName);
+	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
+		super(scene, x, y, tokenName, id);
 
 		// cool effects!
 		const particles = scene.add.particles('fire');

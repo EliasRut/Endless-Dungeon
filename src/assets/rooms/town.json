@@ -117,7 +117,143 @@
 		[32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32],
 		[32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32]
 ],
-	"npcs": [],
+	"npcs": [{
+		"id": "nk-1",
+		"type": "naked-guy",
+		"x": 55,
+		"y": 55,
+		"script": {
+			"repeat": -1,
+			"steps": [
+				{
+					"type": "wait",
+					"time": 1000
+				},
+				{
+					"type": "walk",
+					"posX": 65,
+					"posY": 65
+				},
+				{
+					"type": "animation",
+					"animation": "naked-guy-idle-s"
+				},
+				{
+					"type": "wait",
+					"time": 4000
+				}, {
+					"type": "walk",
+					"posX": 55,
+					"posY": 55
+				},
+				{
+					"type": "animation",
+					"animation": "naked-guy-idle-s"
+				}
+			]}
+		}, {
+		"id": "nk-2",
+		"type": "naked-guy",
+		"x": 65,
+		"y": 65,
+		"script": {
+			"repeat": -1,
+			"steps": [
+				{
+					"type": "wait",
+					"time": 2000
+				},
+				{
+					"type": "walk",
+					"posX": 55,
+					"posY": 55
+				},
+				{
+					"type": "animation",
+					"animation": "naked-guy-idle-s"
+				},
+				{
+					"type": "wait",
+					"time": 3000
+				}, {
+					"type": "walk",
+					"posX": 65,
+					"posY": 65
+				},
+				{
+					"type": "animation",
+					"animation": "naked-guy-idle-s"
+				}
+			]}
+		}, {
+		"id": "nk-3",
+		"type": "naked-guy",
+		"x": 55,
+		"y": 65,
+		"script": {
+			"repeat": -1,
+			"steps": [
+				{
+					"type": "wait",
+					"time": 3000
+				},
+				{
+					"type": "walk",
+					"posX": 65,
+					"posY": 55
+				},
+				{
+					"type": "animation",
+					"animation": "naked-guy-idle-s"
+				},
+				{
+					"type": "wait",
+					"time": 2000
+				}, {
+					"type": "walk",
+					"posX": 55,
+					"posY": 65
+				},
+				{
+					"type": "animation",
+					"animation": "naked-guy-idle-s"
+				}
+			]}
+		}, {
+		"id": "nk-4",
+		"type": "naked-guy",
+		"x": 65,
+		"y": 55,
+		"script": {
+			"repeat": -1,
+			"steps": [
+				{
+					"type": "wait",
+					"time": 4000
+				},
+				{
+					"type": "walk",
+					"posX": 55,
+					"posY": 65
+				},
+				{
+					"type": "animation",
+					"animation": "naked-guy-idle-s"
+				},
+				{
+					"type": "wait",
+					"time": 1000
+				}, {
+					"type": "walk",
+					"posX": 65,
+					"posY": 55
+				},
+				{
+					"type": "animation",
+					"animation": "naked-guy-idle-s"
+				}
+			]}
+		}],
 	"items": [],
 	"connections": [{
 		"y": 62,

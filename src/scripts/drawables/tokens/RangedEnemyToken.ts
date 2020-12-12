@@ -9,8 +9,8 @@ const ATTACK_RANGE = 100;
 
 export default class RangedEnemyToken extends EnemyToken {
 
-	constructor(scene: MainScene, x: number, y: number, tokenName: string) {
-		super(scene, x, y, tokenName);
+	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
+		super(scene, x, y, tokenName, id);
 
 		this.attackRange = ATTACK_RANGE; // how close the enemy comes.
 	}

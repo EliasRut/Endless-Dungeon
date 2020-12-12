@@ -6,9 +6,6 @@ import StoryLine from '../models/StoryLine';
 import SideQuestLog from '../models/SideQuestLog';
 
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
-import EnemyToken from '../drawables/tokens/EnemyToken';
-import RangedEnemyToken from '../drawables/tokens/RangedEnemyToken';
-import MeleeEnemyToken from '../drawables/tokens/MeleeEnemyToken';
 import WeaponToken from '../drawables/tokens/WeaponToken';
 import FpsText from '../drawables/ui/FpsText';
 
@@ -28,6 +25,8 @@ import ScriptHelper from '../helpers/ScriptHelper';
 import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
 import { spawnNpc } from '../helpers/spawn';
+import CharacterToken from '../drawables/tokens/CharacterToken';
+import { NpcScript } from '../../../typings/custom';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -49,7 +48,7 @@ export default class MainScene extends Phaser.Scene {
 	abilityHelper: AbilityHelper;
 
 	mainCharacter: PlayerCharacterToken;
-	npcMap: {[id: string]: EnemyToken};
+	npcMap: {[id: string]: CharacterToken};
 	groundItem: WeaponToken[];
 
 	overlayScreens: {
@@ -120,10 +119,11 @@ export default class MainScene extends Phaser.Scene {
 		this.sound.play('testSound', {volume: 0.08, loop: true});
 	}
 
-	addNpc(id: string, type: string, x: number, y: number) {
-		this.npcMap[id] = spawnNpc(this, type, x, y);
+	addNpc(id: string, type: string, x: number, y: number, script?: NpcScript) {
+		this.npcMap[id] = spawnNpc(this, type, id, x, y);
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.physics.add.collider(this.npcMap[id], this.tileLayer);
+		this.npcMap[id].script = script;
 	}
 
 	drawRoom() {
@@ -142,7 +142,7 @@ export default class MainScene extends Phaser.Scene {
 
 		this.tileLayer.setDepth(UiDepths.BASE_TILE_LAYER);
 		npcs.forEach((npc) => {
-			this.addNpc(npc.id, npc.type, npc.x, npc.y);
+			this.addNpc(npc.id, npc.type, npc.x, npc.y, npc.script);
 		});
 
 		return [startPositionX, startPositionY];

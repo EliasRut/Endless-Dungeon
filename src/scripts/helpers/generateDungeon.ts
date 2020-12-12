@@ -409,7 +409,6 @@ export default class DungeonGenerator {
 				const [roomYBlockOffset, roomXBlockOffset] = this.roomOffsets[roomIndex];
 				this.npcs.push({
 					...npc,
-					type: npc.type,
 					id: `${room.name}-${npc.id}`,
 					x: (npc.x + roomXBlockOffset * BLOCK_SIZE) * TILE_WIDTH,
 					y: (npc.y + roomYBlockOffset * BLOCK_SIZE) * TILE_HEIGHT

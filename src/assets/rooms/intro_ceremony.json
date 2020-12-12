@@ -2,7 +2,10 @@
 	"name": "intro_ceremony",
 	"tileset": "dungeon",
 	"openings": [],
-	"usedNpcTypes": ["red-link"],
+	"usedNpcTypes": [
+		"red-link",
+		"naked-guy"
+	],
 	"layout": [
 		[13,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8, 12],
 		[ 6, 20, 15, 15, 15, 21, 15, 15, 15, 21, 15, 15, 15, 21, 15, 15, 15, 15, 21, 15, 15, 15, 22,  4],
@@ -21,6 +24,42 @@
 		[ 0,  0,  0,  6, 32, 32, 32, 53, 32, 32, 43, 32, 32, 43, 32, 32, 53, 32, 32, 32,  4,  0,  0,  0],
 		[ 0,  0,  0, 11,  2,  2,  2, 44,  2,  2, 44,  2,  2, 44,  2,  2, 44,  2,  2,  2, 10,  0,  0,  0]
 	],
+	"npcs": [{
+		"id": "nk-1",
+		"type": "naked-guy",
+		"x": 3,
+		"y": 6,
+		"script": {
+			"repeat": -1,
+			"steps": [
+				{
+					"type": "wait",
+					"time": 5000
+				},
+				{
+					"type": "walk",
+					"posX": 21,
+					"posY": 6
+				},
+				{
+					"type": "animation",
+					"animation": "naked-guy-idle-s"
+				},
+				{
+					"type": "wait",
+					"time": 5000
+				}, {
+					"type": "walk",
+					"posX": 3,
+					"posY": 6
+				},
+				{
+					"type": "animation",
+					"animation": "naked-guy-idle-s"
+				}
+			]
+		}
+	}],
 	"scripts": {
 		"onEntry": [
 			{
@@ -76,9 +115,8 @@
 				"time": 1000
 			},
 			{
-				"type": "spawn",
-				"npcId": "rl-1",
-				"npcType": "red-link",
+				"type": "walk",
+				"target": "player",
 				"posX": 21,
 				"posY": 4
 			}

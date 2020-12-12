@@ -1,8 +1,16 @@
+export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
+
+export interface NpcScript {
+	repeat: number;
+	steps: NpcScriptStep [];
+}
+
 export interface NpcPositioning {
 	type: string;
 	id: string;
 	x: number;
 	y: number;
+	script?: NpcScript;
 }
 
 export interface MapConnection {
@@ -35,14 +43,14 @@ export interface ScriptDialog {
 
 export interface ScriptAnimation {
 	type: "animation";
-	target: string;
+	target?: string;
 	animation: string;
 	duration: number;
 }
 
 export interface ScriptMove {
 	type: "move";
-	target: string;
+	target?: string;
 	posX: number;
 	posY: number;
 	facingX: number; //-1, 0, 1
@@ -51,7 +59,7 @@ export interface ScriptMove {
 
 export interface ScriptWalk {
 	type: "walk";
-	target: string;
+	target?: string;
 	posX: number;
 	posY: number;
 }
