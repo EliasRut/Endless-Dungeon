@@ -265,18 +265,18 @@ export default class RoomGenerator {
 			default:
 		}
 
-		let debugOutput = '';
-		for(let i=0;i<room.length;i++) {
-			for(let j=0;j<room[i].length;j++) {
-				if(room[i][j] < 10) {
-					debugOutput += ' ';
-				}
-				debugOutput += room[i][j];
-			}
-			debugOutput += '\n';
-		}
+		// let debugOutput = '';
+		// for(let i=0;i<room.length;i++) {
+		// 	for(let j=0;j<room[i].length;j++) {
+		// 		if(room[i][j] < 10) {
+		// 			debugOutput += ' ';
+		// 		}
+		// 		debugOutput += room[i][j];
+		// 	}
+		// 	debugOutput += '\n';
+		// }
 
-		console.log(debugOutput);
+		// console.log(debugOutput);
 
 		const ret: {tileset: string,
 								layout: number[][],
