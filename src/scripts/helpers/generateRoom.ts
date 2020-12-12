@@ -143,6 +143,18 @@ export default class RoomGenerator {
 		return factor;
 	}
 
+	/**
+	 * - The rooms are built from tile blocks of size 4x4,
+	 *   and their heights and widths are multiples of 8.
+	 * - All rooms have their entrances in the middle of the room.
+	 * - The side with the entrance is at least 3x8 in Size.
+	 *   For example if the door is on the top, the width of the room
+	 *   is at least 24 tiles long.
+	 * - An entrance can be in any of the four major directions.
+	 *   The orientation is chosen at random.
+	 *
+	 * @param roomTileset Tileset to be used for the generated room.
+	 */
 	public generateRoom: (roomTileset: string) => Room = (roomTileset) => {
 		const roomHeight = this.roomSize(this.minSize,this.maxSize);
 		const roomWidth = this.roomSize(this.minSize,this.maxSize);
@@ -151,27 +163,32 @@ export default class RoomGenerator {
 
 		let room: number[][] = [];
 
-		// Draw the outer walls of the room
-		// for (let y = 0; y < roomHeight; y++) {
-		//     room[y] = [];
-		//   for (let x = 0; x < roomWidth; x++) {
-		//       room[y][x] = FLOOR;
+		/*
+		// Initial variant build the room by specifically setting the
+		// walls, etc.
 
-		//       if(y === 0) {
-		//           room[y][x] = 8;
-		//       } else if(x === 0) {
-		//           room[y][x] = 6;
-		//       } else if(x === roomWidth-1) {
-		//           room[y][x] = 4;
-		//       } else if(y === roomHeight-7) {
-		//           room[y][x] = 2;
-		//       }
-		//   }
-		// }
-		// room[0][0] = 13;
-		// room[0][room[0].length-1] = 12;
-		// room[room.length-1][0] = 11;
-		// room[room.length-1][room[0].length-1] = 10;
+		 Draw the outer walls of the room
+		 for (let y = 0; y < roomHeight; y++) {
+		     room[y] = [];
+		   for (let x = 0; x < roomWidth; x++) {
+		       room[y][x] = FLOOR;
+
+		       if(y === 0) {
+		           room[y][x] = 8;
+		       } else if(x === 0) {
+		           room[y][x] = 6;
+		       } else if(x === roomWidth-1) {
+		           room[y][x] = 4;
+		       } else if(y === roomHeight-7) {
+		           room[y][x] = 2;
+		       }
+		   }
+		 }
+		 room[0][0] = 13;
+		 room[0][room[0].length-1] = 12;
+		 room[room.length-1][0] = 11;
+		 room[room.length-1][room[0].length-1] = 10;
+		*/
 
 		/* We need an opening in the room for to be connected to any other room.
 		 * 0 == north ^= top
@@ -180,9 +197,8 @@ export default class RoomGenerator {
 		 * 3 == west ^= left
 		 */
 		const roomOrientation =  (Math.floor(Math.random() * 10)) % 4;
-		const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'}
+		const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'};
 		const orientation: [[number,number,string]] = [[0,0,'']];
-
 
 		// Console output
 		let h1: string = '';
@@ -199,20 +215,25 @@ export default class RoomGenerator {
 		console.log('Creating '+roomName+' of size '+roomHeight+h1+'x'+roomWidth+w1);
 		// end Console output
 
+		// Depending on the orientation generate one of the layouts below and set
+		// the orientation for the dungeon config.
 		switch(roomOrientation) {
 			case 0:
 				room = layoutTopBottomEntrance(roomHeight,roomWidth,TOP);
-				// const startIndex = 9;//Math.max(0,((room[0].length-doorSize)/2)+1);
-				// if(0 < startIndex-1) {
-				//   room[0][startIndex-1] = 9;
-				// }
+				// Part of the initial implementation.
+				/*
+				 const startIndex = 9;//Math.max(0,((room[0].length-doorSize)/2)+1);
+				 if(0 < startIndex-1) {
+				   room[0][startIndex-1] = 9;
+				 }
 
-				// if(room[0].length-1 > startIndex + doorSize) {
-				//   room[0][startIndex + doorSize] = 7;
-				// }
-				// for(let i=startIndex;i < Math.min(room[0].length,startIndex + doorSize);i++) {
-				//     room[0][i] = 32;
-				// }
+				 if(room[0].length-1 > startIndex + doorSize) {
+				   room[0][startIndex + doorSize] = 7;
+				 }
+				 for(let i=startIndex;i < Math.min(room[0].length,startIndex + doorSize);i++) {
+				     room[0][i] = 32;
+				 }
+				*/
 				orientation.push([-1, (roomWidth/2), orientationMap[roomOrientation]]);
 				break;
 			case 1:
@@ -258,6 +279,12 @@ export default class RoomGenerator {
 	}
 }
 
+/**
+ * Generate layouts for rooms with doors on top or at the bottom.
+ * @param roomHeight Room height
+ * @param roomWidth Room width
+ * @param orientation Sets the door position. Either 'top' or 'bottom'. Other values are ignored.
+ */
 function layoutTopBottomEntrance(roomHeight: number, roomWidth: number, orientation: string) {
 
 		const topPart: number[][] = genTopPart(roomWidth,orientation);
@@ -273,9 +300,13 @@ function layoutTopBottomEntrance(roomHeight: number, roomWidth: number, orientat
 		return topPart.concat(middlePart).concat(bottomPart);
 }
 
-function layoutLeftRightEntrance(roomHeight: number,
-																 roomWidth: number,
-																 orientation: string) {
+/**
+ * Generate layouts for rooms with doors on the left or on the right.
+ * @param roomHeight Room height
+ * @param roomWidth Room width
+ * @param orientation Sets the door position. Either 'left' or 'right'. Other values are ignored.
+ */
+function layoutLeftRightEntrance(roomHeight: number, roomWidth: number, orientation: string) {
 
 		const topPart: number[][] = genTopPart(roomWidth);
 
@@ -316,6 +347,12 @@ function layoutLeftRightEntrance(roomHeight: number,
 
 }
 
+/**
+ * Genereate the 'middle' part of the room, which has neither top walls, nor bottom walls.
+ * @param roomWidth Width of the room.
+ * @param withDoor Sets if the left or right side has an entrance,
+ *                 and if the upper or lower part of the entrance is to be generated.
+ */
 function genMiddlePart(roomWidth: number, withDoor: string = '') {
 		let doorOffset: number = 0;
 		if([TOP,BOTTOM].includes(withDoor)) {
@@ -356,6 +393,11 @@ function genMiddlePart(roomWidth: number, withDoor: string = '') {
 		return middlePart;
 }
 
+/**
+ * Genereate the part of the room with the bottom walls.
+ * @param roomWidth Width of the room.
+ * @param withDoor Sets if the wall should have a door, or not. Value 'top' sets a wall.
+ */
 function genBottomPart(roomWidth: number, withDoor: string = '') {
 		const doorSize = [TOP,BOTTOM].includes(withDoor) ? 2 : 0;
 		// const doorSize = 2;
@@ -367,6 +409,8 @@ function genBottomPart(roomWidth: number, withDoor: string = '') {
 
 			const width: number = Math.max(1,(roomWidth-1-doorSize));
 
+			// Add buffer walls before the entrance. This is sized s.t.
+			// the door is in the middle of the wall.
 			for(let j=0;j<width;j++)  {
 				bottomPart[i] = bottomPart[i].concat(BOTTOM_WALL[i]);
 			}
@@ -374,6 +418,7 @@ function genBottomPart(roomWidth: number, withDoor: string = '') {
 			// Door segment
 			let segment: number[] = []; // BOTTOM_WALL[i].concat(BOTTOM_WALL[i]);
 
+			// If the door is on the bottom we need to add an opening, otherwise we add a wall
 			if(withDoor === BOTTOM) {
 				segment = BOTTOM_OPENING_LEFT[i].concat(BOTTOM_OPENING_RIGHT[i]);
 
@@ -384,6 +429,7 @@ function genBottomPart(roomWidth: number, withDoor: string = '') {
 
 			bottomPart[i] = bottomPart[i].concat(segment);
 
+			// Add buffer walls after the entrance. This is sized s.t. the door is in the middle of the wall.
 			for(let j=0;j<Math.max(1,width);j++)  {
 				bottomPart[i] = bottomPart[i].concat(BOTTOM_WALL[i]);
 			}
@@ -394,6 +440,11 @@ function genBottomPart(roomWidth: number, withDoor: string = '') {
 		return bottomPart;
 }
 
+/**
+ * Genereate the part of the room with the top walls.
+ * @param roomWidth Width of the room.
+ * @param withDoor Sets if the wall should have a door, or not. Value 'bottom' sets a wall.
+ */
 function genTopPart(roomWidth: number, withDoor: string = '') {
 		const doorSize = [TOP,BOTTOM].includes(withDoor) ? 2 : 0;
 
@@ -404,6 +455,8 @@ function genTopPart(roomWidth: number, withDoor: string = '') {
 
 			const width: number = Math.max(1,(roomWidth-1-doorSize));
 
+			// Add buffer walls before the entrance. This is sized s.t.
+			// the door is in the middle of the wall.
 			for(let j=0;j<width;j++)  {
 				topPart[i] = topPart[i].concat(TOP_WALL[i]);
 			}
@@ -411,6 +464,7 @@ function genTopPart(roomWidth: number, withDoor: string = '') {
 			// Door part
 			let segment: number[] = []; // TOP_WALL[i].concat(TOP_WALL[i]);
 
+			// If the door is on the top we need to add an opening, otherwise we add a wall
 			if(withDoor === TOP) {
 				segment = TOP_OPENING_LEFT[i].concat(TOP_OPENING_RIGHT[i]);
 
@@ -422,6 +476,7 @@ function genTopPart(roomWidth: number, withDoor: string = '') {
 			topPart[i] = topPart[i].concat(segment);
 			// end Door part
 
+			// Add buffer walls after the entrance. This is sized s.t. the door is in the middle of the wall.
 			for(let j=0;j<Math.max(1,width);j++)  {
 				topPart[i] = topPart[i].concat(TOP_WALL[i]);
 			}
