@@ -62,9 +62,9 @@ const TOP_OPENING_RIGHT = [
 ];
 
 const LEFT_OPENING_UPPER = [
-  [ 6, 32, 32, 32],
-  [32, 32, 32, 32],
-  [32, 32, 32, 32],
+  [ 9, 32, 32, 32],
+  [15, 32, 32, 32],
+  [18, 32, 32, 32],
   [32, 32, 32, 32]
 ];
 
@@ -72,13 +72,13 @@ const LEFT_OPENING_LOWER = [
   [32, 32, 32, 32],
   [32, 32, 32, 32],
   [32, 32, 32, 32],
-  [ 6, 32, 32, 32]
+  [48, 32, 32, 32]
 ];
 
 const RIGHT_OPENING_UPPER = [
-  [32, 32, 32,  4],
-  [32, 32, 32, 32],
-  [32, 32, 32, 32],
+  [32, 32, 32,  7],
+  [32, 32, 32, 15],
+  [32, 32, 32, 18],
   [32, 32, 32, 32]
 ];
 
@@ -86,21 +86,21 @@ const RIGHT_OPENING_LOWER = [
   [32, 32, 32, 32],
   [32, 32, 32, 32],
   [32, 32, 32, 32],
-  [32, 32, 32,  4]
+  [32, 32, 32, 49]
 ];
 
 const BOTTOM_OPENING_LEFT = [
   [32, 32, 32, 32],
   [32, 32, 32, 32],
   [32, 32, 32, 32],
-  [ 2, 32, 32, 32]
+  [48, 32, 32, 32]
 ];
 
 const BOTTOM_OPENING_RIGHT = [
   [32, 32, 32, 32],
   [32, 32, 32, 32],
   [32, 32, 32, 32],
-  [32, 32, 32,  2]
+  [32, 32, 32, 49]
 ];
 
 const TOP_LEFT_CORNER = [
@@ -139,8 +139,8 @@ export default class RoomGenerator {
 
   private roomSize(min: number, max: number) {
       const factor = Math.max(min,(Math.floor(Math.random() * 100)) % max)
-      console.log(factor+" * "+BLOCK_SIZE);
-    return BLOCK_SIZE * factor;
+      console.log(factor);
+    return factor;
   }
 
   public generateRoom: (roomTileset: string) => Room = (roomTileset) => {
@@ -180,12 +180,12 @@ export default class RoomGenerator {
      * 2 == south
      * 3 == west
      */
-    let orient = 1//Math.floor(Math.random()*10) % 4;
+    let orient = 3//Math.floor(Math.random()*10) % 4;
     const roomOrientation = orient; //(Math.random() * 100) % 4;
     const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'}
     let orientation: [[number,number,string]] = [[0,0,'']];
 
-    console.log(roomWidth/BLOCK_SIZE/2)
+    console.log(roomWidth/2)
     switch(roomOrientation) {
       case 0:
         room = layoutTopBottomEntrance(roomHeight,roomWidth,TOP);
@@ -200,19 +200,19 @@ export default class RoomGenerator {
         // for(let i=startIndex;i < Math.min(room[0].length,startIndex + doorSize);i++) {
         //     room[0][i] = 32;
         // }
-        orientation.push([-1, (roomWidth/BLOCK_SIZE/2), orientationMap[roomOrientation]]);
+        orientation.push([-1, (roomWidth/2), orientationMap[roomOrientation]]);
         break;
       case 1:
         room = layoutLeftRightEntrance(roomHeight,roomWidth,RIGHT);
-        orientation.push([(roomHeight/BLOCK_SIZE/2), (roomWidth/BLOCK_SIZE)+1, orientationMap[roomOrientation]]);
+        orientation.push([(roomHeight/2), roomWidth, orientationMap[roomOrientation]]);
         break;
       case 2:
         room = layoutTopBottomEntrance(roomHeight,roomWidth,BOTTOM);
-        orientation.push([(roomHeight/BLOCK_SIZE/2)+1, (roomWidth/BLOCK_SIZE/2)+1, orientationMap[roomOrientation]]);
+        orientation.push([roomHeight, (roomWidth/2), orientationMap[roomOrientation]]);
         break;
       case 3:
         room = layoutLeftRightEntrance(roomHeight,roomWidth,LEFT);
-        orientation.push([-1, (roomWidth/BLOCK_SIZE/2)+1, orientationMap[roomOrientation]]);
+        orientation.push([roomHeight/2,-1, orientationMap[roomOrientation]]);
         break;
       default:
     }
@@ -250,7 +250,11 @@ function layoutTopBottomEntrance(roomHeight: number, roomWidth: number, orientat
 
     const topPart: number[][] = genTopPart(roomHeight,roomWidth,orientation);
 
-    const middlePart: number[][] = genMiddlePart(roomHeight,roomWidth,orientation);
+    let middlePart: number[][] = [];
+
+    for(let i=0;i<(roomHeight-1)*2;i++) {
+     middlePart = middlePart.concat(genMiddlePart(roomHeight,roomWidth,orientation));
+    }
 
     const bottomPart: number[][] = genBottomPart(roomHeight,roomWidth,orientation);
 
@@ -265,7 +269,10 @@ function layoutLeftRightEntrance(roomHeight: number,
 
     let middlePart: number[][] = [];
 
-    for(let i=0;i<(roomHeight/BLOCK_SIZE/2)-1;i++) {
+    // -2 for the door parts, and -1 for the bottom part
+    const height = Math.max(1,((roomHeight-3)/2));
+
+    for(let i=0;i<height;i++) {
       middlePart = middlePart.concat(genMiddlePart(roomHeight,roomWidth));
     }
 
@@ -286,7 +293,8 @@ function layoutLeftRightEntrance(roomHeight: number,
 
     // end Door part
 
-    for(let i=0;i<(roomHeight/BLOCK_SIZE/2)-1;i++) {
+    // -2 for the door parts
+    for(let i=0;i<(Math.max(1,height));i++) {
       middlePart = middlePart.concat(genMiddlePart(roomHeight,roomWidth));
     }
 
@@ -299,6 +307,11 @@ function layoutLeftRightEntrance(roomHeight: number,
 function genMiddlePart(roomHeight: number,
                        roomWidth: number,
                        withDoor: string = "") {
+    let doorOffset: number = 0;
+    if([TOP,BOTTOM].includes(withDoor)) {
+      doorOffset = 2;
+    }
+
     const middlePart: number[][] = [];
 
     for(let i=0;i<TILE_SIZE;i++) {
@@ -312,10 +325,10 @@ function genMiddlePart(roomHeight: number,
         firstSegment = LEFT_OPENING_LOWER[i];
       }
 
-      middlePart[i] = firstSegment.concat(TILED_FLOOR[i]);
+      middlePart[i] = firstSegment;
       // end Door part
 
-      for(let j=0;j<((roomWidth-(2*BLOCK_SIZE)))/BLOCK_SIZE;j++)  {
+      for(let j=0;j<Math.max(2+doorOffset,(roomWidth*2)-2);j++)  {
         middlePart[i] = middlePart[i].concat(TILED_FLOOR[i]);
       }
 
@@ -327,35 +340,41 @@ function genMiddlePart(roomHeight: number,
         lastSegment = RIGHT_OPENING_LOWER[i];
       }
 
-      middlePart[i] = middlePart[i].concat(TILED_FLOOR[i])
-                                   .concat(lastSegment);
+      middlePart[i] = middlePart[i].concat(lastSegment);
     }
 
     return middlePart;
 }
 
 function genBottomPart(roomHeight: number, roomWidth: number, withDoor: string = "") {
+    const doorSize = [TOP,BOTTOM].includes(withDoor) ? 2 : 0;
+    // const doorSize = 2;
 
     const bottomPart: number[][] = [];
     for(let i=0;i<TILE_SIZE;i++) {
 
       bottomPart[i] = BOTTOM_LEFT_CORNER[i];
 
-      for(let j=0;j<Math.floor((roomWidth-2*BLOCK_SIZE)/BLOCK_SIZE/2);j++)  {
+      const width: number = Math.max(1,(roomWidth-1-doorSize));
+
+      for(let j=0;j<width;j++)  {
         bottomPart[i] = bottomPart[i].concat(BOTTOM_WALL[i]);
       }
 
-      // Door part
-      let segment: number[] = BOTTOM_WALL[i].concat(BOTTOM_WALL[i]);
+      // Door segment
+      let segment: number[] = [] // BOTTOM_WALL[i].concat(BOTTOM_WALL[i]);
 
       if(withDoor === BOTTOM) {
         segment = BOTTOM_OPENING_LEFT[i].concat(BOTTOM_OPENING_RIGHT[i]);
+
+      } else if(withDoor === TOP) {
+        segment = BOTTOM_WALL[i].concat(BOTTOM_WALL[i]);
       }
+      // end Door segment
 
       bottomPart[i] = bottomPart[i].concat(segment);
-      // end Door part
 
-      for(let j=0;j<Math.ceil((roomWidth-2*BLOCK_SIZE)/BLOCK_SIZE/2);j++)  {
+      for(let j=0;j<Math.max(1,width);j++)  {
         bottomPart[i] = bottomPart[i].concat(BOTTOM_WALL[i]);
       }
 
@@ -366,27 +385,34 @@ function genBottomPart(roomHeight: number, roomWidth: number, withDoor: string =
 }
 
 function genTopPart(roomHeight: number, roomWidth: number, withDoor: string = "") {
+    const doorSize = [TOP,BOTTOM].includes(withDoor) ? 2 : 0;
 
     const topPart: number[][] = [];
     for(let i=0;i<TILE_SIZE;i++) {
 
       topPart[i] = TOP_LEFT_CORNER[i];
 
-      for(let j=0;j<Math.floor((roomWidth-2*BLOCK_SIZE)/BLOCK_SIZE/2);j++)  {
+      const width: number = Math.max(1,(roomWidth-1-doorSize));
+
+      for(let j=0;j<width;j++)  {
         topPart[i] = topPart[i].concat(TOP_WALL[i]);
       }
 
       // Door part
-      let segment: number[] = TOP_WALL[i].concat(TOP_WALL[i]);
+      let segment: number[] = [] // TOP_WALL[i].concat(TOP_WALL[i]);
 
       if(withDoor === TOP) {
         segment = TOP_OPENING_LEFT[i].concat(TOP_OPENING_RIGHT[i]);
+
+      } else if(withDoor === BOTTOM) {
+        segment = TOP_WALL[i].concat(TOP_WALL[i]);
+
       }
 
       topPart[i] = topPart[i].concat(segment);
       // end Door part
 
-      for(let j=0;j<Math.ceil((roomWidth-2*BLOCK_SIZE)/BLOCK_SIZE/2);j++)  {
+      for(let j=0;j<Math.max(1,width);j++)  {
         topPart[i] = topPart[i].concat(TOP_WALL[i]);
       }
 
