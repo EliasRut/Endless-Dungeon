@@ -2,6 +2,7 @@ import {
 	Facings,
 	Faction
 } from '../helpers/constants';
+import Item from './Item';
 
 export default class Character {
 	public animationBase: string;
@@ -18,6 +19,9 @@ export default class Character {
 	public x = 0;
 	public y = 0;
 	public vision = 0;
+
+	public mainStat = 1;
+	public items: Item[] = [];
 
 	public faction: Faction;
 

@@ -1,6 +1,5 @@
 // This class handles the items.
-import ItemToken from '../drawables/tokens/ItemToken';
-import PlayerCharacter from '../worldstate/PlayerCharacter';
+import { v4 as uuidv4 } from 'uuid';
 
 const MAX_HEALTH = 100;
 const BASE_DAMAGE = 1;
@@ -23,10 +22,10 @@ export default class Item implements ItemStats {
 	public movementSpeed = 100;
 	public mainStat = 1;
 
-	public itemToken: ItemToken;
 	public iconFrame = 0;
 	public itemLocation = 0; // 0 is ground, 1-80 are inventory slots, 80+ are equipped
 	public type = '';
+	public id: string;
 
 	constructor(
 			maxHealth: number = Math.random() * MAX_HEALTH,
@@ -44,22 +43,6 @@ export default class Item implements ItemStats {
 		this.iconFrame = iconFrame;
 		this.itemLocation = itemLocation;
 		this.type = type;
-	}
-	
-	public equip(player: PlayerCharacter) {
-		// tslint:disable-next-line: no-console
-		console.log(`Equipping item ${JSON.stringify(this)}.`);
-		player.items.push(this);
-		player.updateStats();
-	}
-
-	public unequip(player: PlayerCharacter){
-		// tslint:disable-next-line: no-console
-		console.log(`Unequipping item ${JSON.stringify(this)}.`);
-		const itemIndex = player.items.findIndex((item) => item === this);
-		if (itemIndex > -1) {
-			player.items.splice(itemIndex, 1);
-			player.updateStats();
-		}
+		this.id = uuidv4();
 	}
 }

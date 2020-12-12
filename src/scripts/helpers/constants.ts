@@ -69,3 +69,19 @@ export const DEFAULT_TILE_TINT = 0xffffff;
 export const NUM_ITEM_ICONS = 64;
 
 export const NUM_DIRECTIONS = 8;
+
+export const enum EquipmentSlot {
+	MAIN_HAND = 'mainhand',
+	OFF_HAND = 'offhand',
+	CHEST = 'chest',
+	HEAD = 'head',
+	GLOVES = 'gloves',
+	BOOTS = 'boots',
+	NECKLACE = 'necklace',
+	BELT = 'belt',
+	RIGHT_RING = 'rightRing',
+	LEFT_RING = 'leftRing'
+};
+
+export const INVENTORY_BOXES_X = 8;
+export const INVENTORY_BOXES_Y = 10;

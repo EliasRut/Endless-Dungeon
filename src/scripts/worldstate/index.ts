@@ -66,7 +66,7 @@ export class WorldState {
 		localStorage.setItem('currentLevel', JSON.stringify(this.currentLevel));
 		localStorage.setItem('roomAssignment', JSON.stringify(this.roomAssignment));
 		localStorage.setItem('inventory', JSON.stringify(this.inventory));
-		// localStorage.setItem('saveGameName', 'test-save');
+		localStorage.setItem('saveGameName', 'test-save');
 	}
 
 	loadState() {
@@ -83,8 +83,14 @@ export class WorldState {
 		this.availableTilesets = JSON.parse(localStorage.getItem('availableTilesets') || '');
 		this.currentLevel = JSON.parse(localStorage.getItem('currentLevel') || '');
 		this.roomAssignment = JSON.parse(localStorage.getItem('roomAssignment') || '');
-		// this.inventory = JSON.parse(localStorage.getItem('inventory') || '');
-		this.inventory = new Inventory();
+		this.inventory = JSON.parse(localStorage.getItem('inventory') || '');
+		// Reset cast times.
+		this.playerCharacter.abilityCastTime = [
+		-Infinity,
+		-Infinity,
+		-Infinity,
+		-Infinity
+		];
 	}
 }
 

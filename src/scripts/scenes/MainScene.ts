@@ -6,7 +6,6 @@ import StoryLine from '../models/StoryLine';
 import SideQuestLog from '../models/SideQuestLog';
 
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
-import WeaponToken from '../drawables/tokens/WeaponToken';
 import FpsText from '../drawables/ui/FpsText';
 
 import StatScreen from '../screens/StatScreen';
@@ -15,9 +14,7 @@ import DialogScreen from '../screens/DialogScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getCharacterSpeed, getFacing, updateMovingState } from '../helpers/movement';
-import {
-	NUM_ITEM_ICONS, UiDepths,
-} from '../helpers/constants';
+import { NUM_ITEM_ICONS, UiDepths} from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
@@ -27,6 +24,9 @@ import BackpackIcon from '../drawables/ui/BackpackIcon';
 import { spawnNpc } from '../helpers/spawn';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import { NpcScript } from '../../../typings/custom';
+import WorldItemToken from '../drawables/tokens/WorldItemToken';
+import Item from '../worldstate/Item';
+import { generateRandomItem } from '../helpers/item';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -49,7 +49,7 @@ export default class MainScene extends Phaser.Scene {
 
 	mainCharacter: PlayerCharacterToken;
 	npcMap: {[id: string]: CharacterToken};
-	groundItem: WeaponToken[];
+	worldItems: WorldItemToken[];
 
 	overlayScreens: {
 		inventory: InventoryScreen;
@@ -81,15 +81,10 @@ export default class MainScene extends Phaser.Scene {
 		// tslint:disable-next-line:no-unused-expression
 		this.cameras.main.fadeIn(FADE_IN_TIME_MS);
 
-		if (globalState.gameTime) {
-			console.log(`Updating to timestamp ${globalState.gameTime}.`);
-			this.time.update(globalState.gameTime, globalState.gameTime);
-		}
-
 		this.generateStory();
 
 		this.npcMap = {};
-		this.groundItem = [];
+		this.worldItems = [];
 		const [startX, startY] = this.drawRoom();
 
 		this.useDynamicLighting = globalState.roomAssignment[globalState.currentLevel].dynamicLighting;
@@ -107,14 +102,11 @@ export default class MainScene extends Phaser.Scene {
 		this.physics.add.collider(this.mainCharacter, this.tileLayer);
 		this.physics.add.collider(this.mainCharacter, this.decorationLayer);
 
-		const rndItem = Math.floor(Math.random() * NUM_ITEM_ICONS); // todo calculate from tileset
-		const length = this.groundItem.push(new WeaponToken(
-			this,
+		this.dropItem(
 			startX - DEBUG__ITEM_OFFSET_X,
 			startY - DEBUG__ITEM_OFFSET_Y,
-			rndItem,
-			'weapon'));
-		this.groundItem[length - 1].setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
+			generateRandomItem()
+		);
 
 		this.overlayScreens = {
 			statScreen: new StatScreen(this),
@@ -200,6 +192,8 @@ export default class MainScene extends Phaser.Scene {
 
 		this.scriptHelper.handleScripts(globalTime);
 
+		this.overlayScreens.statScreen.update();
+
 		if (this.isPaused) {
 			return;
 		}
@@ -234,8 +228,6 @@ export default class MainScene extends Phaser.Scene {
 			this.abilityHelper.update(castAbilities);
 		}
 
-		this.overlayScreens.statScreen.update();
-
 		const cooldowns = this.keyboardHelper.getAbilityCooldowns(globalTime);
 		this.avatar.update(cooldowns);
 
@@ -248,8 +240,9 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		// TODO: remove items that are picked up
-		this.groundItem.forEach((curItem) => {
-			curItem.update(this);
+		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);
+		this.worldItems.forEach((item) => {
+			item.update(this);
 		});
 
 		// Check if the player is close to a connection point and move them if so
@@ -279,6 +272,12 @@ export default class MainScene extends Phaser.Scene {
 	resume() {
 		this.isPaused = false;
 		this.physics.resume();
+	}
+
+	dropItem(x: number, y: number, item: Item) {
+		const itemToken = new WorldItemToken(this, x, y, item);
+		itemToken.setDepth(UiDepths.TOKEN_MAIN_LAYER);
+		this.worldItems.push(itemToken);
 	}
 
 	generateStory() {

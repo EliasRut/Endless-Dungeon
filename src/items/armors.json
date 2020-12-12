@@ -1,46 +1,46 @@
 {
-   "head": {
-      "abilities": [
-         "health",
-         "resistance",
-         "mainstat"
-      ],
-      "icon": [
-         4,
-         6
-      ]
-   },
-   "gloves": {
-      "abilities": [
-         "health",
-         "resistance",
-         "cooldown"
-      ],
-      "icon": [
-         21,
-         23
-      ]
-   },
-   "boots": {
-      "abilities": [
-         "health",
-         "resistance",
-         "movespeed"
-      ],
-      "icon": [
-         13,
-         15
-      ]
-   },
-   "chest": {
-      "abilities": [
-         "health",
-         "resistance",
-         "mainstat"
-      ],
-      "icon": [
-         5,
-         7
-      ]
-   }
+	"head": {
+		"abilities": [
+			"health",
+			"resistance",
+			"mainstat"
+		],
+		"icon": [
+			4,
+			6
+		]
+	},
+	"gloves": {
+		"abilities": [
+			"health",
+			"resistance",
+			"cooldown"
+		],
+		"icon": [
+			21,
+			23
+		]
+	},
+	"boots": {
+		"abilities": [
+			"health",
+			"resistance",
+			"movespeed"
+		],
+		"icon": [
+			13,
+			15
+		]
+	},
+	"chest": {
+		"abilities": [
+			"health",
+			"resistance",
+			"mainstat"
+		],
+		"icon": [
+			5,
+			7
+		]
+	}
 }

@@ -1,16 +1,11 @@
-import { Faction, UiDepths, VISITED_TILE_TINT } from '../../helpers/constants';
+import { Faction, VISITED_TILE_TINT } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
 import FireBallEffect from '../effects/FireBallEffect';
 import globalState from '../../worldstate';
 import MainScene from '../../scenes/MainScene';
-import WeaponToken from './WeaponToken';
 import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
-import Item from '../../worldstate/Item';
-import weapons from '../../../items/weapons.json';
-import armors from '../../../items/armors.json';
-import accessories from '../../../items/accessories.json';
-import ItemToken from './ItemToken';
+import { generateRandomItem } from '../../helpers/item';
 
 const BODY_RADIUS = 6;
 const BODY_X_OFFSET = 10;
@@ -19,8 +14,6 @@ const BODY_Y_OFFSET = 12;
 const ENEMY_DAMAGE = 10;
 const ENEMY_HEALTH = 10;
 const ENEMY_SPEED = 35;
-
-const NUMBER_ITEMS_IN_TILESET = 63;
 
 export default abstract class EnemyToken extends CharacterToken {
 	fireballEffect: FireBallEffect | undefined;
@@ -67,26 +60,7 @@ export default abstract class EnemyToken extends CharacterToken {
 			// TODO find out when this happens
 			return;
 		}
-
-		const rnd = Math.random();
-		if(rnd < 0.25){
-			let itemType = weapons.itemgroup;			
-			let rndIcon = weapons.icon[Math.floor(Math.random() * weapons.icon.length)];
-			const length = this.scene.groundItem.push(new WeaponToken(this.scene, this.x, this.y, rndIcon, itemType));
-			this.scene.groundItem[length-1].setDepth(UiDepths.TOKEN_MAIN_LAYER);
-		} else if(0.25 <= rnd && rnd < 0.7){
-			let rndIndex = Math.floor(Math.random() * Object.keys(armors).length);
-			let itemType = Object.keys(armors)[rndIndex];
-			let rndIcon = Object.values(armors)[rndIndex].icon[Math.floor(Math.random() * Object.values(armors)[rndIndex].icon.length)];			
-			const length = this.scene.groundItem.push(new WeaponToken(this.scene, this.x, this.y, rndIcon, itemType));
-			this.scene.groundItem[length-1].setDepth(UiDepths.TOKEN_MAIN_LAYER);
-		} else if(rnd >= 0.7){
-			let rndIndex = Math.floor(Math.random() * Object.keys(accessories).length);
-			let itemType = Object.keys(accessories)[rndIndex];
-			let rndIcon = Object.values(accessories)[rndIndex].icon[Math.floor(Math.random() * Object.values(accessories)[rndIndex].icon.length)];
-			const length = this.scene.groundItem.push(new WeaponToken(this.scene, this.x, this.y, rndIcon, itemType));
-			this.scene.groundItem[length-1].setDepth(UiDepths.TOKEN_MAIN_LAYER);
-		}
+		this.scene.dropItem(this.x, this.y, generateRandomItem());
 	}
 
 	private getOccupiedTile() {
