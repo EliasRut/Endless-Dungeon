@@ -1,4 +1,4 @@
-import { VISITED_TILE_TINT } from '../../helpers/constants';
+import { UiDepths, VISITED_TILE_TINT } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
 import FireBallEffect from '../effects/FireBallEffect';
@@ -6,7 +6,6 @@ import globalState from '../../worldstate';
 import MainScene from '../../scenes/MainScene';
 import WeaponToken from './WeaponToken';
 import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
-import { UI_DEPTHS } from '../../helpers/uiDepths';
 
 const BODY_RADIUS = 6;
 const BODY_X_OFFSET = 10;
@@ -65,7 +64,7 @@ export default abstract class EnemyToken extends CharacterToken {
 		}
 		const rndItem = Math.floor(Math.random() * NUMBER_ITEMS_IN_TILESET);
 		const length = this.scene.groundItem.push(new WeaponToken(this.scene, this.x, this.y, rndItem));
-		this.scene.groundItem[length-1].setDepth(UI_DEPTHS.TOKEN_MAIN_LAYER);
+		this.scene.groundItem[length-1].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 	}
 
 	private getOccupiedTile() {

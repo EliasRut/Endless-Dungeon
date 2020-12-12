@@ -1,10 +1,10 @@
-import { UI_DEPTHS } from '../helpers/uiDepths';
+import { UiDepths } from '../helpers/constants';
 
 export default class OverlayScreen extends Phaser.GameObjects.Group {
 	constructor(scene: Phaser.Scene, startX: number, startY: number, width: number, height: number) {
 		super(scene);
 
-		this.setDepth(UI_DEPTHS.UI_BACKGROUND_LAYER);
+		this.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 
 		const leftBorderX = startX;
 		const topBorderY = startY;
@@ -60,7 +60,7 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 			centerPiece,
 		];
 		pieces.forEach((piece) => {
-			piece.setDepth(UI_DEPTHS.UI_BACKGROUND_LAYER);
+			piece.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 			piece.setScrollFactor(0);
 		});
 		this.addMultiple(pieces, true);

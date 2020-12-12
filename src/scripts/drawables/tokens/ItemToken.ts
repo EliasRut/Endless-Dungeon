@@ -1,7 +1,7 @@
 import Item from '../../worldstate/Item';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import { UI_DEPTHS } from '../../helpers/uiDepths';
+import { UiDepths } from '../../helpers/constants';
 
 const MAX_INTERACTION_DISTANCE = 30;
 const MAX_EQUIPPABLE_ITEM_LOCATION = 80;
@@ -25,7 +25,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 				if (globalState.inventory.sortIntoInventory(this)) {
 					scene.overlayScreens.inventory.add(this, false);
 					this.setVisible(false);
-					this.setDepth(UI_DEPTHS.UI_FOREGROUND_LAYER);
+					this.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 					this.setScrollFactor(0);
 					this.setInteractive();
 					this.on('pointerdown', () => {

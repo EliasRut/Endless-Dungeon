@@ -1,4 +1,4 @@
-import { UI_DEPTHS } from '../../helpers/uiDepths';
+import { UiDepths } from '../../helpers/constants';
 import MainScene from '../../scenes/MainScene';
 
 export default class BackpackIcon extends Phaser.GameObjects.Image {
@@ -8,7 +8,7 @@ export default class BackpackIcon extends Phaser.GameObjects.Image {
 
 		this.setScrollFactor(0);
 		this.setInteractive();
-		this.setDepth(UI_DEPTHS.UI_BACKGROUND_LAYER);
+		this.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.on('pointerdown', () => {
 			if (scene.isPaused) {
 				scene.physics.resume();

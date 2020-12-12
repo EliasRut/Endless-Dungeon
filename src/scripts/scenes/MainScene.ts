@@ -19,10 +19,9 @@ import DialogScreen from '../screens/DialogScreen';
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getFacing } from '../helpers/orientation';
 import {
-	NUM_ITEM_ICONS,
+	NUM_ITEM_ICONS, UiDepths,
 } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
-import { UI_DEPTHS } from '../helpers/uiDepths';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
 import ScriptHelper from '../helpers/ScriptHelper';
@@ -90,7 +89,7 @@ export default class MainScene extends Phaser.Scene {
 		}
 
 		this.mainCharacter = new PlayerCharacterToken(this, startX, startY);
-		this.mainCharacter.setDepth(UI_DEPTHS.TOKEN_MAIN_LAYER);
+		this.mainCharacter.setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.cameras.main.startFollow(this.mainCharacter, false);
 		this.physics.add.collider(this.mainCharacter, this.tileLayer);
 
@@ -100,7 +99,7 @@ export default class MainScene extends Phaser.Scene {
 			startX - DEBUG__ITEM_OFFSET_X,
 			startY - DEBUG__ITEM_OFFSET_Y,
 			rndItem));
-		this.groundItem[length - 1].setDepth(UI_DEPTHS.TOKEN_BACKGROUND_LAYER);
+		this.groundItem[length - 1].setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 
 		this.overlayScreens = {
 			statScreen: new StatScreen(this),
@@ -133,7 +132,7 @@ export default class MainScene extends Phaser.Scene {
 
 		this.tileLayer = generateTilemap(this, dungeonLevel);
 
-		this.tileLayer.setDepth(UI_DEPTHS.BASE_TILE_LAYER);
+		this.tileLayer.setDepth(UiDepths.BASE_TILE_LAYER);
 		let npcCounter = 0;
 		npcs.forEach((npc) => {
 			switch(npc.id) {
@@ -152,7 +151,7 @@ export default class MainScene extends Phaser.Scene {
 				}
 			}
 
-			this.enemy[npcCounter].setDepth(UI_DEPTHS.TOKEN_MAIN_LAYER);
+			this.enemy[npcCounter].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 			this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
 			npcCounter++;
 		});

@@ -1,4 +1,4 @@
-import { UI_DEPTHS } from '../helpers/uiDepths';
+import { UiDepths } from '../helpers/constants';
 import OverlayScreen from './OverlayScreen';
 
 export default class DialogScreen extends OverlayScreen {
@@ -11,7 +11,7 @@ export default class DialogScreen extends OverlayScreen {
 		this.dialogText = new Phaser.GameObjects.BitmapText(
 			scene, 24, 308, 'pixelfont', '', 12);
 		this.dialogText.setOrigin(0, 0);
-		this.dialogText.setDepth(UI_DEPTHS.UI_FOREGROUND_LAYER);
+		this.dialogText.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		this.dialogText.setScrollFactor(0);
 		this.add(this.dialogText, true);
 		// tslint:enable

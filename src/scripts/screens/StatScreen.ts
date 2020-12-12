@@ -1,4 +1,4 @@
-import { UI_DEPTHS } from '../helpers/uiDepths';
+import { UiDepths } from '../helpers/constants';
 import globalState from '../worldstate';
 import OverlayScreen from './OverlayScreen';
 
@@ -21,7 +21,7 @@ export default class StatScreen extends OverlayScreen {
 			'Statistics',
 			FONT_SIZE_HEADER);
 		header.setOrigin(0);
-		header.setDepth(UI_DEPTHS.UI_BACKGROUND_LAYER);
+		header.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		header.setScrollFactor(0);
 		this.add(header, true);
 
@@ -44,9 +44,9 @@ export default class StatScreen extends OverlayScreen {
 			'pixelfont',
 			`${currentHealth}/${maxHealth}`,
 			FONT_SIZE_TEXT);
-		lableHealth.setDepth(UI_DEPTHS.UI_BACKGROUND_LAYER);
+		lableHealth.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		lableHealth.setScrollFactor(0);
-		this.lableHealthValue.setDepth(UI_DEPTHS.UI_BACKGROUND_LAYER);
+		this.lableHealthValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.lableHealthValue.setScrollFactor(0);
 		this.add(lableHealth, true);
 		this.add(this.lableHealthValue, true);
@@ -65,9 +65,9 @@ export default class StatScreen extends OverlayScreen {
 			'pixelfont',
 			`${currentDamage}`,
 			FONT_SIZE_TEXT);
-		lableDamage.setDepth(UI_DEPTHS.UI_BACKGROUND_LAYER);
+		lableDamage.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		lableDamage.setScrollFactor(0);
-		this.lableDamageValue.setDepth(UI_DEPTHS.UI_BACKGROUND_LAYER);
+		this.lableDamageValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.lableDamageValue.setScrollFactor(0);
 		this.add(lableDamage, true);
 		this.add(this.lableDamageValue, true);
@@ -86,9 +86,9 @@ export default class StatScreen extends OverlayScreen {
 			'pixelfont',
 			`${currentMovSpeed}`,
 			FONT_SIZE_TEXT);
-		lableMovSpeed.setDepth(UI_DEPTHS.UI_BACKGROUND_LAYER);
+		lableMovSpeed.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		lableMovSpeed.setScrollFactor(0);
-		this.lableMovSpeedValue.setDepth(UI_DEPTHS.UI_BACKGROUND_LAYER);
+		this.lableMovSpeedValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.lableMovSpeedValue.setScrollFactor(0);
 		this.add(lableMovSpeed, true);
 		this.add(this.lableMovSpeedValue, true);
