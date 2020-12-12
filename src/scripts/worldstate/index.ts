@@ -2,6 +2,7 @@ import { Room } from '../../../typings/custom';
 import Dungeon from './Dungeon';
 import DungeonLevel from './DungeonLevel';
 import Inventory from './Inventory';
+import Item from './Item';
 import PlayerCharacter from './PlayerCharacter';
 import RoomAssignment from './RoomAssignment';
 
@@ -17,7 +18,7 @@ export class WorldState {
 	public dungeon: Dungeon;
 	public availableRooms: {[name: string]: Room} = {};
 	public availableTilesets: string[] = [];
-	public currentLevel: string = 'intro_ceremony';
+	public currentLevel: string = 'town';
 	public roomAssignment: {[name: string]: RoomAssignment} = {
 		'intro_dormRoom': {
 			dynamicLighting: false,
@@ -42,11 +43,13 @@ export class WorldState {
 		}
 	};
 	public inventory: Inventory;
+	public itemList: Item[];
 
 	constructor() {
 		this.playerCharacter = new PlayerCharacter();
 		this.dungeon = new Dungeon();
 		this.inventory = new Inventory();
+		this.itemList = [];
 	}
 
 	storeState() {

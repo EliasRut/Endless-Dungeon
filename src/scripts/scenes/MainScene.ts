@@ -100,7 +100,8 @@ export default class MainScene extends Phaser.Scene {
 			this,
 			startX - DEBUG__ITEM_OFFSET_X,
 			startY - DEBUG__ITEM_OFFSET_Y,
-			rndItem));
+			rndItem,
+			'weapon'));
 		this.groundItem[length - 1].setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 
 		this.overlayScreens = {

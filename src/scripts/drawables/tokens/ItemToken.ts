@@ -8,15 +8,16 @@ const MAX_EQUIPPABLE_ITEM_LOCATION = 80;
 
 export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 	stateObject: Item;
-	public itemLocation = 0; // 0 is ground, 1-80 are inventory slots, 80+ are equipped
 
-	constructor(scene: Phaser.Scene, x: number, y: number, icon: number) {
-		super(scene, x, y, 'test-items-spritesheet', icon);
+	constructor(scene: Phaser.Scene, x: number, y: number, item: Item) {	
+		super(scene, x, y, 'test-items-spritesheet', item.iconFrame);
+		this.stateObject = item;
+		item.itemToken = this;
 		scene.add.existing(this);
 	}
 
 	public update(scene: MainScene) {
-		if (this.itemLocation === 0) {
+		if (!globalState.inventory.itemList.includes(this.stateObject)) {
 			const px = scene.mainCharacter.x;
 			const py = scene.mainCharacter.y;
 			const distance = Math.hypot(this.x - px, this.y - py);
@@ -29,10 +30,10 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 					this.setScrollFactor(0);
 					this.setInteractive();
 					this.on('pointerdown', () => {
-						if(this.itemLocation > 0 && this.itemLocation <= MAX_EQUIPPABLE_ITEM_LOCATION){
-							globalState.inventory.equip(this);
-						} else if(this.itemLocation > MAX_EQUIPPABLE_ITEM_LOCATION){
-							globalState.inventory.unequip(this);
+						if(this.stateObject.itemLocation > 0 && this.stateObject.itemLocation <= MAX_EQUIPPABLE_ITEM_LOCATION){
+							globalState.inventory.equip(this.stateObject);
+						} else if(this.stateObject.itemLocation > MAX_EQUIPPABLE_ITEM_LOCATION){
+							globalState.inventory.unequip(this.stateObject);
 						}
 					});
 				}

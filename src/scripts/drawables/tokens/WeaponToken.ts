@@ -10,15 +10,16 @@ const MAX_ADDITIONAL_MAIN_STAT = 1;
 const NUM_ICON_FRAMES = 64;
 
 export default class WeaponToken extends ItemToken {
-	constructor(scene: Phaser.Scene, x: number, y: number, icon: number) {
-		super(scene, x, y, icon);
-		this.stateObject = new Item(
+	constructor(scene: Phaser.Scene, x: number, y: number, icon: number, type: string) {
+		super(scene, x, y, new Item(
 			Math.random() * MAX_HEALTH,
 			Math.random() * MAX_ADDITIONAL_DAMAGE + BASE_DAMAGE,
 			Math.random() * MAX_MOVEMENT_SPEED,
 			Math.random() * MAX_ADDITIONAL_MAIN_STAT + BASE_MAIN_STAT,
-			Math.floor(Math.random() * NUM_ICON_FRAMES)
-		);
+			icon,
+			type,
+			0
+		));
 	}
 	destroy() {
 		super.destroy();
