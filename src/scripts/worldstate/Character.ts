@@ -42,20 +42,21 @@ export default abstract class Character {
 		return this.movementSpeed * this.slowFactor;
 	}
 
-	public updateMovingState (hasMoved: boolean, facing: Facings) {
-		if (!hasMoved) {
+	public updateMovingState (hasMoved: boolean, facing: Facings, forceUpdate?: boolean) {
+		if (!hasMoved && !forceUpdate) {
 			const lastCharDirection = facingToSpriteNameMap[this.currentFacing];
 			// this.currentFacing = facing;
 			this.isWalking = hasMoved;
 			return `${this.animationBase}-${ANIMATION_IDLE}-${lastCharDirection}`;
 		}
-		if (facing === this.currentFacing && this.isWalking) {
+		if (facing === this.currentFacing && this.isWalking && !forceUpdate) {
 			return false;
 		}
 		const newDirection = facingToSpriteNameMap[facing];
 		this.currentFacing = facing;
 		this.isWalking = hasMoved;
-		return `${this.animationBase}-${ANIMATION_WALK}-${newDirection}`;
+		const animationType = this.isWalking ? ANIMATION_WALK : ANIMATION_IDLE;
+		return `${this.animationBase}-${animationType}-${newDirection}`;
 	}
 
 	getFacingVelocities() {

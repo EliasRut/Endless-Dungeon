@@ -1,4 +1,5 @@
 export interface NpcPositioning {
+	type: string;
 	id: string;
 	x: number;
 	y: number;
@@ -39,6 +40,30 @@ export interface ScriptAnimation {
 	duration: number;
 }
 
+export interface ScriptMove {
+	type: "move";
+	target: string;
+	posX: number;
+	posY: number;
+	facingX: number; //-1, 0, 1
+	facingY: number; //-1, 0, 1
+}
+
+export interface ScriptWalk {
+	type: "walk";
+	target: string;
+	posX: number;
+	posY: number;
+}
+
+export interface ScriptSpawn {
+	type: "spawn";
+	npcId: string;
+	npcType: string;
+	posX: number;
+	posY: number;
+}
+
 export interface ScriptSceneChange {
 	type: "sceneChange";
 	target: string;
@@ -55,7 +80,7 @@ export interface ScriptFadeOut {
 }
 
 export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange |
-	ScriptFadeIn | ScriptFadeOut;
+	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];
@@ -80,6 +105,7 @@ export interface Room {
 	openings: Opening[];
 	name: string;
 	scripts: Scripting;
+	usedNpcTypes?: string[];
 }
 
 export interface Weapon {

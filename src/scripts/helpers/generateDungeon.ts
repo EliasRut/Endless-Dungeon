@@ -179,22 +179,22 @@ const CORRIDOR_LAYOUTS = {
 	[													BIT_SOUTH						]:				CAP_SOUTH,
 	[BIT_NORTH +							BIT_SOUTH						]:				CORRIDOR_UP,
 	[							BIT_EAST + 	BIT_SOUTH						]:				CORRIDOR_UP_LEFT,
-	[BIT_NORTH + 	BIT_EAST + 	BIT_SOUTH						]:				T_CROSSING_TOP_LEFT_BOTTOM,
+	[BIT_NORTH +	BIT_EAST + 	BIT_SOUTH						]:				T_CROSSING_TOP_LEFT_BOTTOM,
 	[																			BIT_WEST]:				CAP_WEST,
 	[BIT_NORTH +													BIT_WEST]:				CORRIDOR_DOWN_RIGHT,
 	[							BIT_EAST + 							BIT_WEST]:				CORRIDOR_LEFT,
-	[BIT_NORTH + 	BIT_EAST + 							BIT_WEST]:				T_CROSSING_TOP_LEFT_RIGHT,
+	[BIT_NORTH +	BIT_EAST + 							BIT_WEST]:				T_CROSSING_TOP_LEFT_RIGHT,
 	[													BIT_SOUTH + BIT_WEST]:				CORRIDOR_UP_RIGHT,
-	[BIT_NORTH + 							BIT_SOUTH + BIT_WEST]:				T_CROSSING_TOP_RIGHT_BOTTOM,
+	[BIT_NORTH +							BIT_SOUTH + BIT_WEST]:				T_CROSSING_TOP_RIGHT_BOTTOM,
 	[							BIT_EAST + 	BIT_SOUTH + BIT_WEST]:				T_CROSSING_LEFT_RIGHT_BOTTOM,
-	[BIT_NORTH + 	BIT_EAST + 	BIT_SOUTH + BIT_WEST]:				CROSSWAY,
+	[BIT_NORTH +	BIT_EAST + 	BIT_SOUTH + BIT_WEST]:				CROSSWAY,
 };
 
 export default class DungeonGenerator {
 	tilesUsed: boolean[][];
 	rooms: Room[];
 	startRoomIndex: number;
-	roomOffsets:  [number, number][];
+	roomOffsets: [number, number][];
 	tileSetCollections: {[name: string]: number[]};
 	tileSetGid: {[name: string]: number};
 	maxGenerationResets = 100;
@@ -404,10 +404,13 @@ export default class DungeonGenerator {
 		this.npcs = [];
 
 		for (let roomIndex = 0; roomIndex < this.rooms.length; roomIndex++) {
-			this.rooms[roomIndex].npcs?.forEach((npc) => {
+			const room = this.rooms[roomIndex];
+			room.npcs?.forEach((npc) => {
 				const [roomYBlockOffset, roomXBlockOffset] = this.roomOffsets[roomIndex];
 				this.npcs.push({
 					...npc,
+					type: npc.type,
+					id: `${room.name}-${npc.id}`,
 					x: (npc.x + roomXBlockOffset * BLOCK_SIZE) * TILE_WIDTH,
 					y: (npc.y + roomYBlockOffset * BLOCK_SIZE) * TILE_HEIGHT
 				});

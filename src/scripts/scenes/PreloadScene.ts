@@ -71,8 +71,11 @@ export default class PreloadScene extends Phaser.Scene {
 				globalState.availableTilesets.push(room.tileset);
 			}
 			room.npcs?.forEach((npc) => {
-				requiredNpcs.add(npc.id);
+				requiredNpcs.add(npc.type);
 			});
+			room.usedNpcTypes?.forEach((npcType) => {
+				requiredNpcs.add(npcType);
+			})
 		});
 
 		// Tiles

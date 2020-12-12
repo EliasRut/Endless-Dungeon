@@ -25,12 +25,14 @@
   ],
   "npcs": [
     {
-      "id": "red-ball",
+      "id": "rb-1",
+      "type": "red-ball",
       "x": 5,
       "y": 4
     },
     {
-      "id": "red-ball",
+      "id": "rb-2",
+      "type": "red-ball",
       "x": 5,
       "y": 14
     }

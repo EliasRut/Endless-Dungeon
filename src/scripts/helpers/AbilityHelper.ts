@@ -55,7 +55,7 @@ export default class AbilityHelper {
 			});
 
 			const targetTokens = origin.faction === Faction.PLAYER ?
-				this.scene.enemy :
+				Object.values(this.scene.npcMap) :
 				this.scene.mainCharacter;
 			this.scene.physics.add.collider(effect, targetTokens, (collidingEffect, target) => {
 				collidingEffect.destroy();

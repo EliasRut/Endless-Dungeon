@@ -27,6 +27,7 @@ import Avatar from '../drawables/ui/Avatar';
 import ScriptHelper from '../helpers/ScriptHelper';
 import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
+import { spawnNpc } from '../helpers/spawn';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -48,7 +49,7 @@ export default class MainScene extends Phaser.Scene {
 	abilityHelper: AbilityHelper;
 
 	mainCharacter: PlayerCharacterToken;
-	enemy: EnemyToken[];
+	npcMap: {[id: string]: EnemyToken};
 	groundItem: WeaponToken[];
 
 	overlayScreens: {
@@ -58,6 +59,7 @@ export default class MainScene extends Phaser.Scene {
 	};
 	alive: number;
 	isPaused = false;
+	blockUserInteraction = false;
 
 	avatar: Avatar;
 	backpackIcon: BackpackIcon;
@@ -78,7 +80,7 @@ export default class MainScene extends Phaser.Scene {
 
 		this.generateStory();
 
-		this.enemy = [];
+		this.npcMap = {};
 		this.groundItem = [];
 		const [startX, startY] = this.drawRoom();
 
@@ -118,6 +120,12 @@ export default class MainScene extends Phaser.Scene {
 		this.sound.play('testSound', {volume: 0.08, loop: true});
 	}
 
+	addNpc(id: string, type: string, x: number, y: number) {
+		this.npcMap[id] = spawnNpc(this, type, x, y);
+		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
+		this.physics.add.collider(this.npcMap[id], this.tileLayer);
+	}
+
 	drawRoom() {
 		const dungeonLevel = globalState.dungeon.levels.get(globalState.currentLevel);
 		if (!dungeonLevel) {
@@ -133,27 +141,8 @@ export default class MainScene extends Phaser.Scene {
 		this.tileLayer = generateTilemap(this, dungeonLevel);
 
 		this.tileLayer.setDepth(UiDepths.BASE_TILE_LAYER);
-		let npcCounter = 0;
 		npcs.forEach((npc) => {
-			switch(npc.id) {
-				case 'red-link': {
-					this.enemy[npcCounter] =
-						new MeleeEnemyToken( this, npc.x, npc.y, npc.id);
-					break;
-				}
-				case 'red-ball': {
-					this.enemy[npcCounter] =
-						new RangedEnemyToken( this, npc.x, npc.y, npc.id);
-					break;
-				}
-				default: {
-					throw new Error(`Map called for unknown enemy "${npc.id}".`);
-				}
-			}
-
-			this.enemy[npcCounter].setDepth(UiDepths.TOKEN_MAIN_LAYER);
-			this.physics.add.collider(this.enemy[npcCounter], this.tileLayer);
-			npcCounter++;
+			this.addNpc(npc.id, npc.type, npc.x, npc.y);
 		});
 
 		return [startPositionX, startPositionY];
@@ -188,28 +177,32 @@ export default class MainScene extends Phaser.Scene {
 			return;
 		}
 
-		const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
-		const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalTime);
-		const isCasting = msSinceLastCast < CASTING_SPEED_MS;
+		if (!this.blockUserInteraction) {
+			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalTime);
+			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
 
-		const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing();
-		const newFacing = getFacing(xFacing, yFacing);
+			const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing();
+			const newFacing = getFacing(xFacing, yFacing);
 
-		const hasMoved = isCasting ? false : (xFacing !== 0 || yFacing !== 0);
-		const playerAnimation = globalState.playerCharacter.updateMovingState(hasMoved, newFacing);
-		if (playerAnimation) {
-			this.mainCharacter.play(playerAnimation);
+			const hasMoved = isCasting ? false : (xFacing !== 0 || yFacing !== 0);
+			const playerAnimation = globalState.playerCharacter.updateMovingState(hasMoved, newFacing);
+			if (playerAnimation) {
+				this.mainCharacter.play(playerAnimation);
+			}
+
+			const speed = isCasting ? 0 : globalState.playerCharacter.getSpeed();
+
+			this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
+			this.mainCharacter.body.velocity.normalize().scale(speed);
+
 		}
-
-		const speed = isCasting ? 0 : globalState.playerCharacter.getSpeed();
-
-		this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
-		this.mainCharacter.body.velocity.normalize().scale(speed);
-
 		globalState.playerCharacter.x = Math.round(this.mainCharacter.x);
 		globalState.playerCharacter.y = Math.round(this.mainCharacter.y);
 
-		this.abilityHelper.update(castAbilities);
+		if (!this.blockUserInteraction) {
+			const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
+			this.abilityHelper.update(castAbilities);
+		}
 
 		this.overlayScreens.statScreen.update();
 
@@ -220,12 +213,12 @@ export default class MainScene extends Phaser.Scene {
 			this.dynamicLightingHelper.updateDynamicLighting();
 		}
 
-		this.enemy.forEach(curEnemy => {
-			curEnemy.update(globalTime);
+		Object.values(this.npcMap).forEach((curNpc) => {
+			curNpc.update(globalTime);
 		});
 
 		// TODO: remove items that are picked up
-		this.groundItem.forEach(curItem => {
+		this.groundItem.forEach((curItem) => {
 			curItem.update(this);
 		});
 
