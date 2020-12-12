@@ -548,6 +548,7 @@ export default class DungeonGenerator {
 				targetOpenings.push([roomIndex, ...opening]);
 			});
 		});
+		console.log("target openings: "+targetOpenings);
 
 		// Special case dungeons with a single room with a single exit
 		if (targetOpenings.length === 0) {

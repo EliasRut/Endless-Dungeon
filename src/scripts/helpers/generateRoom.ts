@@ -156,8 +156,8 @@ export default class RoomGenerator {
 	 * @param roomTileset Tileset to be used for the generated room.
 	 */
 	public generateRoom: (roomTileset: string) => Room = (roomTileset) => {
-		const roomHeight = this.roomSize(this.minSize,this.maxSize);
-		const roomWidth = this.roomSize(this.minSize,this.maxSize);
+		let roomHeight = this.roomSize(this.minSize,this.maxSize);
+		let roomWidth = this.roomSize(this.minSize,this.maxSize);
 
 		const roomName: string = 'awsomeRoom'+(Math.floor(Math.random() * 1000));
 
@@ -169,20 +169,20 @@ export default class RoomGenerator {
 
 		 Draw the outer walls of the room
 		 for (let y = 0; y < roomHeight; y++) {
-		     room[y] = [];
-		   for (let x = 0; x < roomWidth; x++) {
-		       room[y][x] = FLOOR;
+				 room[y] = [];
+			 for (let x = 0; x < roomWidth; x++) {
+					 room[y][x] = FLOOR;
 
-		       if(y === 0) {
-		           room[y][x] = 8;
-		       } else if(x === 0) {
-		           room[y][x] = 6;
-		       } else if(x === roomWidth-1) {
-		           room[y][x] = 4;
-		       } else if(y === roomHeight-7) {
-		           room[y][x] = 2;
-		       }
-		   }
+					 if(y === 0) {
+							 room[y][x] = 8;
+					 } else if(x === 0) {
+							 room[y][x] = 6;
+					 } else if(x === roomWidth-1) {
+							 room[y][x] = 4;
+					 } else if(y === roomHeight-7) {
+							 room[y][x] = 2;
+					 }
+			 }
 		 }
 		 room[0][0] = 13;
 		 room[0][room[0].length-1] = 12;
@@ -196,24 +196,27 @@ export default class RoomGenerator {
 		 * 2 == south ^= bottom
 		 * 3 == west ^= left
 		 */
-		const roomOrientation =  (Math.floor(Math.random() * 10)) % 4;
+		let orient = 1
+		const roomOrientation = orient// (Math.floor(Math.random() * 10)) % 4;
 		const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'};
 		const orientation: [[number,number,string]] = [[0,0,'']];
 
 		// Console output
-		let h1: string = '';
-		let w1: string = '';
-
-		if([1,3].includes(roomOrientation) && roomHeight < 3) {
-			h1 = '(+'+(3-roomHeight)+')';
-		}
-
-		if([0,2].includes(roomOrientation) && roomWidth < 3) {
-			w1 = '(+'+(3-roomWidth)+')';
-		}
+		const h1 = ([1,3].includes(roomOrientation) && roomHeight < 3) ? '(+'+(3-roomHeight)+')' : '';
+		const w1 = ([0,2].includes(roomOrientation) && roomWidth < 3) ? '(+'+(3-roomWidth)+')': '';
 
 		console.log('Creating '+roomName+' of size '+roomHeight+h1+'x'+roomWidth+w1);
 		// end Console output
+
+		// Update roomsize to actual size that is going to be created.
+		if([1,3].includes(roomOrientation) && roomHeight < 3) {
+			roomHeight = 3;
+		}
+
+		if([0,2].includes(roomOrientation) && roomWidth < 3) {
+			roomWidth = 3;
+		}
+
 
 		// Depending on the orientation generate one of the layouts below and set
 		// the orientation for the dungeon config.
@@ -224,45 +227,57 @@ export default class RoomGenerator {
 				/*
 				 const startIndex = 9;//Math.max(0,((room[0].length-doorSize)/2)+1);
 				 if(0 < startIndex-1) {
-				   room[0][startIndex-1] = 9;
+					 room[0][startIndex-1] = 9;
 				 }
 
 				 if(room[0].length-1 > startIndex + doorSize) {
-				   room[0][startIndex + doorSize] = 7;
+					 room[0][startIndex + doorSize] = 7;
 				 }
 				 for(let i=startIndex;i < Math.min(room[0].length,startIndex + doorSize);i++) {
-				     room[0][i] = 32;
+						 room[0][i] = 32;
 				 }
 				*/
-				orientation.push([-1, Math.ceil(roomWidth/2), orientationMap[roomOrientation]]);
+
+				let actualHeight = room.length/BLOCK_SIZE;
+				let acutalWidth = room[0].length/BLOCK_SIZE;
+				orientation.push([-1, Math.ceil(acutalWidth/2), orientationMap[roomOrientation]]);
 				break;
 			case 1:
 				room = layoutLeftRightEntrance(roomHeight,roomWidth,RIGHT);
-				orientation.push([Math.ceil(roomHeight/2), roomWidth, orientationMap[roomOrientation]]);
+
+				actualHeight = room.length/BLOCK_SIZE;
+				acutalWidth = room[0].length/BLOCK_SIZE;
+				orientation.push([Math.floor(actualHeight/2), acutalWidth, orientationMap[roomOrientation]]);
 				break;
 			case 2:
 				room = layoutTopBottomEntrance(roomHeight,roomWidth,BOTTOM);
-				orientation.push([roomHeight, Math.ceil(roomWidth/2), orientationMap[roomOrientation]]);
+
+				actualHeight = room.length/BLOCK_SIZE;
+				acutalWidth = room[0].length/BLOCK_SIZE;
+				orientation.push([actualHeight, Math.floor(acutalWidth/2), orientationMap[roomOrientation]]);
 				break;
 			case 3:
 				room = layoutLeftRightEntrance(roomHeight,roomWidth,LEFT);
-				orientation.push([Math.ceil(roomHeight/2),-1, orientationMap[roomOrientation]]);
+
+				actualHeight = room.length/BLOCK_SIZE;
+				acutalWidth = room[0].length/BLOCK_SIZE;
+				orientation.push([Math.floor(actualHeight/2),-1, orientationMap[roomOrientation]]);
 				break;
 			default:
 		}
 
-		// let debugOutput = '';
-		// for(let i=0;i<room.length;i++) {
-		//   for(let j=0;j<room[i].length;j++) {
-		//     if(room[i][j] < 10) {
-		//       debugOutput += ' ';
-		//     }
-		//     debugOutput += room[i][j];
-		//   }
-		//   debugOutput += '\n';
-		// }
+		let debugOutput = '';
+		for(let i=0;i<room.length;i++) {
+			for(let j=0;j<room[i].length;j++) {
+				if(room[i][j] < 10) {
+					debugOutput += ' ';
+				}
+				debugOutput += room[i][j];
+			}
+			debugOutput += '\n';
+		}
 
-		// console.log(debugOutput);
+		console.log(debugOutput);
 
 		const ret: {tileset: string,
 								layout: number[][],
