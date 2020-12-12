@@ -7,7 +7,7 @@ import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import { Faction } from './constants';
-import { getRotationInRadiansForFacing } from './orientation';
+import { getRotationInRadiansForFacing } from './movement';
 
 export default class AbilityHelper {
 	scene: MainScene;
@@ -53,9 +53,15 @@ export default class AbilityHelper {
 					this.scene.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
 				}
 			});
+			this.scene.physics.add.collider(effect, this.scene.decorationLayer, () => {
+				effect.destroy();
+				if (projectileData?.collisionSound) {
+					this.scene.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
+				}
+			});
 
 			const targetTokens = origin.faction === Faction.PLAYER ?
-				Object.values(this.scene.npcMap) :
+				Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES) :
 				this.scene.mainCharacter;
 			this.scene.physics.add.collider(effect, targetTokens, (collidingEffect, target) => {
 				collidingEffect.destroy();

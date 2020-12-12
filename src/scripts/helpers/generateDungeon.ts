@@ -201,6 +201,8 @@ export default class DungeonGenerator {
 	maxRoomPlacementTries = 100;
 	npcs: NpcPositioning[];
 	combinedLayout: number[][];
+	decorationLayout: number[][];
+	overlayLayout: number[][];
 	blocksUsed: number[][];
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
@@ -228,6 +230,22 @@ export default class DungeonGenerator {
 				this.tileSetGid[room.tileset] = Object.keys(this.tileSetGid).length * GID_MULTIPLE;
 			}
 			this.tileSetCollections[room.tileset].push(roomIndex);
+
+			if (room.decorationTileset) {
+				if (!this.tileSetCollections[room.decorationTileset]) {
+					this.tileSetCollections[room.decorationTileset] = [];
+					this.tileSetGid[room.decorationTileset] = Object.keys(this.tileSetGid).length * GID_MULTIPLE;
+				}
+				this.tileSetCollections[room.decorationTileset].push(roomIndex);
+			}
+
+			if (room.overlayTileset) {
+				if (!this.tileSetCollections[room.overlayTileset]) {
+					this.tileSetCollections[room.overlayTileset] = [];
+					this.tileSetGid[room.overlayTileset] = Object.keys(this.tileSetGid).length * GID_MULTIPLE;
+				}
+				this.tileSetCollections[room.overlayTileset].push(roomIndex);
+			}
 		});
 
 		// This will set the class variables and return true if everything worked, false otherwise
@@ -239,10 +257,16 @@ export default class DungeonGenerator {
 
 		// Reset the combined layout which holds the actual tileset data
 		this.combinedLayout = [];
+		this.decorationLayout = [];
+		this.overlayLayout = [];
 		for (let y = 0; y < DUNGEON_HEIGHT; y++) {
 			this.combinedLayout[y] = [];
+			this.decorationLayout[y] = [];
+			this.overlayLayout[y] = [];
 			for (let x = 0; x < DUNGEON_WIDTH; x++) {
 				this.combinedLayout[y][x] = -1;
+				this.decorationLayout[y][x] = -1;
+				this.overlayLayout[y][x] = -1;
 			}
 		}
 
@@ -289,6 +313,8 @@ export default class DungeonGenerator {
 			rooms: roomPositions,
 			tilesets,
 			layout: this.combinedLayout,
+			decorationLayout: this.decorationLayout,
+			overlayLayout: this.overlayLayout,
 			npcs: this.npcs,
 			connections
 		};
@@ -409,7 +435,6 @@ export default class DungeonGenerator {
 				const [roomYBlockOffset, roomXBlockOffset] = this.roomOffsets[roomIndex];
 				this.npcs.push({
 					...npc,
-					type: npc.type,
 					id: `${room.name}-${npc.id}`,
 					x: (npc.x + roomXBlockOffset * BLOCK_SIZE) * TILE_WIDTH,
 					y: (npc.y + roomYBlockOffset * BLOCK_SIZE) * TILE_HEIGHT
@@ -433,6 +458,39 @@ export default class DungeonGenerator {
 					const actualY = y + roomYBlockOffset * BLOCK_SIZE;
 					const actualX = x + roomXBlockOffset * BLOCK_SIZE;
 					this.combinedLayout[actualY][actualX] = gid + roomLayout[y][x];
+				}
+			}
+		}
+
+		if (room.decorationTileset && room.decorations) {
+			const decorationGid = this.tileSetGid[room.decorationTileset];
+			const decorationLayout = room.decorations;
+			// tslint:disable-next-line: no-console
+			console.log(`Drawing decoration for room ${room.name}.`);
+
+			for (let y = 0; y < decorationLayout.length; y++) {
+				for (let x = 0; x < decorationLayout[y].length; x++) {
+					if (decorationLayout[y][x] > 0) {
+						const actualY = y + roomYBlockOffset * BLOCK_SIZE;
+						const actualX = x + roomXBlockOffset * BLOCK_SIZE;
+						this.decorationLayout[actualY][actualX] = decorationGid + decorationLayout[y][x];
+					}
+				}
+			}
+		}
+		if (room.overlayTileset && room.overlays) {
+			const overlayGid = this.tileSetGid[room.overlayTileset];
+			const overlayLayout = room.overlays;
+			// tslint:disable-next-line: no-console
+			console.log(`Drawing overlay for room ${room.name}.`);
+
+			for (let y = 0; y < overlayLayout.length; y++) {
+				for (let x = 0; x < overlayLayout[y].length; x++) {
+					if (overlayLayout[y][x] > 0) {
+						const actualY = y + roomYBlockOffset * BLOCK_SIZE;
+						const actualX = x + roomXBlockOffset * BLOCK_SIZE;
+						this.overlayLayout[actualY][actualX] = overlayGid + overlayLayout[y][x];
+					}
 				}
 			}
 		}
@@ -490,6 +548,8 @@ export default class DungeonGenerator {
 				targetOpenings.push([roomIndex, ...opening]);
 			});
 		});
+		// tslint:disable-next-line: no-console
+		console.log('target openings: ' + targetOpenings);
 
 		// Special case dungeons with a single room with a single exit
 		if (targetOpenings.length === 0) {

@@ -1,4 +1,5 @@
-import { Facings } from './constants';
+import Character from '../worldstate/Character';
+import { ANIMATION_IDLE, ANIMATION_WALK, Facings, facingToSpriteNameMap } from './constants';
 
 const ROTATION_THRESHOLD = 3;
 
@@ -56,3 +57,29 @@ export const getRotationInRadiansForFacing = (facing: Facings) => {
 		case Facings.NORTH_WEST:	return Math.PI * -0.25;
 	}
 };
+
+export const getCharacterSpeed = (char: Character) => {
+	return char.movementSpeed * char.slowFactor;
+}
+
+export const updateMovingState = (
+		char: Character,
+		hasMoved: boolean,
+		facing: Facings,
+		forceUpdate?: boolean
+	) => {
+		if (!hasMoved && !forceUpdate) {
+			const lastCharDirection = facingToSpriteNameMap[char.currentFacing];
+			// char.currentFacing = facing;
+			char.isWalking = hasMoved;
+			return `${char.animationBase}-${ANIMATION_IDLE}-${lastCharDirection}`;
+		}
+		if (facing === char.currentFacing && char.isWalking && !forceUpdate) {
+			return false;
+		}
+		const newDirection = facingToSpriteNameMap[facing];
+		char.currentFacing = facing;
+		char.isWalking = hasMoved;
+		const animationType = char.isWalking ? ANIMATION_WALK : ANIMATION_IDLE;
+		return `${char.animationBase}-${animationType}-${newDirection}`;
+}

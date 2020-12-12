@@ -1,4 +1,5 @@
 import { Room } from '../../../typings/custom';
+import Character from './Character';
 import Dungeon from './Dungeon';
 import DungeonLevel from './DungeonLevel';
 import Inventory from './Inventory';
@@ -14,7 +15,10 @@ import RoomAssignment from './RoomAssignment';
 
 // This is the world state typing.
 export class WorldState {
+	public loadGame: boolean = true;
+	public gameTime: number;
 	public playerCharacter: PlayerCharacter;
+	public npcs: {[id: string]: Character} = {};
 	public dungeon: Dungeon;
 	public availableRooms: {[name: string]: Room} = {};
 	public availableTilesets: string[] = [];
@@ -53,13 +57,34 @@ export class WorldState {
 	}
 
 	storeState() {
-		// tslint:disable-next-line: no-console
-		console.log('Storing state.');
+		localStorage.setItem('playerCharacter', JSON.stringify(this.playerCharacter));
+		localStorage.setItem('gameTime', `${this.gameTime}`);
+		localStorage.setItem('npcs', JSON.stringify(this.npcs));
+		localStorage.setItem('dungeon', JSON.stringify(this.dungeon));
+		localStorage.setItem('availableRooms', JSON.stringify(this.availableRooms));
+		localStorage.setItem('availableTilesets', JSON.stringify(this.availableTilesets));
+		localStorage.setItem('currentLevel', JSON.stringify(this.currentLevel));
+		localStorage.setItem('roomAssignment', JSON.stringify(this.roomAssignment));
+		localStorage.setItem('inventory', JSON.stringify(this.inventory));
+		// localStorage.setItem('saveGameName', 'test-save');
 	}
 
 	loadState() {
-		// tslint:disable-next-line: no-console
-		console.log('Loading state.');
+		this.loadGame = false;
+		const saveGameName = localStorage.getItem('saveGameName');
+		if (!saveGameName) {
+			return;
+		}
+		this.gameTime = parseInt(localStorage.getItem('gameTime') || '0', 10);
+		this.playerCharacter = JSON.parse(localStorage.getItem('playerCharacter') || '');
+		this.npcs = JSON.parse(localStorage.getItem('npcs') || '');
+		this.dungeon = JSON.parse(localStorage.getItem('dungeon') || '');
+		this.availableRooms = JSON.parse(localStorage.getItem('availableRooms') || '');
+		this.availableTilesets = JSON.parse(localStorage.getItem('availableTilesets') || '');
+		this.currentLevel = JSON.parse(localStorage.getItem('currentLevel') || '');
+		this.roomAssignment = JSON.parse(localStorage.getItem('roomAssignment') || '');
+		// this.inventory = JSON.parse(localStorage.getItem('inventory') || '');
+		this.inventory = new Inventory();
 	}
 }
 

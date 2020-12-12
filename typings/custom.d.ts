@@ -1,8 +1,16 @@
+export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
+
+export interface NpcScript {
+	repeat: number;
+	steps: NpcScriptStep [];
+}
+
 export interface NpcPositioning {
 	type: string;
 	id: string;
 	x: number;
 	y: number;
+	script?: NpcScript;
 }
 
 export interface MapConnection {
@@ -35,14 +43,14 @@ export interface ScriptDialog {
 
 export interface ScriptAnimation {
 	type: "animation";
-	target: string;
+	target?: string;
 	animation: string;
 	duration: number;
 }
 
 export interface ScriptMove {
 	type: "move";
-	target: string;
+	target?: string;
 	posX: number;
 	posY: number;
 	facingX: number; //-1, 0, 1
@@ -51,7 +59,7 @@ export interface ScriptMove {
 
 export interface ScriptWalk {
 	type: "walk";
-	target: string;
+	target?: string;
 	posX: number;
 	posY: number;
 }
@@ -97,7 +105,11 @@ export interface Scripting {
 export interface Room {
 	startRoom?: boolean;
 	tileset: string; 
+	decorationTileset?: string; 
+	overlayTileset?: string; 
 	layout: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
+	decorations?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
+	overlays?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
 	overlay?: number[][];
 	npcs?: NpcPositioning[]; //place npcs in room
 	connections?: MapConnection[]; //place npcs in room

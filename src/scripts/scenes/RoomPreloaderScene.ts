@@ -23,6 +23,11 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 	preload() {
 		// Rooms
 		const requestedRoomId = getUrlParam('roomName');
+		const mapToEditId = getUrlParam('editMap');
+		if (globalState.loadGame) {
+			globalState.loadState();
+		}
+
 		if (requestedRoomId) {
 			this.usedRooms.push(requestedRoomId);
 			globalState.roomAssignment = {[`${requestedRoomId}`]: {
@@ -34,7 +39,6 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 			this.usedRooms.push(...globalState.roomAssignment[globalState.currentLevel].rooms);
 		}
 
-		const mapToEditId = getUrlParam('editMap');
 		if (mapToEditId) {
 			Object.values(globalState.roomAssignment).forEach((assignment) => {
 				assignment.rooms.forEach((room) => {
@@ -44,7 +48,14 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 				});
 			});
 			// We need to load all tilesets if we are going to use the map editor
-			globalState.availableTilesets.push('dungeon', 'dungeon-blue', 'town');
+			globalState.availableTilesets.push(
+				'dungeon',
+				'dungeon-blue',
+				'town',
+				'dungeon-overlay',
+				'dungeon-decoration',
+				'town-overlay'
+				);
 		}
 
 		this.usedRooms.forEach((roomId) => {
@@ -53,11 +64,15 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 
 		if (requestedRoomId !== undefined) {
 			const roomGen = new RoomGenerator();
+			let cnt: number = 0;
+			while(cnt < 3) {
+				cnt++;
 			const genericRoom = roomGen.generateRoom('dungeon');
 			// globalState.availableRooms[genericRoom.name] = genericRoom;
 			globalState.roomAssignment[requestedRoomId].rooms.push(genericRoom.name);
 			this.usedRooms.push(genericRoom.name);
 			this.cache.json.add(`room-${genericRoom.name}`,genericRoom);
+			}
 		}
 	}
 

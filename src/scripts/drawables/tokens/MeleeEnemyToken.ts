@@ -1,4 +1,4 @@
-import { getFacing } from '../../helpers/orientation';
+import { getFacing, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
@@ -12,8 +12,8 @@ const REGULAR_ATTACK_RANGE = 15;
 
 export default class MeleeEnemyToken extends EnemyToken {
 
-	constructor(scene: MainScene, x: number, y: number, tokenName: string) {
-		super(scene,x,y,tokenName);
+	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
+		super(scene, x, y, tokenName, id);
 
 		// cool effects!
 		const particles = scene.add.particles('fire');
@@ -73,7 +73,10 @@ export default class MeleeEnemyToken extends EnemyToken {
 					this.emitter.setSpeedX(xSpeed);
 					this.emitter.setSpeedY(ySpeed);
 					const newFacing = getFacing(xSpeed, ySpeed);
-					const animation = this.stateObject.updateMovingState(true, newFacing);
+					const animation = updateMovingState(
+						this.stateObject,
+						true,
+						newFacing);
 					if (animation) {
 						this.play(animation);
 					}
@@ -83,8 +86,10 @@ export default class MeleeEnemyToken extends EnemyToken {
 					this.setVelocityY(0);
 					this.emitter.setSpeedX(0);
 					this.emitter.setSpeedY(0);
-					const animation =
-						this.stateObject.updateMovingState(false, this.stateObject.currentFacing);
+					const animation = updateMovingState(
+						this.stateObject,
+						false,
+						this.stateObject.currentFacing);
 					if (animation) {
 						this.play(animation);
 					}

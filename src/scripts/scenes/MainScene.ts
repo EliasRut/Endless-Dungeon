@@ -6,9 +6,6 @@ import StoryLine from '../models/StoryLine';
 import SideQuestLog from '../models/SideQuestLog';
 
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
-import EnemyToken from '../drawables/tokens/EnemyToken';
-import RangedEnemyToken from '../drawables/tokens/RangedEnemyToken';
-import MeleeEnemyToken from '../drawables/tokens/MeleeEnemyToken';
 import WeaponToken from '../drawables/tokens/WeaponToken';
 import FpsText from '../drawables/ui/FpsText';
 
@@ -17,7 +14,7 @@ import InventoryScreen from '../screens/InventoryScreen';
 import DialogScreen from '../screens/DialogScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
-import { getFacing } from '../helpers/orientation';
+import { getCharacterSpeed, getFacing, updateMovingState } from '../helpers/movement';
 import {
 	NUM_ITEM_ICONS, UiDepths,
 } from '../helpers/constants';
@@ -28,6 +25,8 @@ import ScriptHelper from '../helpers/ScriptHelper';
 import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
 import { spawnNpc } from '../helpers/spawn';
+import CharacterToken from '../drawables/tokens/CharacterToken';
+import { NpcScript } from '../../../typings/custom';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -49,7 +48,7 @@ export default class MainScene extends Phaser.Scene {
 	abilityHelper: AbilityHelper;
 
 	mainCharacter: PlayerCharacterToken;
-	npcMap: {[id: string]: EnemyToken};
+	npcMap: {[id: string]: CharacterToken};
 	groundItem: WeaponToken[];
 
 	overlayScreens: {
@@ -64,10 +63,14 @@ export default class MainScene extends Phaser.Scene {
 	avatar: Avatar;
 	backpackIcon: BackpackIcon;
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
 	useDynamicLighting = false;
 	storyLine: StoryLine;
 	sideQuestLog: SideQuestLog;
+
+	lastSave: number = Date.now();
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -77,6 +80,11 @@ export default class MainScene extends Phaser.Scene {
 		this.alive = 0;
 		// tslint:disable-next-line:no-unused-expression
 		this.cameras.main.fadeIn(FADE_IN_TIME_MS);
+
+		if (globalState.gameTime) {
+			console.log(`Updating to timestamp ${globalState.gameTime}.`);
+			this.time.update(globalState.gameTime, globalState.gameTime);
+		}
 
 		this.generateStory();
 
@@ -90,10 +98,14 @@ export default class MainScene extends Phaser.Scene {
 			this.dynamicLightingHelper = new DynamicLightingHelper(this.tileLayer);
 		}
 
-		this.mainCharacter = new PlayerCharacterToken(this, startX, startY);
+		this.mainCharacter = new PlayerCharacterToken(
+			this,
+			globalState.playerCharacter.x || startX,
+			globalState.playerCharacter.y || startY);
 		this.mainCharacter.setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.cameras.main.startFollow(this.mainCharacter, false);
 		this.physics.add.collider(this.mainCharacter, this.tileLayer);
+		this.physics.add.collider(this.mainCharacter, this.decorationLayer);
 
 		const rndItem = Math.floor(Math.random() * NUM_ITEM_ICONS); // todo calculate from tileset
 		const length = this.groundItem.push(new WeaponToken(
@@ -121,14 +133,16 @@ export default class MainScene extends Phaser.Scene {
 		this.sound.play('testSound', {volume: 0.08, loop: true});
 	}
 
-	addNpc(id: string, type: string, x: number, y: number) {
-		this.npcMap[id] = spawnNpc(this, type, x, y);
+	addNpc(id: string, type: string, x: number, y: number, script?: NpcScript) {
+		this.npcMap[id] = spawnNpc(this, type, id, x, y);
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.physics.add.collider(this.npcMap[id], this.tileLayer);
+		this.physics.add.collider(this.npcMap[id], this.decorationLayer);
+		this.npcMap[id].script = script;
 	}
 
 	drawRoom() {
-		const dungeonLevel = globalState.dungeon.levels.get(globalState.currentLevel);
+		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];
 		if (!dungeonLevel) {
 			throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
 		}
@@ -139,11 +153,22 @@ export default class MainScene extends Phaser.Scene {
 			npcs
 		} = dungeonLevel;
 
-		this.tileLayer = generateTilemap(this, dungeonLevel);
+		const [
+			tileLayer,
+			decorationLayer,
+			overlayLayer
+		] = generateTilemap(this, dungeonLevel);
+
+		this.tileLayer = tileLayer;
+		this.decorationLayer = decorationLayer;
+		this.overlayLayer = overlayLayer;
 
 		this.tileLayer.setDepth(UiDepths.BASE_TILE_LAYER);
+		this.decorationLayer.setDepth(UiDepths.DECORATION_TILE_LAYER);
+		this.overlayLayer.setDepth(UiDepths.OVERLAY_TILE_LAYER);
+
 		npcs.forEach((npc) => {
-			this.addNpc(npc.id, npc.type, npc.x, npc.y);
+			this.addNpc(npc.id, npc.type, npc.x, npc.y, npc.script);
 		});
 
 		return [startPositionX, startPositionY];
@@ -161,6 +186,7 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	update(globalTime: number, _delta: number) {
+		globalState.gameTime = globalTime;
 		this.fpsText.update();
 
 		if(globalState.playerCharacter.health <= 0 && this.alive ===0){
@@ -186,12 +212,15 @@ export default class MainScene extends Phaser.Scene {
 			const newFacing = getFacing(xFacing, yFacing);
 
 			const hasMoved = isCasting ? false : (xFacing !== 0 || yFacing !== 0);
-			const playerAnimation = globalState.playerCharacter.updateMovingState(hasMoved, newFacing);
+			const playerAnimation = updateMovingState(
+				globalState.playerCharacter,
+				hasMoved,
+				newFacing);
 			if (playerAnimation) {
 				this.mainCharacter.play(playerAnimation);
 			}
 
-			const speed = isCasting ? 0 : globalState.playerCharacter.getSpeed();
+			const speed = isCasting ? 0 : getCharacterSpeed(globalState.playerCharacter);
 
 			this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
 			this.mainCharacter.body.velocity.normalize().scale(speed);
@@ -224,14 +253,22 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		// Check if the player is close to a connection point and move them if so
-		globalState.dungeon.levels.get(globalState.currentLevel)?.connections.forEach((connection) => {
+		globalState.dungeon.levels[globalState.currentLevel]?.connections.forEach((connection) => {
 			if (Math.hypot(
 						connection.x - globalState.playerCharacter.x,
 						connection.y - globalState.playerCharacter.y) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
 				globalState.currentLevel = connection.targetMap;
+				globalState.playerCharacter.x = 0;
+				globalState.playerCharacter.y = 0;
 				this.scene.start('RoomPreloaderScene');
 			}
 		});
+
+		// tslint:disable-next-line: no-magic-numbers
+		if (Date.now() - this.lastSave > 10 * 1000) {
+			this.lastSave = Date.now();
+			globalState.storeState();
+		}
 	}
 
 	pause() {

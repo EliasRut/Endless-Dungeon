@@ -9,6 +9,8 @@ export default class DungeonLevel {
 	rooms: RoomPositioning[];
 	tilesets: string[];
 	layout: number[][];
+	decorationLayout: number[][];
+	overlayLayout: number[][];
 	npcs: NpcPositioning[];
 	connections: MapConnection[];
 }

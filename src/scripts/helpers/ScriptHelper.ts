@@ -1,4 +1,4 @@
-import { ScriptEntry } from '../../../typings/custom';
+import { NpcScript, ScriptEntry } from '../../../typings/custom';
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import MainScene from '../scenes/MainScene';
 import DialogScreen from '../screens/DialogScreen';
@@ -7,9 +7,17 @@ import StatScreen from '../screens/StatScreen';
 import globalState from '../worldstate';
 import { TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import RoomPositioning from '../worldstate/RoomPositioning';
-import { getFacing } from './orientation';
+import { getCharacterSpeed, getFacing, updateMovingState } from './movement';
+import CharacterToken from '../drawables/tokens/CharacterToken';
 
 const DIALOG_TEXT_TIME_MS = 5000;
+
+export interface NpcScriptState {
+	repetition: number;
+	step?: number;
+	stepStartMs?: number;
+	animationFallback?: string;
+}
 
 export default class ScriptHelper {
 
@@ -20,24 +28,21 @@ export default class ScriptHelper {
 	scriptSubStep?: number;
 	scriptStepStartMs?: number;
 	scriptAnimationFallback?: string;
+	npcScriptStates: {[npcId: string]: NpcScriptState} = {};
 
 	constructor (scene: MainScene) {
 		this.scene = scene;
 	}
 
-	findCurrentRoom() {
-		const rooms = globalState.dungeon.levels.get(globalState.currentLevel)?.rooms;
+	findRoomForToken(token: CharacterToken) {
+		const rooms = globalState.dungeon.levels[globalState.currentLevel]?.rooms;
 		const currentRoom = rooms?.find((room) => {
-			return room.x * TILE_WIDTH < globalState.playerCharacter.x &&
-				(room.x + room.width) * TILE_WIDTH > globalState.playerCharacter.x &&
-				room.y * TILE_HEIGHT < globalState.playerCharacter.y &&
-				(room.y + room.height) * TILE_HEIGHT > globalState.playerCharacter.y;
+			return room.x * TILE_WIDTH < token.x &&
+				(room.x + room.width) * TILE_WIDTH > token.x &&
+				room.y * TILE_HEIGHT < token.y &&
+				(room.y + room.height) * TILE_HEIGHT > token.y;
 		});
-		if (currentRoom) {
-			this.currentRoom = currentRoom;
-		} else {
-			this.currentRoom = undefined;
-		}
+		return currentRoom;
 	}
 
 	handleScriptStep(globalTime: number) {
@@ -128,8 +133,11 @@ export default class ScriptHelper {
 					this.scene.mainCharacter.x = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH;
 					this.scene.mainCharacter.y = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT;
 					const facing = getFacing(currentStep.facingX, currentStep.facingY);
-					const playerAnimation =
-						globalState.playerCharacter.updateMovingState(false, facing, true);
+					const playerAnimation = updateMovingState(
+						globalState.playerCharacter,
+						false,
+						facing,
+						true);
 					if (playerAnimation) {
 						this.scene.mainCharacter.play(playerAnimation);
 					}
@@ -148,11 +156,14 @@ export default class ScriptHelper {
 					if (!atTarget) {
 						const xFactor = (targetX - mainCharacter.x) / totalDistance;
 						const yFactor = (targetY - mainCharacter.y) / totalDistance;
-						const speed = globalState.playerCharacter.getSpeed();
+						const speed = getCharacterSpeed(globalState.playerCharacter);
 						mainCharacter.setVelocity(speed * xFactor, speed * yFactor);
 						mainCharacter.body.velocity.normalize().scale(speed);
 						const newFacing = getFacing(xFactor, yFactor);
-						const playerAnimation = globalState.playerCharacter.updateMovingState(true, newFacing);
+						const playerAnimation = updateMovingState(
+							globalState.playerCharacter,
+							true,
+							newFacing);
 						if (playerAnimation) {
 							mainCharacter.play(playerAnimation);
 						}
@@ -183,10 +194,127 @@ export default class ScriptHelper {
 		}
 	}
 
-	handleScripts(globalTime: number) {
+	handleNpcScriptStep(globalTime: number, token: CharacterToken) {
+		const scriptState = this.npcScriptStates[token.id];
+		const script = token.script!;
+		const currentStepNumber = scriptState.step || 0;
+		const currentStep = script.steps[currentStepNumber];
+		let cleanUpStep = false;
+		if (!currentStep) {
+			scriptState.step = 0;
+			scriptState.repetition++;
+			return;
+		}
+		switch (currentStep.type) {
+			case 'wait': {
+				if (!scriptState.stepStartMs) {
+					scriptState.stepStartMs = globalTime;
+				} else if ((scriptState.stepStartMs + currentStep.time) < globalTime) {
+					cleanUpStep = true;
+				}
+				break;
+			}
+			case 'animation': {
+				if (currentStep.duration) {
+					if (!scriptState.stepStartMs) {
+						scriptState.stepStartMs = globalTime;
+						scriptState.animationFallback = token.anims.currentAnim.key;
+							token.play(currentStep.animation);
+					} else if ((scriptState.stepStartMs + currentStep.duration) < globalTime) {
+						cleanUpStep = true;
+						token.play(this.scriptAnimationFallback!);
+					}
+				} else {
+					cleanUpStep = true;
+					token.play(currentStep.animation);
+				}
+				break;
+			}
+			case 'move': {
+				cleanUpStep = true;
+				const tokenRoom = this.findRoomForToken(token);
+				if (!tokenRoom) {
+					cleanUpStep = true;
+					break;
+				}
+				token.x = (tokenRoom!.x + currentStep.posX) * TILE_WIDTH;
+				token.y = (tokenRoom!.y + currentStep.posY) * TILE_HEIGHT;
+				const facing = getFacing(currentStep.facingX, currentStep.facingY);
+				const animation = updateMovingState(
+					globalState.npcs[token.id],
+					false,
+					facing,
+					true);
+				if (animation) {
+					token.play(animation);
+				}
+				break;
+			}
+			case 'walk': {
+				const tokenRoom = this.findRoomForToken(token);
+				if (!tokenRoom) {
+					cleanUpStep = true;
+					break;
+				}
+				const targetX = (tokenRoom!.x + currentStep.posX) * TILE_WIDTH;
+				const targetY = (tokenRoom!.y + currentStep.posY) * TILE_HEIGHT;
+				const totalDistance = Math.abs(targetX - token.x) +
+					Math.abs(targetY - token.y);
+				const atTarget = totalDistance < (TILE_HEIGHT / 2);
+				if (atTarget) {
+					cleanUpStep = true;
+					token.isBeingMoved = false;
+					token.setVelocity(0);
+				} else {
+					const xFactor = (targetX - token.x) / totalDistance;
+					const yFactor = (targetY - token.y) / totalDistance;
+					const speed = getCharacterSpeed(globalState.npcs[token.id]);
+					token.isBeingMoved = true;
+					token.setVelocity(speed * xFactor, speed * yFactor);
+					token.body.velocity.normalize().scale(speed);
+					const newFacing = getFacing(xFactor, yFactor);
+					const animation = updateMovingState(
+						globalState.npcs[token.id],
+						true,
+						newFacing);
+					if (animation) {
+						token.play(animation);
+					}
+				}
+				break;
+			}
+		}
+		if (cleanUpStep) {
+			scriptState.step = currentStepNumber + 1;
+			scriptState.stepStartMs = undefined;
+			scriptState.animationFallback = undefined;
+		}
+	}
+
+	handleNpcScript(globalTime: number, token: CharacterToken) {
+		if (!this.npcScriptStates[token.id]) {
+			this.npcScriptStates[token.id] = {
+				repetition: 0
+			};
+		}
+		const script = token.script!;
+		if (script.repeat === -1 || this.npcScriptStates[token.id].repetition < script.repeat) {
+			this.handleNpcScriptStep(globalTime, token);
+		}
+	}
+
+	handleNpcScripts(globalTime: number) {
+		Object.values(this.scene.npcMap).forEach((npcToken) => {
+			if (npcToken.script) {
+				this.handleNpcScript(globalTime, npcToken);
+			}
+		});
+	}
+
+	handleRoomScripts(globalTime: number) {
 		if (!this.runningScript) {
 			const lastRoomName = this.currentRoom?.roomName;
-			this.findCurrentRoom();
+			this.currentRoom = this.findRoomForToken(this.scene.mainCharacter);
 			const currentRooomName = this.currentRoom?.roomName;
 			if (lastRoomName !== currentRooomName) {
 				if (lastRoomName &&
@@ -203,5 +331,10 @@ export default class ScriptHelper {
 		if (this.runningScript) {
 			this.handleScriptStep(globalTime);
 		}
+	}
+
+	handleScripts(globalTime: number) {
+		this.handleRoomScripts(globalTime);
+		this.handleNpcScripts(globalTime);
 	}
 }
