@@ -65,7 +65,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 		if (requestedRoomId !== undefined) {
 			const roomGen = new RoomGenerator();
 			let cnt: number = 0;
-			while(cnt < 4) {
+			while(cnt < 3) {
 				cnt++;
 			const genericRoom = roomGen.generateRoom('dungeon');
 			// globalState.availableRooms[genericRoom.name] = genericRoom;
