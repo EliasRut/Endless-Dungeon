@@ -1,14 +1,11 @@
 import {
-	ANIMATION_IDLE,
-	ANIMATION_WALK,
 	Facings,
-	facingToSpriteNameMap,
 	Faction
 } from '../helpers/constants';
-import { getVelocitiesForFacing } from '../helpers/orientation';
+import Item from './Item';
 
 export default class Character {
-	private animationBase: string;
+	public animationBase: string;
 	public maxHealth: number;
 	public health: number;
 	public damage: number;
@@ -23,6 +20,9 @@ export default class Character {
 	public y = 0;
 	public vision = 0;
 
+	public mainStat = 1;
+	public items: Item[] = [];
+
 	public faction: Faction;
 
 	constructor(
@@ -36,30 +36,5 @@ export default class Character {
 		this.health = health;
 		this.damage = damage;
 		this.movementSpeed = movementSpeed;
-	}
-
-	public getSpeed() {
-		return this.movementSpeed * this.slowFactor;
-	}
-
-	public updateMovingState (hasMoved: boolean, facing: Facings, forceUpdate?: boolean) {
-		if (!hasMoved && !forceUpdate) {
-			const lastCharDirection = facingToSpriteNameMap[this.currentFacing];
-			// this.currentFacing = facing;
-			this.isWalking = hasMoved;
-			return `${this.animationBase}-${ANIMATION_IDLE}-${lastCharDirection}`;
-		}
-		if (facing === this.currentFacing && this.isWalking && !forceUpdate) {
-			return false;
-		}
-		const newDirection = facingToSpriteNameMap[facing];
-		this.currentFacing = facing;
-		this.isWalking = hasMoved;
-		const animationType = this.isWalking ? ANIMATION_WALK : ANIMATION_IDLE;
-		return `${this.animationBase}-${animationType}-${newDirection}`;
-	}
-
-	getFacingVelocities() {
-		return getVelocitiesForFacing(this.currentFacing);
 	}
 }

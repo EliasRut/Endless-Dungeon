@@ -7,7 +7,7 @@ import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import { Faction } from './constants';
-import { getRotationInRadiansForFacing } from './orientation';
+import { getRotationInRadiansForFacing } from './movement';
 
 export default class AbilityHelper {
 	scene: MainScene;

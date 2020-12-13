@@ -7,7 +7,7 @@ import StatScreen from '../screens/StatScreen';
 import globalState from '../worldstate';
 import { TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import RoomPositioning from '../worldstate/RoomPositioning';
-import { getFacing } from './orientation';
+import { getCharacterSpeed, getFacing, updateMovingState } from './movement';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 
 const DIALOG_TEXT_TIME_MS = 5000;
@@ -35,7 +35,7 @@ export default class ScriptHelper {
 	}
 
 	findRoomForToken(token: CharacterToken) {
-		const rooms = globalState.dungeon.levels.get(globalState.currentLevel)?.rooms;
+		const rooms = globalState.dungeon.levels[globalState.currentLevel]?.rooms;
 		const currentRoom = rooms?.find((room) => {
 			return room.x * TILE_WIDTH < token.x &&
 				(room.x + room.width) * TILE_WIDTH > token.x &&
@@ -133,8 +133,11 @@ export default class ScriptHelper {
 					this.scene.mainCharacter.x = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH;
 					this.scene.mainCharacter.y = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT;
 					const facing = getFacing(currentStep.facingX, currentStep.facingY);
-					const playerAnimation =
-						globalState.playerCharacter.updateMovingState(false, facing, true);
+					const playerAnimation = updateMovingState(
+						globalState.playerCharacter,
+						false,
+						facing,
+						true);
 					if (playerAnimation) {
 						this.scene.mainCharacter.play(playerAnimation);
 					}
@@ -153,11 +156,14 @@ export default class ScriptHelper {
 					if (!atTarget) {
 						const xFactor = (targetX - mainCharacter.x) / totalDistance;
 						const yFactor = (targetY - mainCharacter.y) / totalDistance;
-						const speed = globalState.playerCharacter.getSpeed();
+						const speed = getCharacterSpeed(globalState.playerCharacter);
 						mainCharacter.setVelocity(speed * xFactor, speed * yFactor);
 						mainCharacter.body.velocity.normalize().scale(speed);
 						const newFacing = getFacing(xFactor, yFactor);
-						const playerAnimation = globalState.playerCharacter.updateMovingState(true, newFacing);
+						const playerAnimation = updateMovingState(
+							globalState.playerCharacter,
+							true,
+							newFacing);
 						if (playerAnimation) {
 							mainCharacter.play(playerAnimation);
 						}
@@ -234,7 +240,11 @@ export default class ScriptHelper {
 				token.x = (tokenRoom!.x + currentStep.posX) * TILE_WIDTH;
 				token.y = (tokenRoom!.y + currentStep.posY) * TILE_HEIGHT;
 				const facing = getFacing(currentStep.facingX, currentStep.facingY);
-				const animation = globalState.npcs[token.id].updateMovingState(false, facing, true);
+				const animation = updateMovingState(
+					globalState.npcs[token.id],
+					false,
+					facing,
+					true);
 				if (animation) {
 					token.play(animation);
 				}
@@ -258,12 +268,15 @@ export default class ScriptHelper {
 				} else {
 					const xFactor = (targetX - token.x) / totalDistance;
 					const yFactor = (targetY - token.y) / totalDistance;
-					const speed = globalState.npcs[token.id].getSpeed();
+					const speed = getCharacterSpeed(globalState.npcs[token.id]);
 					token.isBeingMoved = true;
 					token.setVelocity(speed * xFactor, speed * yFactor);
 					token.body.velocity.normalize().scale(speed);
 					const newFacing = getFacing(xFactor, yFactor);
-					const animation = globalState.npcs[token.id].updateMovingState(true, newFacing);
+					const animation = updateMovingState(
+						globalState.npcs[token.id],
+						true,
+						newFacing);
 					if (animation) {
 						token.play(animation);
 					}

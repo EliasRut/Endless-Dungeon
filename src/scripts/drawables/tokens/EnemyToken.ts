@@ -1,11 +1,11 @@
-import { Faction, UiDepths, VISITED_TILE_TINT } from '../../helpers/constants';
+import { Faction, VISITED_TILE_TINT } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
 import FireBallEffect from '../effects/FireBallEffect';
 import globalState from '../../worldstate';
 import MainScene from '../../scenes/MainScene';
-import WeaponToken from './WeaponToken';
 import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
+import { generateRandomItem } from '../../helpers/item';
 
 const BODY_RADIUS = 6;
 const BODY_X_OFFSET = 10;
@@ -14,8 +14,6 @@ const BODY_Y_OFFSET = 12;
 const ENEMY_DAMAGE = 10;
 const ENEMY_HEALTH = 10;
 const ENEMY_SPEED = 35;
-
-const NUMBER_ITEMS_IN_TILESET = 63;
 
 export default abstract class EnemyToken extends CharacterToken {
 	fireballEffect: FireBallEffect | undefined;
@@ -62,9 +60,7 @@ export default abstract class EnemyToken extends CharacterToken {
 			// TODO find out when this happens
 			return;
 		}
-		const rndItem = Math.floor(Math.random() * NUMBER_ITEMS_IN_TILESET);
-		const length = this.scene.groundItem.push(new WeaponToken(this.scene, this.x, this.y, rndItem));
-		this.scene.groundItem[length-1].setDepth(UiDepths.TOKEN_MAIN_LAYER);
+		this.scene.dropItem(this.x, this.y, generateRandomItem());
 	}
 
 	private getOccupiedTile() {

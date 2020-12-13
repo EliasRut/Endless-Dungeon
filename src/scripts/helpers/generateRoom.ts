@@ -167,27 +167,27 @@ export default class RoomGenerator {
 		// Initial variant build the room by specifically setting the
 		// walls, etc.
 
-		 Draw the outer walls of the room
-		 for (let y = 0; y < roomHeight; y++) {
-				 room[y] = [];
-			 for (let x = 0; x < roomWidth; x++) {
-					 room[y][x] = FLOOR;
+		Draw the outer walls of the room
+		for (let y = 0; y < roomHeight; y++) {
+				room[y] = [];
+			for (let x = 0; x < roomWidth; x++) {
+					room[y][x] = FLOOR;
 
-					 if(y === 0) {
-							 room[y][x] = 8;
-					 } else if(x === 0) {
-							 room[y][x] = 6;
-					 } else if(x === roomWidth-1) {
-							 room[y][x] = 4;
-					 } else if(y === roomHeight-7) {
-							 room[y][x] = 2;
-					 }
-			 }
-		 }
-		 room[0][0] = 13;
-		 room[0][room[0].length-1] = 12;
-		 room[room.length-1][0] = 11;
-		 room[room.length-1][room[0].length-1] = 10;
+					if(y === 0) {
+							room[y][x] = 8;
+					} else if(x === 0) {
+							room[y][x] = 6;
+					} else if(x === roomWidth-1) {
+							room[y][x] = 4;
+					} else if(y === roomHeight-7) {
+							room[y][x] = 2;
+					}
+			}
+		}
+		room[0][0] = 13;
+		room[0][room[0].length-1] = 12;
+		room[room.length-1][0] = 11;
+		room[room.length-1][room[0].length-1] = 10;
 		*/
 
 		/* We need an opening in the room for to be connected to any other room.
@@ -205,9 +205,9 @@ export default class RoomGenerator {
 		const h1 = ([1,3].includes(roomOrientation) && roomHeight < 3) ? '(+'+(3-roomHeight)+')' : '';
 		const w1 = ([0,2].includes(roomOrientation) && roomWidth < 3) ? '(+'+(3-roomWidth)+')': '';
 
-		console.log('Creating '+roomName+' of size '+roomHeight+h1+'x'+roomWidth+w1);
+		// tslint:disable-next-line: no-console
+		console.log('Creating ' + roomName + ' of size ' + roomHeight + h1 + 'x' + roomWidth + w1);
 		// end Console output
-
 
 		let actualHeight: number;
 		let acutalWidth: number;
@@ -218,17 +218,17 @@ export default class RoomGenerator {
 				room = layoutTopBottomEntrance(roomHeight,roomWidth,TOP);
 				// Part of the initial implementation.
 				/*
-				 const startIndex = 9;//Math.max(0,((room[0].length-doorSize)/2)+1);
-				 if(0 < startIndex-1) {
-					 room[0][startIndex-1] = 9;
-				 }
+				const startIndex = 9;//Math.max(0,((room[0].length-doorSize)/2)+1);
+				if(0 < startIndex-1) {
+					room[0][startIndex-1] = 9;
+				}
 
-				 if(room[0].length-1 > startIndex + doorSize) {
-					 room[0][startIndex + doorSize] = 7;
-				 }
-				 for(let i=startIndex;i < Math.min(room[0].length,startIndex + doorSize);i++) {
-						 room[0][i] = 32;
-				 }
+				if(room[0].length-1 > startIndex + doorSize) {
+					room[0][startIndex + doorSize] = 7;
+				}
+				for(let i=startIndex;i < Math.min(room[0].length,startIndex + doorSize);i++) {
+						room[0][i] = 32;
+				}
 				*/
 
 				actualHeight = room.length/BLOCK_SIZE;

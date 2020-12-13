@@ -17,8 +17,4 @@ export default class Enemy extends Character {
 
 		this.faction = Faction.ENEMIES;
 	}
-
-	getFacingVelocities() {
-		return {x: this.exactTargetXFactor, y: this.exactTargetYFactor};
-	}
 }

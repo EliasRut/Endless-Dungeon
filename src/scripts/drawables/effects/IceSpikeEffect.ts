@@ -1,5 +1,5 @@
 import { Facings } from '../../helpers/constants';
-import { getRotationInRadiansForFacing, getVelocitiesForFacing } from '../../helpers/orientation';
+import { getRotationInRadiansForFacing, getVelocitiesForFacing } from '../../helpers/movement';
 import AbilityEffect from './AbilityEffect';
 
 const SPRITE_SCALE = 0.5;

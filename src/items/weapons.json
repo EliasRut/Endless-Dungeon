@@ -1,10 +1,30 @@
 {
-    "itemgroup": "weapons",
-    "abilities": [
-        "damage",
-        "cooldown",
-        "durability",
-        "ranged"
-    ],
-    "tile": [[37]]
+	"itemgroup": "weapon",
+	"abilities":[
+		"damage",
+		"cooldown",
+		"mainstat"
+	],
+	"icon":[
+		28,
+		29,
+		30,
+		31,
+		36,
+		37,
+		38,
+		39,
+		44,
+		45,
+		46,
+		47,
+		52,
+		53,
+		54,
+		55,
+		60,
+		61,
+		62,
+		63
+	]
 }
