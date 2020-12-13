@@ -196,7 +196,8 @@ export default class RoomGenerator {
 		 * 2 == south ^= bottom
 		 * 3 == west ^= left
 		 */
-		const roomOrientation = (Math.floor(Math.random() * 10)) % 4;
+		let orient = 0;
+		const roomOrientation = orient // (Math.floor(Math.random() * 10)) % 4;
 		const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'};
 		const orientation: [[number,number,string]] = [[0,0,'']];
 
@@ -207,16 +208,9 @@ export default class RoomGenerator {
 		console.log('Creating '+roomName+' of size '+roomHeight+h1+'x'+roomWidth+w1);
 		// end Console output
 
-		// Update roomsize to actual size that is going to be created.
-		if([1,3].includes(roomOrientation) && roomHeight < 3) {
-			roomHeight = 3;
-		}
 
-		if([0,2].includes(roomOrientation) && roomWidth < 3) {
-			roomWidth = 3;
-		}
-
-
+		let actualHeight: number;
+		let acutalWidth: number;
 		// Depending on the orientation generate one of the layouts below and set
 		// the orientation for the dungeon config.
 		switch(roomOrientation) {
@@ -237,9 +231,9 @@ export default class RoomGenerator {
 				 }
 				*/
 
-				let actualHeight = room.length/BLOCK_SIZE;
-				let acutalWidth = room[0].length/BLOCK_SIZE;
-				orientation.push([-1, Math.ceil(acutalWidth/2), orientationMap[roomOrientation]]);
+				actualHeight = room.length/BLOCK_SIZE;
+				acutalWidth = room[0].length/BLOCK_SIZE;
+				orientation.push([-1, Math.floor(acutalWidth/2), orientationMap[roomOrientation]]);
 				break;
 			case 1:
 				room = layoutLeftRightEntrance(roomHeight,roomWidth,RIGHT);
