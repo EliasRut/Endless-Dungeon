@@ -145,14 +145,18 @@ export default class RoomGenerator {
 	}
 
 	/**
-	 * - The rooms are built from tile blocks of size 4x4,
+	 * - The rooms are built from block tiles of size 4x4 tiles each,
 	 *   and their heights and widths are multiples of 8.
-	 * - All rooms have their entrances in the middle of the room.
-	 * - The side with the entrance is at least 3x8 in Size.
-	 *   For example if the door is on the top, the width of the room
-	 *   is at least 24 tiles long.
+	 * - All rooms have their entrances in the middle, 
+	 *   i.e. there are no doors on corners, etc.
+	 * - Rooms can have 1-4 entrances.
+	 * - A side with an entrance is at least 3x8 in length.
+	 *   For example if a door is on the top, the width of the room
+	 *   is at least 24 tiles (== 6 block tiles == 3 blocks) long.
 	 * - An entrance can be in any of the four major directions.
-	 *   The orientation is chosen at random.
+	 * - The orientation and number of entrances is chosen at random.
+	 * 
+	 * Note: The names 'door' and 'entrance' are used interchangably here.
 	 *
 	 * @param roomTileset Tileset to be used for the generated room.
 	 */
@@ -160,17 +164,26 @@ export default class RoomGenerator {
 		let roomHeight = this.roomSize(this.minSize,this.maxSize);
 		let roomWidth = this.roomSize(this.minSize,this.maxSize);
 
-		const roomName: string = 'awsomeRoom'+(Math.floor(Math.random() * 1000));
+		// Create some random name, which should be unique.
+		const roomName: string = 'awsomeRoom'+((new Date().getTime())+(Math.floor(Math.random() * 1000))%1000);
 
 		let room: number[][] = [];
 
+		// Set the number of entrances the room will have, this is between 1 and 4.
 		const entranceCnt: number = Math.max(1,(Math.floor(Math.random() * 10)) % 4);
+
+		// Mapping for the generated orientations to strings. I am using strings,
+		// because it makes things easier to read.
+		const orientationMap = {0: TOP, 1: RIGHT, 2: BOTTOM, 3: LEFT};
 		const orientations: number[] = [];
 		const orientationStr: string[] = [];
-		const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'};
 
+		// Set the orientation for each entrance.
 		for(let i=0;i<entranceCnt;i++) {
 			let orient: number = (Math.floor(Math.random() * 10)) % 4;
+
+			// NOTE: This is commented out decrease the number of entrances on average.
+			// Make sure that each orientation is selected only once.
 			// for(let i=0;i<entranceCnt;i++) {
 			// 	if(orientations.includes(orient)) {
 			// 		orient = orient === 3 ? 0 : orient+1;
@@ -179,6 +192,8 @@ export default class RoomGenerator {
 			// 	}
 			// }
 
+			// Get the string representation of the orientation and push it 
+			// to the list of entrances to be created.
 			orientations.push(orient);
 			switch(orient) {
 				case 0: orientationStr.push(orientationMap[orient]); break;
@@ -231,61 +246,13 @@ export default class RoomGenerator {
 		// const roomOrientation = (Math.floor(Math.random() * 10)) % 4;
 
 		// Console output
-		// const h1 = ([1,3].includes(roomOrientation) && roomHeight < 3) ? '(+'+(3-roomHeight)+')' : '';
-		// const w1 = ([0,2].includes(roomOrientation) && roomWidth < 3) ? '(+'+(3-roomWidth)+')': '';
+		const h1 = ([1,3].some(elem => orientations.includes(elem)) && roomHeight < 3) ? '(+'+(3-roomHeight)+')' : '';
+		const w1 = ([0,2].some(elem => orientations.includes(elem)) && roomWidth < 3) ? '(+'+(3-roomWidth)+')': '';
 
-		// // tslint:disable-next-line: no-console
-		// console.log('Creating ' + roomName + ' of size ' + roomHeight + h1 + 'x' + roomWidth + w1);
-		// // end Console output
+		// tslint:disable-next-line: no-console
+		console.log('Creating ' + roomName + ' of size ' + roomHeight + h1 + 'x' + roomWidth + w1);
+		// end Console output
 
-
-		// Depending on the orientation generate one of the layouts below and set
-		// the orientation for the dungeon config.
-		// switch(roomOrientation) {
-		// 	case 0:
-		// 		room = layoutTopBottomEntrance(roomHeight,roomWidth,TOP);
-		// 		// Part of the initial implementation.
-		// 		/*
-		// 		const startIndex = 9;//Math.max(0,((room[0].length-doorSize)/2)+1);
-		// 		if(0 < startIndex-1) {
-		// 			room[0][startIndex-1] = 9;
-		// 		}
-
-		// 		if(room[0].length-1 > startIndex + doorSize) {
-		// 			room[0][startIndex + doorSize] = 7;
-		// 		}
-		// 		for(let i=startIndex;i < Math.min(room[0].length,startIndex + doorSize);i++) {
-		// 				room[0][i] = 32;
-		// 		}
-		// 		*/
-
-		// 		actualHeight = room.length/BLOCK_SIZE;
-		// 		acutalWidth = room[0].length/BLOCK_SIZE;
-		// 		orientation.push([-1, Math.floor(acutalWidth/2), orientationMap[roomOrientation]]);
-		// 		break;
-		// 	case 1:
-		// 		room = layoutLeftRightEntrance(roomHeight,roomWidth,RIGHT);
-
-		// 		actualHeight = room.length/BLOCK_SIZE;
-		// 		acutalWidth = room[0].length/BLOCK_SIZE;
-		// 		orientation.push([Math.floor(actualHeight/2), acutalWidth, orientationMap[roomOrientation]]);
-		// 		break;
-		// 	case 2:
-		// 		room = layoutTopBottomEntrance(roomHeight,roomWidth,BOTTOM);
-
-		// 		actualHeight = room.length/BLOCK_SIZE;
-		// 		acutalWidth = room[0].length/BLOCK_SIZE;
-		// 		orientation.push([actualHeight, Math.floor(acutalWidth/2), orientationMap[roomOrientation]]);
-		// 		break;
-		// 	case 3:
-		// 		room = layoutLeftRightEntrance(roomHeight,roomWidth,LEFT);
-
-		// 		actualHeight = room.length/BLOCK_SIZE;
-		// 		acutalWidth = room[0].length/BLOCK_SIZE;
-		// 		orientation.push([Math.floor(actualHeight/2),-1, orientationMap[roomOrientation]]);
-		// 		break;
-		// 	default:
-		// }
 
 		// let debugOutput = '';
 		// for(let i=0;i<room.length;i++) {
@@ -315,36 +282,51 @@ export default class RoomGenerator {
 	}
 }
 
+// Ceate top, middle, and bottom parts of rooms and put them together.
+// If necessary add multiple middle parts to reach the desired room size.
 function assemble(roomHeight: number, roomWidth: number, orientations: string[]) {
 	let result: number[][] = []; 
 
 	const top: number[][] = genTopPart(roomWidth,orientations);
 
 
+	// Remove left and right orientations. If the resulting list ist not empty
+	// we know that there exists a door on top or at the bottom and we need to
+	// make the middle part wide enough to fit the door.
 	const topBottomOrientation: string[] = orientations.filter(elem => ![LEFT,RIGHT].includes(elem));
-	const height = Math.max(1,((roomHeight-3)/2));
+
+	// Height of half the room. To set the doors halfway into a vertical wall
+	// the parts above and below the door need to the same size. The '-3'
+	// accounts for the top, bottom and possible middle part that has a door.
+	const height = Math.max(1,(roomHeight-3)/2);
 
 	let middle: number[][] = []; 
 	for(let i=0;i<height;i++) {
 		middle = middle.concat(genMiddlePart(roomWidth,topBottomOrientation));
 	}
 
+	// Build a middle part with a door
+	// TODO: Check if the room is not too small if we have no left/right door.
 	if(orientations.some(elem => [LEFT,RIGHT].includes(elem))) {
 		let upper: string[] = [];
 		let lower: string[] = [];
 
 		topBottomOrientation.forEach( e => {upper.push(e);lower.push(e);});
 
+		// Set left door if necessary
 		if(orientations.includes(LEFT)) {
 			upper.push(LEFT_UPPER);
 			lower.push(LEFT_LOWER);
 		}
 
+		// Set right door ifnecessary
 		if(orientations.includes(RIGHT)) {
 			upper.push(RIGHT_UPPER);
 			lower.push(RIGHT_LOWER);
 		}
 
+		// Doors consist of two middle parts, since our passages are 6 tiles
+		// wide.
 		middle = middle.concat(genMiddlePart(roomWidth,upper))
 					   .concat(genMiddlePart(roomWidth,lower));
 	}
@@ -356,78 +338,11 @@ function assemble(roomHeight: number, roomWidth: number, orientations: string[])
 	const bottom: number[][] = genBottomPart(roomWidth,orientations);
 
 
+	// Assemble the room from the three parts.
 	result = top.concat(middle).concat(bottom);
 
 	return result;
 }
-
-// /**
-//  * Generate layouts for rooms with doors on top or at the bottom.
-//  * @param roomHeight Room height
-//  * @param roomWidth Room width
-//  * @param orientation Sets the door position. Either 'top' or 'bottom'. Other values are ignored.
-//  */
-// function layoutTopBottomEntrance(roomHeight: number, roomWidth: number, orientation: string[]) {
-
-// 		const topPart: number[][] = genTopPart(roomWidth,orientation);
-
-// 		let middlePart: number[][] = [];
-
-// 		for(let i=0;i<(roomHeight-1)*2;i++) {
-// 			middlePart = middlePart.concat(genMiddlePart(roomWidth,orientation));
-// 		}
-
-// 		const bottomPart: number[][] = genBottomPart(roomWidth,orientation);
-
-// 		return topPart.concat(middlePart).concat(bottomPart);
-// }
-
-// /**
-//  * Generate layouts for rooms with doors on the left or on the right.
-//  * @param roomHeight Room height
-//  * @param roomWidth Room width
-//  * @param orientation Sets the door position. Either 'left' or 'right'. Other values are ignored.
-//  */
-// function layoutLeftRightEntrance(roomHeight: number, roomWidth: number, orientation: string) {
-
-// 		const topPart: number[][] = genTopPart(roomWidth);
-
-// 		let middlePart: number[][] = [];
-
-// 		// -2 for the door parts, and -1 for the bottom part
-// 		const height = Math.max(1,((roomHeight-3)/2));
-
-// 		for(let i=0;i<height;i++) {
-// 			middlePart = middlePart.concat(genMiddlePart(roomWidth));
-// 		}
-
-// 		// Door part
-// 		let upper: string = RIGHT_UPPER;
-// 		let lower: string = RIGHT_LOWER;
-
-// 		if(orientation === LEFT) {
-// 			upper = LEFT_UPPER;
-// 			lower = LEFT_LOWER;
-// 		}
-
-// 		// const upper: string = orientation === LEFT ? LEFT_UPPER : RIGHT_UPPER;
-// 		middlePart = middlePart.concat(genMiddlePart(roomWidth,[upper]));
-
-// 		// const lower: string = orientation === LEFT ? LEFT_LOWER : RIGHT_LOWER;
-// 		middlePart = middlePart.concat(genMiddlePart(roomWidth,[lower]));
-
-// 		// end Door part
-
-// 		// -2 for the door parts
-// 		for(let i=0;i<(Math.max(1,height));i++) {
-// 			middlePart = middlePart.concat(genMiddlePart(roomWidth));
-// 		}
-
-// 		const bottomPart: number[][] = genBottomPart(roomWidth);
-
-// 		return topPart.concat(middlePart).concat(bottomPart);
-
-// }
 
 /**
  * Genereate the 'middle' part of the room, which has neither top walls, nor bottom walls.
