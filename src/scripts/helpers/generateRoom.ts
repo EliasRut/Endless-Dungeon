@@ -174,9 +174,9 @@ export default class RoomGenerator {
 
 		// Mapping for the generated orientations to strings. I am using strings,
 		// because it makes things easier to read.
-		const orientationMap = {0: TOP, 1: RIGHT, 2: BOTTOM, 3: LEFT};
 		const orientations: number[] = [];
 		const orientationStr: string[] = [];
+		const orientationMap = {0: 'top', 1: 'right', 2: 'bottom', 3: 'left'};
 
 		// Set the orientation for each entrance.
 		for(let i=0;i<entranceCnt;i++) {
@@ -352,9 +352,9 @@ function assemble(roomHeight: number, roomWidth: number, orientations: string[])
  */
 function genMiddlePart(roomWidth: number, withDoor: string[] = []) {
 		let doorOffset: number = 0;
-			console.log("#tops and bottoms: "+withDoor)
+			// console.log("#tops and bottoms: "+withDoor)
 		if([TOP,BOTTOM].some(elem => withDoor.includes(elem))) {
-			console.log("tops and bottoms: "+withDoor)
+			// console.log("tops and bottoms: "+withDoor)
 			doorOffset = 2;
 		}
 
