@@ -53,6 +53,10 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
 			{ frameWidth: 16, frameHeight: 16 });
 
+		// Doors
+		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png',
+			{ frameWidth: 48, frameHeight: 32 });
+
 		// load test music
 		this.load.audio('testSound', 'assets/sounds/testSound.MP3');
 		this.load.audio('sound-fireball', 'assets/sounds/fireball.wav');
@@ -88,6 +92,15 @@ export default class PreloadScene extends Phaser.Scene {
 		globalState.availableTilesets.forEach((tileSet) => {
 			this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
 		});
+
+		// If we are in map editor mode, also load the library background tilesets
+		const mapToEditId = getUrlParam('editMap');
+		if (mapToEditId) {
+			this.load.image('base-background', 'assets/tilesets/base-background.png');
+			this.load.image('decoration-background', 'assets/tilesets/decoration-background.png');
+			this.load.image('overlay-background', 'assets/tilesets/overlay-background.png');
+			this.load.image('map-editor-highlighting', 'assets/img/map-editor-highlighting.png');
+		}
 
 		// NPCs
 		requiredNpcs.forEach((npc) => {
@@ -140,9 +153,17 @@ export default class PreloadScene extends Phaser.Scene {
 		// Construct dungeon for this map
 		if (!globalState.dungeon.levels[globalState.currentLevel]) {
 
+			// Town is 0, "dungeonLevelx"s are their last character (that's a bit hacky)
+			// everything else is -1
+			const numericLevel = globalState.currentLevel === 'town' ? 0 :
+				globalState.currentLevel.startsWith('dungeonLevel') ?
+					parseInt(globalState.currentLevel.substr(-1), 10) :
+					-1;
+
 			const dungeonLevel = new DungeonGenerator().generateLevel(
 				globalState.currentLevel,
-				globalState.roomAssignment[globalState.currentLevel].rooms
+				globalState.roomAssignment[globalState.currentLevel].rooms,
+				numericLevel
 			);
 
 			globalState.dungeon.levels[globalState.currentLevel] = dungeonLevel;

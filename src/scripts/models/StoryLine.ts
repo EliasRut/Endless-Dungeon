@@ -1,24 +1,58 @@
 import { Quest } from './Quest';
 
-import firstQuest from '../../assets/variableMainQuests/firstVarMainQuest.json';
-import secondQuest from '../../assets/variableMainQuests/secondVarMainQuest.json';
-import thirdQuest from '../../assets/variableMainQuests/thirdVarMainQuest.json';
+const MAIN_QUEST_PATH = 'assets/variableMainQuests';
+const STORY_LINE_PATH = 'assets/storyLines';
+
+// import firstQuest from '../../assets/variableMainQuests/firstVarMainQuest.json';
+// import secondQuest from '../../assets/variableMainQuests/secondVarMainQuest.json';
+// import thirdQuest from '../../assets/variableMainQuests/thirdVarMainQuest.json';
 import StoryLineData from './StoryLineData';
 
-import lichKingStoryLineData from '../../assets/storyLines/lichking.json';
-import lichQueenStoryLineData from '../../assets/storyLines/lichqueen.json';
+// import lichKingStoryLineData from '../../assets/storyLines/lichking.json';
+// import lichQueenStoryLineData from '../../assets/storyLines/lichqueen.json';
 import { VariableMainQuest } from './VariableMainQuest';
 
-const loadedVariableMainQuests: VariableMainQuest[] = [
-	firstQuest,
-	secondQuest,
-	thirdQuest
-];
+import storyLines from '../../assets/storyLines/storyLines.json';
 
-const loadedStorylineData: StoryLineData[] = [
-	lichKingStoryLineData,
-	lichQueenStoryLineData
-];
+const loadedVariableMainQuests: VariableMainQuest[] = [];
+// [
+// 	firstQuest,
+// 	secondQuest,
+// 	thirdQuest
+// ];
+
+for(const varMainQuest of storyLines.variableMainQuests) {
+	try {
+	// We "require" json files to allow for non-static, main quest based lookup
+	// Note: Using variables for the path results in an error!
+	// tslint:disable-next-line: no-var-requires
+	const varMainQuestObject: VariableMainQuest = require(`../../${MAIN_QUEST_PATH}/${varMainQuest}.json`);
+
+	loadedVariableMainQuests.push(varMainQuestObject);
+	} catch(e) {
+		console.error(`Main quest json file not found in path:  ../../${MAIN_QUEST_PATH}/${varMainQuest}.json`);
+	}
+}
+
+const loadedStorylineData: StoryLineData[] = [];
+// [
+// 	lichKingStoryLineData,
+// 	lichQueenStoryLineData
+// ];
+
+for(const storyLine of storyLines.storyLines) {
+	try{
+	// We "require" json files to allow for non-static, story line based lookup
+	// Note: Using variables for the path results in an error!
+	// tslint:disable-next-line: no-var-requires
+
+	const storyLineObject: StoryLineData = require(`../../${STORY_LINE_PATH}/${storyLine}.json`);
+
+	loadedStorylineData.push(storyLineObject);
+	} catch(e) {
+		console.error(`Storyline json file not found in path:  ../../${STORY_LINE_PATH}/${storyLine}.json`);
+	}
+}
 
 export default class StoryLine {
 	storyLineData: StoryLineData;

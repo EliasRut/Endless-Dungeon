@@ -28,6 +28,9 @@ import { NpcScript } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import Item from '../worldstate/Item';
 import { generateRandomItem } from '../helpers/item';
+import DoorToken from '../drawables/tokens/DoorToken';
+
+import fixedItems from '../../items/fixedItems.json';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -50,6 +53,7 @@ export default class MainScene extends Phaser.Scene {
 
 	mainCharacter: PlayerCharacterToken;
 	npcMap: {[id: string]: CharacterToken};
+	doorMap: {[id: string]: DoorToken};
 	worldItems: WorldItemToken[];
 
 	overlayScreens: {
@@ -86,13 +90,18 @@ export default class MainScene extends Phaser.Scene {
 		this.generateStory();
 
 		this.npcMap = {};
+		this.doorMap = {};
 		this.worldItems = [];
 		const [startX, startY] = this.drawRoom();
 
 		this.useDynamicLighting = globalState.roomAssignment[globalState.currentLevel].dynamicLighting;
 
 		if (this.useDynamicLighting) {
-			this.dynamicLightingHelper = new DynamicLightingHelper(this.tileLayer);
+			this.dynamicLightingHelper = new DynamicLightingHelper(
+				this.tileLayer,
+				this.decorationLayer,
+				this.overlayLayer
+			);
 		}
 
 		this.mainCharacter = new PlayerCharacterToken(
@@ -103,6 +112,9 @@ export default class MainScene extends Phaser.Scene {
 		this.cameras.main.startFollow(this.mainCharacter, false);
 		this.physics.add.collider(this.mainCharacter, this.tileLayer);
 		this.physics.add.collider(this.mainCharacter, this.decorationLayer);
+		Object.values(this.doorMap).forEach((door) => {
+			this.physics.add.collider(this.mainCharacter, door);
+		});
 
 		this.dropItem(
 			startX - DEBUG__ITEM_OFFSET_X,
@@ -142,6 +154,42 @@ export default class MainScene extends Phaser.Scene {
 		this.npcMap[id].script = script;
 	}
 
+	addDoor(id: string, type: string, x: number, y: number, open: boolean) {
+		globalState.doors[id] = {
+			id,
+			type,
+			x,
+			y,
+			open
+		};
+		this.doorMap[id] = new DoorToken(this, x, y, type, id);
+		this.doorMap[id].setDepth(UiDepths.DECORATION_TILE_LAYER);
+		this.physics.add.collider(this.doorMap[id], this.mainCharacter);
+		Object.values(this.npcMap).forEach((npc) => {
+			this.physics.add.collider(this.doorMap[id], npc);
+		});
+		this.doorMap[id].setFrame(open ? 1 : 0);
+	}
+
+	addFixedItem(id: string, x: number, y: number) {
+		this.dropItem(
+			x - DEBUG__ITEM_OFFSET_X,
+			y - DEBUG__ITEM_OFFSET_Y,
+			{
+				...(fixedItems as {[id: string]: Partial<Item>})[id],
+				itemLocation: 0
+			} as Item
+		);
+	}
+
+	changeDoorState(id: string, open: boolean) {
+		if (open) {
+			this.doorMap[id].open();
+		} else {
+			this.doorMap[id].close();
+		}
+	}
+
 	drawRoom() {
 		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];
 		if (!dungeonLevel) {
@@ -151,7 +199,9 @@ export default class MainScene extends Phaser.Scene {
 		const {
 			startPositionX,
 			startPositionY,
-			npcs
+			npcs,
+			doors,
+			items
 		} = dungeonLevel;
 
 		const [
@@ -172,6 +222,14 @@ export default class MainScene extends Phaser.Scene {
 			this.addNpc(npc.id, npc.type, npc.x, npc.y, npc.script);
 		});
 
+		doors.forEach((door) => {
+			this.addDoor(door.id, door.type, door.x, door.y, door.open);
+		});
+
+		items.forEach((item) => {
+			this.addFixedItem(item.id, item.x, item.y);
+		});
+
 		return [startPositionX, startPositionY];
 	}
 
@@ -189,6 +247,11 @@ export default class MainScene extends Phaser.Scene {
 	update(globalTime: number, _delta: number) {
 		globalState.gameTime = globalTime;
 		this.fpsText.update();
+
+		if (this.keyboardHelper.isKKeyPressed()) {
+			globalState.clearState();
+			location.reload();
+		}
 
 		if(globalState.playerCharacter.health <= 0 && this.alive ===0){
 			this.cameras.main.fadeOut(FADE_OUT_TIME_MS);
@@ -256,10 +319,14 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		// Check if the player is close to a connection point and move them if so
-		globalState.dungeon.levels[globalState.currentLevel]?.connections.forEach((connection) => {
+		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections;
+		const playerX = globalState.playerCharacter.x;
+		const playerY = globalState.playerCharacter.y;
+		connections.forEach((connection) => {
+
 			if (Math.hypot(
-						connection.x - globalState.playerCharacter.x,
-						connection.y - globalState.playerCharacter.y) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
+						connection.x - playerX,
+						connection.y - playerY) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
 				globalState.currentLevel = connection.targetMap;
 				globalState.playerCharacter.x = 0;
 				globalState.playerCharacter.y = 0;
@@ -307,9 +374,13 @@ export default class MainScene extends Phaser.Scene {
 						sideQuestRooms.concat(sideQuest.rooms);
 					}
 				}
-				globalState.roomAssignment['dungeonLvl' + i] = {
+				const rooms = ['connection_up'];
+				if (i < mainQuests.length - 1) {
+					rooms.push('connection_down');
+				}
+				globalState.roomAssignment['dungeonLevel' + (i + 1)] = {
 					dynamicLighting: true,
-					rooms: mainQuests[i].rooms.concat(sideQuestRooms)
+					rooms: rooms.concat(mainQuests[i].rooms).concat(sideQuestRooms)
 				};
 			}
 		}

@@ -1,6 +1,8 @@
 import { UiDepths } from '../helpers/constants';
+import EquippableItem from '../worldstate/EquippableItem';
 import Item from '../worldstate/Item';
 import OverlayScreen from './OverlayScreen';
+import { isEquippable } from '../helpers/inventory';
 
 const BASE_SIZE_NAME = 25;
 const FONT_SIZE_TEXT = 10;
@@ -123,10 +125,16 @@ export default class ItemScreen extends OverlayScreen {
 
 	update(item: Item) {
 		if (item !== undefined) {
-			this.lableHealthValue.setText(`${(item.maxHealth).toFixed(2)}`);
-			this.lableDamageValue.setText(`${(item.damage).toFixed(2)}`);
-			this.lableMovSpeedValue.setText(`${(item.movementSpeed).toFixed(2)}`);
-
+			if (isEquippable(item)) {
+				let eItem = item as EquippableItem;
+				this.lableHealthValue.setText(`${(eItem.maxHealth).toFixed(2)}`);
+				this.lableDamageValue.setText(`${(eItem.damage).toFixed(2)}`);
+				this.lableMovSpeedValue.setText(`${(eItem.movementSpeed).toFixed(2)}`);
+			} else {
+				this.lableHealthValue.setText(`${0}`);
+				this.lableDamageValue.setText(`${0}`);
+				this.lableMovSpeedValue.setText(`${0}`);
+			}
 			// center flavor text
 			this.flavorText.setText(`${item.flavorText}`);
 			let residualHeight = FLAVOR_HEIGHT - this.flavorText.getBounds().height;

@@ -1,7 +1,6 @@
 import { AbilityType } from '../abilities/abilityData';
 import { AbilityKey, Faction } from '../helpers/constants';
 import Character from './Character';
-import Item, { ItemStats } from './Item';
 
 // This class handles the players character and all mechanical events associated with it.
 export default class PlayerCharacter extends Character {

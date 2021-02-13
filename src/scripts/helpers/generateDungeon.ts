@@ -1,5 +1,6 @@
-import { MapConnection, NpcPositioning, OpeningDirection, Room } from '../../../typings/custom';
+import { ItemsPositioning, MapConnection, NpcPositioning, OpeningDirection, Room } from '../../../typings/custom';
 import globalState from '../worldstate';
+import Door from '../worldstate/Door';
 import DungeonLevel from '../worldstate/DungeonLevel';
 
 export const DUNGEON_WIDTH = 128;
@@ -205,9 +206,12 @@ export default class DungeonGenerator {
 	overlayLayout: number[][];
 	blocksUsed: number[][];
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	dungeonLevel: number;
 
-	public generateLevel: (id: string, rooms: string[]) => DungeonLevel = (id, rooms) => {
+	public generateLevel: (id: string, rooms: string[], dungeonLevel: number) => DungeonLevel 
+			= (id, rooms, dungeonLevel) => {
 		this.rooms = rooms.map((roomName) => globalState.availableRooms[roomName]);
+		this.dungeonLevel = dungeonLevel;
 
 		// if(id !== 'town') {
 		//   const roomGen = new RoomGenerator();
@@ -298,10 +302,52 @@ export default class DungeonGenerator {
 			(room.connections || []).forEach((connection) => {
 				const y = connection.y + this.roomOffsets[index][0] * BLOCK_SIZE;
 				const x = connection.x + this.roomOffsets[index][1] * BLOCK_SIZE;
+
+				let targetMap = connection.targetMap;
+				if (targetMap === 'NEXT_LEVEL') {
+					targetMap = `dungeonLevel${this.dungeonLevel + 1}`;
+				} else if (targetMap === 'PREVIOUS_LEVEL') {
+					if (this.dungeonLevel === 1) {
+						targetMap = 'town';
+					} else {
+						targetMap = `dungeonLevel${this.dungeonLevel - 1}`;
+					}
+				}
+
 				connections.push({
 					x: x * TILE_WIDTH,
 					y: y * TILE_HEIGHT,
-					targetMap: connection.targetMap
+					targetMap
+				});
+			});
+		});
+
+		const doors: Door[] = [];
+		this.rooms.forEach((room, index) => {
+			(room.doors || []).forEach((door) => {
+				const y = door.y + this.roomOffsets[index][0] * BLOCK_SIZE;
+				const x = door.x + this.roomOffsets[index][1] * BLOCK_SIZE;
+
+				doors.push({
+					x: x * TILE_WIDTH,
+					y: y * TILE_HEIGHT,
+					open: door.open,
+					type: door.type,
+					id: `${id}_${room.name}_${door.id}`
+				});
+			});
+		});
+
+		const items: ItemsPositioning[] = [];
+		this.rooms.forEach((room, index) => {
+			(room.items || []).forEach((item) => {
+				const y = item.y + this.roomOffsets[index][0] * BLOCK_SIZE;
+				const x = item.x + this.roomOffsets[index][1] * BLOCK_SIZE;
+
+				items.push({
+					x: x * TILE_WIDTH,
+					y: y * TILE_HEIGHT,
+					id: item.id
 				});
 			});
 		});
@@ -316,7 +362,9 @@ export default class DungeonGenerator {
 			decorationLayout: this.decorationLayout,
 			overlayLayout: this.overlayLayout,
 			npcs: this.npcs,
-			connections
+			connections,
+			doors,
+			items
 		};
 	}
 

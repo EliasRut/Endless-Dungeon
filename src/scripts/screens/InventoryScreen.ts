@@ -10,6 +10,8 @@ import {
 	placeItemInNextFreeBagSlot
 } from '../helpers/inventory';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
+import { isEquippable } from '../helpers/inventory';
+import EquippableItem from '../worldstate/EquippableItem';
 
 const INVENTORY_START_X = 500;
 const INVENTORY_START_Y = 198;
@@ -89,15 +91,18 @@ export default class InventoryScreen extends OverlayScreen {
 		this.add(itemToken, true);
 		itemToken.on('pointerdown', () => {
 			if (this.focusedItem === item) {
-				if (isEquipped(item)) {
-					unequipItem(item);
-				} else {
-					equipItem(item);
+				if (isEquippable(item)) {
+					const equippableItem = item as EquippableItem;
+					if (isEquipped(equippableItem)) {
+						unequipItem(equippableItem);
+					} else {
+						equipItem(equippableItem);
+					}
+					this.update();
 				}
 			} else {
 				this.focusedItem = item;
 			}
-			this.update();
 		});
 	}
 

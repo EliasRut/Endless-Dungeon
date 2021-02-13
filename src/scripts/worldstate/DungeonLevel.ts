@@ -1,4 +1,5 @@
-import { MapConnection, NpcPositioning } from '../../../typings/custom';
+import { ItemsPositioning, MapConnection, NpcPositioning } from '../../../typings/custom';
+import Door from './Door';
 import RoomPositioning from './RoomPositioning';
 
 // This class handles a singular dungeon level.
@@ -13,4 +14,6 @@ export default class DungeonLevel {
 	overlayLayout: number[][];
 	npcs: NpcPositioning[];
 	connections: MapConnection[];
+	doors: Door[];
+	items: ItemsPositioning[];
 }

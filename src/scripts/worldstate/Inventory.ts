@@ -1,19 +1,20 @@
 import Item from './Item';
 import { BAG_BOXES_X, BAG_BOXES_Y } from '../helpers/constants';
+import EquippableItem from './EquippableItem';
 export default class Inventory {
 	public itemOffsetX = 0;
 	public itemOffsetY = 0;
 	public bag: integer[][];
-	public head?: Item;
-	public necklace?: Item;
-	public mainhand?: Item;
-	public offhand?: Item;
-	public chest?: Item;
-	public leftRing?: Item;
-	public rightRing?: Item;
-	public belt?: Item;
-	public gloves?: Item;
-	public boots?: Item;
+	public head?: EquippableItem;
+	public necklace?: EquippableItem;
+	public mainhand?: EquippableItem;
+	public offhand?: EquippableItem;
+	public chest?: EquippableItem;
+	public leftRing?: EquippableItem;
+	public rightRing?: EquippableItem;
+	public belt?: EquippableItem;
+	public gloves?: EquippableItem;
+	public boots?: EquippableItem;
 	public unequippedItemList: {
 		x: number,
 		y: number,
