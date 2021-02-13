@@ -1,24 +1,38 @@
 import { Quest } from './Quest';
 
-import firstQuest from '../../assets/variableMainQuests/firstVarMainQuest.json';
-import secondQuest from '../../assets/variableMainQuests/secondVarMainQuest.json';
-import thirdQuest from '../../assets/variableMainQuests/thirdVarMainQuest.json';
+// import firstQuest from '../../assets/variableMainQuests/firstVarMainQuest.json';
+// import secondQuest from '../../assets/variableMainQuests/secondVarMainQuest.json';
+// import thirdQuest from '../../assets/variableMainQuests/thirdVarMainQuest.json';
 import StoryLineData from './StoryLineData';
 
-import lichKingStoryLineData from '../../assets/storyLines/lichking.json';
-import lichQueenStoryLineData from '../../assets/storyLines/lichqueen.json';
+// import lichKingStoryLineData from '../../assets/storyLines/lichking.json';
+// import lichQueenStoryLineData from '../../assets/storyLines/lichqueen.json';
 import { VariableMainQuest } from './VariableMainQuest';
 
-const loadedVariableMainQuests: VariableMainQuest[] = [
-	firstQuest,
-	secondQuest,
-	thirdQuest
-];
+import storyLines from '../../assets/storyLines/storyLines.json';
 
-const loadedStorylineData: StoryLineData[] = [
-	lichKingStoryLineData,
-	lichQueenStoryLineData
-];
+const loadedVariableMainQuests: VariableMainQuest[] = [];
+// [
+// 	firstQuest,
+// 	secondQuest,
+// 	thirdQuest
+// ];
+
+for(const varMainQuest of storyLines.variableMainQuests) {
+	const varMainQuestObject: VariableMainQuest = require('../../assets/variableMainQuests/'+varMainQuest+'.json');
+	loadedVariableMainQuests.push(varMainQuestObject);
+}
+
+const loadedStorylineData: StoryLineData[] = [];
+// [
+// 	lichKingStoryLineData,
+// 	lichQueenStoryLineData
+// ];
+
+for(const storyLine of storyLines.storyLines) {
+	const storyLineObject: StoryLineData = require('../../assets/storyLines/'+storyLine+'.json');
+	loadedStorylineData.push(storyLineObject);
+}
 
 export default class StoryLine {
 	storyLineData: StoryLineData;

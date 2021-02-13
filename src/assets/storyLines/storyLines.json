@@ -1,0 +1,16 @@
+{
+    "storyLines": [
+        "lichking",
+        "lichqueen"
+    ],
+    "variableMainQuests": [
+        "firstVarMainQuest",
+        "secondVarMainQuest",
+        "thirdVarMainQuest"
+    ],
+    "sideQuests": [
+        "firstSideQuest",
+        "secondSideQuest",
+        "thirdSideQuest"
+    ]
+}

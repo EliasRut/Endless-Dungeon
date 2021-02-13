@@ -1,14 +1,26 @@
-import firstSideQuest from '../../assets/sideQuests/firstSideQuest.json';
-import secondSideQuest from '../../assets/sideQuests/secondSideQuest.json';
-import thirdSideQuest from '../../assets/sideQuests/thirdSideQuest.json';
+// import firstSideQuest from '../../assets/sideQuests/firstSideQuest.json';
+// import secondSideQuest from '../../assets/sideQuests/secondSideQuest.json';
+// import thirdSideQuest from '../../assets/sideQuests/thirdSideQuest.json';
 import { QuestTheme } from './StoryLineData';
 import { SideQuest } from './SideQuest';
+import storyLines from '../../assets/storyLines/storyLines.json';
+// import fs from 'fs';
 
-const loadedSideQuests: SideQuest[] = [
-	firstSideQuest,
-	secondSideQuest,
-	thirdSideQuest
-];
+const loadedSideQuests: SideQuest[] = [];
+// fs.readdir('../../assets/sideQuests/', 'utf-8', (err, files) => {
+// 	if (err) throw err;
+
+// 	files.forEach(file => {
+// 		const sideQuest: SideQuest = JSON.parse(file);
+// 		loadedSideQuests.push(sideQuest);
+// 	});
+
+// });
+
+for(const sideQuest of storyLines.sideQuests) {
+	const sideQuestObject:SideQuest = require('../../assets/sideQuests/'+sideQuest+'.json');
+	loadedSideQuests.push(sideQuestObject);
+}
 
 export default class SideQuestLog {
 	sideQuests: SideQuest[] = [];
