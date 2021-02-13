@@ -96,8 +96,8 @@ export default class MapEditor extends Phaser.Scene {
 		this.positionText = new PositionText(this);
 		this.mapEditorMenuElement.style.display = 'flex';
 
-		this.mapEditorHighlighting = 
-			new Phaser.GameObjects.Image(this, 8, 8, 'map-editor-highlighting');
+		this.mapEditorHighlighting = new Phaser.GameObjects.Image(
+			this, TILE_WIDTH / 2, TILE_HEIGHT / 2, 'map-editor-highlighting');
 		this.mapEditorHighlighting.setDepth(DEPTHS.libraryHighlighting);
 		this.mapEditorHighlighting.setScrollFactor(0, 0);
 		this.mapEditorHighlighting.alpha = 0.5;
@@ -214,7 +214,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, false);
 		this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, false);
 		this.tKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T, false);
-		
+
 		this.exportButtonElement.onclick = () => {
 			const roomNameValue = this.roomNameElement.value;
 
@@ -271,7 +271,7 @@ export default class MapEditor extends Phaser.Scene {
 				this.tileLayer.removeInteractive();
 				this.decorationTileLayer.removeInteractive();
 				this.overlayTileLayer.setInteractive();
-			}			
+			}
 			this.drawTileSet();
 		};
 	}
@@ -315,7 +315,6 @@ export default class MapEditor extends Phaser.Scene {
 
 		this.drawTileSet();
 		this.drawRoom();
-	
 	}
 
 	drawTileSet() {
@@ -391,8 +390,8 @@ export default class MapEditor extends Phaser.Scene {
 				const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
 				if (clickedTile) {
 					this.selectedId = clickedTile.index;
-					this.mapEditorHighlighting.x = clickedTile.x * TILE_WIDTH + 8;
-					this.mapEditorHighlighting.y = clickedTile.y * TILE_HEIGHT + 8;
+					this.mapEditorHighlighting.x = clickedTile.x * TILE_WIDTH + (TILE_WIDTH / 2);
+					this.mapEditorHighlighting.y = clickedTile.y * TILE_HEIGHT + (TILE_HEIGHT / 2);
 				}
 			});
 			this.libraryLayer.setScrollFactor(0, 0);
@@ -410,7 +409,7 @@ export default class MapEditor extends Phaser.Scene {
 				1,
 				2
 			);
-			this.backgroundLibraryLayer = 
+			this.backgroundLibraryLayer =
 				backgroundMap.createDynamicLayer(0, backgroundTileSet, 0, 0).setInteractive();
 			this.backgroundLibraryLayer.setDepth(DEPTHS.backgroundLibraryLayer);
 			this.backgroundLibraryLayer.setScrollFactor(0, 0);
@@ -498,7 +497,7 @@ export default class MapEditor extends Phaser.Scene {
 		});
 
 		const overlayMap = this.make.tilemap({
-			data: this.roomDecorationLayout,
+			data: this.roomOverlayLayout,
 			tileWidth: TILE_WIDTH,
 			tileHeight: TILE_HEIGHT
 		});
@@ -558,7 +557,7 @@ export default class MapEditor extends Phaser.Scene {
 		const tileX = Math.floor((pointerPosX - this.tileLayer.x) / TILE_WIDTH);
 		const pointerPosY = this.input.activePointer.worldY;
 		const tileY = Math.floor((pointerPosY - this.tileLayer.y) / TILE_HEIGHT);
-		
+
 		this.positionText.update(tileY, tileX);
 
 		if (document.activeElement && document.activeElement.nodeName === 'INPUT') {
@@ -584,8 +583,8 @@ export default class MapEditor extends Phaser.Scene {
 			this.backgroundLibraryLayer.setVisible(this.isLibraryVisible);
 			this.mapEditorHighlighting.setVisible(this.isLibraryVisible);
 		}
-		this.wasTKeyDown = this.tKey.isDown
-		
+		this.wasTKeyDown = this.tKey.isDown;
+
 		this.cameras.main.centerOn(this.cameraPositionX, this.cameraPositionY);
 	}
 }
