@@ -60,18 +60,14 @@
 				"itemId": "goldKey"
 			},
 			{
-				"type": "wait",
-				"time": 1000
+				"type": "takeItem",
+				"itemId": "goldKey",
+				"amount": 1
 			},
 			{
 				"type": "openDoor",
 				"doorId": "door"
-			},
-			{
-				"type": "dialog",
-				"portrait": "player_happy",
-				"text": ["Nice!"]
-			}, {
+			},{
 				"type": "setScriptState",
 				"scriptId": "doorOpening",
 				"scriptState": "finished"

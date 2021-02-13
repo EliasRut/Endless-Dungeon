@@ -45,7 +45,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('icon-hero', 'assets/img/hero-icon.png');
 		this.load.image('icon-guibase', 'assets/img/gui-base.png');
 		this.load.image('icon-healthbar', 'assets/img/gui-life.png');
-		this.load.image('inventory-borders', 'assets/img/inventory-borders.png');
+		this.load.image('inventory-borders', 'assets/img/inventory-borders-tall.png');
 		this.load.spritesheet('icon-abilities', 'assets/img/abilities-sheet.png',
 			{ frameWidth: 20, frameHeight: 20 });
 

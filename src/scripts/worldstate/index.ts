@@ -7,6 +7,7 @@ import Inventory from './Inventory';
 import Item from './Item';
 import PlayerCharacter from './PlayerCharacter';
 import RoomAssignment from './RoomAssignment';
+import Script from './Script';
 
 /*
 	This file contains the full, current game state. It is intended to handle all information that
@@ -21,14 +22,19 @@ export class WorldState {
 	public playerCharacter: PlayerCharacter;
 	public npcs: {[id: string]: Character} = {};
 	public doors: {[id: string]: Door} = {};
+	public scripts: {[id: string]: Script} = {};
 	public dungeon: Dungeon;
 	public availableRooms: {[name: string]: Room} = {};
 	public availableTilesets: string[] = [];
-	public currentLevel: string = 'town';//'doorTest';
+	public currentLevel: string = 'town';
 	public roomAssignment: {[name: string]: RoomAssignment} = {
 		'intro_dormRoom': {
 			dynamicLighting: false,
 			rooms: ['intro_dormRoom']
+		},
+		'woodenHouse': {
+			dynamicLighting: false,
+			rooms: ['woodenHouse']
 		},
 		'intro_ceremony': {
 			dynamicLighting: false,
@@ -67,6 +73,7 @@ export class WorldState {
 		localStorage.setItem('gameTime', `${this.gameTime}`);
 		localStorage.setItem('npcs', JSON.stringify(this.npcs));
 		localStorage.setItem('doors', JSON.stringify(this.doors));
+		localStorage.setItem('scripts', JSON.stringify(this.scripts));
 		localStorage.setItem('dungeon', JSON.stringify(this.dungeon));
 		localStorage.setItem('availableRooms', JSON.stringify(this.availableRooms));
 		localStorage.setItem('availableTilesets', JSON.stringify(this.availableTilesets));
@@ -78,20 +85,22 @@ export class WorldState {
 
 	loadState() {
 		this.loadGame = false;
+		localStorage.clear();
 		const saveGameName = localStorage.getItem('saveGameName');
 		if (!saveGameName) {
 			return;
 		}
 		this.gameTime = parseInt(localStorage.getItem('gameTime') || '0', 10);
-		this.playerCharacter = JSON.parse(localStorage.getItem('playerCharacter') || '');
-		this.npcs = JSON.parse(localStorage.getItem('npcs') || '');
-		this.doors = JSON.parse(localStorage.getItem('doors') || '');
-		this.dungeon = JSON.parse(localStorage.getItem('dungeon') || '');
-		this.availableRooms = JSON.parse(localStorage.getItem('availableRooms') || '');
-		this.availableTilesets = JSON.parse(localStorage.getItem('availableTilesets') || '');
-		this.currentLevel = JSON.parse(localStorage.getItem('currentLevel') || '');
-		this.roomAssignment = JSON.parse(localStorage.getItem('roomAssignment') || '');
-		this.inventory = JSON.parse(localStorage.getItem('inventory') || '');
+		this.playerCharacter = JSON.parse(localStorage.getItem('playerCharacter') || '{}');
+		this.npcs = JSON.parse(localStorage.getItem('npcs') || '{}');
+		this.scripts = JSON.parse(localStorage.getItem('scripts') || '{}');
+		this.doors = JSON.parse(localStorage.getItem('doors') || '{}');
+		this.dungeon = JSON.parse(localStorage.getItem('dungeon') || '{}');
+		this.availableRooms = JSON.parse(localStorage.getItem('availableRooms') || '{}');
+		this.availableTilesets = JSON.parse(localStorage.getItem('availableTilesets') || '{}');
+		this.currentLevel = JSON.parse(localStorage.getItem('currentLevel') || '{}');
+		this.roomAssignment = JSON.parse(localStorage.getItem('roomAssignment') || '{}');
+		this.inventory = JSON.parse(localStorage.getItem('inventory') || '{}');
 		// Reset cast times.
 		this.playerCharacter.abilityCastTime = [
 			-Infinity,

@@ -19,6 +19,7 @@ export default class BackpackIcon extends Phaser.GameObjects.Image {
 			}
 			scene.isPaused = !scene.isPaused;
 			scene.overlayScreens.inventory.toggleVisible();
+			scene.overlayScreens.itemScreen.toggleVisible();
 			scene.overlayScreens.statScreen.toggleVisible();
 		});
 
