@@ -146,20 +146,22 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	addDoor(id: string, type: string, x: number, y: number, open: boolean) {
-		globalState.doors[id] = {
-			id,
-			type,
-			x,
-			y,
-			open
-		};
+		if (!globalState.doors[id]) {
+			globalState.doors[id] = {
+				id,
+				type,
+				x,
+				y,
+				open
+			};
+		}
 		this.doorMap[id] = new DoorToken(this, x, y, type, id);
 		this.doorMap[id].setDepth(UiDepths.DECORATION_TILE_LAYER);
 		this.physics.add.collider(this.doorMap[id], this.mainCharacter);
 		Object.values(this.npcMap).forEach((npc) => {
 			this.physics.add.collider(this.doorMap[id], npc);
 		});
-		this.doorMap[id].setFrame(open ? 1 : 0);
+		this.doorMap[id].setFrame(globalState.doors[id].open ? 1 : 0);
 	}
 
 	addFixedItem(id: string, x: number, y: number) {

@@ -9,6 +9,7 @@ export default class Item {
 	public itemLocation = 0; // 0 is ground, 1-80 are inventory slots, 80+ are equipped
 	public type = '';
 	public id: string;
+	public amount: number = 1;
 
 	constructor(
 			iconFrame: number = Math.floor(Math.random() * NUM_ICON_FRAMES),

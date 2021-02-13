@@ -106,15 +106,19 @@ export const getSlotAndConflictsForEquipAction: (
 	throw new Error (`Unknown item type ${item.type} encountered.`);
 };
 
-const removeItemFromBag = (itemToRemove: Item) => {
+export const removeItemFromBagById = (itemIdToRemove: string) => {
 	const inventory = globalState.inventory;
 	const itemPositionIndex = inventory.unequippedItemList.findIndex(
-		({item}) => item.id === itemToRemove.id);
+		({item}) => item.id === itemIdToRemove);
 	if (itemPositionIndex >= 0) {
 		const {x, y} = inventory.unequippedItemList[itemPositionIndex];
 		inventory.bag[x][y] = 0;
 		inventory.unequippedItemList.splice(itemPositionIndex, 1);
 	}
+};
+
+export const removeItemFromBag = (itemToRemove: Item) => {
+	removeItemFromBagById(itemToRemove.id);
 };
 
 export const isEquippable = (item: Item) => {
