@@ -297,9 +297,13 @@ export default class MainScene extends Phaser.Scene {
 						sideQuestRooms.concat(sideQuest.rooms);
 					}
 				}
-				globalState.roomAssignment['dungeonLvl' + i] = {
+				const rooms = ['connection_up'];
+				if (i < mainQuests.length - 1) {
+					rooms.push('connection_down');
+				}
+				globalState.roomAssignment['dungeonLevel' + (i + 1)] = {
 					dynamicLighting: true,
-					rooms: mainQuests[i].rooms.concat(sideQuestRooms)
+					rooms: rooms.concat(mainQuests[i].rooms).concat(sideQuestRooms)
 				};
 			}
 		}

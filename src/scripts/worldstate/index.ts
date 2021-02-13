@@ -36,15 +36,15 @@ export class WorldState {
 			dynamicLighting: false,
 			rooms: ['town']
 		},
-		'dungeon': {
-			dynamicLighting: true,
-			rooms: [
-				'firstTest',
-				'secondTest',
-				'thirdTest',
-				'startRoom'
-			]
-		}
+		// 'dungeon': {
+		// 	dynamicLighting: true,
+		// 	rooms: [
+		// 		'firstTest',
+		// 		'secondTest',
+		// 		'thirdTest',
+		// 		'startRoom'
+		// 	]
+		// }
 	};
 	public inventory: Inventory;
 	public itemList: Item[];
@@ -86,10 +86,10 @@ export class WorldState {
 		this.inventory = JSON.parse(localStorage.getItem('inventory') || '');
 		// Reset cast times.
 		this.playerCharacter.abilityCastTime = [
-		-Infinity,
-		-Infinity,
-		-Infinity,
-		-Infinity
+			-Infinity,
+			-Infinity,
+			-Infinity,
+			-Infinity
 		];
 	}
 }

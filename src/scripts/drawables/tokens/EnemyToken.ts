@@ -99,7 +99,9 @@ export default abstract class EnemyToken extends CharacterToken {
 
 	// destroy the enemy
 	destroy() {
-		delete (this.scene.npcMap[this.id]);
+		if (this.scene?.npcMap) {
+			delete (this.scene.npcMap[this.id]);
+		}
 
 		super.destroy();
 	}

@@ -140,9 +140,17 @@ export default class PreloadScene extends Phaser.Scene {
 		// Construct dungeon for this map
 		if (!globalState.dungeon.levels[globalState.currentLevel]) {
 
+			// Town is 0, "dungeonLevelx"s are their last character (that's a bit hacky)
+			// everything else is -1
+			const numericLevel = globalState.currentLevel === 'town' ? 0 :
+				globalState.currentLevel.startsWith('dungeonLevel') ?
+					parseInt(globalState.currentLevel.substr(-1), 10) :
+					-1;
+
 			const dungeonLevel = new DungeonGenerator().generateLevel(
 				globalState.currentLevel,
-				globalState.roomAssignment[globalState.currentLevel].rooms
+				globalState.roomAssignment[globalState.currentLevel].rooms,
+				numericLevel
 			);
 
 			globalState.dungeon.levels[globalState.currentLevel] = dungeonLevel;
