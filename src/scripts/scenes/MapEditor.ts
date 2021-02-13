@@ -14,6 +14,15 @@ const CAMERA_MOVEMENT_PER_FRAME = 10;
 const ROOM_DEFAULT_WIDTH = 8;
 const ROOM_DEFAULT_HEIGHT = 8;
 
+const DEPTHS = {
+	baseLayer: 1,
+	decorationLayer: 2,
+	overlayLayer: 3,
+	backgroundLibraryLayer: 4,
+	libraryTileLayer: 5,
+	libraryHighlighting: 6
+};
+
 // The main scene handles the actual game play.
 export default class MapEditor extends Phaser.Scene {
 	roomName: string = '';
@@ -35,11 +44,15 @@ export default class MapEditor extends Phaser.Scene {
 	decorationTileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	overlayTileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	libraryLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	backgroundLibraryLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+
+	mapEditorHighlighting: Phaser.GameObjects.Image;
 
 	wKey: Phaser.Input.Keyboard.Key;
 	aKey: Phaser.Input.Keyboard.Key;
 	sKey: Phaser.Input.Keyboard.Key;
 	dKey: Phaser.Input.Keyboard.Key;
+	tKey: Phaser.Input.Keyboard.Key;
 
 	cameraPositionX: number = 0;
 	cameraPositionY: number = 0;
@@ -57,6 +70,9 @@ export default class MapEditor extends Phaser.Scene {
 	roomWidthElement: HTMLInputElement;
 	exportButtonElement: HTMLButtonElement;
 	activeLayerDropdownElement: HTMLSelectElement;
+
+	wasTKeyDown: boolean = false;
+	isLibraryVisible: boolean = false;
 
 	constructor() {
 		super({ key: 'MapEditor' });
@@ -79,6 +95,13 @@ export default class MapEditor extends Phaser.Scene {
 	create() {
 		this.positionText = new PositionText(this);
 		this.mapEditorMenuElement.style.display = 'flex';
+
+		this.mapEditorHighlighting = 
+			new Phaser.GameObjects.Image(this, 8, 8, 'map-editor-highlighting');
+		this.mapEditorHighlighting.setDepth(DEPTHS.libraryHighlighting);
+		this.mapEditorHighlighting.setScrollFactor(0, 0);
+		this.mapEditorHighlighting.alpha = 0.5;
+		this.add.existing(this.mapEditorHighlighting);
 
 		while (this.roomsDropdownElement.firstChild) {
 			this.roomsDropdownElement.remove(0);
@@ -190,7 +213,8 @@ export default class MapEditor extends Phaser.Scene {
 		this.aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A, false);
 		this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, false);
 		this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, false);
-
+		this.tKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T, false);
+		
 		this.exportButtonElement.onclick = () => {
 			const roomNameValue = this.roomNameElement.value;
 
@@ -247,7 +271,7 @@ export default class MapEditor extends Phaser.Scene {
 				this.tileLayer.removeInteractive();
 				this.decorationTileLayer.removeInteractive();
 				this.overlayTileLayer.setInteractive();
-			}
+			}			
 			this.drawTileSet();
 		};
 	}
@@ -291,69 +315,105 @@ export default class MapEditor extends Phaser.Scene {
 
 		this.drawTileSet();
 		this.drawRoom();
+	
 	}
 
 	drawTileSet() {
-		if (this.libraryLayer) {
-			this.libraryLayer.destroy(true);
-		}
-		const data: number[][] = [];
+			if (this.libraryLayer) {
+				this.libraryLayer.destroy(true);
+			}
+			if (this.backgroundLibraryLayer) {
+				this.backgroundLibraryLayer.destroy(true);
+			}
+			let tileSetName: string;
+			let backgroundTileSetName: string;
+			switch (this.activeLayerDropdownElement.value) {
+				case 'decoration': {
+					tileSetName = this.decorationTileSetName;
+					backgroundTileSetName = 'decoration-background';
+					break;
+				}
+				case 'overlay': {
+					tileSetName = this.overlayTileSetName;
+					backgroundTileSetName = 'overlay-background';
+					break;
+				}
+				case 'base':
+				default: {
+					tileSetName = this.tileSetName;
+					backgroundTileSetName = 'base-background';
+					break;
+				}
+			}
 
-		let tileSetName: string;
-		switch (this.activeLayerDropdownElement.value) {
-			case 'decoration': {
-				tileSetName = this.decorationTileSetName;
-				break;
-			}
-			case 'overlay': {
-				tileSetName = this.overlayTileSetName;
-				break;
-			}
-			case 'base':
-			default: {
-				tileSetName = this.tileSetName;
-				break;
-			}
-		}
+			const tileSetImage = this.textures.get(tileSetName).source[0];
+			const backgroundTileSetImage = this.textures.get(backgroundTileSetName).source[0];
+			const imageWidth = tileSetImage.width;
+			const imageHeight = tileSetImage.height;
+			const widthInTiles = Math.ceil(imageWidth / (TILE_WIDTH + TILE_SPACING));
+			const heightInTiles = Math.ceil(imageHeight / (TILE_HEIGHT + TILE_SPACING));
 
-		const tileSetImage = this.textures.get(tileSetName).source[0];
-		const imageWidth = tileSetImage.width;
-		const imageHeight = tileSetImage.height;
-		const widthInTiles = Math.ceil(imageWidth / (TILE_WIDTH + TILE_SPACING));
-		const heightInTiles = Math.ceil(imageHeight / (TILE_HEIGHT + TILE_SPACING));
+			const data: number[][] = [];
+			const backgroundData: number[][] = [];
 
-		for (let y = 0; y < heightInTiles; y++) {
-			data[y] = [];
-			for (let x = 0; x < widthInTiles; x++) {
-				data[y][x] = y * widthInTiles + x;
+			for (let y = 0; y < heightInTiles; y++) {
+				data[y] = [];
+				backgroundData[y] = [];
+				for (let x = 0; x < widthInTiles; x++) {
+					data[y][x] = y * widthInTiles + x;
+					// backgroundData repeats for every line, so we only care about the x, not the y position
+					backgroundData[y][x] = x;
+				}
 			}
-		}
-		const map = this.make.tilemap({
-			data,
-			tileWidth: TILE_WIDTH,
-			tileHeight: TILE_HEIGHT,
-		});
-		const tileSet = map.addTilesetImage(
-			`${tileSetName}-lib`,
-			tileSetName,
-			TILE_WIDTH,
-			TILE_HEIGHT,
-			1,
-			2
-		);
-		this.libraryLayer = map.createDynamicLayer(0, tileSet, 0, 0).setInteractive();
-		this.libraryLayer.setDepth(1);
-		this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
-			const clickX = pointer.downX - this.libraryLayer.x;
-			const clickY = pointer.downY - this.libraryLayer.y;
-			const tileX = Math.floor(clickX / TILE_WIDTH);
-			const tileY = Math.floor(clickY / TILE_HEIGHT);
-			const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
-			if (clickedTile) {
-				this.selectedId = clickedTile.index;
-			}
-		});
-		this.libraryLayer.setScrollFactor(0, 0);
+			const map = this.make.tilemap({
+				data,
+				tileWidth: TILE_WIDTH,
+				tileHeight: TILE_HEIGHT,
+			});
+			const tileSet = map.addTilesetImage(
+				`${tileSetName}-lib`,
+				tileSetName,
+				TILE_WIDTH,
+				TILE_HEIGHT,
+				1,
+				2
+			);
+			this.libraryLayer = map.createDynamicLayer(0, tileSet, 0, 0).setInteractive();
+			this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
+			this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
+				this.libraryLayer.forEachTile((tile) => {
+					tile.clearAlpha();
+				});
+				const clickX = pointer.downX - this.libraryLayer.x;
+				const clickY = pointer.downY - this.libraryLayer.y;
+				const tileX = Math.floor(clickX / TILE_WIDTH);
+				const tileY = Math.floor(clickY / TILE_HEIGHT);
+				const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
+				if (clickedTile) {
+					this.selectedId = clickedTile.index;
+					this.mapEditorHighlighting.x = clickedTile.x * TILE_WIDTH + 8;
+					this.mapEditorHighlighting.y = clickedTile.y * TILE_HEIGHT + 8;
+				}
+			});
+			this.libraryLayer.setScrollFactor(0, 0);
+
+			const backgroundMap = this.make.tilemap({
+				data: backgroundData,
+				tileWidth: TILE_WIDTH,
+				tileHeight: TILE_HEIGHT,
+			});
+			const backgroundTileSet = backgroundMap.addTilesetImage(
+				`${backgroundTileSetName}-lib`,
+				backgroundTileSetName,
+				TILE_WIDTH,
+				TILE_HEIGHT,
+				1,
+				2
+			);
+			this.backgroundLibraryLayer = 
+				backgroundMap.createDynamicLayer(0, backgroundTileSet, 0, 0).setInteractive();
+			this.backgroundLibraryLayer.setDepth(DEPTHS.backgroundLibraryLayer);
+			this.backgroundLibraryLayer.setScrollFactor(0, 0);
 	}
 
 	getDataFromClick (
@@ -400,6 +460,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.tileLayer = map
 			.createDynamicLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2)
 			.setInteractive();
+		this.tileLayer.setDepth(DEPTHS.baseLayer);
 		this.tileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			const [tileX, tileY, clickedTile] = this.getDataFromClick(pointer, this.tileLayer);
 			this.roomLayout[tileY][tileX] = this.selectedId;
@@ -425,6 +486,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.decorationTileLayer = decorationMap
 			.createDynamicLayer(0, decorationTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
 			// .setInteractive();
+		this.decorationTileLayer.setDepth(DEPTHS.decorationLayer);
 		this.decorationTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			const [tileX, tileY, clickedTile] = this.getDataFromClick(pointer, this.decorationTileLayer);
 			this.roomDecorationLayout[tileY][tileX] = this.selectedId;
@@ -451,6 +513,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.overlayTileLayer = overlayMap
 			.createDynamicLayer(0, overlayTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
 			// .setInteractive();
+		this.overlayTileLayer.setDepth(DEPTHS.overlayLayer);
 		this.overlayTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			const [tileX, tileY, clickedTile] = this.getDataFromClick(pointer, this.overlayTileLayer);
 			this.roomOverlayLayout[tileY][tileX] = this.selectedId;
@@ -495,7 +558,7 @@ export default class MapEditor extends Phaser.Scene {
 		const tileX = Math.floor((pointerPosX - this.tileLayer.x) / TILE_WIDTH);
 		const pointerPosY = this.input.activePointer.worldY;
 		const tileY = Math.floor((pointerPosY - this.tileLayer.y) / TILE_HEIGHT);
-
+		
 		this.positionText.update(tileY, tileX);
 
 		if (document.activeElement && document.activeElement.nodeName === 'INPUT') {
@@ -513,6 +576,16 @@ export default class MapEditor extends Phaser.Scene {
 		if (this.aKey.isDown) {
 			this.cameraPositionX = this.cameraPositionX - CAMERA_MOVEMENT_PER_FRAME;
 		}
+		// Phaser will keep saying that tKey is down for multiple update calls, we only care about the
+		// first.
+		if (this.tKey.isDown && !this.wasTKeyDown) {
+			this.isLibraryVisible = !this.isLibraryVisible;
+			this.libraryLayer.setVisible(this.isLibraryVisible);
+			this.backgroundLibraryLayer.setVisible(this.isLibraryVisible);
+			this.mapEditorHighlighting.setVisible(this.isLibraryVisible);
+		}
+		this.wasTKeyDown = this.tKey.isDown
+		
 		this.cameras.main.centerOn(this.cameraPositionX, this.cameraPositionY);
 	}
 }

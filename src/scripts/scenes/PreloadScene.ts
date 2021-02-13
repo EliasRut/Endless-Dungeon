@@ -89,6 +89,15 @@ export default class PreloadScene extends Phaser.Scene {
 			this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
 		});
 
+		// If we are in map editor mode, also load the library background tilesets
+		const mapToEditId = getUrlParam('editMap');
+		if (mapToEditId) {
+			this.load.image('base-background', 'assets/tilesets/base-background.png');
+			this.load.image('decoration-background', 'assets/tilesets/decoration-background.png');
+			this.load.image('overlay-background', 'assets/tilesets/overlay-background.png');
+			this.load.image('map-editor-highlighting', 'assets/img/map-editor-highlighting.png');
+		}
+
 		// NPCs
 		requiredNpcs.forEach((npc) => {
 		this.load.spritesheet(npc, `assets/sprites/${npc}.png`,
