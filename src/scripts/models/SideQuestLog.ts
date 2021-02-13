@@ -1,14 +1,31 @@
-import firstSideQuest from '../../assets/sideQuests/firstSideQuest.json';
-import secondSideQuest from '../../assets/sideQuests/secondSideQuest.json';
-import thirdSideQuest from '../../assets/sideQuests/thirdSideQuest.json';
+// import firstSideQuest from '../../assets/sideQuests/firstSideQuest.json';
+// import secondSideQuest from '../../assets/sideQuests/secondSideQuest.json';
+// import thirdSideQuest from '../../assets/sideQuests/thirdSideQuest.json';
 import { QuestTheme } from './StoryLineData';
 import { SideQuest } from './SideQuest';
+import storyLines from '../../assets/storyLines/storyLines.json';
+// import fs from 'fs';
 
-const loadedSideQuests: SideQuest[] = [
-	firstSideQuest,
-	secondSideQuest,
-	thirdSideQuest
-];
+const SIDE_QUEST_PATH = '../../assets/sideQuests';
+
+const loadedSideQuests: SideQuest[] = [];
+// fs.readdir('../../assets/sideQuests/', 'utf-8', (err, files) => {
+// 	if (err) throw err;
+
+// 	files.forEach(file => {
+// 		const sideQuest: SideQuest = JSON.parse(file);
+// 		loadedSideQuests.push(sideQuest);
+// 	});
+
+// });
+
+for(const sideQuest of storyLines.sideQuests) {
+	// tslint:disable-next-line: no-var-requires
+	const sideQuestObject:SideQuest = require(`${SIDE_QUEST_PATH}/${sideQuest}.json`);
+	// We "require" json files to allow for non-static, story line based lookup
+	// tslint:disable-next-line: no-var-requires
+	loadedSideQuests.push(sideQuestObject);
+}
 
 export default class SideQuestLog {
 	sideQuests: SideQuest[] = [];

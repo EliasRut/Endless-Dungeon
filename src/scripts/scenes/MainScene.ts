@@ -49,6 +49,7 @@ export default class MainScene extends Phaser.Scene {
 
 	mainCharacter: PlayerCharacterToken;
 	npcMap: {[id: string]: CharacterToken};
+	doorMap: {[id: string]: CharacterToken};
 	worldItems: WorldItemToken[];
 
 	overlayScreens: {
