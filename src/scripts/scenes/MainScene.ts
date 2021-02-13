@@ -239,6 +239,11 @@ export default class MainScene extends Phaser.Scene {
 		globalState.gameTime = globalTime;
 		this.fpsText.update();
 
+		if (this.keyboardHelper.isKKeyPressed()) {
+			globalState.clearState();
+			location.reload();
+		}
+
 		if(globalState.playerCharacter.health <= 0 && this.alive ===0){
 			this.cameras.main.fadeOut(FADE_OUT_TIME_MS);
 			// tslint:disable-next-line: no-console

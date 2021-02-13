@@ -7,6 +7,7 @@ export default class KeyboardHelper {
 	downKey: Phaser.Input.Keyboard.Key;
 	leftKey: Phaser.Input.Keyboard.Key;
 	rightKey: Phaser.Input.Keyboard.Key;
+	kKey: Phaser.Input.Keyboard.Key;
 	abilityKey1: Phaser.Input.Keyboard.Key;
 	abilityKey2: Phaser.Input.Keyboard.Key;
 	abilityKey3: Phaser.Input.Keyboard.Key;
@@ -17,6 +18,7 @@ export default class KeyboardHelper {
 		this.downKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
 		this.leftKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
 		this.rightKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+		this.kKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
 
 		this.abilityKey1 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 		this.abilityKey2 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
@@ -41,6 +43,13 @@ export default class KeyboardHelper {
 		}
 
 		return [xFacing, yFacing];
+	}
+
+	isKKeyPressed() {
+		if (this.kKey.isDown) {
+			return true;
+		}
+		return false;
 	}
 
 	getRelevantKeyForEnum(abilityKey: AbilityKey) {

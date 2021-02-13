@@ -1,7 +1,7 @@
 import { Quest } from './Quest';
 
-const MAIN_QUEST_PATH = '../../assets/variableMainQuests';
-const STORY_LINE_PATH = '../../assets/storyLines';
+const MAIN_QUEST_PATH = 'assets/variableMainQuests';
+const STORY_LINE_PATH = 'assets/storyLines';
 
 // import firstQuest from '../../assets/variableMainQuests/firstVarMainQuest.json';
 // import secondQuest from '../../assets/variableMainQuests/secondVarMainQuest.json';
@@ -22,12 +22,16 @@ const loadedVariableMainQuests: VariableMainQuest[] = [];
 // ];
 
 for(const varMainQuest of storyLines.variableMainQuests) {
+	try {
 	// We "require" json files to allow for non-static, main quest based lookup
+	// Note: Using variables for the path results in an error!
 	// tslint:disable-next-line: no-var-requires
-	const varMainQuestObject: VariableMainQuest =
-		require('../../assets/variableMainQuests/'+ varMainQuest +'.json');
+	const varMainQuestObject: VariableMainQuest = require(`../../${MAIN_QUEST_PATH}/${varMainQuest}.json`);
 
 	loadedVariableMainQuests.push(varMainQuestObject);
+	} catch(e) {
+		console.error(`Main quest json file not found in path:  ../../${MAIN_QUEST_PATH}/${varMainQuest}.json`);
+	}
 }
 
 const loadedStorylineData: StoryLineData[] = [];
@@ -37,11 +41,17 @@ const loadedStorylineData: StoryLineData[] = [];
 // ];
 
 for(const storyLine of storyLines.storyLines) {
+	try{
 	// We "require" json files to allow for non-static, story line based lookup
+	// Note: Using variables for the path results in an error!
 	// tslint:disable-next-line: no-var-requires
-	const storyLineObject: StoryLineData =
-		require('../../assets/storyLines/' + storyLine + '.json');
+
+	const storyLineObject: StoryLineData = require(`../../${STORY_LINE_PATH}/${storyLine}.json`);
+
 	loadedStorylineData.push(storyLineObject);
+	} catch(e) {
+		console.error(`Storyline json file not found in path:  ../../${STORY_LINE_PATH}/${storyLine}.json`);
+	}
 }
 
 export default class StoryLine {

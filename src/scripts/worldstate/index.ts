@@ -24,7 +24,7 @@ export class WorldState {
 	public dungeon: Dungeon;
 	public availableRooms: {[name: string]: Room} = {};
 	public availableTilesets: string[] = [];
-	public currentLevel: string = 'doorTest';
+	public currentLevel: string = 'town';//'doorTest';
 	public roomAssignment: {[name: string]: RoomAssignment} = {
 		'intro_dormRoom': {
 			dynamicLighting: false,
@@ -99,6 +99,10 @@ export class WorldState {
 			-Infinity,
 			-Infinity
 		];
+	}
+
+	clearState() {
+		localStorage.clear();
 	}
 }
 
