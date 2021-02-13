@@ -24,19 +24,25 @@
   ],
   "npcs": [
     {
-      "id": "red-link",
+      "id": "rl-1",
+      "type": "red-link",
       "x": 5,
       "y": 4
     },
     {
-      "id": "red-link",
+      "id": "rl-2",
+      "type": "red-link",
       "x": 5,
       "y": 18
     },
     {
-      "id": "red-link",
+      "id": "rl-3",
+      "type": "red-link",
       "x": 12,
       "y": 5
     }
-  ]
+  ],
+  "scripts": {
+    "onEntry": []
+  }
 }

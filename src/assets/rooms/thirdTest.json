@@ -2,8 +2,8 @@
   "name": "thirdTest",
   "tileset": "dungeon-blue",
   "openings": [
-    [-1, 1, "top"],
     [ 2, 3, "right"],
+    [-1, 1, "top"],
     [ 5, 1, "bottom"]
   ],
   "layout": [
@@ -54,34 +54,41 @@
   ],
   "npcs": [
     {
-      "id": "red-ball",
+      "id": "rb-1",
+      "type": "red-ball",
       "x": 3,
       "y": 5
     },
     {
-      "id": "red-ball",
+      "id": "rb-2",
+      "type": "red-ball",
       "x": 22,
       "y": 5
     },
     {
-      "id": "red-ball",
+      "id": "rb-3",
+      "type": "red-ball",
       "x": 3,
       "y": 21
     },
     {
-      "id": "red-ball",
+      "id": "rb-4",
+      "type": "red-ball",
       "x": 22,
       "y": 21
     },
     {
-      "id": "red-ball",
+      "id": "rb-5",
+      "type": "red-ball",
       "x": 3,
       "y": 37
     },
     {
-      "id": "red-ball",
+      "id": "rb-6",
+      "type": "red-ball",
       "x": 22,
       "y": 37
     }
-  ]
+  ],
+  "scripts": {}
 }

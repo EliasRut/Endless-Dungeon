@@ -1,0 +1,26 @@
+{
+	"ring": {
+	"abilities":[
+		"health",
+		"movespeed",
+		"damage",
+		"mainstat"
+	],
+	"icon":[
+		56,
+		57
+	]
+	},
+	"necklace": {
+		"abilities":[
+			"health",
+			"mainstat",
+			"cooldown",
+			"resistance"
+		],
+		"icon":[
+			58,
+			59
+		]
+	}
+}
