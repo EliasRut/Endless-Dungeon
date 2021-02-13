@@ -4,7 +4,7 @@ import CharacterToken from './CharacterToken';
 
 const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;
-const BODY_Y_OFFSET = 14;
+const BODY_Y_OFFSET = 16;
 
 export default class PlayerCharacterToken extends CharacterToken {
 	constructor(scene: Phaser.Scene, x: number, y: number) {

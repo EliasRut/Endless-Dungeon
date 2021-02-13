@@ -7,7 +7,8 @@ import {
 	isEquipped,
 	unequipItem,
 	equipItem,
-	placeItemInNextFreeBagSlot
+	placeItemInNextFreeBagSlot,
+	removeItemFromBagById
 } from '../helpers/inventory';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import { isEquippable } from '../helpers/inventory';
@@ -112,6 +113,12 @@ export default class InventoryScreen extends OverlayScreen {
 			item,
 			BAG_START_X + x * BOX_SIZE,
 			BAG_START_Y + y * BOX_SIZE);
+	}
+
+	// We currently ignore amount.
+	removeFromInventory(itemId: string, amount: number) {
+		removeItemFromBagById(itemId);
+		this.itemTokenMap[itemId].destroy(true);
 	}
 
 	update() {
