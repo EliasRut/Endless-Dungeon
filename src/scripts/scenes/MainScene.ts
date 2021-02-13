@@ -90,7 +90,11 @@ export default class MainScene extends Phaser.Scene {
 		this.useDynamicLighting = globalState.roomAssignment[globalState.currentLevel].dynamicLighting;
 
 		if (this.useDynamicLighting) {
-			this.dynamicLightingHelper = new DynamicLightingHelper(this.tileLayer);
+			this.dynamicLightingHelper = new DynamicLightingHelper(
+				this.tileLayer,
+				this.decorationLayer,
+				this.overlayLayer
+			);
 		}
 
 		this.mainCharacter = new PlayerCharacterToken(
@@ -246,10 +250,14 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		// Check if the player is close to a connection point and move them if so
-		globalState.dungeon.levels[globalState.currentLevel]?.connections.forEach((connection) => {
+		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections;
+		const playerX = globalState.playerCharacter.x;
+		const playerY = globalState.playerCharacter.y;
+		connections.forEach((connection) => {
+
 			if (Math.hypot(
-						connection.x - globalState.playerCharacter.x,
-						connection.y - globalState.playerCharacter.y) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
+						connection.x - playerX,
+						connection.y - playerY) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
 				globalState.currentLevel = connection.targetMap;
 				globalState.playerCharacter.x = 0;
 				globalState.playerCharacter.y = 0;

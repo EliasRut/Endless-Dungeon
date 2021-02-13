@@ -12,6 +12,8 @@ export default class DynamicLightingHelper {
 
 	lightingLevels: number[][] = [];
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	lastLightLevel: number = 255;
 
 	isBlockingTile: boolean[][] = [];
@@ -19,13 +21,21 @@ export default class DynamicLightingHelper {
 	visitedTiles: number[][] = [];
 	visibleTiles: boolean[][] = [];
 
-	constructor(tileLayer: Phaser.Tilemaps.DynamicTilemapLayer) {
+	constructor(
+		tileLayer: Phaser.Tilemaps.DynamicTilemapLayer,
+		decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer,
+		overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer
+	) {
 		this.tileLayer = tileLayer;
+		this.decorationLayer = decorationLayer;
+		this.overlayLayer = overlayLayer;
 		this.prepareDynamicLighting();
 	}
 
 	prepareDynamicLighting() {
 		this.tileLayer.forEachTile((tile) => tile.tint = 0x000000);
+		this.decorationLayer.forEachTile((tile) => tile.tint = 0x000000);
+		this.overlayLayer.forEachTile((tile) => tile.tint = 0x000000);
 		for (let x = 0; x < DUNGEON_WIDTH; x++) {
 				this.isBlockingTile[x] = [];
 				this.visitedTiles[x] = [];
@@ -120,11 +130,14 @@ export default class DynamicLightingHelper {
 				const tileX = playerTileX + x;
 				const tileY = playerTileY + y;
 				const tile = this.tileLayer.getTileAt(tileX, tileY);
+				const decorationTile = this.decorationLayer.getTileAt(tileX, tileY);
+				const overlayTile = this.overlayLayer.getTileAt(tileX, tileY);
 
 				// Not all fields have tiles, black fields have no tile
-				if (tile) {
-					const distanceX = Math.abs(playerTokenX - tile.pixelX);
-					const distanceY = Math.abs(playerTokenY - tile.pixelY);
+				const relevantTile = tile || decorationTile || overlayTile;
+				if (relevantTile) {
+					const distanceX = Math.abs(playerTokenX - relevantTile.pixelX);
+					const distanceY = Math.abs(playerTokenY - relevantTile.pixelY);
 					// Visited Tiles is either VISITED_TILE_TINT or 0 for each tile
 					this.visitedTiles[tileX][tileY] = Math.max(
 						VISITED_TILE_TINT *
@@ -138,12 +151,20 @@ export default class DynamicLightingHelper {
 					// That is: lightingLevel for the distance if it is currently visible,
 					// VISITED_TILE_TINT if it has been visited before,
 					// black otherwise
-					tile.tint = Math.max(
+					const tint = Math.max(
 						this.visibleTiles[x + sightRadius][y + sightRadius] as unknown as number *
 							this.lightingLevels[distanceX][distanceY],
 						this.visitedTiles[tileX][tileY] +
-							(this.visibleTiles[x + sightRadius][y + sightRadius] as unknown as number)
-					);
+							(this.visibleTiles[x + sightRadius][y + sightRadius] as unknown as number));
+					if (tile) {
+						tile.tint = tint;
+					}
+					if (decorationTile) {
+						decorationTile.tint = tint;
+					}
+					if (overlayTile) {
+						overlayTile.tint = tint;
+					}
 				}
 			}
 		}

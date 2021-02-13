@@ -1,6 +1,5 @@
 {
 	"name": "startRoom",
-  "startRoom": true,
 	"tileset": "dungeon",
 	"decorationTileset": "dungeon-blue",
 	"overlayTileset": "town",
