@@ -21,12 +21,14 @@ import Avatar from '../drawables/ui/Avatar';
 import ScriptHelper from '../helpers/ScriptHelper';
 import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
+import SaveIcon from '../drawables/ui/SaveIcon';
 import { spawnNpc } from '../helpers/spawn';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import { NpcScript } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import Item from '../worldstate/Item';
 import { generateRandomItem } from '../helpers/item';
+import SaveScreen from '../screens/SaveScreen';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -56,6 +58,7 @@ export default class MainScene extends Phaser.Scene {
 		inventory: InventoryScreen;
 		statScreen: StatScreen;
 		dialogScreen: DialogScreen;
+		saveScreen: SaveScreen;
 	};
 	alive: number;
 	isPaused = false;
@@ -63,6 +66,7 @@ export default class MainScene extends Phaser.Scene {
 
 	avatar: Avatar;
 	backpackIcon: BackpackIcon;
+	saveIcon: SaveIcon;
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
@@ -116,11 +120,13 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayScreens = {
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
-			dialogScreen: new DialogScreen(this)
+			dialogScreen: new DialogScreen(this),
+			saveScreen: new SaveScreen(this)
 		};
 
 		this.fpsText = new FpsText(this);
 		this.backpackIcon = new BackpackIcon(this);
+		this.saveIcon = new SaveIcon(this);
 		this.avatar = new Avatar(this);
 
 		this.keyboardHelper = new KeyboardHelper(this);
