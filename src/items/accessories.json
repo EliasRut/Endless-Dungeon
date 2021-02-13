@@ -1,26 +1,28 @@
 {
 	"ring": {
-	"abilities":[
-		"health",
-		"movespeed",
-		"damage",
-		"mainstat"
-	],
-	"icon":[
-		56,
-		57
-	]
+		"abilities": [
+			"health",
+			"movespeed",
+			"damage",
+			"mainstat"
+		],
+		"icon": [
+			56,
+			57
+		],
+		"flavor": "A normal ring."
 	},
 	"necklace": {
-		"abilities":[
+		"abilities": [
 			"health",
 			"mainstat",
 			"cooldown",
 			"resistance"
 		],
-		"icon":[
+		"icon": [
 			58,
 			59
-		]
+		],
+		"flavor": "A normal necklace."
 	}
 }

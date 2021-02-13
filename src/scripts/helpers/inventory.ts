@@ -1,7 +1,7 @@
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import Item, { ItemStats } from '../worldstate/Item';
-import { EquipmentSlot, INVENTORY_BOXES_X, INVENTORY_BOXES_Y } from './constants';
+import { EquipmentSlot, BAG_BOXES_X, BAG_BOXES_Y } from './constants';
 
 const BASE_HEALTH = 100;
 const BASE_MOVEMENT_SPEED = 200;
@@ -44,8 +44,8 @@ export const unequipItemFromCharacter = (itemToUnequip: Item, char: Character) =
 
 export const placeItemInNextFreeBagSlot = (item: Item) => {
 	const inventory = globalState.inventory;
-	for (let x = 0; x < INVENTORY_BOXES_X; x++) {
-		for (let y = 0; y < INVENTORY_BOXES_Y; y++) {
+	for (let x = 0; x < BAG_BOXES_X; x++) {
+		for (let y = 0; y < BAG_BOXES_Y; y++) {
 			if (inventory.bag[x][y] === 0) {
 				inventory.bag[x][y] = 1;
 				inventory.unequippedItemList.push({

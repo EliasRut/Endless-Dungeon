@@ -11,6 +11,7 @@ import FpsText from '../drawables/ui/FpsText';
 import StatScreen from '../screens/StatScreen';
 import InventoryScreen from '../screens/InventoryScreen';
 import DialogScreen from '../screens/DialogScreen';
+import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getCharacterSpeed, getFacing, updateMovingState } from '../helpers/movement';
@@ -55,6 +56,7 @@ export default class MainScene extends Phaser.Scene {
 		inventory: InventoryScreen;
 		statScreen: StatScreen;
 		dialogScreen: DialogScreen;
+		itemScreen: ItemScreen;
 	};
 	alive: number;
 	isPaused = false;
@@ -111,6 +113,7 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayScreens = {
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
+			itemScreen: new ItemScreen(this),
 			dialogScreen: new DialogScreen(this)
 		};
 
@@ -121,6 +124,12 @@ export default class MainScene extends Phaser.Scene {
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
 		this.scriptHelper = new ScriptHelper(this);
+
+		var pointers = this.input.activePointer;
+		this.input.on('pointerdown', function () {
+		  console.log("mouse x", pointers.x)
+		  console.log("mouse y", pointers.y)
+	});
 
 		this.sound.play('testSound', {volume: 0.08, loop: true});
 	}
@@ -193,6 +202,7 @@ export default class MainScene extends Phaser.Scene {
 		this.scriptHelper.handleScripts(globalTime);
 
 		this.overlayScreens.statScreen.update();
+		this.overlayScreens.itemScreen.update(this.overlayScreens.inventory.focusedItem);
 
 		if (this.isPaused) {
 			return;

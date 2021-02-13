@@ -8,7 +8,8 @@
 		"icon": [
 			4,
 			6
-		]
+		],
+		"flavor": "A normal armor."
 	},
 	"gloves": {
 		"abilities": [
@@ -19,7 +20,8 @@
 		"icon": [
 			21,
 			23
-		]
+		],
+		"flavor": "A normal armor."
 	},
 	"boots": {
 		"abilities": [
@@ -30,7 +32,8 @@
 		"icon": [
 			13,
 			15
-		]
+		],
+		"flavor": "A normal armor."
 	},
 	"chest": {
 		"abilities": [
@@ -41,6 +44,7 @@
 		"icon": [
 			5,
 			7
-		]
+		],
+		"flavor": "A normal armor."
 	}
 }

@@ -21,6 +21,8 @@ export default class Item implements ItemStats {
 	public damage = 1;
 	public movementSpeed = 100;
 	public mainStat = 1;
+	public flavorText = 'A normal item.';
+	public name = 'Item';
 
 	public iconFrame = 0;
 	public itemLocation = 0; // 0 is ground, 1-80 are inventory slots, 80+ are equipped
@@ -32,6 +34,8 @@ export default class Item implements ItemStats {
 			damage: number = Math.random() * MAX_ADDITIONAL_DAMAGE + BASE_DAMAGE,
 			movementSpeed: number = Math.random() * MAX_MOVEMENT_SPEED,
 			mainStat: number = Math.random() * MAX_ADDITIONAL_MAIN_STAT + BASE_MAIN_STAT,
+			flavorText: string = 'A normal item.',
+			name: string = 'Item',
 			iconFrame: number = Math.floor(Math.random() * NUM_ICON_FRAMES),
 			type: string = 'potion',
 			itemLocation: number = 0
@@ -43,6 +47,8 @@ export default class Item implements ItemStats {
 		this.iconFrame = iconFrame;
 		this.itemLocation = itemLocation;
 		this.type = type;
+		this.flavorText = flavorText;
+		this.name = name;
 		this.id = uuidv4();
 	}
 }

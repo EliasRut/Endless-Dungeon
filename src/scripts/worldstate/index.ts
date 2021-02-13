@@ -71,6 +71,7 @@ export class WorldState {
 
 	loadState() {
 		this.loadGame = false;
+		localStorage.clear();
 		const saveGameName = localStorage.getItem('saveGameName');
 		if (!saveGameName) {
 			return;
