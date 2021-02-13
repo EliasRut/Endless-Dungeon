@@ -1,10 +1,24 @@
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
-import Item, { ItemStats } from '../worldstate/Item';
+import EquippableItem, { ItemStats } from '../worldstate/EquippableItem';
+import Item from '../worldstate/Item';
 import { EquipmentSlot, INVENTORY_BOXES_X, INVENTORY_BOXES_Y } from './constants';
 
 const BASE_HEALTH = 100;
 const BASE_MOVEMENT_SPEED = 200;
+
+const EQUIPPABLE_ITEM_TYPES = [
+	'weapon',
+	'offhand',
+	'largeWeapon',
+	'chest',
+	'head',
+	'gloves',
+	'boots',
+	'necklace',
+	'belt',
+	'ring',
+];
 
 export const updateStats = (char: Character) => {
 	const healthBeforeUpdate = char.health;
@@ -25,14 +39,14 @@ export const updateStats = (char: Character) => {
 	char.damage = (1 + (itemStats.damage || 0)) * char.mainStat;
 };
 
-export const equipItemOnCharacter = (item: Item, char: Character) => {
+export const equipItemOnCharacter = (item: EquippableItem, char: Character) => {
 	// tslint:disable-next-line: no-console
 	console.log(`Equipping item ${JSON.stringify(item)}.`);
 	char.items.push(item);
 	updateStats(char);
 };
 
-export const unequipItemFromCharacter = (itemToUnequip: Item, char: Character) => {
+export const unequipItemFromCharacter = (itemToUnequip: EquippableItem, char: Character) => {
 	// tslint:disable-next-line: no-console
 	console.log(`Unequipping item ${JSON.stringify(itemToUnequip)}.`);
 	const itemIndex = char.items.findIndex((item) => item === itemToUnequip);
@@ -60,15 +74,15 @@ export const placeItemInNextFreeBagSlot = (item: Item) => {
 	throw new Error('No slot for item found.');
 };
 
-export const unequipItem = (itemToUnequip: Item) => {
+export const unequipItem = (itemToUnequip: EquippableItem) => {
 	unequipItemFromCharacter(itemToUnequip, globalState.playerCharacter);
 	removeItemFromActiveEquippmentSlots(itemToUnequip);
 	return placeItemInNextFreeBagSlot(itemToUnequip);
 };
 
 export const getSlotAndConflictsForEquipAction: (
-	item: Item
-) => [EquipmentSlot, (Item | undefined)[]] = (item: Item) => {
+	item: EquippableItem
+) => [EquipmentSlot, (EquippableItem | undefined)[]] = (item: EquippableItem) => {
 
 // export const unequip = (item: Item) => {
 // 	item.unequip(globalState.playerCharacter);
@@ -103,7 +117,11 @@ const removeItemFromBag = (itemToRemove: Item) => {
 	}
 };
 
-export const equipItem = (item: Item) => {
+export const isEquippable = (item: Item) => {
+	return EQUIPPABLE_ITEM_TYPES.includes(item.type);
+};
+
+export const equipItem = (item: EquippableItem) => {
 	const inventory = globalState.inventory;
 	const [slot, conflicts] = getSlotAndConflictsForEquipAction(item);
 	removeItemFromBag(item);
@@ -114,7 +132,7 @@ export const equipItem = (item: Item) => {
 	inventory[slot] = item;
 };
 
-export const getItemEquippmentSlot = (item: Item) => {
+export const getItemEquippmentSlot = (item: EquippableItem) => {
 	const inventory = globalState.inventory;
 	if (item.id === inventory.mainhand?.id) return EquipmentSlot.MAIN_HAND;
 	if (item.id === inventory.offhand?.id) return EquipmentSlot.OFF_HAND;
@@ -129,7 +147,7 @@ export const getItemEquippmentSlot = (item: Item) => {
 	return undefined;
 };
 
-export const removeItemFromActiveEquippmentSlots = (item: Item) => {
+export const removeItemFromActiveEquippmentSlots = (item: EquippableItem) => {
 	const inventory = globalState.inventory;
 	const slot = getItemEquippmentSlot(item);
 	if (slot) {
@@ -137,7 +155,7 @@ export const removeItemFromActiveEquippmentSlots = (item: Item) => {
 	}
 };
 
-export const isEquipped = (item: Item) => {
+export const isEquipped = (item: EquippableItem) => {
 	return getItemEquippmentSlot(item) !== undefined;
 };
 

@@ -24,7 +24,8 @@ const loadedVariableMainQuests: VariableMainQuest[] = [];
 for(const varMainQuest of storyLines.variableMainQuests) {
 	// We "require" json files to allow for non-static, main quest based lookup
 	// tslint:disable-next-line: no-var-requires
-	const varMainQuestObject: VariableMainQuest = require(`${MAIN_QUEST_PATH}/${varMainQuest}.json`);
+	const varMainQuestObject: VariableMainQuest =
+		require('../../assets/variableMainQuests/'+ varMainQuest +'.json');
 
 	loadedVariableMainQuests.push(varMainQuestObject);
 }
@@ -38,7 +39,8 @@ const loadedStorylineData: StoryLineData[] = [];
 for(const storyLine of storyLines.storyLines) {
 	// We "require" json files to allow for non-static, story line based lookup
 	// tslint:disable-next-line: no-var-requires
-	const storyLineObject: StoryLineData = require(`${STORY_LINE_PATH}/${storyLine}.json`);
+	const storyLineObject: StoryLineData =
+		require('../../assets/storyLines/' + storyLine + '.json');
 	loadedStorylineData.push(storyLineObject);
 }
 

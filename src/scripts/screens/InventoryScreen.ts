@@ -11,6 +11,8 @@ import {
 	placeItemInNextFreeBagSlot
 } from '../helpers/inventory';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
+import { isEquippable } from '../helpers/inventory';
+import EquippableItem from '../worldstate/EquippableItem';
 
 const BOX_SIZE = 16;
 
@@ -79,12 +81,15 @@ export default class InventoryScreen extends OverlayScreen {
 		itemToken.setVisible(false);
 		this.add(itemToken, true);
 		itemToken.on('pointerdown', () => {
-			if (isEquipped(item)) {
-				unequipItem(item);
-			} else {
-				equipItem(item);
+			if (isEquippable(item)) {
+				const equippableItem = item as EquippableItem;
+				if (isEquipped(equippableItem)) {
+					unequipItem(equippableItem);
+				} else {
+					equipItem(equippableItem);
+				}
+				this.update();
 			}
-			this.update();
 		});
 	}
 

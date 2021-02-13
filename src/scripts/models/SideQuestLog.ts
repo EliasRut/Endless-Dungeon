@@ -21,7 +21,7 @@ const loadedSideQuests: SideQuest[] = [];
 
 for(const sideQuest of storyLines.sideQuests) {
 	// tslint:disable-next-line: no-var-requires
-	const sideQuestObject:SideQuest = require(`${SIDE_QUEST_PATH}/${sideQuest}.json`);
+	const sideQuestObject:SideQuest = require('../../assets/sideQuests/' + sideQuest + '.json');
 	// We "require" json files to allow for non-static, story line based lookup
 	// tslint:disable-next-line: no-var-requires
 	loadedSideQuests.push(sideQuestObject);

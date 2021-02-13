@@ -27,12 +27,28 @@ export interface ItemsPositioning {
 	y: number;
 }
 
+export interface Door {
+	id: string;
+	x: number;
+	y: number;
+	type: string;
+	open: boolean;
+}
+
 export type OpeningDirection = "top" | "left" | "right" | "bottom";
 export type Opening = [number, number, OpeningDirection];
 
 export interface ScriptWait {
 	type: "wait";
 	time: number
+}
+
+export interface ScriptCondition {
+	type: "condition";
+	conditionType: "hasItem" | "scriptState";
+	itemId?: string;
+	scriptId?: string;
+	scriptState?: string;
 }
 
 export interface ScriptDialog {
@@ -72,6 +88,11 @@ export interface ScriptSpawn {
 	posY: number;
 }
 
+export interface ScriptOpenDoor {
+	type: "openDoor";
+	doorId: string;
+}
+
 export interface ScriptSceneChange {
 	type: "sceneChange";
 	target: string;
@@ -87,8 +108,15 @@ export interface ScriptFadeOut {
 	time: number;
 }
 
+export interface ScriptSetScriptState {
+	type: "seScriptState";
+	scriptId: string;
+	scriptState: "new" | "finished";
+}
+
 export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange |
-	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn;
+	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn | ScriptOpenDoor |
+	ScriptCondition | ScriptSetScriptState;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];
@@ -118,6 +146,7 @@ export interface Room {
 	name: string;
 	scripts: Scripting;
 	usedNpcTypes?: string[];
+	doors?: Door[];
 }
 
 export interface Weapon {

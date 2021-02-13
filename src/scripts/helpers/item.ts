@@ -2,6 +2,7 @@ import weapons from '../../items/weapons.json';
 import armors from '../../items/armors.json';
 import accessories from '../../items/accessories.json';
 import Item from '../worldstate/Item';
+import EquippableItem from '../worldstate/EquippableItem';
 
 const MAX_HEALTH = 100;
 const BASE_DAMAGE = 1;
@@ -28,7 +29,7 @@ export const generateRandomItem = () => {
 		const accessoryData = accessories[itemType as keyof typeof accessories];
 		iconFrame = accessoryData.icon[Math.floor(Math.random() * accessoryData.icon.length)];
 	}
-	return new Item(
+	return new EquippableItem(
 		Math.random() * MAX_HEALTH,
 		Math.random() * MAX_ADDITIONAL_DAMAGE + BASE_DAMAGE,
 		Math.random() * MAX_MOVEMENT_SPEED,

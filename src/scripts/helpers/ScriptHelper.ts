@@ -185,6 +185,26 @@ export default class ScriptHelper {
 					targetY);
 				break;
 			}
+			case 'openDoor': {
+				cleanUpStep = true;
+				this.scene.changeDoorState(
+					`${globalState.currentLevel}_${this.currentRoom!.roomName}_${currentStep.doorId}`,
+					true);
+				break;
+			}
+			case 'condition': {
+				if (currentStep.conditionType === 'hasItem') {
+					const hasMatchingItems = !!globalState.inventory.unequippedItemList.find(
+						(item) => item.item.id === currentStep.itemId);
+					if (hasMatchingItems) {
+						cleanUpStep = true;
+					} else {
+						this.runningScript = undefined;
+						this.scriptStep = undefined;
+						return;
+					}
+				}
+			}
 		}
 		if (cleanUpStep) {
 			this.scriptStep = this.scriptStep! + 1;

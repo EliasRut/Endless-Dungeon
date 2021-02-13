@@ -53,6 +53,10 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
 			{ frameWidth: 16, frameHeight: 16 });
 
+		// Doors
+		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png',
+			{ frameWidth: 48, frameHeight: 32 });
+
 		// load test music
 		this.load.audio('testSound', 'assets/sounds/testSound.MP3');
 		this.load.audio('sound-fireball', 'assets/sounds/fireball.wav');

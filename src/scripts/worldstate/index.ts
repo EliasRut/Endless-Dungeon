@@ -1,5 +1,6 @@
 import { Room } from '../../../typings/custom';
 import Character from './Character';
+import Door from './Door';
 import Dungeon from './Dungeon';
 import DungeonLevel from './DungeonLevel';
 import Inventory from './Inventory';
@@ -19,10 +20,11 @@ export class WorldState {
 	public gameTime: number;
 	public playerCharacter: PlayerCharacter;
 	public npcs: {[id: string]: Character} = {};
+	public doors: {[id: string]: Door} = {};
 	public dungeon: Dungeon;
 	public availableRooms: {[name: string]: Room} = {};
 	public availableTilesets: string[] = [];
-	public currentLevel: string = 'town';
+	public currentLevel: string = 'doorTest';
 	public roomAssignment: {[name: string]: RoomAssignment} = {
 		'intro_dormRoom': {
 			dynamicLighting: false,
@@ -36,6 +38,10 @@ export class WorldState {
 			dynamicLighting: false,
 			rooms: ['town']
 		},
+		'doorTest': {
+			dynamicLighting: true,
+			rooms: ['firstTest', 'door_room']
+		}
 		// 'dungeon': {
 		// 	dynamicLighting: true,
 		// 	rooms: [
@@ -60,6 +66,7 @@ export class WorldState {
 		localStorage.setItem('playerCharacter', JSON.stringify(this.playerCharacter));
 		localStorage.setItem('gameTime', `${this.gameTime}`);
 		localStorage.setItem('npcs', JSON.stringify(this.npcs));
+		localStorage.setItem('doors', JSON.stringify(this.doors));
 		localStorage.setItem('dungeon', JSON.stringify(this.dungeon));
 		localStorage.setItem('availableRooms', JSON.stringify(this.availableRooms));
 		localStorage.setItem('availableTilesets', JSON.stringify(this.availableTilesets));
@@ -78,6 +85,7 @@ export class WorldState {
 		this.gameTime = parseInt(localStorage.getItem('gameTime') || '0', 10);
 		this.playerCharacter = JSON.parse(localStorage.getItem('playerCharacter') || '');
 		this.npcs = JSON.parse(localStorage.getItem('npcs') || '');
+		this.doors = JSON.parse(localStorage.getItem('doors') || '');
 		this.dungeon = JSON.parse(localStorage.getItem('dungeon') || '');
 		this.availableRooms = JSON.parse(localStorage.getItem('availableRooms') || '');
 		this.availableTilesets = JSON.parse(localStorage.getItem('availableTilesets') || '');

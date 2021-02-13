@@ -30,18 +30,17 @@
       "y": 4
     },
     {
-      "id": "rl-2",
-      "type": "red-link",
-      "x": 5,
-      "y": 18
-    },
-    {
       "id": "rl-3",
       "type": "red-link",
       "x": 12,
       "y": 5
     }
   ],
+  "items": [{
+    "id": "goldKey",
+    "x": 14,
+    "y": 14
+  }],
   "scripts": {
     "onEntry": []
   }
