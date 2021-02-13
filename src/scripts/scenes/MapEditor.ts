@@ -582,6 +582,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.isLibraryVisible = !this.isLibraryVisible;
 			this.libraryLayer.setVisible(this.isLibraryVisible);
 			this.backgroundLibraryLayer.setVisible(this.isLibraryVisible);
+			this.mapEditorHighlighting.setVisible(this.isLibraryVisible);
 		}
 		this.wasTKeyDown = this.tKey.isDown
 		
