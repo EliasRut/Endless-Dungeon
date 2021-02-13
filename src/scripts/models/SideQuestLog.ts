@@ -6,7 +6,7 @@ import { SideQuest } from './SideQuest';
 import storyLines from '../../assets/storyLines/storyLines.json';
 // import fs from 'fs';
 
-const SIDE_QUEST_PATH = '../../assets/sideQuests';
+const SIDE_QUEST_PATH = 'assets/sideQuests';
 
 const loadedSideQuests: SideQuest[] = [];
 // fs.readdir('../../assets/sideQuests/', 'utf-8', (err, files) => {
@@ -20,11 +20,15 @@ const loadedSideQuests: SideQuest[] = [];
 // });
 
 for(const sideQuest of storyLines.sideQuests) {
+	try{
 	// tslint:disable-next-line: no-var-requires
-	const sideQuestObject:SideQuest = require(`${SIDE_QUEST_PATH}/${sideQuest}.json`);
+	const sideQuestObject:SideQuest = require(`../../${SIDE_QUEST_PATH}/${sideQuest}.json`);
 	// We "require" json files to allow for non-static, story line based lookup
 	// tslint:disable-next-line: no-var-requires
 	loadedSideQuests.push(sideQuestObject);
+	} catch(e) {
+		console.error(`Sidequest json file not found in path:  ../../${SIDE_QUEST_PATH}/${sideQuest}.json`);
+	}
 }
 
 export default class SideQuestLog {
