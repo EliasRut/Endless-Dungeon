@@ -116,12 +116,6 @@ export default class MainScene extends Phaser.Scene {
 			this.physics.add.collider(this.mainCharacter, door);
 		});
 
-		this.dropItem(
-			startX - DEBUG__ITEM_OFFSET_X,
-			startY - DEBUG__ITEM_OFFSET_Y,
-			generateRandomItem()
-		);
-
 		this.overlayScreens = {
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
@@ -137,11 +131,11 @@ export default class MainScene extends Phaser.Scene {
 		this.abilityHelper = new AbilityHelper(this);
 		this.scriptHelper = new ScriptHelper(this);
 
-		var pointers = this.input.activePointer;
-		this.input.on('pointerdown', function () {
-		  console.log("mouse x", pointers.x)
-		  console.log("mouse y", pointers.y)
-	});
+	// 	var pointers = this.input.activePointer;
+	// 	this.input.on('pointerdown', function () {
+	// 	  console.log("mouse x", pointers.x)
+	// 	  console.log("mouse y", pointers.y)
+	// });
 
 		this.sound.play('testSound', {volume: 0.08, loop: true});
 	}
@@ -329,10 +323,14 @@ export default class MainScene extends Phaser.Scene {
 			if (Math.hypot(
 						connection.x - playerX,
 						connection.y - playerY) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
-				globalState.currentLevel = connection.targetMap;
 				globalState.playerCharacter.x = 0;
 				globalState.playerCharacter.y = 0;
-				this.scene.start('RoomPreloaderScene');
+				if (connection.targetMap) {
+					globalState.currentLevel = connection.targetMap;
+					this.scene.start('RoomPreloaderScene');
+				} else if (connection.targetScene) {
+					this.scene.start(connection.targetScene);
+				}
 			}
 		});
 

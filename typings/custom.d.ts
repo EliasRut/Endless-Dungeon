@@ -16,7 +16,8 @@ export interface NpcPositioning {
 export interface MapConnection {
   x: number;
   y: number;
-  targetMap: string;
+	targetScene?: string;
+  targetMap?: string;
   targetX?: number;
   targetY?: number;
 }
@@ -115,7 +116,7 @@ export interface ScriptTakeItem {
 }
 
 export interface ScriptSetScriptState {
-	type: "seScriptState";
+	type: "setScriptState";
 	scriptId: string;
 	scriptState: "new" | "finished";
 }

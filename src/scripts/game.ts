@@ -22,11 +22,11 @@ const config: Phaser.Types.Core.GameConfig = {
 		height: DEFAULT_HEIGHT
 	},
 	scene: [
+		RoomPreloaderScene,
+		PreloadScene,
+		MainScene,
+		MapEditor,
 		DungeonDoorPreloadScene,
-		RoomPreloaderScene, 
-		PreloadScene, 
-		MainScene, 
-		MapEditor, 
 		DungeonDoorScene
 	],
 	// We are using Phasers arcade physics library

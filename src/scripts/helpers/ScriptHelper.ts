@@ -233,7 +233,7 @@ export default class ScriptHelper {
 				}
 				break;
 			}
-			case 'seScriptState': {
+			case 'setScriptState': {
 				cleanUpStep = true;
 				const scriptId =
 					`${globalState.currentLevel}_${this.currentRoom!.roomName}_${currentStep.scriptId}`;

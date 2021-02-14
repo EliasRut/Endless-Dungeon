@@ -36,7 +36,7 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 		this.doorknob.setDepth(UiDepths.UI_MAIN_LAYER);
 		this.doorknob.setInteractive();
 		this.doorknob.on('pointerdown', () => {
-			for (let i=0; i<5; i++) {
+			for (let i=0; i < 5; i++) {
 				const [x , y] = socketPositions[i];
 				this.runes[i].x = x;
 				this.runes[i].y = y;
@@ -44,6 +44,9 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 				this.runes[i].setInteractive();
 				this.runes[i].setDepth(UiDepths.UI_FOREGROUND_LAYER);
 				this.runes[i].setFrame(Math.floor(Math.random()*8));
+				window.setTimeout(() => {
+					(this.scene as DungeonDoorScene).enterDungeon();
+				}, 3000);
 			}
 		});
 
