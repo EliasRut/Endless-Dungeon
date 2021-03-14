@@ -1,5 +1,5 @@
 {
-	"name": "intro_dormRoom",
+	"name": "intro_dormRoom2",
 	"tileset": "town",
   "decorationTileset": "town-decoration",
 	"overlayTileset": "town-overlay",
@@ -51,9 +51,9 @@
 			{
 				"type": "move",
 				"target": "player",
-				"posX": 6,
+				"posX": 4,
 				"posY": 5,
-				"facingX": 0,
+				"facingX": -1,
 				"facingY": 1
 			}, {
 				"type": "fadeIn",
@@ -64,26 +64,25 @@
 				"time": 1000
 			}, {
 				"type": "dialog",
-				"portrait": "player_happy",
-				"text": ["Finally, today is the day I've waited for so long!"]
-			}, {
-				"type": "animation",
-				"target": "player",
-				"animation": "player-walk-s",
-				"duration": 2000
+				"portrait": "player_sad",
+				"text": ["Krumbein, you know, I will miss this school. I will",
+                "miss the great times we spent together with", 
+                "Samarah and Abraxas, the times you chased him",
+                "through the school, Samarah close at your tail,",
+                "trying to hit you with minor curses.", 
+                "The gargoyle riding and especially sprout class!"]
 			}, {
 				"type": "dialog",
-				"portrait": "player_excited",
+				"portrait": "player_crying",
 				"text": [
-					"Today I become a WIZARD!",
-					"I can hardly await my ceremony."
+					"... awesome astronomy class ... fireball spell ..."
 				]
 			}, {
 				"type": "fadeOut",
 				"time": 2000
 			}, {
 				"type": "sceneChange",
-				"target": "intro_ceremony"
+				"target": "intro_road"
 			}
 		]
 	}
