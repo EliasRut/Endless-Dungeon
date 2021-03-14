@@ -348,7 +348,7 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		// Check if the player is close to a connection point and move them if so
-		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections;
+		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections || [];
 		const playerX = globalState.playerCharacter.x;
 		const playerY = globalState.playerCharacter.y;
 		connections.forEach((connection) => {

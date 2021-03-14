@@ -32,13 +32,17 @@ export class WorldState {
 			dynamicLighting: false,
 			rooms: ['intro_dormRoom']
 		},
-		'woodenHouse': {
-			dynamicLighting: false,
-			rooms: ['woodenHouse']
-		},
 		'intro_ceremony': {
 			dynamicLighting: false,
 			rooms: ['intro_ceremony']
+		},
+		'intro_dormRoom2': {
+			dynamicLighting: false,
+			rooms: ['intro_dormRoom2']
+		},
+		'intro_road': {
+			dynamicLighting: false,
+			rooms: ['intro_road']
 		},
 		'town': {
 			dynamicLighting: false,
@@ -47,6 +51,10 @@ export class WorldState {
 		'doorTest': {
 			dynamicLighting: true,
 			rooms: ['firstTest', 'door_room']
+		},
+		'woodenHouse': {
+			dynamicLighting: false,
+			rooms: ['woodenHouse']
 		}
 		// 'dungeon': {
 		// 	dynamicLighting: true,

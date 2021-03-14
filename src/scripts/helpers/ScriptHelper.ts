@@ -124,6 +124,10 @@ export default class ScriptHelper {
 			case 'sceneChange': {
 				cleanUpStep = true;
 				globalState.currentLevel = currentStep.target;
+				globalState.playerCharacter.x = 0;
+				globalState.playerCharacter.y = 0;
+				this.scene.mainCharacter.x = 0;
+				this.scene.mainCharacter.y = 0;
 				this.scene.scene.start('RoomPreloaderScene');
 				break;
 			}
@@ -245,6 +249,10 @@ export default class ScriptHelper {
 				};
 				break;
 			}
+			// To Do's:
+			// Implement animation using ability (for example cast fireball)
+			// Implememt item take and drop case (for example wizard scroll)
+			// implement facing for NPCs for move
 		}
 		if (cleanUpStep) {
 			this.scriptStep = this.scriptStep! + 1;
