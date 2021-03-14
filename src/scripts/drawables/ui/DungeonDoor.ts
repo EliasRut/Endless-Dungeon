@@ -1,4 +1,4 @@
-import { UiDepths } from '../../helpers/constants';
+import { UiDepths, RuneAssignment, ColorsArray } from '../../helpers/constants';
 import DungeonDoorScene from '../../scenes/DungeonDoorScene';
 
 const socketPositions = [
@@ -14,8 +14,8 @@ const frameHeight = 32;
 
 export default class DungeonDoor extends Phaser.GameObjects.Image {
 	doorknob: Phaser.GameObjects.Image;
-	runeSockets: Array<Phaser.GameObjects.Sprite> = [];
-	runes: Array<Phaser.GameObjects.Sprite> = [];
+	runeSockets: Phaser.GameObjects.Sprite[] = [];
+	runes: Phaser.GameObjects.Sprite[] = [];
 
 	constructor(scene: DungeonDoorScene) {
 		super(scene, scene.cameras.main.width / 2, scene.cameras.main.height / 2, 'dungeon-door');
@@ -36,6 +36,7 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 		this.doorknob.setDepth(UiDepths.UI_MAIN_LAYER);
 		this.doorknob.setInteractive();
 		this.doorknob.on('pointerdown', () => {
+			const usedRunes: number[] = [];
 			for (let i=0; i < 5; i++) {
 				const [x , y] = socketPositions[i];
 				this.runes[i].x = x;
@@ -43,11 +44,24 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 				this.runes[i].setScrollFactor(0);
 				this.runes[i].setInteractive();
 				this.runes[i].setDepth(UiDepths.UI_FOREGROUND_LAYER);
-				this.runes[i].setFrame(Math.floor(Math.random()*8));
-				window.setTimeout(() => {
-					(this.scene as DungeonDoorScene).enterDungeon();
-				}, 3000);
+				const usedRune = (i === 0) ?
+					5 :
+					((i === 1) ? 5 : Math.floor(Math.random() * 8));
+				this.runes[i].setFrame(usedRune);
+				usedRunes.push(usedRune);
 			}
+
+			const runeAssignment: RuneAssignment = {
+				primaryContent: ColorsArray[usedRunes[0]],
+				secondaryContent: ColorsArray[usedRunes[1]],
+				wanderingMonsters: ColorsArray[usedRunes[2]],
+				playerBuff: ColorsArray[usedRunes[3]],
+				randomNpc: ColorsArray[usedRunes[4]]
+			};
+
+			window.setTimeout(() => {
+				(this.scene as DungeonDoorScene).enterDungeon(runeAssignment);
+			}, 3000);
 		});
 
 		for (let i=0; i<5; i++) {

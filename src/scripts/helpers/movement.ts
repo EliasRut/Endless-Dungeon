@@ -60,7 +60,7 @@ export const getRotationInRadiansForFacing = (facing: Facings) => {
 
 export const getCharacterSpeed = (char: Character) => {
 	return char.movementSpeed * char.slowFactor;
-}
+};
 
 export const updateMovingState = (
 		char: Character,
@@ -82,4 +82,4 @@ export const updateMovingState = (
 		char.isWalking = hasMoved;
 		const animationType = char.isWalking ? ANIMATION_WALK : ANIMATION_IDLE;
 		return `${char.animationBase}-${animationType}-${newDirection}`;
-}
+};
