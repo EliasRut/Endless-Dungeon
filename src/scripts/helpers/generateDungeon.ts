@@ -208,8 +208,8 @@ export default class DungeonGenerator {
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	dungeonLevel: number;
 
-	public generateLevel: (id: string, rooms: string[], dungeonLevel: number) => DungeonLevel 
-			= (id, rooms, dungeonLevel) => {
+	public generateLevel: (id: string, rooms: string[], dungeonLevel: number) => DungeonLevel =
+			(id, rooms, dungeonLevel) => {
 		this.rooms = rooms.map((roomName) => globalState.availableRooms[roomName]);
 		this.dungeonLevel = dungeonLevel;
 

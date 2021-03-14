@@ -41,6 +41,7 @@ const DEBUG__ITEM_OFFSET_Y = 30;
 const CASTING_SPEED_MS = 250;
 
 const CONNECTION_POINT_THRESHOLD_DISTANCE = 32;
+const STEP_SOUND_TIME= 200;
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -77,6 +78,8 @@ export default class MainScene extends Phaser.Scene {
 	sideQuestLog: SideQuestLog;
 
 	lastSave: number = Date.now();
+
+	lastStepLeft: number | undefined;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -137,7 +140,12 @@ export default class MainScene extends Phaser.Scene {
 	// 	  console.log("mouse y", pointers.y)
 	// });
 
-		this.sound.play('testSound', {volume: 0.08, loop: true});
+		this.sound.stopAll();
+		if (globalState.currentLevel === 'town') {
+			this.sound.play('score-town', {volume: 0.05, loop: true});
+		} else {
+			this.sound.play('score-dungeon', {volume: 0.04, loop: true});
+		}
 	}
 
 	addNpc(id: string, type: string, x: number, y: number, script?: NpcScript) {
@@ -249,7 +257,7 @@ export default class MainScene extends Phaser.Scene {
 			location.reload();
 		}
 
-		if(globalState.playerCharacter.health <= 0 && this.alive ===0){
+		if(globalState.playerCharacter.health <= 0 && this.alive === 0){
 			this.cameras.main.fadeOut(FADE_OUT_TIME_MS);
 			// tslint:disable-next-line: no-console
 			console.log('you died');
@@ -281,6 +289,17 @@ export default class MainScene extends Phaser.Scene {
 				newFacing);
 			if (playerAnimation) {
 				this.mainCharacter.play(playerAnimation);
+			}
+			if (hasMoved) {
+				const shouldPlayLeftStepSfx =
+					!this.lastStepLeft || (globalTime - this.lastStepLeft) > STEP_SOUND_TIME;
+
+				if (shouldPlayLeftStepSfx) {
+					this.sound.play('sound-step-grass-l', {volume: 0.25});
+					this.lastStepLeft = globalTime;
+				}
+			} else {
+				this.lastStepLeft = undefined;
 			}
 
 			const speed = isCasting ? 0 : getCharacterSpeed(globalState.playerCharacter);

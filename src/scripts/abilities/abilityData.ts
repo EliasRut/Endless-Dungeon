@@ -42,10 +42,10 @@ export const Abilities: {[type: string]: AbilityData} = {
 			yOffset: 32,
 			effect: FireBallEffect,
 			collisionSound: 'sound-fireball-explosion',
-			sfxVolume: 0.4,
+			sfxVolume: 0.3,
 		},
 		sound: 'sound-fireball',
-		sfxVolume: 0.2,
+		sfxVolume: 0.15,
 		cooldownMs: 400
 	},
 	[AbilityType.ICESPIKE]: {
