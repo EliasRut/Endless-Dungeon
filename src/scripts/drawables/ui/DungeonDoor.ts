@@ -14,8 +14,8 @@ const frameHeight = 32;
 
 export default class DungeonDoor extends Phaser.GameObjects.Image {
 	doorknob: Phaser.GameObjects.Image;
-	runeSockets: Array<Phaser.GameObjects.Sprite> = [];
-	runes: Array<Phaser.GameObjects.Sprite> = [];
+	runeSockets: Phaser.GameObjects.Sprite[] = [];
+	runes: Phaser.GameObjects.Sprite[] = [];
 
 	constructor(scene: DungeonDoorScene) {
 		super(scene, scene.cameras.main.width / 2, scene.cameras.main.height / 2, 'dungeon-door');
@@ -43,11 +43,11 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 				this.runes[i].setScrollFactor(0);
 				this.runes[i].setInteractive();
 				this.runes[i].setDepth(UiDepths.UI_FOREGROUND_LAYER);
-				this.runes[i].setFrame(Math.floor(Math.random()*8));
-				window.setTimeout(() => {
-					(this.scene as DungeonDoorScene).enterDungeon();
-				}, 3000);
+				this.runes[i].setFrame(Math.floor(Math.random() * 8));
 			}
+			window.setTimeout(() => {
+				(this.scene as DungeonDoorScene).enterDungeon();
+			}, 3000);
 		});
 
 		for (let i=0; i<5; i++) {
