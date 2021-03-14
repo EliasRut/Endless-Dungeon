@@ -66,7 +66,7 @@ export default class AbilityHelper {
 			this.scene.physics.add.collider(effect, targetTokens, (collidingEffect, target) => {
 				collidingEffect.destroy();
 				const enemy = target as CharacterToken;
-				enemy.stateObject.health -= origin.damage;
+				enemy.stateObject.health -= (origin.damage * Abilities[type].damageMultiplier);
 				if (projectileData?.collisionSound) {
 					this.scene.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
 				}

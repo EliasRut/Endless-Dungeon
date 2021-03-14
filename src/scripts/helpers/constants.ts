@@ -81,7 +81,7 @@ export const enum EquipmentSlot {
 	BELT = 'belt',
 	RIGHT_RING = 'rightRing',
 	LEFT_RING = 'leftRing'
-};
+}
 
 export const BAG_BOXES_X = 8;
 export const BAG_BOXES_Y = 4;

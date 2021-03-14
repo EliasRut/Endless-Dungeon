@@ -3,6 +3,8 @@ import EquippableItem from '../worldstate/EquippableItem';
 import Item from '../worldstate/Item';
 import OverlayScreen from './OverlayScreen';
 import { isEquippable } from '../helpers/inventory';
+import { Abilities, AbilityType } from '../abilities/abilityData';
+import globalState from '../worldstate';
 
 const BASE_SIZE_NAME = 25;
 const FONT_SIZE_TEXT = 10;
@@ -113,9 +115,11 @@ export default class ItemScreen extends OverlayScreen {
 			SCREEN_X - 10,
 			SCREEN_Y + 80,
 			'',
-			{ fontSize: '12px',
-			color: 'orange',
-			wordWrap: { width: SCREEN_WIDTH - 30, useAdvancedWrap: true } });
+			{
+				fontSize: '12px',
+				color: 'orange',
+				wordWrap: { width: SCREEN_WIDTH - 30, useAdvancedWrap: true }
+			});
 		this.flavorText.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.flavorText.setScrollFactor(0);
 		this.add(this.flavorText, true);
@@ -123,10 +127,10 @@ export default class ItemScreen extends OverlayScreen {
 		this.setVisible(false);
 	}
 
-	update(item: Item) {
+	update(item?: Item) {
 		if (item !== undefined) {
 			if (isEquippable(item)) {
-				let eItem = item as EquippableItem;
+				const eItem = item as EquippableItem;
 				this.lableHealthValue.setText(`${(eItem.maxHealth).toFixed(2)}`);
 				this.lableDamageValue.setText(`${(eItem.damage).toFixed(2)}`);
 				this.lableMovSpeedValue.setText(`${(eItem.movementSpeed).toFixed(2)}`);
@@ -152,6 +156,29 @@ export default class ItemScreen extends OverlayScreen {
 				textWidth = this.itemName.getBounds().width;
 				variableSize--;
 			}
+		}
+	}
+
+	updateAbility(ability: string) {
+		this.lableDamageValue.setText(`${(Abilities[ability as AbilityType].damageMultiplier * globalState.playerCharacter.damage).toFixed(2)}`);
+		this.lableHealthValue.setText(`${0}`);
+		this.lableMovSpeedValue.setText(`${0}`);
+		// center flavor text
+		this.flavorText.setText(`${Abilities[ability as AbilityType].flavorText}`);
+		let residualHeight = FLAVOR_HEIGHT - this.flavorText.getBounds().height;
+		residualHeight = residualHeight / 2;
+		this.flavorText.setY(SCREEN_Y + 80 + residualHeight);
+
+		// update item name
+		this.itemName.setText(`${ability}`);
+		let textHeight = 100;
+		let textWidth = SCREEN_WIDTH;
+		let variableSize = BASE_SIZE_NAME;
+		while (textHeight > 40 || textWidth > SCREEN_WIDTH - 40) {
+			this.itemName.setFontSize(variableSize);
+			textHeight = this.itemName.getBounds().height;
+			textWidth = this.itemName.getBounds().width;
+			variableSize--;
 		}
 	}
 }
