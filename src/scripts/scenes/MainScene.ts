@@ -157,7 +157,7 @@ export default class MainScene extends Phaser.Scene {
 		this.npcMap[id] = npc;
 		const facing = getFacing(facingX, facingY);
 		const animation = updateMovingState(
-			npc.stateObject,
+			globalState.npcs[id],
 			false,
 			facing,
 			true
@@ -192,8 +192,8 @@ export default class MainScene extends Phaser.Scene {
 
 	addFixedItem(id: string, x: number, y: number) {
 		this.dropItem(
-			x - DEBUG__ITEM_OFFSET_X,
-			y - DEBUG__ITEM_OFFSET_Y,
+			x, //- DEBUG__ITEM_OFFSET_X,
+			y, //- DEBUG__ITEM_OFFSET_Y,
 			{
 				...(fixedItems as { [id: string]: Partial<Item> })[id],
 				itemLocation: 0

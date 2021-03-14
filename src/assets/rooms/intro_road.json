@@ -70,10 +70,8 @@
           "don't you think? But it was definitely worth it,",
           "all the things I've learned. Especially this:"]
 			}, {
-				"type": "animation",
-				"target": "player",
-				"animation": "player-walk-s",
-				"duration": 2000
+				"type": "cast",
+				"ability": "fireball"
 			}, {
 				"type": "dialog",
 				"portrait": "player_happy",

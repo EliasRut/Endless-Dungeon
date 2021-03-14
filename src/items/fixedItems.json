@@ -3,5 +3,10 @@
 		"iconFrame": 58,
 		"type": "key",
 		"id": "goldKey"
+	},
+	"graduationScroll": {
+		"iconFrame": 32,
+		"type": "questItem",
+		"id": "graduationScroll"
 	}
 }

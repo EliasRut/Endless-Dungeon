@@ -70,11 +70,18 @@
 			"type": "naked-guy",
 			"x": 6,
 			"y": 4
-		}, 		{
+		}, {
 			"id": "nk-2",
 			"type": "naked-guy",
 			"x": 5,
 			"y": 4
+		}, {
+			"id": "nk-3",
+			"type": "naked-guy",
+			"x": 14,
+			"y": 11,
+			"facingX": -1,
+			"facingY": 0
 		}
 	],
 	"scripts": {
@@ -85,13 +92,6 @@
 				"posX": 8,
 				"posY": 11,
 				"facingX": 1,
-				"facingY": 0
-			}, {
-				"type": "move",
-				"target": "nk-2",
-				"posX": 12,
-				"posY": 11,
-				"facingX": -1,
 				"facingY": 0
 			}, {
 				"type": "fadeIn",
@@ -112,10 +112,19 @@
 					"of our world."
 				]
 			}, {
-				"type": "animation",
+				"type": "placeItem",
+				"posX": 12,
+				"posY": 11,
+				"itemId": "graduationScroll"
+			}, 
+			{
+				"type": "wait",
+				"time": 2000
+			}, {
+				"type": "walk",
 				"target": "player",
-				"animation": "player-walk-e",
-				"duration": 2000
+				"posX": 10,
+				"posY": 11
 			}, {
 				"type": "dialog",
 				"target": "npc",
@@ -182,6 +191,11 @@
 					"blessed with wisdom."
 				]
 			}, {
+				"type": "walk",
+				"target": "player",
+				"posX": 12,
+				"posY": 11
+			},  {
 				"type": "fadeOut",
 				"time": 2000
 			}, {
