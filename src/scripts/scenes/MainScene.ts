@@ -134,7 +134,6 @@ export default class MainScene extends Phaser.Scene {
 		// 	console.log("mouse x", pointers.x);
 		// 	console.log("mouse y", pointers.y);
 		// });
-		this.dropItem(1200, 1200, generateRandomItem(1, 0, 0));
 
 		this.sound.stopAll();
 		if (globalState.currentLevel === 'town') {
@@ -155,15 +154,17 @@ export default class MainScene extends Phaser.Scene {
 		) {
 		const npc = spawnNpc(this, type, id, x, y);
 		this.npcMap[id] = npc;
-		const facing = getFacing(facingX, facingY);
-		const animation = updateMovingState(
-			globalState.npcs[id],
-			false,
-			facing,
-			true
-		);
-		if (animation) {
-			npc.play(animation);
+		if (globalState.npcs[id]) {
+			const facing = getFacing(facingX, facingY);
+			const animation = updateMovingState(
+				globalState.npcs[id],
+				false,
+				facing,
+				true
+			);
+			if (animation) {
+				npc.play(animation);
+			}
 		}
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.physics.add.collider(this.npcMap[id], this.tileLayer);
@@ -248,6 +249,13 @@ export default class MainScene extends Phaser.Scene {
 		items.forEach((item) => {
 			this.addFixedItem(item.id, item.x, item.y);
 		});
+
+		console.log(`Dropping item at ${startPositionX}, ${startPositionY}`);
+		this.dropItem(
+			startPositionX,
+			startPositionY,
+			generateRandomItem(1, 0, 0, 0, 0)
+		);
 
 		return [startPositionX, startPositionY];
 	}

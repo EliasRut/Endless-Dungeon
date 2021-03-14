@@ -26,7 +26,7 @@ export class WorldState {
 	public dungeon: Dungeon;
 	public availableRooms: {[name: string]: Room} = {};
 	public availableTilesets: string[] = [];
-	public currentLevel: string = 'intro_ceremony';
+	public currentLevel: string = 'town';
 	public roomAssignment: {[name: string]: RoomAssignment} = {
 		'intro_dormRoom': {
 			dynamicLighting: false,
@@ -46,7 +46,7 @@ export class WorldState {
 		},
 		'town': {
 			dynamicLighting: false,
-			rooms: ['town']
+			rooms: ['town_new']
 		},
 		'doorTest': {
 			dynamicLighting: true,

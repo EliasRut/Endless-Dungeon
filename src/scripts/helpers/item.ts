@@ -1,8 +1,14 @@
-import weapons from '../../items/weapons.json';
-import armors from '../../items/armors.json';
-import accessories from '../../items/accessories.json';
-import Item from '../worldstate/Item';
 import EquippableItem from '../worldstate/EquippableItem';
+import {
+	EquippableItemType,
+	SourceData,
+	ItemData,
+	AbilityLinkedItem,
+	CatalystData,
+	ChestPieceData,
+	RingData,
+	AmuletData
+} from '../../items/itemData';
 
 const MAX_HEALTH = 100;
 const BASE_DAMAGE = 1;
@@ -12,44 +18,44 @@ const BASE_MAIN_STAT = 1;
 const MAX_ADDITIONAL_MAIN_STAT = 1;
 
 export const generateRandomItem = (
-								weaponWeight: number = 1,
+								sourceWeight: number = 1,
+								catalystWeight: number = 1,
 								armorWeight: number = 1,
-								accessoryWeight: number = 1) => {
+								ringWeight: number = 1,
+								amuletWeight: number = 1) => {
 	const rnd = Math.random();
 	let itemType: string;
-	let iconFrame: number;
-	let flavorText: string;
-	let name: string;
-	const totalWeight = weaponWeight + armorWeight + accessoryWeight;
-	if (rnd < (weaponWeight / totalWeight)) {
-		itemType = weapons.itemgroup;
-		iconFrame = weapons.icon[Math.floor(Math.random() * weapons.icon.length)];
-		flavorText = weapons.flavor;
-		name = itemType;
-	} else if (rnd > (weaponWeight + accessoryWeight) / totalWeight) {
-		// const rndIndex = Math.floor(Math.random() * Object.keys(armors).length);
-		const rndIndex = 3; // hard coded 3 since only one armor can currently drop
-		itemType = Object.keys(armors)[rndIndex];
-		const armorData = armors[itemType as keyof typeof armors];
-		iconFrame = armorData.icon[Math.floor(Math.random() * armorData.icon.length)];
-		flavorText = armorData.flavor;
-		name = itemType;
+	let data: ItemData | AbilityLinkedItem;
+	const totalWeight = sourceWeight + catalystWeight + armorWeight + ringWeight + amuletWeight;
+	if (rnd < (sourceWeight / totalWeight)) {
+		itemType = EquippableItemType.SOURCE;
+		const randomIndex = Math.floor(Math.random() * Object.keys(SourceData).length);
+		data = Object.values(SourceData)[randomIndex];
+	} else if (rnd < (sourceWeight + catalystWeight) / totalWeight) {
+		itemType = EquippableItemType.CATALYST;
+		const randomIndex = Math.floor(Math.random() * Object.keys(CatalystData).length);
+		data = Object.values(CatalystData)[randomIndex];
+	} else if (rnd < (sourceWeight + catalystWeight + armorWeight) / totalWeight) {
+		itemType = EquippableItemType.CHESTPIECE;
+		const randomIndex = Math.floor(Math.random() * Object.keys(ChestPieceData).length);
+		data = Object.values(ChestPieceData)[randomIndex];
+	} else if (rnd < (sourceWeight + catalystWeight + ringWeight) / totalWeight) {
+		itemType = EquippableItemType.RING;
+		const randomIndex = Math.floor(Math.random() * Object.keys(RingData).length);
+		data = Object.values(RingData)[randomIndex];
 	} else {
-		const rndIndex = Math.floor(Math.random() * Object.keys(accessories).length);
-		itemType = Object.keys(accessories)[rndIndex];
-		const accessoryData = accessories[itemType as keyof typeof accessories];
-		iconFrame = accessoryData.icon[Math.floor(Math.random() * accessoryData.icon.length)];
-		flavorText = accessoryData.flavor;
-		name = itemType;
+		itemType = EquippableItemType.NECKLACE;
+		const randomIndex = Math.floor(Math.random() * Object.keys(AmuletData).length);
+		data = Object.values(AmuletData)[randomIndex];
 	}
 	return new EquippableItem(
 		Math.random() * MAX_HEALTH,
 		Math.random() * MAX_ADDITIONAL_DAMAGE + BASE_DAMAGE,
 		Math.random() * MAX_MOVEMENT_SPEED,
 		Math.random() * MAX_ADDITIONAL_MAIN_STAT + BASE_MAIN_STAT,
-		iconFrame,
-		flavorText,
-		name,
+		data.iconFrame,
+		data.description,
+		data.name,
 		itemType
 	);
 };

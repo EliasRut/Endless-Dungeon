@@ -73,12 +73,8 @@ export const NUM_DIRECTIONS = 8;
 export const enum EquipmentSlot {
 	MAIN_HAND = 'mainhand',
 	OFF_HAND = 'offhand',
-	CHEST = 'chest',
-	HEAD = 'head',
-	GLOVES = 'gloves',
-	BOOTS = 'boots',
+	CHESTPIECE = 'chestpiece',
 	NECKLACE = 'necklace',
-	BELT = 'belt',
 	RIGHT_RING = 'rightRing',
 	LEFT_RING = 'leftRing'
 }
