@@ -23,8 +23,8 @@ export default class DungeonDoorPreloadScene extends Phaser.Scene {
 		this.load.spritesheet('runes', `assets/sprites/runes.png`, 
 		{ frameWidth: 32, frameHeight: 32 });
 
-		// load test music
-		this.load.audio('testSound', 'assets/sounds/testSound.MP3');
+		// load music score
+		this.load.audio('score-mage-tower', 'assets/sounds/score-mage-tower.mp3');
 	}
 
 	create() {
