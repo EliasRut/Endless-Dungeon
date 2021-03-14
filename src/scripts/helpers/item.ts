@@ -11,20 +11,24 @@ const MAX_MOVEMENT_SPEED = 100;
 const BASE_MAIN_STAT = 1;
 const MAX_ADDITIONAL_MAIN_STAT = 1;
 
-export const generateRandomItem = () => {
+export const generateRandomItem = (
+								weaponWeight: number = 1,
+								armorWeight: number = 1,
+								accessoryWeight: number = 1) => {
 	const rnd = Math.random();
 	let itemType: string;
 	let iconFrame: number;
 	let flavorText: string;
 	let name: string;
-	if (rnd < 0.33) {
+	const totalWeight = weaponWeight + armorWeight + accessoryWeight;
+	if (rnd < (weaponWeight / totalWeight)) {
 		itemType = weapons.itemgroup;
 		iconFrame = weapons.icon[Math.floor(Math.random() * weapons.icon.length)];
 		flavorText = weapons.flavor;
 		name = itemType;
-	} else if (0.33 <= rnd && rnd < 0.5) {
-		//const rndIndex = Math.floor(Math.random() * Object.keys(armors).length);
-		const rndIndex = 3;
+	} else if (rnd > (weaponWeight + accessoryWeight) / totalWeight) {
+		// const rndIndex = Math.floor(Math.random() * Object.keys(armors).length);
+		const rndIndex = 3; // hard coded 3 since only one armor can currently drop
 		itemType = Object.keys(armors)[rndIndex];
 		const armorData = armors[itemType as keyof typeof armors];
 		iconFrame = armorData.icon[Math.floor(Math.random() * armorData.icon.length)];

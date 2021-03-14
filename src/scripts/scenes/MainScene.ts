@@ -12,7 +12,7 @@ import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getCharacterSpeed, getFacing, updateMovingState } from '../helpers/movement';
-import { NUM_ITEM_ICONS, UiDepths} from '../helpers/constants';
+import { NUM_ITEM_ICONS, UiDepths } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
@@ -39,7 +39,7 @@ const DEBUG__ITEM_OFFSET_Y = 30;
 const CASTING_SPEED_MS = 250;
 
 const CONNECTION_POINT_THRESHOLD_DISTANCE = 32;
-const STEP_SOUND_TIME= 200;
+const STEP_SOUND_TIME = 200;
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -51,8 +51,8 @@ export default class MainScene extends Phaser.Scene {
 	abilityHelper: AbilityHelper;
 
 	mainCharacter: PlayerCharacterToken;
-	npcMap: {[id: string]: CharacterToken};
-	doorMap: {[id: string]: DoorToken};
+	npcMap: { [id: string]: CharacterToken };
+	doorMap: { [id: string]: DoorToken };
 	worldItems: WorldItemToken[];
 
 	overlayScreens: {
@@ -114,6 +114,10 @@ export default class MainScene extends Phaser.Scene {
 			this.physics.add.collider(this.mainCharacter, door);
 		});
 
+		this.fpsText = new FpsText(this);
+		this.backpackIcon = new BackpackIcon(this);
+		this.avatar = new Avatar(this);
+
 		this.overlayScreens = {
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
@@ -121,23 +125,20 @@ export default class MainScene extends Phaser.Scene {
 			dialogScreen: new DialogScreen(this)
 		};
 
-		this.fpsText = new FpsText(this);
-		this.backpackIcon = new BackpackIcon(this);
-		this.avatar = new Avatar(this);
-
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
 		this.scriptHelper = new ScriptHelper(this);
 
-	// 	var pointers = this.input.activePointer;
-	// 	this.input.on('pointerdown', function () {
-	// 	  console.log("mouse x", pointers.x)
-	// 	  console.log("mouse y", pointers.y)
-	// });
+		// var pointers = this.input.activePointer;
+		// this.input.on('pointerdown', function () {
+		// 	console.log("mouse x", pointers.x);
+		// 	console.log("mouse y", pointers.y);
+		// });
+		this.dropItem(1200, 1200, generateRandomItem(1, 0, 0));
 
 		this.sound.stopAll();
 		if (globalState.currentLevel === 'town') {
-			this.sound.play('score-town', {volume: 0.05, loop: true});
+			this.sound.play('score-town', { volume: 0.05, loop: true });
 		} else {
 			this.sound.play('score-dungeon', {volume: 0.08, loop: true});
 		}
@@ -175,7 +176,7 @@ export default class MainScene extends Phaser.Scene {
 			x - DEBUG__ITEM_OFFSET_X,
 			y - DEBUG__ITEM_OFFSET_Y,
 			{
-				...(fixedItems as {[id: string]: Partial<Item>})[id],
+				...(fixedItems as { [id: string]: Partial<Item> })[id],
 				itemLocation: 0
 			} as Item
 		);
@@ -252,7 +253,7 @@ export default class MainScene extends Phaser.Scene {
 			location.reload();
 		}
 
-		if(globalState.playerCharacter.health <= 0 && this.alive === 0){
+		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
 			this.cameras.main.fadeOut(FADE_OUT_TIME_MS);
 			// tslint:disable-next-line: no-console
 			console.log('you died');
@@ -264,7 +265,6 @@ export default class MainScene extends Phaser.Scene {
 		this.scriptHelper.handleScripts(globalTime);
 
 		this.overlayScreens.statScreen.update();
-		this.overlayScreens.itemScreen.update(this.overlayScreens.inventory.focusedItem);
 
 		if (this.isPaused) {
 			return;
@@ -290,7 +290,7 @@ export default class MainScene extends Phaser.Scene {
 					!this.lastStepLeft || (globalTime - this.lastStepLeft) > STEP_SOUND_TIME;
 
 				if (shouldPlayLeftStepSfx) {
-					this.sound.play('sound-step-grass-l', {volume: 0.25});
+					this.sound.play('sound-step-grass-l', { volume: 0.25 });
 					this.lastStepLeft = globalTime;
 				}
 			} else {
@@ -335,8 +335,8 @@ export default class MainScene extends Phaser.Scene {
 		connections.forEach((connection) => {
 
 			if (Math.hypot(
-						connection.x - playerX,
-						connection.y - playerY) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
+				connection.x - playerX,
+				connection.y - playerY) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
 				globalState.playerCharacter.x = 0;
 				globalState.playerCharacter.y = 0;
 				if (connection.targetMap) {

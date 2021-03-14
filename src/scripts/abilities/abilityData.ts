@@ -23,6 +23,8 @@ interface AbilityData {
 	sound?: string;
 	sfxVolume?: number;
 	cooldownMs?: number;
+	flavorText?: string;
+	damageMultiplier: number;
 }
 
 export const enum AbilityType {
@@ -46,7 +48,9 @@ export const Abilities: {[type: string]: AbilityData} = {
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
-		cooldownMs: 400
+		cooldownMs: 400,
+		damageMultiplier: 1,
+		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`
 	},
 	[AbilityType.ICESPIKE]: {
 		projectiles: 1,
@@ -60,7 +64,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
-		cooldownMs: 1200
+		cooldownMs: 1200,
+		damageMultiplier: 0.75,
 	},
 	[AbilityType.DUSTNOVA]: {
 		projectiles: 32,
@@ -76,7 +81,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		},
 		sound: 'sound-wind',
 		sfxVolume: 1.4,
-		cooldownMs: 1200
+		cooldownMs: 1200,
+		damageMultiplier: 0.05,
 	},
 	[AbilityType.ROUND_HOUSE_KICK]: {
 		projectiles: 16,
@@ -93,7 +99,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		},
 		sound: 'sound-wind',
 		sfxVolume: 1.4,
-		cooldownMs: 1200
+		cooldownMs: 1200,
+		damageMultiplier: 0.1,
 	},
 	[AbilityType.HEALING_LIGHT]: {
 		projectiles: 1,
@@ -107,6 +114,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 		},
 		sound: 'sound-wind',
 		sfxVolume: 1.4,
-		cooldownMs: 1200
+		cooldownMs: 1200,
+		damageMultiplier: 1,
 	}
 };

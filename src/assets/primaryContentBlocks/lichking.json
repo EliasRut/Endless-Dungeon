@@ -24,7 +24,9 @@
         {
             "title": "Royal crypta - Level 3",
             "style": "death",
-            "rooms": []
+            "rooms": [
+                "firstTest"
+            ]
         },
         {
             "title": "The kings final resting place",
