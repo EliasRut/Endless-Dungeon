@@ -11,6 +11,8 @@ export default class DungeonDoorScene extends Phaser.Scene {
 
 	create() {
 		this.dungeonDoor = new DungeonDoor(this);
+		this.sound.stopAll();
+		this.sound.play('score-mage-tower', {volume: 0.04});
 	}
 
 	enterDungeon() {

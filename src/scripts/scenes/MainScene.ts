@@ -144,7 +144,7 @@ export default class MainScene extends Phaser.Scene {
 		if (globalState.currentLevel === 'town') {
 			this.sound.play('score-town', {volume: 0.05, loop: true});
 		} else {
-			this.sound.play('score-dungeon', {volume: 0.04, loop: true});
+			this.sound.play('score-dungeon', {volume: 0.08, loop: true});
 		}
 	}
 

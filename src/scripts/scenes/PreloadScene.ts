@@ -61,8 +61,8 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('dungeon-door', 'assets/img/dungeon-door.png');
 
 		// load music score
-		this.load.audio('score-town', 'assets/sounds/town-theme.mp3');
-		this.load.audio('score-dungeon', 'assets/sounds/testSound.MP3');
+		this.load.audio('score-town', 'assets/sounds/score-town.mp3');
+		this.load.audio('score-dungeon', 'assets/sounds/score-dungeon.mp3');
 
 		// load sound effects
 		this.load.audio('sound-step-grass-l', 'assets/sounds/step-grass-l.wav');
