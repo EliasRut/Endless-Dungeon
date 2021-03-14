@@ -1,4 +1,6 @@
 import 'phaser';
+import DungeonDoorPreloadScene from './scenes/DungeonDoorPreloadScene';
+import DungeonDoorScene from './scenes/DungeonDoorScene';
 import MainScene from './scenes/MainScene';
 import MapEditor from './scenes/MapEditor';
 import PreloadScene from './scenes/PreloadScene';
@@ -19,7 +21,14 @@ const config: Phaser.Types.Core.GameConfig = {
 		width: DEFAULT_WIDTH,
 		height: DEFAULT_HEIGHT
 	},
-	scene: [RoomPreloaderScene, PreloadScene, MainScene, MapEditor],
+	scene: [
+		RoomPreloaderScene,
+		PreloadScene,
+		MainScene,
+		MapEditor,
+		DungeonDoorPreloadScene,
+		DungeonDoorScene
+	],
 	// We are using Phasers arcade physics library
 	physics: {
 		default: 'arcade',

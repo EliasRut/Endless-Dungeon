@@ -2,7 +2,7 @@ import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import EquippableItem, { ItemStats } from '../worldstate/EquippableItem';
 import Item from '../worldstate/Item';
-import { EquipmentSlot, INVENTORY_BOXES_X, INVENTORY_BOXES_Y } from './constants';
+import { EquipmentSlot, BAG_BOXES_X, BAG_BOXES_Y } from './constants';
 
 const BASE_HEALTH = 100;
 const BASE_MOVEMENT_SPEED = 200;
@@ -58,8 +58,8 @@ export const unequipItemFromCharacter = (itemToUnequip: EquippableItem, char: Ch
 
 export const placeItemInNextFreeBagSlot = (item: Item) => {
 	const inventory = globalState.inventory;
-	for (let x = 0; x < INVENTORY_BOXES_X; x++) {
-		for (let y = 0; y < INVENTORY_BOXES_Y; y++) {
+	for (let x = 0; x < BAG_BOXES_X; x++) {
+		for (let y = 0; y < BAG_BOXES_Y; y++) {
 			if (inventory.bag[x][y] === 0) {
 				inventory.bag[x][y] = 1;
 				inventory.unequippedItemList.push({
@@ -106,15 +106,19 @@ export const getSlotAndConflictsForEquipAction: (
 	throw new Error (`Unknown item type ${item.type} encountered.`);
 };
 
-const removeItemFromBag = (itemToRemove: Item) => {
+export const removeItemFromBagById = (itemIdToRemove: string) => {
 	const inventory = globalState.inventory;
 	const itemPositionIndex = inventory.unequippedItemList.findIndex(
-		({item}) => item.id === itemToRemove.id);
+		({item}) => item.id === itemIdToRemove);
 	if (itemPositionIndex >= 0) {
 		const {x, y} = inventory.unequippedItemList[itemPositionIndex];
 		inventory.bag[x][y] = 0;
 		inventory.unequippedItemList.splice(itemPositionIndex, 1);
 	}
+};
+
+export const removeItemFromBag = (itemToRemove: Item) => {
+	removeItemFromBagById(itemToRemove.id);
 };
 
 export const isEquippable = (item: Item) => {

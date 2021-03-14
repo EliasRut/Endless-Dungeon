@@ -3,10 +3,10 @@ import globalState from '../worldstate';
 import Door from '../worldstate/Door';
 import DungeonLevel from '../worldstate/DungeonLevel';
 
-export const DUNGEON_WIDTH = 128;
+export const DUNGEON_WIDTH = 160;
 export const BLOCK_SIZE = 8;
 export const DUNGEON_BLOCKS_X = DUNGEON_WIDTH / BLOCK_SIZE;
-export const DUNGEON_HEIGHT = 128;
+export const DUNGEON_HEIGHT = 160;
 export const DUNGEON_BLOCKS_Y = DUNGEON_HEIGHT / BLOCK_SIZE;
 export const TILE_WIDTH = 16;
 export const TILE_HEIGHT = 16;
@@ -317,7 +317,8 @@ export default class DungeonGenerator {
 				connections.push({
 					x: x * TILE_WIDTH,
 					y: y * TILE_HEIGHT,
-					targetMap
+					targetMap,
+					targetScene: connection.targetScene
 				});
 			});
 		});

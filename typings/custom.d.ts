@@ -16,7 +16,8 @@ export interface NpcPositioning {
 export interface MapConnection {
   x: number;
   y: number;
-  targetMap: string;
+	targetScene?: string;
+  targetMap?: string;
   targetX?: number;
   targetY?: number;
 }
@@ -48,7 +49,7 @@ export interface ScriptCondition {
 	conditionType: "hasItem" | "scriptState";
 	itemId?: string;
 	scriptId?: string;
-	scriptState?: string;
+	scriptState?: "new" | "finished";
 }
 
 export interface ScriptDialog {
@@ -108,15 +109,21 @@ export interface ScriptFadeOut {
 	time: number;
 }
 
+export interface ScriptTakeItem {
+	type: "takeItem";
+	itemId: string;
+	amount: number;
+}
+
 export interface ScriptSetScriptState {
-	type: "seScriptState";
+	type: "setScriptState";
 	scriptId: string;
 	scriptState: "new" | "finished";
 }
 
 export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange |
 	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn | ScriptOpenDoor |
-	ScriptCondition | ScriptSetScriptState;
+	ScriptCondition | ScriptSetScriptState | ScriptTakeItem;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];

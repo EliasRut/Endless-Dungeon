@@ -83,5 +83,5 @@ export const enum EquipmentSlot {
 	LEFT_RING = 'leftRing'
 };
 
-export const INVENTORY_BOXES_X = 8;
-export const INVENTORY_BOXES_Y = 10;
+export const BAG_BOXES_X = 8;
+export const BAG_BOXES_Y = 4;

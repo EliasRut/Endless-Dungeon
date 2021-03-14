@@ -1,5 +1,5 @@
 import Item from './Item';
-import { INVENTORY_BOXES_X, INVENTORY_BOXES_Y } from '../helpers/constants';
+import { BAG_BOXES_X, BAG_BOXES_Y } from '../helpers/constants';
 import EquippableItem from './EquippableItem';
 export default class Inventory {
 	public itemOffsetX = 0;
@@ -23,9 +23,9 @@ export default class Inventory {
 
 	constructor() {
 		this.bag = [];
-		for (let x = 0; x < INVENTORY_BOXES_X; x++) {
+		for (let x = 0; x < BAG_BOXES_X; x++) {
 			this.bag[x] = [];
-			for (let y = 0; y < INVENTORY_BOXES_Y; y++) {
+			for (let y = 0; y < BAG_BOXES_Y; y++) {
 				this.bag[x][y] = 0;
 			}
 		}

@@ -15,19 +15,28 @@ export const generateRandomItem = () => {
 	const rnd = Math.random();
 	let itemType: string;
 	let iconFrame: number;
-	if (rnd < 0.25) {
+	let flavorText: string;
+	let name: string;
+	if (rnd < 0.33) {
 		itemType = weapons.itemgroup;
 		iconFrame = weapons.icon[Math.floor(Math.random() * weapons.icon.length)];
-	} else if (0.25 <= rnd && rnd < 0.75) {
-		const rndIndex = Math.floor(Math.random() * Object.keys(armors).length);
+		flavorText = weapons.flavor;
+		name = itemType;
+	} else if (0.33 <= rnd && rnd < 0.5) {
+		//const rndIndex = Math.floor(Math.random() * Object.keys(armors).length);
+		const rndIndex = 3;
 		itemType = Object.keys(armors)[rndIndex];
 		const armorData = armors[itemType as keyof typeof armors];
 		iconFrame = armorData.icon[Math.floor(Math.random() * armorData.icon.length)];
+		flavorText = armorData.flavor;
+		name = itemType;
 	} else {
 		const rndIndex = Math.floor(Math.random() * Object.keys(accessories).length);
 		itemType = Object.keys(accessories)[rndIndex];
 		const accessoryData = accessories[itemType as keyof typeof accessories];
 		iconFrame = accessoryData.icon[Math.floor(Math.random() * accessoryData.icon.length)];
+		flavorText = accessoryData.flavor;
+		name = itemType;
 	}
 	return new EquippableItem(
 		Math.random() * MAX_HEALTH,
@@ -35,6 +44,8 @@ export const generateRandomItem = () => {
 		Math.random() * MAX_MOVEMENT_SPEED,
 		Math.random() * MAX_ADDITIONAL_MAIN_STAT + BASE_MAIN_STAT,
 		iconFrame,
+		flavorText,
+		name,
 		itemType
 	);
 };

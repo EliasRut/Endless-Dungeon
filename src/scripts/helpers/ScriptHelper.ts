@@ -192,6 +192,12 @@ export default class ScriptHelper {
 					true);
 				break;
 			}
+			case 'takeItem': {
+				cleanUpStep = true;
+				this.scene.overlayScreens.inventory.removeFromInventory(
+					currentStep.itemId, currentStep.amount);
+				break;
+			}
 			case 'condition': {
 				if (currentStep.conditionType === 'hasItem') {
 					const hasMatchingItems = !!globalState.inventory.unequippedItemList.find(
@@ -203,7 +209,39 @@ export default class ScriptHelper {
 						this.scriptStep = undefined;
 						return;
 					}
+				} else if (currentStep.conditionType === 'scriptState') {
+					const scriptId =
+						`${globalState.currentLevel}_${this.currentRoom!.roomName}_${currentStep.scriptId}`;
+					if (currentStep.scriptState === 'new') {
+						if (!globalState.scripts[scriptId] || globalState.scripts[scriptId].state === 'new') {
+							cleanUpStep = true;
+						} else {
+							this.runningScript = undefined;
+							this.scriptStep = undefined;
+							return;
+						}
+					} else if (currentStep.scriptState === 'finished') {
+						if (!globalState.scripts[scriptId]
+								|| globalState.scripts[scriptId].state !== 'finished') {
+							this.runningScript = undefined;
+							this.scriptStep = undefined;
+							return;
+						} else {
+							cleanUpStep = true;
+						}
+					}
 				}
+				break;
+			}
+			case 'setScriptState': {
+				cleanUpStep = true;
+				const scriptId =
+					`${globalState.currentLevel}_${this.currentRoom!.roomName}_${currentStep.scriptId}`;
+				globalState.scripts[scriptId] = {
+					id: scriptId,
+					state: currentStep.scriptState
+				};
+				break;
 			}
 		}
 		if (cleanUpStep) {

@@ -45,7 +45,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('icon-hero', 'assets/img/hero-icon.png');
 		this.load.image('icon-guibase', 'assets/img/gui-base.png');
 		this.load.image('icon-healthbar', 'assets/img/gui-life.png');
-		this.load.image('inventory-borders', 'assets/img/inventory-borders.png');
+		this.load.image('inventory-borders', 'assets/img/inventory-borders-tall.png');
 		this.load.spritesheet('icon-abilities', 'assets/img/abilities-sheet.png',
 			{ frameWidth: 20, frameHeight: 20 });
 
@@ -56,6 +56,9 @@ export default class PreloadScene extends Phaser.Scene {
 		// Doors
 		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png',
 			{ frameWidth: 48, frameHeight: 32 });
+		
+		// Dungeon Door
+		this.load.image('dungeon-door', 'assets/img/dungeon-door.png');
 
 		// load test music
 		this.load.audio('testSound', 'assets/sounds/testSound.MP3');
