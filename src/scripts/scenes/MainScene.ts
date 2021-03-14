@@ -144,8 +144,27 @@ export default class MainScene extends Phaser.Scene {
 		}
 	}
 
-	addNpc(id: string, type: string, x: number, y: number, script?: NpcScript) {
-		this.npcMap[id] = spawnNpc(this, type, id, x, y);
+	addNpc(
+			id: string,
+			type: string,
+			x: number,
+			y: number,
+			facingX: number,
+			facingY: number,
+			script?: NpcScript
+		) {
+		const npc = spawnNpc(this, type, id, x, y);
+		this.npcMap[id] = npc;
+		const facing = getFacing(facingX, facingY);
+		const animation = updateMovingState(
+			npc.stateObject,
+			false,
+			facing,
+			true
+		);
+		if (animation) {
+			npc.play(animation);
+		}
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.physics.add.collider(this.npcMap[id], this.tileLayer);
 		this.physics.add.collider(this.npcMap[id], this.decorationLayer);
@@ -219,7 +238,7 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayLayer.setDepth(UiDepths.OVERLAY_TILE_LAYER);
 
 		npcs.forEach((npc) => {
-			this.addNpc(npc.id, npc.type, npc.x, npc.y, npc.script);
+			this.addNpc(npc.id, npc.type, npc.x, npc.y, npc.facingX || 0, npc.facingY || 0, npc.script);
 		});
 
 		doors.forEach((door) => {

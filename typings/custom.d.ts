@@ -10,6 +10,8 @@ export interface NpcPositioning {
 	id: string;
 	x: number;
 	y: number;
+	facingX?: number;
+	facingY?: number;
 	script?: NpcScript;
 }
 
@@ -82,6 +84,8 @@ export interface ScriptWalk {
 }
 
 export interface ScriptSpawn {
+	facingX?: number;
+	facingY?: number;
 	type: "spawn";
 	npcId: string;
 	npcType: string;

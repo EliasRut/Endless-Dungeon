@@ -182,7 +182,9 @@ export default class ScriptHelper {
 					`${this.currentRoom!.roomName}${currentStep.npcId}`,
 					currentStep.npcType,
 					targetX,
-					targetY);
+					targetY,
+					currentStep.facingX || 0,
+					currentStep.facingY || 0);
 				break;
 			}
 			case 'openDoor': {
