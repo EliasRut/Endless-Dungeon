@@ -2,9 +2,6 @@ import 'phaser';
 
 import globalState from '../worldstate/index';
 
-import StoryLine from '../models/StoryLine';
-import SideQuestLog from '../models/SideQuestLog';
-
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import FpsText from '../drawables/ui/FpsText';
 
@@ -31,6 +28,7 @@ import { generateRandomItem } from '../helpers/item';
 import DoorToken from '../drawables/tokens/DoorToken';
 
 import fixedItems from '../../items/fixedItems.json';
+import { DungeonRunData } from '../models/DungeonRunData';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -74,8 +72,7 @@ export default class MainScene extends Phaser.Scene {
 	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
 	useDynamicLighting = false;
-	storyLine: StoryLine;
-	sideQuestLog: SideQuestLog;
+	dungeonRunData: DungeonRunData;
 
 	lastSave: number = Date.now();
 
@@ -89,8 +86,6 @@ export default class MainScene extends Phaser.Scene {
 		this.alive = 0;
 		// tslint:disable-next-line:no-unused-expression
 		this.cameras.main.fadeIn(FADE_IN_TIME_MS);
-
-		this.generateStory();
 
 		this.npcMap = {};
 		this.doorMap = {};
@@ -374,34 +369,5 @@ export default class MainScene extends Phaser.Scene {
 		const itemToken = new WorldItemToken(this, x, y, item);
 		itemToken.setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.worldItems.push(itemToken);
-	}
-
-	generateStory() {
-		if(!this.storyLine) {
-			this.storyLine = new StoryLine();
-			// tslint:disable-next-line: no-console
-			console.log(this.storyLine);
-			const mainQuests = this.storyLine.storyLineData.mainQuests;
-			this.sideQuestLog = new SideQuestLog(mainQuests.length, this.storyLine.storyLineData.themes);
-			// tslint:disable-next-line: no-console
-			console.log(this.sideQuestLog);
-
-			for(let i = 0; i < mainQuests.length; i++) {
-				const sideQuestRooms: string[] = [];
-				for(const sideQuest of this.sideQuestLog.sideQuests) {
-					if(sideQuest.level === i) {
-						sideQuestRooms.concat(sideQuest.rooms);
-					}
-				}
-				const rooms = ['connection_up'];
-				if (i < mainQuests.length - 1) {
-					rooms.push('connection_down');
-				}
-				globalState.roomAssignment['dungeonLevel' + (i + 1)] = {
-					dynamicLighting: true,
-					rooms: rooms.concat(mainQuests[i].rooms).concat(sideQuestRooms)
-				};
-			}
-		}
 	}
 }

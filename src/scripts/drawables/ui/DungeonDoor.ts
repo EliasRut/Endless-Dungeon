@@ -1,4 +1,4 @@
-import { UiDepths } from '../../helpers/constants';
+import { UiDepths, RuneAssignment, ColorsArray } from '../../helpers/constants';
 import DungeonDoorScene from '../../scenes/DungeonDoorScene';
 
 const socketPositions = [
@@ -36,6 +36,7 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 		this.doorknob.setDepth(UiDepths.UI_MAIN_LAYER);
 		this.doorknob.setInteractive();
 		this.doorknob.on('pointerdown', () => {
+			const usedRunes: number[] = [];
 			for (let i=0; i < 5; i++) {
 				const [x , y] = socketPositions[i];
 				this.runes[i].x = x;
@@ -43,10 +44,23 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 				this.runes[i].setScrollFactor(0);
 				this.runes[i].setInteractive();
 				this.runes[i].setDepth(UiDepths.UI_FOREGROUND_LAYER);
-				this.runes[i].setFrame(Math.floor(Math.random() * 8));
+				const usedRune = (i === 0) ?
+					5 :
+					((i === 1) ? 5 : Math.floor(Math.random() * 8));
+				this.runes[i].setFrame(usedRune);
+				usedRunes.push(usedRune);
 			}
+
+			const runeAssignment: RuneAssignment = {
+				primaryContent: ColorsArray[usedRunes[0]],
+				secondaryContent: ColorsArray[usedRunes[1]],
+				wanderingMonsters: ColorsArray[usedRunes[2]],
+				playerBuff: ColorsArray[usedRunes[3]],
+				randomNpc: ColorsArray[usedRunes[4]]
+			};
+
 			window.setTimeout(() => {
-				(this.scene as DungeonDoorScene).enterDungeon();
+				(this.scene as DungeonDoorScene).enterDungeon(runeAssignment);
 			}, 3000);
 		});
 

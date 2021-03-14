@@ -1,0 +1,31 @@
+{
+    "title": "Legends of the Lich Queen",
+    "lowerBoundOfSecondaryContentBlocks": 1,
+    "upperBoundOfSecondaryContentBlocks": 1,
+    "mainQuests": [
+        {
+            "title": "Queens crypta - Level 1",
+            "style": "death",
+            "rooms": [
+                "firstTest",
+                "secondTest"
+            ]
+        },
+        {
+            "title": "Queens crypta - Level 2",
+            "style": "death",
+            "rooms": []
+        },
+        {
+            "title": "The queens final resting place",
+            "style": "death",
+            "rooms": [
+                "firstTest",
+                "secondTest"
+            ]
+        }
+    ],
+    "themes": [
+        "blood"
+    ]
+}

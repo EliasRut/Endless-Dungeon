@@ -1,0 +1,41 @@
+{
+    "title": "Legends of the Lich King",
+    "lowerBoundOfSecondaryContentBlocks": 1,
+    "upperBoundOfSecondaryContentBlocks": 1,
+    "dungeonLevels": [
+        {
+            "title": "Royal crypta - Level 1",
+            "style": "death",
+            "rooms": [
+                "startRoom",
+                "firstTest",
+                "secondTest",
+                "thirdTest"
+            ]
+        },
+        {
+            "title": "Royal crypta - Level 2",
+            "style": "death",
+            "rooms": [
+                "firstTest",
+                "secondTest"
+            ]
+        },
+        {
+            "title": "Royal crypta - Level 3",
+            "style": "death",
+            "rooms": []
+        },
+        {
+            "title": "The kings final resting place",
+            "style": "death",
+            "rooms": [
+                "firstTest",
+                "secondTest"
+            ]
+        }
+    ],
+    "themes": [
+        "death"
+    ]
+}
