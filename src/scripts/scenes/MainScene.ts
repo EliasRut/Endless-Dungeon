@@ -14,7 +14,7 @@ import DialogScreen from '../screens/DialogScreen';
 import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
-import { getCharacterSpeed, getFacing, updateMovingState } from '../helpers/movement';
+import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
 import { NUM_ITEM_ICONS, UiDepths} from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
@@ -272,7 +272,7 @@ export default class MainScene extends Phaser.Scene {
 			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
 
 			const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing();
-			const newFacing = getFacing(xFacing, yFacing);
+			const newFacing = getFacing8Dir(xFacing, yFacing);
 
 			const hasMoved = isCasting ? false : (xFacing !== 0 || yFacing !== 0);
 			const playerAnimation = updateMovingState(

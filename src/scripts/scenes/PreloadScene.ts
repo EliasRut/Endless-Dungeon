@@ -1,5 +1,5 @@
 import { getUrlParam } from '../helpers/browserState';
-import { spriteDirectionList, NUM_DIRECTIONS } from '../helpers/constants';
+import { spriteDirectionList, NUM_DIRECTIONS,npcTypeToFileMap,FacingRange } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 
@@ -12,7 +12,7 @@ export default class PreloadScene extends Phaser.Scene {
 		super({ key: 'PreloadScene' });
 	}
 
-	neededAnimations = ['player'];
+	neededAnimations = [{name: 'player',facingRange: FacingRange.ALL_DIRECTIONS}];
 
 	init() {
 		const text = new Phaser.GameObjects.Text(this,
@@ -107,9 +107,9 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// NPCs
 		requiredNpcs.forEach((npc) => {
-		this.load.spritesheet(npc, `assets/sprites/${npc}.png`,
+		this.load.spritesheet(npc, npcTypeToFileMap[npc].file,
 			{ frameWidth: 40, frameHeight: 40 });
-			this.neededAnimations.push(npc);
+			this.neededAnimations.push({name: npc, facingRange: npcTypeToFileMap[npc].facing});
 		});
 	}
 
@@ -129,27 +129,29 @@ export default class PreloadScene extends Phaser.Scene {
 			const firstWalkFrame = numIdleFrames * spriteDirectionList.length;
 			const walkFrameOffset = firstWalkFrame + numWalkFrames * directionIndex;
 
-			const directionName = spriteDirectionList[directionIndex];
-
-			this.neededAnimations.forEach((tokenName) => {
+			const directionName = spriteDirectionList[directionIndex];	
+			
+			this.neededAnimations.forEach((token) => {
+				if(directionIndex% token.facingRange === 0) {
 				this.anims.create({
-					key: `${tokenName}-idle-${directionName}`,
-					frames: this.anims.generateFrameNumbers(tokenName, {
-						start: idleFrameOffset,
-						end: idleFrameOffset /* Currently only 1 drawn */
+					key: `${token.name}-idle-${directionName}`,
+					frames: this.anims.generateFrameNumbers(token.name, {
+						start: idleFrameOffset / token.facingRange,
+						end: idleFrameOffset / token.facingRange /* Currently only 1 drawn */
 					}),
 					frameRate: 5,
 					repeat: -1
 				});
 				this.anims.create({
-					key: `${tokenName}-walk-${directionName}`,
-					frames: this.anims.generateFrameNumbers(tokenName, {
-						start: walkFrameOffset,
-						end: walkFrameOffset + numWalkFrames - 1
+					key: `${token.name}-walk-${directionName}`,
+					frames: this.anims.generateFrameNumbers(token.name, {
+						start: walkFrameOffset / token.facingRange,
+						end: walkFrameOffset / token.facingRange + numWalkFrames - 1
 					}),
 					frameRate: 12,
 					repeat: -1
 				});
+			}
 			});
 		}
 

@@ -7,7 +7,7 @@ import StatScreen from '../screens/StatScreen';
 import globalState from '../worldstate';
 import { TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import RoomPositioning from '../worldstate/RoomPositioning';
-import { getCharacterSpeed, getFacing, updateMovingState } from './movement';
+import { getCharacterSpeed, getFacing8Dir, updateMovingState } from './movement';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 
 const DIALOG_TEXT_TIME_MS = 5000;
@@ -132,7 +132,7 @@ export default class ScriptHelper {
 				if (currentStep.target === 'player') {
 					this.scene.mainCharacter.x = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH;
 					this.scene.mainCharacter.y = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT;
-					const facing = getFacing(currentStep.facingX, currentStep.facingY);
+					const facing = getFacing8Dir(currentStep.facingX, currentStep.facingY);
 					const playerAnimation = updateMovingState(
 						globalState.playerCharacter,
 						false,
@@ -159,7 +159,7 @@ export default class ScriptHelper {
 						const speed = getCharacterSpeed(globalState.playerCharacter);
 						mainCharacter.setVelocity(speed * xFactor, speed * yFactor);
 						mainCharacter.body.velocity.normalize().scale(speed);
-						const newFacing = getFacing(xFactor, yFactor);
+						const newFacing = getFacing8Dir(xFactor, yFactor);
 						const playerAnimation = updateMovingState(
 							globalState.playerCharacter,
 							true,
@@ -297,7 +297,7 @@ export default class ScriptHelper {
 				}
 				token.x = (tokenRoom!.x + currentStep.posX) * TILE_WIDTH;
 				token.y = (tokenRoom!.y + currentStep.posY) * TILE_HEIGHT;
-				const facing = getFacing(currentStep.facingX, currentStep.facingY);
+				const facing = getFacing8Dir(currentStep.facingX, currentStep.facingY);
 				const animation = updateMovingState(
 					globalState.npcs[token.id],
 					false,
@@ -330,7 +330,7 @@ export default class ScriptHelper {
 					token.isBeingMoved = true;
 					token.setVelocity(speed * xFactor, speed * yFactor);
 					token.body.velocity.normalize().scale(speed);
-					const newFacing = getFacing(xFactor, yFactor);
+					const newFacing = getFacing8Dir(xFactor, yFactor);
 					const animation = updateMovingState(
 						globalState.npcs[token.id],
 						true,

@@ -85,3 +85,15 @@ export const enum EquipmentSlot {
 
 export const BAG_BOXES_X = 8;
 export const BAG_BOXES_Y = 4;
+
+export const enum FacingRange {
+	ALL_DIRECTIONS = 1,
+	ONLY_NESW = 2
+}
+
+export const npcTypeToFileMap : {[name: string]:{file: string, facing: FacingRange}} =  {
+	'red-ball'     : {file: 'assets/sprites/red-ball.png',facing: FacingRange.ALL_DIRECTIONS},
+	'red-link'     : {file: 'assets/sprites/red-link.png',facing: FacingRange.ALL_DIRECTIONS},
+	'naked-guy'    : {file: 'assets/sprites/naked-guy.png',facing: FacingRange.ALL_DIRECTIONS},
+	'enemy_Zombie' : {file: 'assets/sprites/enemy_Zombie.png',facing: FacingRange.ONLY_NESW}
+};

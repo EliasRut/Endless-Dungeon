@@ -1,5 +1,5 @@
 import { AbilityType } from '../../abilities/abilityData';
-import { getFacing, updateMovingState } from '../../helpers/movement';
+import { getFacing8Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
@@ -38,7 +38,7 @@ export default class RangedEnemyToken extends EnemyToken {
 		(this.stateObject as Enemy).exactTargetYFactor = yFactor;
 		const xSpeed = xFactor * this.stateObject.movementSpeed;
 		const ySpeed = yFactor * this.stateObject.movementSpeed;
-		const newFacing = getFacing(xSpeed, ySpeed);
+		const newFacing = getFacing8Dir(xSpeed, ySpeed);
 
 		if(this.aggro) {
 			if (this.attackedAt + this.stateObject.attackTime < time

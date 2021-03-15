@@ -147,8 +147,8 @@ export interface Room {
 	overlays?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
 	overlay?: number[][];
 	npcs?: NpcPositioning[]; //place npcs in room
-	connections?: MapConnection[]; //place npcs in room
-	items?: ItemsPositioning[]; //place npcs in room
+	connections?: MapConnection[];
+	items?: ItemsPositioning[];
 	openings: Opening[];
 	name: string;
 	scripts: Scripting;
