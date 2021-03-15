@@ -153,7 +153,7 @@ export default class ScriptHelper {
 					}
 					this.scene.npcMap[npcId].x = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH;
 					this.scene.npcMap[npcId].y = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT;
-					const facing = getFacing(currentStep.facingX, currentStep.facingY);
+					const facing = getFacing8Dir(currentStep.facingX, currentStep.facingY);
 					const animation = updateMovingState(
 						globalState.npcs[npcId],
 						false,
