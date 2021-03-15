@@ -2,9 +2,6 @@ import 'phaser';
 
 import globalState from '../worldstate/index';
 
-import StoryLine from '../models/StoryLine';
-import SideQuestLog from '../models/SideQuestLog';
-
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import FpsText from '../drawables/ui/FpsText';
 
@@ -15,7 +12,7 @@ import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
-import { NUM_ITEM_ICONS, UiDepths} from '../helpers/constants';
+import { NUM_ITEM_ICONS, UiDepths } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
@@ -31,6 +28,7 @@ import { generateRandomItem } from '../helpers/item';
 import DoorToken from '../drawables/tokens/DoorToken';
 
 import fixedItems from '../../items/fixedItems.json';
+import { DungeonRunData } from '../models/DungeonRunData';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -41,6 +39,7 @@ const DEBUG__ITEM_OFFSET_Y = 30;
 const CASTING_SPEED_MS = 250;
 
 const CONNECTION_POINT_THRESHOLD_DISTANCE = 32;
+const STEP_SOUND_TIME = 200;
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -52,8 +51,8 @@ export default class MainScene extends Phaser.Scene {
 	abilityHelper: AbilityHelper;
 
 	mainCharacter: PlayerCharacterToken;
-	npcMap: {[id: string]: CharacterToken};
-	doorMap: {[id: string]: DoorToken};
+	npcMap: { [id: string]: CharacterToken };
+	doorMap: { [id: string]: DoorToken };
 	worldItems: WorldItemToken[];
 
 	overlayScreens: {
@@ -73,10 +72,11 @@ export default class MainScene extends Phaser.Scene {
 	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
 	useDynamicLighting = false;
-	storyLine: StoryLine;
-	sideQuestLog: SideQuestLog;
+	dungeonRunData: DungeonRunData;
 
 	lastSave: number = Date.now();
+
+	lastStepLeft: number | undefined;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -86,8 +86,6 @@ export default class MainScene extends Phaser.Scene {
 		this.alive = 0;
 		// tslint:disable-next-line:no-unused-expression
 		this.cameras.main.fadeIn(FADE_IN_TIME_MS);
-
-		this.generateStory();
 
 		this.npcMap = {};
 		this.doorMap = {};
@@ -116,6 +114,10 @@ export default class MainScene extends Phaser.Scene {
 			this.physics.add.collider(this.mainCharacter, door);
 		});
 
+		this.fpsText = new FpsText(this);
+		this.backpackIcon = new BackpackIcon(this);
+		this.avatar = new Avatar(this);
+
 		this.overlayScreens = {
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
@@ -123,25 +125,47 @@ export default class MainScene extends Phaser.Scene {
 			dialogScreen: new DialogScreen(this)
 		};
 
-		this.fpsText = new FpsText(this);
-		this.backpackIcon = new BackpackIcon(this);
-		this.avatar = new Avatar(this);
-
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
 		this.scriptHelper = new ScriptHelper(this);
 
-	// 	var pointers = this.input.activePointer;
-	// 	this.input.on('pointerdown', function () {
-	// 	  console.log("mouse x", pointers.x)
-	// 	  console.log("mouse y", pointers.y)
-	// });
+		// var pointers = this.input.activePointer;
+		// this.input.on('pointerdown', function () {
+		// 	console.log("mouse x", pointers.x);
+		// 	console.log("mouse y", pointers.y);
+		// });
 
-		this.sound.play('testSound', {volume: 0.08, loop: true});
+		this.sound.stopAll();
+		if (globalState.currentLevel === 'town') {
+			this.sound.play('score-town', { volume: 0.05, loop: true });
+		} else {
+			this.sound.play('score-dungeon', {volume: 0.08, loop: true});
+		}
 	}
 
-	addNpc(id: string, type: string, x: number, y: number, script?: NpcScript) {
-		this.npcMap[id] = spawnNpc(this, type, id, x, y);
+	addNpc(
+			id: string,
+			type: string,
+			x: number,
+			y: number,
+			facingX: number,
+			facingY: number,
+			script?: NpcScript
+		) {
+		const npc = spawnNpc(this, type, id, x, y);
+		this.npcMap[id] = npc;
+		if (globalState.npcs[id]) {
+			const facing = getFacing8Dir(facingX, facingY);
+			const animation = updateMovingState(
+				globalState.npcs[id],
+				false,
+				facing,
+				true
+			);
+			if (animation) {
+				npc.play(animation);
+			}
+		}
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.physics.add.collider(this.npcMap[id], this.tileLayer);
 		this.physics.add.collider(this.npcMap[id], this.decorationLayer);
@@ -169,10 +193,10 @@ export default class MainScene extends Phaser.Scene {
 
 	addFixedItem(id: string, x: number, y: number) {
 		this.dropItem(
-			x - DEBUG__ITEM_OFFSET_X,
-			y - DEBUG__ITEM_OFFSET_Y,
+			x, //- DEBUG__ITEM_OFFSET_X,
+			y, //- DEBUG__ITEM_OFFSET_Y,
 			{
-				...(fixedItems as {[id: string]: Partial<Item>})[id],
+				...(fixedItems as { [id: string]: Partial<Item> })[id],
 				itemLocation: 0
 			} as Item
 		);
@@ -215,7 +239,7 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayLayer.setDepth(UiDepths.OVERLAY_TILE_LAYER);
 
 		npcs.forEach((npc) => {
-			this.addNpc(npc.id, npc.type, npc.x, npc.y, npc.script);
+			this.addNpc(npc.id, npc.type, npc.x, npc.y, npc.facingX || 0, npc.facingY || 0, npc.script);
 		});
 
 		doors.forEach((door) => {
@@ -225,6 +249,13 @@ export default class MainScene extends Phaser.Scene {
 		items.forEach((item) => {
 			this.addFixedItem(item.id, item.x, item.y);
 		});
+
+		console.log(`Dropping item at ${startPositionX}, ${startPositionY}`);
+		this.dropItem(
+			startPositionX,
+			startPositionY,
+			generateRandomItem(1, 0, 0, 0, 0)
+		);
 
 		return [startPositionX, startPositionY];
 	}
@@ -249,7 +280,7 @@ export default class MainScene extends Phaser.Scene {
 			location.reload();
 		}
 
-		if(globalState.playerCharacter.health <= 0 && this.alive ===0){
+		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
 			this.cameras.main.fadeOut(FADE_OUT_TIME_MS);
 			// tslint:disable-next-line: no-console
 			console.log('you died');
@@ -261,7 +292,6 @@ export default class MainScene extends Phaser.Scene {
 		this.scriptHelper.handleScripts(globalTime);
 
 		this.overlayScreens.statScreen.update();
-		this.overlayScreens.itemScreen.update(this.overlayScreens.inventory.focusedItem);
 
 		if (this.isPaused) {
 			return;
@@ -281,6 +311,17 @@ export default class MainScene extends Phaser.Scene {
 				newFacing);
 			if (playerAnimation) {
 				this.mainCharacter.play(playerAnimation);
+			}
+			if (hasMoved) {
+				const shouldPlayLeftStepSfx =
+					!this.lastStepLeft || (globalTime - this.lastStepLeft) > STEP_SOUND_TIME;
+
+				if (shouldPlayLeftStepSfx) {
+					this.sound.play('sound-step-grass-l', { volume: 0.25 });
+					this.lastStepLeft = globalTime;
+				}
+			} else {
+				this.lastStepLeft = undefined;
 			}
 
 			const speed = isCasting ? 0 : getCharacterSpeed(globalState.playerCharacter);
@@ -315,14 +356,14 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		// Check if the player is close to a connection point and move them if so
-		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections;
+		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections || [];
 		const playerX = globalState.playerCharacter.x;
 		const playerY = globalState.playerCharacter.y;
 		connections.forEach((connection) => {
 
 			if (Math.hypot(
-						connection.x - playerX,
-						connection.y - playerY) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
+				connection.x - playerX,
+				connection.y - playerY) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
 				globalState.playerCharacter.x = 0;
 				globalState.playerCharacter.y = 0;
 				if (connection.targetMap) {
@@ -355,34 +396,5 @@ export default class MainScene extends Phaser.Scene {
 		const itemToken = new WorldItemToken(this, x, y, item);
 		itemToken.setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.worldItems.push(itemToken);
-	}
-
-	generateStory() {
-		if(!this.storyLine) {
-			this.storyLine = new StoryLine();
-			// tslint:disable-next-line: no-console
-			console.log(this.storyLine);
-			const mainQuests = this.storyLine.storyLineData.mainQuests;
-			this.sideQuestLog = new SideQuestLog(mainQuests.length, this.storyLine.storyLineData.themes);
-			// tslint:disable-next-line: no-console
-			console.log(this.sideQuestLog);
-
-			for(let i = 0; i < mainQuests.length; i++) {
-				const sideQuestRooms: string[] = [];
-				for(const sideQuest of this.sideQuestLog.sideQuests) {
-					if(sideQuest.level === i) {
-						sideQuestRooms.concat(sideQuest.rooms);
-					}
-				}
-				const rooms = ['connection_up'];
-				if (i < mainQuests.length - 1) {
-					rooms.push('connection_down');
-				}
-				globalState.roomAssignment['dungeonLevel' + (i + 1)] = {
-					dynamicLighting: true,
-					rooms: rooms.concat(mainQuests[i].rooms).concat(sideQuestRooms)
-				};
-			}
-		}
 	}
 }

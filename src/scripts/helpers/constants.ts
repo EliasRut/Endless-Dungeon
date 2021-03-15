@@ -73,15 +73,41 @@ export const NUM_DIRECTIONS = 8;
 export const enum EquipmentSlot {
 	MAIN_HAND = 'mainhand',
 	OFF_HAND = 'offhand',
-	CHEST = 'chest',
-	HEAD = 'head',
-	GLOVES = 'gloves',
-	BOOTS = 'boots',
+	CHESTPIECE = 'chestpiece',
 	NECKLACE = 'necklace',
-	BELT = 'belt',
 	RIGHT_RING = 'rightRing',
 	LEFT_RING = 'leftRing'
-};
+}
+
+export const enum ColorsOfMagic {
+	FLUX = 'flux',
+	METAL = 'metal',
+	CHANGE = 'change',
+	BLOOD = 'blood',
+	DEATH = 'death',
+	PASSION = 'passion',
+	WILD = 'wild',
+	ROYAL = 'royal'
+}
+
+export const ColorsArray = [
+	ColorsOfMagic.WILD,
+	ColorsOfMagic.ROYAL,
+	ColorsOfMagic.METAL,
+	ColorsOfMagic.PASSION,
+	ColorsOfMagic.FLUX,
+	ColorsOfMagic.DEATH,
+	ColorsOfMagic.CHANGE,
+	ColorsOfMagic.BLOOD,
+];
+
+export interface RuneAssignment {
+	primaryContent: ColorsOfMagic;
+	secondaryContent: ColorsOfMagic;
+	wanderingMonsters: ColorsOfMagic;
+	playerBuff: ColorsOfMagic;
+	randomNpc: ColorsOfMagic;
+}
 
 export const BAG_BOXES_X = 8;
 export const BAG_BOXES_Y = 4;

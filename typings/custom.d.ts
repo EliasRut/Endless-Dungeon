@@ -1,3 +1,5 @@
+import { AbilityType } from "../src/scripts/abilities/abilityData";
+
 export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
 
 export interface NpcScript {
@@ -10,6 +12,8 @@ export interface NpcPositioning {
 	id: string;
 	x: number;
 	y: number;
+	facingX?: number;
+	facingY?: number;
 	script?: NpcScript;
 }
 
@@ -65,6 +69,11 @@ export interface ScriptAnimation {
 	duration: number;
 }
 
+export interface ScriptCast {
+	type: "cast";
+	ability: AbilityType;
+}
+
 export interface ScriptMove {
 	type: "move";
 	target?: string;
@@ -82,6 +91,8 @@ export interface ScriptWalk {
 }
 
 export interface ScriptSpawn {
+	facingX?: number;
+	facingY?: number;
 	type: "spawn";
 	npcId: string;
 	npcType: string;
@@ -115,6 +126,13 @@ export interface ScriptTakeItem {
 	amount: number;
 }
 
+export interface ScriptPlaceItem {
+	type: "placeItem";
+	itemId: string;
+	posX: number;
+	posY: number;
+}
+
 export interface ScriptSetScriptState {
 	type: "setScriptState";
 	scriptId: string;
@@ -123,7 +141,7 @@ export interface ScriptSetScriptState {
 
 export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange |
 	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn | ScriptOpenDoor |
-	ScriptCondition | ScriptSetScriptState | ScriptTakeItem;
+	ScriptCondition | ScriptSetScriptState | ScriptTakeItem | ScriptCast | ScriptPlaceItem;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];

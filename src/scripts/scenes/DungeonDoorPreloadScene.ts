@@ -18,13 +18,13 @@ export default class DungeonDoorPreloadScene extends Phaser.Scene {
 		// Dungeon Door
 		this.load.image('dungeon-door', 'assets/img/dungeon-door.png');
 		this.load.image('doorknob', 'assets/img/doorknob.png');
-		this.load.spritesheet('runeSocket', `assets/sprites/socket-animation.png`, 
+		this.load.spritesheet('runeSocket', `assets/sprites/socket-animation.png`,
 			{ frameWidth: 32, frameHeight: 32 });
-		this.load.spritesheet('runes', `assets/sprites/runes.png`, 
+		this.load.spritesheet('runes', `assets/sprites/runes.png`,
 		{ frameWidth: 32, frameHeight: 32 });
 
-		// load test music
-		this.load.audio('testSound', 'assets/sounds/testSound.MP3');
+		// load music score
+		this.load.audio('score-mage-tower', 'assets/sounds/score-mage-tower.mp3');
 	}
 
 	create() {

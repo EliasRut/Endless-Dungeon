@@ -13,6 +13,8 @@ import {
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import { isEquippable } from '../helpers/inventory';
 import EquippableItem from '../worldstate/EquippableItem';
+import globalState from '../worldstate';
+import MainScene from '../scenes/MainScene';
 
 const INVENTORY_START_X = 500;
 const INVENTORY_START_Y = 198;
@@ -28,28 +30,31 @@ const BAG_OFFSET_Y = -61;
 const BAG_START_X = INVENTORY_START_X - BAG_OFFSET_X;
 const BAG_START_Y = INVENTORY_START_Y - BAG_OFFSET_Y;
 
+const ABILITY_ICON_SIZE = 34;
+const ITEM_ABILITY_COORDINATES = {
+	element: [INVENTORY_START_X - 56, INVENTORY_START_Y+1]
+};
+
 // tslint:disable: no-magic-numbers
 const EQUIPMENT_SLOT_COORDINATES = {
-	[EquipmentSlot.MAIN_HAND]:  [INVENTORY_START_X - 42  , INVENTORY_START_Y - 80  ],
-	[EquipmentSlot.OFF_HAND]:   [INVENTORY_START_X + 42  , INVENTORY_START_Y - 80  ],
-	[EquipmentSlot.CHEST]:      [INVENTORY_START_X + 0   , INVENTORY_START_Y - 70  ],
-	[EquipmentSlot.HEAD]:       [346.5 , 119   ],
-	[EquipmentSlot.GLOVES]:     [290   , 207   ],
-	[EquipmentSlot.BOOTS]:      [402   , 207   ],
-	[EquipmentSlot.NECKLACE]:   [INVENTORY_START_X + 0   , INVENTORY_START_Y - 107 ],
-	[EquipmentSlot.BELT]:       [374.15, 199.75],
+	[EquipmentSlot.MAIN_HAND]: [INVENTORY_START_X - 42, INVENTORY_START_Y - 80],
+	[EquipmentSlot.OFF_HAND]: [INVENTORY_START_X + 42, INVENTORY_START_Y - 80],
+	[EquipmentSlot.CHESTPIECE]: [INVENTORY_START_X + 0, INVENTORY_START_Y - 70],
+	[EquipmentSlot.NECKLACE]: [INVENTORY_START_X + 0, INVENTORY_START_Y - 107],
 	[EquipmentSlot.RIGHT_RING]: [INVENTORY_START_X + 42.5, INVENTORY_START_Y - 45.5],
-	[EquipmentSlot.LEFT_RING]:  [INVENTORY_START_X - 41  , INVENTORY_START_Y - 45.5]
+	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X - 41, INVENTORY_START_Y - 45.5]
 };
 // tslint:enable
 
 export default class InventoryScreen extends OverlayScreen {
-	itemTokenMap: {[id: string]: InventoryItemToken} = {};
-	focusedItem: Item;
+	itemTokenMap: { [id: string]: InventoryItemToken } = {};
+	focusedItem?: Item;
+	scene: MainScene;
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
 		super(scene, INVENTORY_BORDER_X, INVENTORY_BORDER_Y, 175, 280);
+		this.scene = scene as MainScene;
 		const inventoryField = new Phaser.GameObjects.Image(scene, INVENTORY_START_X, INVENTORY_START_Y, 'inventory-borders');
 		inventoryField.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		inventoryField.setScrollFactor(0);
@@ -61,15 +66,16 @@ export default class InventoryScreen extends OverlayScreen {
 
 		const equippedItems = getEquippedItems();
 		Object.keys(equippedItems)
-		.filter((slotKey) => !!equippedItems[slotKey as EquipmentSlot])
-		.forEach((key) => {
-			const slotKey = key as EquipmentSlot;
-			const item = equippedItems[slotKey]!;
-			const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotKey];
-			if (!this.itemTokenMap[item.id]) {
-				this.createItemToken(item, x, y);
-			}
-		});
+			.filter((slotKey) => !!equippedItems[slotKey as EquipmentSlot])
+			.forEach((key) => {
+				const slotKey = key as EquipmentSlot;
+				const item = equippedItems[slotKey]!;
+				if (slotKey === 'mainhand') this.updatePrimaryAbility(true);
+				const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotKey];
+				if (!this.itemTokenMap[item.id]) {
+					this.createItemToken(item, x, y);
+				}
+			});
 
 		const uneqippedItemList = getUnequippedItemsWithPositions();
 		uneqippedItemList.forEach((itemPosition) => {
@@ -100,10 +106,39 @@ export default class InventoryScreen extends OverlayScreen {
 						equipItem(equippableItem);
 					}
 					this.update();
+					if (item.type === 'weapon') {
+						this.updatePrimaryAbility(false);
+					}
 				}
 			} else {
 				this.focusedItem = item;
+				this.scene.overlayScreens.itemScreen.update(item);
 			}
+		});
+	}
+
+	updatePrimaryAbility(contructor: boolean) {
+		const [iconX, iconY] = ITEM_ABILITY_COORDINATES.element;
+		const abilityIcon = new Phaser.GameObjects.Image(
+			this.scene,
+			iconX,
+			iconY,
+			'icon-abilities', 1);
+		abilityIcon.displayWidth = ABILITY_ICON_SIZE;
+		abilityIcon.displayHeight = ABILITY_ICON_SIZE;
+		abilityIcon.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		abilityIcon.setScrollFactor(0);
+		abilityIcon.setInteractive();
+		this.add(abilityIcon, true);
+		this.scene.avatar.updatePrimary(this.scene);
+		if (contructor) abilityIcon.setVisible(false);
+		else {
+			globalState.playerCharacter.updatePrimary('icespike');
+			abilityIcon.setVisible(true);
+		}
+		abilityIcon.on('pointerdown', () => {
+			if (this.focusedItem !== undefined) this.focusedItem = undefined;
+			this.scene.overlayScreens.itemScreen.updateAbility('fireball');
 		});
 	}
 
@@ -124,14 +159,14 @@ export default class InventoryScreen extends OverlayScreen {
 	update() {
 		const equippedItems = getEquippedItems();
 		Object.keys(equippedItems)
-		.filter((slotKey) => !!equippedItems[slotKey as EquipmentSlot])
-		.forEach((key) => {
-			const slotKey = key as EquipmentSlot;
-			const item = equippedItems[slotKey]!;
-			const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotKey];
-			this.itemTokenMap[item.id].x = x;
-			this.itemTokenMap[item.id].y = y;
-		});
+			.filter((slotKey) => !!equippedItems[slotKey as EquipmentSlot])
+			.forEach((key) => {
+				const slotKey = key as EquipmentSlot;
+				const item = equippedItems[slotKey]!;
+				const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotKey];
+				this.itemTokenMap[item.id].x = x;
+				this.itemTokenMap[item.id].y = y;
+			});
 
 		const uneqippedItemList = getUnequippedItemsWithPositions();
 		uneqippedItemList.forEach((itemPosition) => {

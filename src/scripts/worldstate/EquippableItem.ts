@@ -26,13 +26,13 @@ export default class EquippableItem extends Item implements ItemStats {
 			movementSpeed: number = Math.random() * MAX_MOVEMENT_SPEED,
 			mainStat: number = Math.random() * MAX_ADDITIONAL_MAIN_STAT + BASE_MAIN_STAT,
 			iconFrame: number = Math.floor(Math.random() * NUM_ICON_FRAMES),
-			flavorText: string = 'A normal item',
+			description: string = 'A normal item',
 			name: string = 'Item',
 			type: string = 'potion',
 			itemLocation: number = 0,
 			id?: string
 		) {
-		super(flavorText, name, iconFrame, type, itemLocation, id);
+		super(description, name, iconFrame, type, itemLocation, id);
 		this.maxHealth = maxHealth;
 		this.damage = damage;
 		this.movementSpeed = movementSpeed;

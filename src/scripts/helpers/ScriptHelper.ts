@@ -124,6 +124,10 @@ export default class ScriptHelper {
 			case 'sceneChange': {
 				cleanUpStep = true;
 				globalState.currentLevel = currentStep.target;
+				globalState.playerCharacter.x = 0;
+				globalState.playerCharacter.y = 0;
+				this.scene.mainCharacter.x = 0;
+				this.scene.mainCharacter.y = 0;
 				this.scene.scene.start('RoomPreloaderScene');
 				break;
 			}
@@ -141,7 +145,29 @@ export default class ScriptHelper {
 					if (playerAnimation) {
 						this.scene.mainCharacter.play(playerAnimation);
 					}
+				} else {
+					const npcId = `${this.currentRoom!.roomName}-${currentStep.target}`;
+					if (!this.scene.npcMap[npcId]) {
+						throw new Error(`Npc with id ${npcId} not defined. ` +
+							`Known npcs are ${Object.keys(this.scene.npcMap)}`);
+					}
+					this.scene.npcMap[npcId].x = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH;
+					this.scene.npcMap[npcId].y = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT;
+					const facing = getFacing(currentStep.facingX, currentStep.facingY);
+					const animation = updateMovingState(
+						globalState.npcs[npcId],
+						false,
+						facing,
+						true);
+					if (animation) {
+						this.scene.npcMap[npcId].play(animation);
+					}
 				}
+				break;
+			}
+			case 'cast': {
+				cleanUpStep = true;
+				this.scene.abilityHelper.triggerAbility(globalState.playerCharacter, currentStep.ability);
 				break;
 			}
 			case 'walk': {
@@ -182,7 +208,9 @@ export default class ScriptHelper {
 					`${this.currentRoom!.roomName}${currentStep.npcId}`,
 					currentStep.npcType,
 					targetX,
-					targetY);
+					targetY,
+					currentStep.facingX || 0,
+					currentStep.facingY || 0);
 				break;
 			}
 			case 'openDoor': {
@@ -196,6 +224,13 @@ export default class ScriptHelper {
 				cleanUpStep = true;
 				this.scene.overlayScreens.inventory.removeFromInventory(
 					currentStep.itemId, currentStep.amount);
+				break;
+			}
+			case 'placeItem': {
+				cleanUpStep = true;
+				const targetX = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH;
+				const targetY = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT;
+				this.scene.addFixedItem(currentStep.itemId, targetX, targetY);
 				break;
 			}
 			case 'condition': {
@@ -243,6 +278,8 @@ export default class ScriptHelper {
 				};
 				break;
 			}
+			// To Do's:
+			// Implememt item take and drop case (for example wizard scroll)
 		}
 		if (cleanUpStep) {
 			this.scriptStep = this.scriptStep! + 1;

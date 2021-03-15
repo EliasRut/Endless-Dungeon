@@ -208,8 +208,8 @@ export default class DungeonGenerator {
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	dungeonLevel: number;
 
-	public generateLevel: (id: string, rooms: string[], dungeonLevel: number) => DungeonLevel 
-			= (id, rooms, dungeonLevel) => {
+	public generateLevel: (id: string, rooms: string[], dungeonLevel: number) => DungeonLevel =
+			(id, rooms, dungeonLevel) => {
 		this.rooms = rooms.map((roomName) => globalState.availableRooms[roomName]);
 		this.dungeonLevel = dungeonLevel;
 
@@ -483,6 +483,8 @@ export default class DungeonGenerator {
 			room.npcs?.forEach((npc) => {
 				const [roomYBlockOffset, roomXBlockOffset] = this.roomOffsets[roomIndex];
 				this.npcs.push({
+					facingX: 0,
+					facingY: 0,
 					...npc,
 					id: `${room.name}-${npc.id}`,
 					x: (npc.x + roomXBlockOffset * BLOCK_SIZE) * TILE_WIDTH,

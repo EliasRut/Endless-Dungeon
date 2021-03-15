@@ -4,10 +4,6 @@ import Character from './Character';
 
 // This class handles the players character and all mechanical events associated with it.
 export default class PlayerCharacter extends Character {
-	// public itemHealth = 0;
-	// public weaponDamage = 1;
-	// public itemMovementSpeed = 0;
-
 	public x = 0;
 	public y = 0;
 
@@ -30,4 +26,8 @@ export default class PlayerCharacter extends Character {
 		[AbilityKey.THREE]: AbilityType.DUSTNOVA,
 		[AbilityKey.FOUR]: AbilityType.ROUND_HOUSE_KICK,
 	};
+
+	public updatePrimary(primaryAbility:string) {
+		this.abilityKeyMapping[0] = primaryAbility as AbilityType;
+	}
 }

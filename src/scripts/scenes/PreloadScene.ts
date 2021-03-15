@@ -56,12 +56,17 @@ export default class PreloadScene extends Phaser.Scene {
 		// Doors
 		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png',
 			{ frameWidth: 48, frameHeight: 32 });
-		
+
 		// Dungeon Door
 		this.load.image('dungeon-door', 'assets/img/dungeon-door.png');
 
-		// load test music
-		this.load.audio('testSound', 'assets/sounds/testSound.MP3');
+		// load music score
+		this.load.audio('score-town', 'assets/sounds/score-town.mp3');
+		this.load.audio('score-dungeon', 'assets/sounds/score-dungeon.mp3');
+
+		// load sound effects
+		this.load.audio('sound-step-grass-l', 'assets/sounds/step-grass-l.wav');
+		this.load.audio('sound-step-grass-r', 'assets/sounds/step-grass-r.wav');
 		this.load.audio('sound-fireball', 'assets/sounds/fireball.wav');
 		this.load.audio('sound-icespike', 'assets/sounds/icespike.wav');
 		this.load.audio('sound-icespike-hit', 'assets/sounds/icespike-hit.wav');

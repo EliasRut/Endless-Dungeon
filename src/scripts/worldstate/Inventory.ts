@@ -5,16 +5,12 @@ export default class Inventory {
 	public itemOffsetX = 0;
 	public itemOffsetY = 0;
 	public bag: integer[][];
-	public head?: EquippableItem;
 	public necklace?: EquippableItem;
 	public mainhand?: EquippableItem;
 	public offhand?: EquippableItem;
-	public chest?: EquippableItem;
+	public chestpiece?: EquippableItem;
 	public leftRing?: EquippableItem;
 	public rightRing?: EquippableItem;
-	public belt?: EquippableItem;
-	public gloves?: EquippableItem;
-	public boots?: EquippableItem;
 	public unequippedItemList: {
 		x: number,
 		y: number,
