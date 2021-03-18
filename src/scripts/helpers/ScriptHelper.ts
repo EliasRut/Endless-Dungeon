@@ -346,6 +346,10 @@ export default class ScriptHelper {
 				break;
 			}
 			case 'walk': {
+				if (!token || !globalState.npcs[token.id]) {
+					cleanUpStep = true;
+					break;
+				}
 				const tokenRoom = this.findRoomForToken(token);
 				if (!tokenRoom) {
 					cleanUpStep = true;

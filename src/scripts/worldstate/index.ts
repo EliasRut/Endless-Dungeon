@@ -46,7 +46,7 @@ export class WorldState {
 		},
 		'town': {
 			dynamicLighting: false,
-			rooms: ['town_new']
+			rooms: ['town']
 		},
 		'doorTest': {
 			dynamicLighting: true,

@@ -1,5 +1,5 @@
 import { getUrlParam } from '../helpers/browserState';
-import { spriteDirectionList, NUM_DIRECTIONS,npcTypeToFileMap,FacingRange } from '../helpers/constants';
+import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 
@@ -112,9 +112,23 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// NPCs
 		requiredNpcs.forEach((npc) => {
-		this.load.spritesheet(npc, npcTypeToFileMap[npc].file,
-			{ frameWidth: 40, frameHeight: 40 });
-			this.neededAnimations.push({name: npc, facingRange: npcTypeToFileMap[npc].facing});
+			this.load.spritesheet(
+				npc,
+				npcTypeToFileMap[npc].file,
+				{ frameWidth: 40, frameHeight: 40 }
+			);
+			this.neededAnimations.push({
+				name: npc,
+				facingRange: npcTypeToFileMap[npc].facing
+			});
+			const attackNames = Object.keys(npcTypeToAttackFileMap[npc] || {});
+			attackNames.forEach((attackName) => {
+				this.load.spritesheet(
+					`${npc}-${attackName}`,
+					npcTypeToAttackFileMap[npc][attackName].file,
+					{ frameWidth: 40, frameHeight: 40 }
+				);
+			})
 		});
 	}
 
@@ -134,29 +148,43 @@ export default class PreloadScene extends Phaser.Scene {
 			const firstWalkFrame = numIdleFrames * spriteDirectionList.length;
 			const walkFrameOffset = firstWalkFrame + numWalkFrames * directionIndex;
 
-			const directionName = spriteDirectionList[directionIndex];	
-			
+			const directionName = spriteDirectionList[directionIndex];
+
 			this.neededAnimations.forEach((token) => {
-				if(directionIndex% token.facingRange === 0) {
-				this.anims.create({
-					key: `${token.name}-idle-${directionName}`,
-					frames: this.anims.generateFrameNumbers(token.name, {
-						start: idleFrameOffset / token.facingRange,
-						end: idleFrameOffset / token.facingRange /* Currently only 1 drawn */
-					}),
-					frameRate: 5,
-					repeat: -1
-				});
-				this.anims.create({
-					key: `${token.name}-walk-${directionName}`,
-					frames: this.anims.generateFrameNumbers(token.name, {
-						start: walkFrameOffset / token.facingRange,
-						end: walkFrameOffset / token.facingRange + numWalkFrames - 1
-					}),
-					frameRate: 12,
-					repeat: -1
-				});
-			}
+				if (directionIndex % token.facingRange === 0) {
+					this.anims.create({
+						key: `${token.name}-idle-${directionName}`,
+						frames: this.anims.generateFrameNumbers(token.name, {
+							start: idleFrameOffset / token.facingRange,
+							end: idleFrameOffset / token.facingRange /* Currently only 1 drawn */
+						}),
+						frameRate: 5,
+						repeat: -1
+					});
+					this.anims.create({
+						key: `${token.name}-walk-${directionName}`,
+						frames: this.anims.generateFrameNumbers(token.name, {
+							start: walkFrameOffset / token.facingRange,
+							end: walkFrameOffset / token.facingRange + numWalkFrames - 1
+						}),
+						frameRate: 12,
+						repeat: -1
+					});
+					const attackNames = Object.keys(npcTypeToAttackFileMap[token.name] || {});
+					const directionFrameMultiplier = Math.floor(directionIndex / token.facingRange);
+					attackNames.forEach((attackName) => {
+						const attackData = npcTypeToAttackFileMap[token.name][attackName];
+						this.anims.create({
+							key: `${token.name}-${attackName}-${directionName}`,
+							frames: this.anims.generateFrameNumbers(`${token.name}-${attackName}`, {
+								start: directionFrameMultiplier * attackData.framesPerDirection,
+								end: (directionFrameMultiplier + 1) * attackData.framesPerDirection  - 1
+							}),
+							frameRate: 8,
+							repeat: 0
+						});
+					})
+				}
 			});
 		}
 

@@ -117,9 +117,20 @@ export const enum FacingRange {
 	ONLY_NESW = 2
 }
 
-export const npcTypeToFileMap : {[name: string]:{file: string, facing: FacingRange}} =  {
+export const npcTypeToFileMap: {[name: string]:{file: string, facing: FacingRange}} =  {
 	'red-ball'     : {file: 'assets/sprites/red-ball.png',facing: FacingRange.ALL_DIRECTIONS},
 	'red-link'     : {file: 'assets/sprites/red-link.png',facing: FacingRange.ALL_DIRECTIONS},
 	'naked-guy'    : {file: 'assets/sprites/naked-guy.png',facing: FacingRange.ALL_DIRECTIONS},
-	'enemy_Zombie' : {file: 'assets/sprites/enemy_Zombie.png',facing: FacingRange.ONLY_NESW}
+	'enemy-zombie' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW}
+};
+
+export const npcTypeToAttackFileMap: {
+	[name: string]: {[attackName: string]: {file: string, framesPerDirection: number}}
+} =  {
+	'enemy-zombie': {
+		'slash': {
+			file: 'assets/sprites/enemy-zombie-slash.png',
+			framesPerDirection: 16
+		}
+	}
 };

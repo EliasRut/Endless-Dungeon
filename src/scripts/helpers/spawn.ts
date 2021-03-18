@@ -21,7 +21,7 @@ export const spawnNpc = (
 		case 'naked-guy': {
 			return new NpcToken(scene, posX, posY, 'naked-guy', id);
 		}
-		case 'enemy_Zombie': {
+		case 'enemy-zombie': {
 			return new ZombieToken(scene, posX, posY, type, id);
 		}
 		default: {

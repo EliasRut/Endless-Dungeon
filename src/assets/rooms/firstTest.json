@@ -24,14 +24,14 @@
   ],
   "npcs": [
     {
-      "id": "rl-1",
-      "type": "red-link",
+      "id": "zom-1",
+      "type": "enemy-zombie",
       "x": 5,
       "y": 4
     },
     {
-      "id": "rl-3",
-      "type": "red-link",
+      "id": "zom-3",
+      "type": "enemy-zombie",
       "x": 12,
       "y": 5
     }
