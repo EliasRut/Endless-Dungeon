@@ -19,12 +19,14 @@ import Avatar from '../drawables/ui/Avatar';
 import ScriptHelper from '../helpers/ScriptHelper';
 import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
+import SettingsIcon from '../drawables/ui/SettingsIcon';
 import { spawnNpc } from '../helpers/spawn';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import { NpcOptions, NpcScript } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import Item from '../worldstate/Item';
 import { generateRandomItem } from '../helpers/item';
+import SettingsScreen from '../screens/SettingsScreen';
 import DoorToken from '../drawables/tokens/DoorToken';
 
 import fixedItems from '../../items/fixedItems.json';
@@ -60,6 +62,7 @@ export default class MainScene extends Phaser.Scene {
 		inventory: InventoryScreen;
 		statScreen: StatScreen;
 		dialogScreen: DialogScreen;
+		settingsScreen: SettingsScreen;
 		itemScreen: ItemScreen;
 	};
 	alive: number;
@@ -68,6 +71,7 @@ export default class MainScene extends Phaser.Scene {
 
 	avatar: Avatar;
 	backpackIcon: BackpackIcon;
+	settingsIcon: SettingsIcon;
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
@@ -135,9 +139,15 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayScreens = {
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
+			dialogScreen: new DialogScreen(this),
 			itemScreen: new ItemScreen(this),
-			dialogScreen: new DialogScreen(this)
+			settingsScreen: new SettingsScreen(this)
 		};
+
+		this.fpsText = new FpsText(this);
+		this.backpackIcon = new BackpackIcon(this);
+		this.settingsIcon = new SettingsIcon(this);
+		this.avatar = new Avatar(this);
 
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);

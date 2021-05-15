@@ -36,6 +36,8 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 			}};
 			globalState.currentLevel = requestedRoomId;
 		} else {
+			console.log(globalState.currentLevel);
+			console.log(globalState.roomAssignment[globalState.currentLevel])
 			const levelRoomAssignment = globalState.roomAssignment[globalState.currentLevel];
 			this.usedRooms.push(...levelRoomAssignment.rooms);
 		}
