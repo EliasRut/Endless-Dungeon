@@ -29,6 +29,7 @@ import DoorToken from '../drawables/tokens/DoorToken';
 
 import fixedItems from '../../items/fixedItems.json';
 import { DungeonRunData } from '../models/DungeonRunData';
+import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -264,14 +265,29 @@ export default class MainScene extends Phaser.Scene {
 			this.addFixedItem(item.id, item.x, item.y);
 		});
 
-		console.log(`Dropping item at ${startPositionX}, ${startPositionY}`);
-		this.dropItem(
-			startPositionX,
-			startPositionY,
-			generateRandomItem(1, 0, 0, 0, 0)
-		);
+		// console.log(`Dropping item at ${startPositionX}, ${startPositionY}`);
+		// this.dropItem(
+		// 	startPositionX,
+		// 	startPositionY,
+		// 	generateRandomItem(1, 0, 0, 0, 0)
+		// );
 
-		return [startPositionX, startPositionY];
+		const transitionCoordinates = globalState.transitionStack[globalState.currentLevel];
+		let usedStartPositionX = startPositionX;
+		let usedStartPositionY = startPositionY;
+		if (transitionCoordinates) {
+			const targetRoom = globalState.dungeon.levels[globalState.currentLevel]?.rooms.find(
+				(room) => room.roomName === transitionCoordinates.targetRoom);
+			if (targetRoom) {
+				usedStartPositionX = (targetRoom.x + transitionCoordinates.targetX) * TILE_WIDTH;
+				usedStartPositionY = (targetRoom.y + transitionCoordinates.targetY) * TILE_HEIGHT;
+			}
+		}
+
+		return [
+			usedStartPositionX,
+			usedStartPositionY
+		];
 	}
 
 	renderDebugGraphics() {
@@ -385,6 +401,13 @@ export default class MainScene extends Phaser.Scene {
 				globalState.playerCharacter.x = 0;
 				globalState.playerCharacter.y = 0;
 				if (connection.targetMap) {
+					if (connection.targetRoom) {
+						globalState.transitionStack[connection.targetMap] = {
+							targetRoom: connection.targetRoom,
+							targetX: connection.targetX || 0,
+							targetY: connection.targetY || 0
+						};
+					}
 					globalState.currentLevel = connection.targetMap;
 					this.scene.start('RoomPreloaderScene');
 				} else if (connection.targetScene) {
