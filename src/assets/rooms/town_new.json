@@ -15,6 +15,13 @@
 		"targetX": 12,
 		"targetY": 14
 	}, {
+		"y": 69,
+		"x": 63,
+		"targetMap": "library",
+		"targetRoom": "library",
+		"targetX": 12,
+		"targetY": 14
+	}, {
 		"y": 45,
 		"x": 77,
 		"targetScene": "DungeonDoorPreloadScene"

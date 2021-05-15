@@ -15,13 +15,29 @@ export const Quests: {[name: string]: Quest} = {
 	'hildaTalks': {
 		questGiverId: 'hilda',
 		name: 'Hilda needs Help'
+	},
+	'vanyaWantsBooks': {
+		questGiverId: 'vanya',
+		name: 'Vanya wants books',
+		preconditions: {
+			previousQuests: ['hildaTalks']
+		}
 	}
 };
 
 export const areQuestPreconditionsMet: (quest: Quest) => boolean = (quest) => {
-	// ToDo: Check whether preconditions are actually met.
-	return !quest.preconditions;
-}
+	if (!quest.preconditions) {
+		return true;
+	}
+	let areAllConditionsMet = true;
+	(quest.preconditions.previousQuests || []).forEach((questName) => {
+		if (!(globalState.quests || {})[questName]?.questFinished) {
+			areAllConditionsMet = false;
+		}
+	});
+	
+	return areAllConditionsMet;
+};
 
 export const getOpenQuestIds: (questGiverId: string) => string[] = (questGiverId) => {
 	return Object.entries(Quests).filter(([key, quest]) => {
@@ -46,15 +62,28 @@ const questScripts: {[name: string]: ScriptEntry[]} = {
 	'hildaTalks': [{
 			type: 'dialog',
 			portrait: 'player_happy',
-			text: ['Finally, today is the day I\'ve waited for so long!']
+			text: ['Go visit Vanya in the library!']
 		}, {
 			type: 'pauseUntilCondition',
-			roomName: 'town_new'
+			roomName: 'library'
 		}, {
 			type: 'dialog',
 			portrait: 'player_happy',
-			text: ['I\'m back in nature. Phew. Finally.']
-		},
+			text: [
+				'This must be the library I\'ve heard about.',
+				'Then this must be Vanya.'
+			]
+		}, {
+			type: 'setQuestState',
+			questId: 'hildaTalks',
+			questState: 'finished'
+		}
+	],
+	'vanyaWantsBooks': [{
+			type: 'dialog',
+			portrait: 'player_happy',
+			text: ['Get me some books, yo!']
+		}
 	]
 };
 

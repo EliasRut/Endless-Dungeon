@@ -154,10 +154,16 @@ export interface ScriptSetScriptState {
 	scriptState: "new" | "finished";
 }
 
+export interface ScriptQuestState {
+	type: "setQuestState";
+	questId: string;
+	questState: "new" | "finished";
+}
+
 export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange |
 	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn | ScriptOpenDoor |
 	ScriptCondition | ScriptSetScriptState | ScriptTakeItem | ScriptCast | ScriptPlaceItem |
-	ScriptPausedCondition;
+	ScriptPausedCondition | ScriptQuestState;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];
