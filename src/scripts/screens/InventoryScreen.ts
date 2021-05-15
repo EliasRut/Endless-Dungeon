@@ -26,6 +26,7 @@ import {
 	RingData,
 	AmuletData
 } from '../../items/itemData';
+import { updateAbility } from '../worldstate/PlayerCharacter';
 
 const INVENTORY_START_X = 500;
 const INVENTORY_START_Y = 198;
@@ -162,8 +163,8 @@ export default class InventoryScreen extends OverlayScreen {
 				// Remove ability if no item is equipped in slot
 				if (equippedItems[slotKey] === undefined) {
 					if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
-					if (slotKey === EquipmentSlot.MAIN_HAND) globalState.playerCharacter.updateAbility(this.scene, 0, AbilityType.FIREBALL);
-					else globalState.playerCharacter.updateAbility(this.scene, EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey], AbilityType.NOTHING);
+					if (slotKey === EquipmentSlot.MAIN_HAND) updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
+					else updateAbility(this.scene, globalState.playerCharacter, EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey], AbilityType.NOTHING);
 					return;
 				}
 
@@ -184,7 +185,7 @@ export default class InventoryScreen extends OverlayScreen {
 				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 				this.abilityIconMap[slotKey] = abilityIcon;				
 
-				globalState.playerCharacter.updateAbility(this.scene, EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey], ability);
+				updateAbility(this.scene, globalState.playerCharacter, EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey], ability);
 
 				if (contructor) abilityIcon.setVisible(false);
 				else abilityIcon.setVisible(true);

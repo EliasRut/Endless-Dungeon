@@ -28,10 +28,9 @@ export default class PlayerCharacter extends Character {
 		[AbilityKey.FOUR]: AbilityType.ROUND_HOUSE_KICK,
 		[AbilityKey.FIVE]: AbilityType.NOTHING,
 	};
-
-	public updateAbility(scene: MainScene, abilitySlot: AbilityKey, ability: AbilityType) {
-		if (abilitySlot === AbilityKey.FIVE) return;
-		this.abilityKeyMapping[abilitySlot] = ability;
-		scene.avatar.updateAbility(abilitySlot, ability);
-	}
+}
+export const updateAbility=(scene: MainScene, player: PlayerCharacter, abilitySlot: AbilityKey, ability: AbilityType) => {
+	if (abilitySlot === AbilityKey.FIVE) return;
+	player.abilityKeyMapping[abilitySlot] = ability;
+	scene.avatar.updateAbility(abilitySlot, ability);
 }

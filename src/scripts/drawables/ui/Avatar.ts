@@ -48,7 +48,10 @@ export default class Avatar extends Phaser.GameObjects.Group {
 	}
 
 	updateAbility(abilityKey: AbilityKey, ability: AbilityType) {
-		if(this.abilityIcons.has(abilityKey)) this.abilityIcons.delete(abilityKey);
+		if(this.abilityIcons.has(abilityKey)) {
+			this.abilityIcons.get(abilityKey)!.destroy(true);
+			this.abilityIcons.delete(abilityKey);
+		}
 		if (ability !== AbilityType.NOTHING) {
 			const abilityIcon = this.scene.add.image(ABILITY_COORDINATES[abilityKey][0], ABILITY_COORDINATES[abilityKey][1], ABILITY_TO_ICON[ability][0] as string, ABILITY_TO_ICON[ability][1]);
 			abilityIcon.setScrollFactor(0);
