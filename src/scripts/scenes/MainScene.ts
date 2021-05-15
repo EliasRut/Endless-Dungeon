@@ -12,7 +12,7 @@ import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
-import { NUM_ITEM_ICONS, UiDepths } from '../helpers/constants';
+import { essenceNames, NUM_ITEM_ICONS, UiDepths } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
@@ -117,6 +117,14 @@ export default class MainScene extends Phaser.Scene {
 		this.fpsText = new FpsText(this);
 		this.backpackIcon = new BackpackIcon(this);
 		this.avatar = new Avatar(this);
+
+		// essenceNames.forEach((name, index) => {
+		// 	const essence = new Phaser.GameObjects.Sprite(this, 200 + index * 20, 200, 'items-essence', 0);
+		// 	essence.play(`essence-${name}`);
+		// 	essence.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		// 	essence.setScrollFactor(0);
+		// 	this.add.existing(essence);
+		// })
 
 		this.overlayScreens = {
 			statScreen: new StatScreen(this),
@@ -353,6 +361,10 @@ export default class MainScene extends Phaser.Scene {
 		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);
 		this.worldItems.forEach((item) => {
 			item.update(this);
+		});
+
+		Object.values(this.doorMap).forEach((door) => {
+			door.update(this);
 		});
 
 		// Check if the player is close to a connection point and move them if so
