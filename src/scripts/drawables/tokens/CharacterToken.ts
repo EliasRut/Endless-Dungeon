@@ -24,4 +24,10 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		this.type = type;
 		this.id = id;
 	}
+
+	public getDistance(px: number, py: number) {
+		const x = this.x - px;
+		const y = this.y - py;
+		return Math.hypot(x, y);
+	}
 }

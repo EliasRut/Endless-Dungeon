@@ -6,6 +6,7 @@ import DungeonLevel from './DungeonLevel';
 import Inventory from './Inventory';
 import Item from './Item';
 import PlayerCharacter from './PlayerCharacter';
+import { QuestState } from './QuestState';
 import RoomAssignment from './RoomAssignment';
 import { RoomCoordinates } from './RoomCoordinates';
 import Script from './Script';
@@ -25,6 +26,7 @@ export class WorldState {
 	public npcs: {[id: string]: Character} = {};
 	public doors: {[id: string]: Door} = {};
 	public scripts: {[id: string]: Script} = {};
+	public quests: {[id: string]: QuestState} = {};
 	public dungeon: Dungeon;
 	public availableRooms: {[name: string]: Room} = {};
 	public availableTilesets: string[] = [];

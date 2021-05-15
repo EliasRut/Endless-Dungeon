@@ -21,7 +21,7 @@ import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
 import { spawnNpc } from '../helpers/spawn';
 import CharacterToken from '../drawables/tokens/CharacterToken';
-import { NpcScript } from '../../../typings/custom';
+import { NpcOptions, NpcScript } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import Item from '../worldstate/Item';
 import { generateRandomItem } from '../helpers/item';
@@ -162,9 +162,9 @@ export default class MainScene extends Phaser.Scene {
 			y: number,
 			facingX: number,
 			facingY: number,
-			script?: NpcScript
+			options?: NpcOptions
 		) {
-		const npc = spawnNpc(this, type, id, x, y);
+		const npc = spawnNpc(this, type, id, x, y, options);
 		this.npcMap[id] = npc;
 		if (globalState.npcs[id]) {
 			const facing = getFacing8Dir(facingX, facingY);
@@ -184,7 +184,7 @@ export default class MainScene extends Phaser.Scene {
 		if (this.mainCharacter) {
 			this.physics.add.collider(this.npcMap[id], this.mainCharacter);
 		}
-		this.npcMap[id].script = script;
+		this.npcMap[id].script = options?.script;
 	}
 
 	addDoor(id: string, type: string, x: number, y: number, open: boolean) {
@@ -254,7 +254,18 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayLayer.setDepth(UiDepths.OVERLAY_TILE_LAYER);
 
 		npcs.forEach((npc) => {
-			this.addNpc(npc.id, npc.type, npc.x, npc.y, npc.facingX || 0, npc.facingY || 0, npc.script);
+			this.addNpc(
+				npc.id,
+				npc.type,
+				npc.x,
+				npc.y,
+				npc.facingX || 0,
+				npc.facingY || 0,
+				{
+					script: npc.script,
+					questGiverId: npc.questGiverId,
+					traderId: npc.traderId
+				});
 		});
 
 		doors.forEach((door) => {

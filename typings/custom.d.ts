@@ -7,14 +7,19 @@ export interface NpcScript {
 	steps: NpcScriptStep [];
 }
 
-export interface NpcPositioning {
+export interface NpcOptions {
+	script?: NpcScript;
+	questGiverId?: string;
+	traderId?: string;
+}
+
+export interface NpcPositioning extends NpcOptions {
 	type: string;
 	id: string;
 	x: number;
 	y: number;
 	facingX?: number;
 	facingY?: number;
-	script?: NpcScript;
 }
 
 export interface MapConnection {

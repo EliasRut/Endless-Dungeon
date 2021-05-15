@@ -432,6 +432,18 @@ export default class ScriptHelper {
 		}
 	}
 
+	isScriptRunning() {
+		return !!this.runningScript;
+	}
+
+	loadScript(script: ScriptEntry[]) {
+		if (this.isScriptRunning()) {
+			return false;
+		}
+		this.runningScript = script;
+		this.scriptStep = 0;
+	}
+
 	handleScripts(globalTime: number) {
 		this.handleRoomScripts(globalTime);
 		this.handleNpcScripts(globalTime);

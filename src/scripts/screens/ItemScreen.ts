@@ -160,7 +160,9 @@ export default class ItemScreen extends OverlayScreen {
 	}
 
 	updateAbility(ability: string) {
-		this.lableDamageValue.setText(`${(Abilities[ability as AbilityType].damageMultiplier * globalState.playerCharacter.damage).toFixed(2)}`);
+		const damageValue = Abilities[ability as AbilityType].damageMultiplier
+			* globalState.playerCharacter.damage;
+		this.lableDamageValue.setText(`${damageValue.toFixed(2)}`);
 		this.lableHealthValue.setText(`${0}`);
 		this.lableMovSpeedValue.setText(`${0}`);
 		// center flavor text

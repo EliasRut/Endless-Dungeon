@@ -42,12 +42,6 @@ export default abstract class EnemyToken extends CharacterToken {
 		this.faction = Faction.ENEMIES;
 	}
 
-	public getDistance(px: number, py: number) {
-		const x = this.x - px;
-		const y = this.y - py;
-		return Math.hypot(x, y);
-	}
-
 	public checkLoS() {
 		// Instead of ray tracing we're using the players line of sight calculation, which tints the
 		// tile the enemy stands on.
