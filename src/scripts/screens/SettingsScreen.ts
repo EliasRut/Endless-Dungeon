@@ -8,7 +8,7 @@ import OverlayScreen from './OverlayScreen';
 export default class SettingsScreen extends OverlayScreen {
 	saveIcon: Phaser.GameObjects.BitmapText;
 	loadIcon: Phaser.GameObjects.BitmapText;
-	refreshIcon: Phaser.GameObjects.BitmapText;
+	newGameIcon: Phaser.GameObjects.BitmapText;
 	scene: Phaser.Scene;
 
 	constructor(scene: Phaser.Scene) {
@@ -32,7 +32,7 @@ export default class SettingsScreen extends OverlayScreen {
 		this.saveIcon.setInteractive();
 		this.saveIcon.on('pointerdown', () => {
 			// scene.overlayScreens.settingsScreen.save();
-			console.log('save game')
+			console.log('save game');
 			this.save();
 		});
 		this.add(this.saveIcon, true);
@@ -57,20 +57,20 @@ export default class SettingsScreen extends OverlayScreen {
 			console.log('load game')
 			// this.load(fileInput);
 			fileInput.click();
-			this.add(this.refreshIcon, true);
+			// this.add(this.refreshIcon, true);
 		});
 		this.add(this.loadIcon, true);
 
 
-		this.refreshIcon = new Phaser.GameObjects.BitmapText(
-			scene, SETTINGS_START_X+SETTINGS_WIDTH/2-72, SETTINGS_START_Y+50, 'pixelfont', 'Refresh', 12);
-		// this.dialogText.setOrigin(0, 0);
-		this.refreshIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-		this.refreshIcon.setScrollFactor(0);
-		this.refreshIcon.setInteractive();
-		this.refreshIcon.on('pointerdown', () => {
-			this.refresh();
-		});
+		// this.newGameIcon = new Phaser.GameObjects.BitmapText(
+		// 	scene, SETTINGS_START_X+SETTINGS_WIDTH/2-72, SETTINGS_START_Y+50, 'pixelfont', 'New Game', 12);
+		// // this.dialogText.setOrigin(0, 0);
+		// this.newGameIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		// this.newGameIcon.setScrollFactor(0);
+		// this.newGameIcon.setInteractive();
+		// // this.refreshIcon.on('pointerdown', () => {
+		// // 	this.refresh();
+		// // });
 
 		// tslint:enable
 		scene.add.existing(this);
@@ -121,19 +121,22 @@ export default class SettingsScreen extends OverlayScreen {
 			return;
 		}
 
-		localStorage.setItem('playerCharacter', JSON.stringify(savegameJSON.playerCharacter));
-		localStorage.setItem('gameTime', `${savegameJSON.gameTime}`);
-		localStorage.setItem('npcs', JSON.stringify(savegameJSON.npcs));
-		localStorage.setItem('doors', JSON.stringify(savegameJSON.doors));
-		localStorage.setItem('scripts', JSON.stringify(savegameJSON.scripts));
-		localStorage.setItem('dungeon', JSON.stringify(savegameJSON.dungeon));
-		localStorage.setItem('transitionStack', JSON.stringify(savegameJSON.transitionStack));
-		localStorage.setItem('availableRooms', JSON.stringify(savegameJSON.availableRooms));
-		localStorage.setItem('availableTilesets', JSON.stringify(savegameJSON.availableTilesets));
-		localStorage.setItem('currentLevel', JSON.stringify(savegameJSON.currentLevel));
-		localStorage.setItem('roomAssignment', JSON.stringify(savegameJSON.roomAssignment));
-		localStorage.setItem('inventory', JSON.stringify(savegameJSON.inventory));
-		localStorage.setItem('saveGameName',JSON.stringify(savegameJSON.saveGameName));
+
+		/* tslint:disable: max-line-length */
+		if(savegameJSON.playerCharacter) 	localStorage.setItem('playerCharacter', JSON.stringify(savegameJSON.playerCharacter));
+		if(savegameJSON.gameTime) 			localStorage.setItem('gameTime', `${savegameJSON.gameTime}`);
+		if(savegameJSON.npcs) 				localStorage.setItem('npcs', JSON.stringify(savegameJSON.npcs));
+		if(savegameJSON.doors) 				localStorage.setItem('doors', JSON.stringify(savegameJSON.doors));
+		if(savegameJSON.scripts) 			localStorage.setItem('scripts', JSON.stringify(savegameJSON.scripts));
+		if(savegameJSON.dungeon) 			localStorage.setItem('dungeon', JSON.stringify(savegameJSON.dungeon));
+		if(savegameJSON.transitionStack) 	localStorage.setItem('transitionStack', JSON.stringify(savegameJSON.transitionStack));
+		if(savegameJSON.availableRooms) 	localStorage.setItem('availableRooms', JSON.stringify(savegameJSON.availableRooms));
+		if(savegameJSON.availableTilesets) 	localStorage.setItem('availableTilesets', JSON.stringify(savegameJSON.availableTilesets));
+		if(savegameJSON.currentLevel) 		localStorage.setItem('currentLevel', JSON.stringify(savegameJSON.currentLevel));
+		if(savegameJSON.roomAssignment) 	localStorage.setItem('roomAssignment', JSON.stringify(savegameJSON.roomAssignment));
+		if(savegameJSON.inventory) 			localStorage.setItem('inventory', JSON.stringify(savegameJSON.inventory));
+		if(savegameJSON.saveGameName) 		localStorage.setItem('saveGameName',JSON.stringify(savegameJSON.saveGameName));
+		/* tslint:enable: max-line-length */
 
 		// globalState.loadState();
 		globalState.loadGame = true;
@@ -143,13 +146,13 @@ export default class SettingsScreen extends OverlayScreen {
 		return '';
 	}
 
-	async refresh() {
-		await(globalState.loadGame === true);
-		// this.scene.registry.destroy();
-		// this.scene.events.off;
-		// this.scene.scene.restart();
-		// globalState.loadGame = false;
-	}
+	// async refresh() {
+	// 	await(globalState.loadGame === true);
+	// 	// this.scene.registry.destroy();
+	// 	// this.scene.events.off;
+	// 	// this.scene.scene.restart();
+	// 	// globalState.loadGame = false;
+	// }
 
 	// handleFileLoad(event: Event){
 	// 	console.log(event);
@@ -166,6 +169,6 @@ export default class SettingsScreen extends OverlayScreen {
 	}
 }
 
-function signal() {
-	globalState.loadGame = true;
-}
+// function signal() {
+// 	globalState.loadGame = true;
+// }
