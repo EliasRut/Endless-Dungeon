@@ -22,7 +22,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		super(scene, x, y, tileName);
 		const tileX = Math.round(x / TILE_WIDTH);
 		const tileY = Math.round(y / TILE_HEIGHT);
-		this.tile = (this.scene as MainScene).tileLayer.getTileAt(tileX, tileY)
+		this.tile = (this.scene as MainScene).tileLayer.getTileAt(tileX, tileY);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.id = id;

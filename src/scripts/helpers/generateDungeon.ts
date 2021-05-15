@@ -310,8 +310,8 @@ export default class DungeonGenerator {
 				if (targetMap === 'NEXT_LEVEL') {
 					targetMap = `dungeonLevel${this.dungeonLevel + 1}`;
 					targetRoom = 'connection_up';
-					targetX = 4;
-					targetY = 4;
+					targetX = 12;
+					targetY = 5;
 				} else if (targetMap === 'PREVIOUS_LEVEL') {
 					if (this.dungeonLevel === 1) {
 						targetMap = 'town_new';
@@ -321,8 +321,8 @@ export default class DungeonGenerator {
 					} else {
 						targetMap = `dungeonLevel${this.dungeonLevel - 1}`;
 						targetRoom = 'connection_down';
-						targetX = 4;
-						targetY = 4;
+						targetX = 11;
+						targetY = 6;
 					}
 				}
 
