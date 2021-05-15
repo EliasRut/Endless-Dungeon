@@ -67,13 +67,13 @@ export const CatalystData = {
 		iconFrame: 33
 	} as AbilityLinkedItem,
 	[Catalyst.STORM]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.DUSTNOVA,
 		name: 'Storm Catalyst',
 		description: 'Homing projectiles shoot out of your source and hunt your enemies.',
 		iconFrame: 34
 	} as AbilityLinkedItem,
 	[Catalyst.SUMMON]: {
-		ability: AbilityType.ICESPIKE,
+		ability: AbilityType.ROUND_HOUSE_KICK,
 		name: 'Summon Catalyst',
 		description: 'Summons your energy into a self containing force, lending you a helping hand.',
 		iconFrame: 35
@@ -105,13 +105,13 @@ export const RingData = {
 		iconFrame: 56
 	} as AbilityLinkedItem,
 	[Ring.METAL]: {
-		ability: AbilityType.DUSTNOVA,
+		ability: AbilityType.ROUND_HOUSE_KICK,
 		name: 'Ring of Metal',
 		description: 'A ring giving you power associated with the color of magic: Metal',
 		iconFrame: 56
 	} as AbilityLinkedItem,
 	[Ring.PASSION]: {
-		ability: AbilityType.DUSTNOVA,
+		ability: AbilityType.ROUND_HOUSE_KICK,
 		name: 'Ring of Passion',
 		description: 'A ring giving you power associated with the color of magic: Passion',
 		iconFrame: 56
@@ -123,7 +123,7 @@ export const RingData = {
 		iconFrame: 56
 	} as AbilityLinkedItem,
 	[Ring.DEATH]: {
-		ability: AbilityType.DUSTNOVA,
+		ability: AbilityType.ROUND_HOUSE_KICK,
 		name: 'Ring of Death',
 		description: 'A ring giving you power associated with the color of magic: Death',
 		iconFrame: 56
@@ -135,7 +135,7 @@ export const RingData = {
 		iconFrame: 56
 	} as AbilityLinkedItem,
 	[Ring.BLOOD]: {
-		ability: AbilityType.DUSTNOVA,
+		ability: AbilityType.ROUND_HOUSE_KICK,
 		name: 'Ring of Blood',
 		description: 'A ring giving you power associated with the color of magic: Blood',
 		iconFrame: 56
