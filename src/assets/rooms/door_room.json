@@ -4,8 +4,8 @@
 	"decorationTileset": "dungeon-decoration",
 	"overlayTileset": "dungeon-overlay",
 	"openings": [
-    [-1, 1, "top"],
-		[ 2, 1, "top"]
+		[-1, 0, "top"],
+		[ 1, 0, "bottom"]
   ],
 	"layout": [
 		[0,6,32,33,32,32,4,0],
@@ -42,9 +42,36 @@
 	"doors": [{
 		"type": "red-door-north",
 		"id": "door",
-		"x": 3,
-		"y": 3,
+		"x": 4.5,
+		"y": 5,
 		"open": false
 	}],
-	"scripts": {}
+	"scripts": {
+		"onEntry": [
+			{
+				"type": "condition",
+				"conditionType": "scriptState",
+				"scriptId": "doorOpening",
+				"scriptState": "new"
+			},
+			{
+				"type": "condition",
+				"conditionType": "hasItem",
+				"itemId": "goldKey"
+			},
+			{
+				"type": "takeItem",
+				"itemId": "goldKey",
+				"amount": 1
+			},
+			{
+				"type": "openDoor",
+				"doorId": "door"
+			},{
+				"type": "setScriptState",
+				"scriptId": "doorOpening",
+				"scriptState": "finished"
+			}
+		]
+	}
 }

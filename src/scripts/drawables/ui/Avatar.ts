@@ -12,7 +12,6 @@ export default class Avatar extends Phaser.GameObjects.Group {
 
 	constructor(scene: Phaser.Scene) {
 		super(scene);
-
 		this.setDepth(UiDepths.UI_MAIN_LAYER);
 
 		// tslint:disable: no-magic-numbers
@@ -29,22 +28,31 @@ export default class Avatar extends Phaser.GameObjects.Group {
 		this.healthBar.setOrigin(0, 0.5);
 		this.healthBar.setDepth(UiDepths.UI_MAIN_LAYER);
 
-		this.abilty1Icon = scene.add.image(72, 63, 'icon-abilities', 0);
+		// if (globalState.inventory.mainhand !== undefined) {
+		// 	this.abilty1Icon = scene.add.image(72, 63, 'icon-abilities', 1);
+		// 	this.abilty1Icon.setScrollFactor(0);
+		// 	this.abilty1Icon.setDepth(UiDepths.UI_MAIN_LAYER);
+		// } else {
+		// 	this.abilty1Icon = scene.add.image(72, 63, 'icon-abilities', 0);
+		// 	this.abilty1Icon.setScrollFactor(0);
+		// 	this.abilty1Icon.setDepth(UiDepths.UI_MAIN_LAYER);
+		// }
+		this.abilty1Icon = scene.add.image(72, 62.5, 'icon-abilities', 0);
 		this.abilty1Icon.setScrollFactor(0);
 		this.abilty1Icon.setDepth(UiDepths.UI_MAIN_LAYER);
-		this.abilty2Icon = scene.add.image(101, 63, 'icon-abilities', 1);
+		this.abilty2Icon = scene.add.image(101, 62.5, 'icon-abilities', 1);
 		this.abilty2Icon.setScrollFactor(0);
 		this.abilty2Icon.setDepth(UiDepths.UI_MAIN_LAYER);
-		this.abilty3Icon = scene.add.image(130, 63, 'icon-abilities', 2);
+		this.abilty3Icon = scene.add.image(130, 62.5, 'icon-abilities', 2);
 		this.abilty3Icon.setScrollFactor(0);
 		this.abilty3Icon.setDepth(UiDepths.UI_MAIN_LAYER);
-		this.abilty4Icon = scene.add.image(159, 63, 'icon-abilities', 2);
+		this.abilty4Icon = scene.add.image(159, 62.5, 'icon-abilities', 2);
 		this.abilty4Icon.setScrollFactor(0);
 		this.abilty4Icon.setDepth(UiDepths.UI_MAIN_LAYER);
 		// tslint:enable: no-magic-numbers
 	}
 
-	update([cooldown1, cooldown2, cooldown3, cooldown4 ]: number[]) {
+	update([cooldown1, cooldown2, cooldown3, cooldown4]: number[]) {
 		const healthRatio = globalState.playerCharacter.health / globalState.playerCharacter.maxHealth;
 		this.healthBar.scaleX = Math.max(0, healthRatio * HEALTH_BAR_WIDTH);
 
@@ -52,5 +60,12 @@ export default class Avatar extends Phaser.GameObjects.Group {
 		this.abilty2Icon.setAlpha(cooldown2);
 		this.abilty3Icon.setAlpha(cooldown3);
 		this.abilty4Icon.setAlpha(cooldown4);
+	}
+
+	updatePrimary(scene: Phaser.Scene) {
+		this.abilty1Icon.destroy();
+		this.abilty1Icon = scene.add.image(72, 62.5, 'icon-abilities', 1);
+		this.abilty1Icon.setScrollFactor(0);
+		this.abilty1Icon.setDepth(UiDepths.UI_MAIN_LAYER);
 	}
 }

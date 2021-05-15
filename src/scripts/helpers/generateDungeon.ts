@@ -1,11 +1,12 @@
-import { MapConnection, NpcPositioning, OpeningDirection, Room } from '../../../typings/custom';
+import { ItemsPositioning, MapConnection, NpcPositioning, OpeningDirection, Room } from '../../../typings/custom';
 import globalState from '../worldstate';
+import Door from '../worldstate/Door';
 import DungeonLevel from '../worldstate/DungeonLevel';
 
-export const DUNGEON_WIDTH = 128;
+export const DUNGEON_WIDTH = 160;
 export const BLOCK_SIZE = 8;
 export const DUNGEON_BLOCKS_X = DUNGEON_WIDTH / BLOCK_SIZE;
-export const DUNGEON_HEIGHT = 128;
+export const DUNGEON_HEIGHT = 160;
 export const DUNGEON_BLOCKS_Y = DUNGEON_HEIGHT / BLOCK_SIZE;
 export const TILE_WIDTH = 16;
 export const TILE_HEIGHT = 16;
@@ -207,8 +208,8 @@ export default class DungeonGenerator {
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	dungeonLevel: number;
 
-	public generateLevel: (id: string, rooms: string[], dungeonLevel: number) => DungeonLevel 
-			= (id, rooms, dungeonLevel) => {
+	public generateLevel: (id: string, rooms: string[], dungeonLevel: number) => DungeonLevel =
+			(id, rooms, dungeonLevel) => {
 		this.rooms = rooms.map((roomName) => globalState.availableRooms[roomName]);
 		this.dungeonLevel = dungeonLevel;
 
@@ -302,21 +303,67 @@ export default class DungeonGenerator {
 				const y = connection.y + this.roomOffsets[index][0] * BLOCK_SIZE;
 				const x = connection.x + this.roomOffsets[index][1] * BLOCK_SIZE;
 
+				let targetX = connection.targetX;
+				let targetY = connection.targetY;
 				let targetMap = connection.targetMap;
+				let targetRoom = connection.targetRoom;
 				if (targetMap === 'NEXT_LEVEL') {
 					targetMap = `dungeonLevel${this.dungeonLevel + 1}`;
+					targetRoom = 'connection_up';
+					targetX = 4;
+					targetY = 4;
 				} else if (targetMap === 'PREVIOUS_LEVEL') {
 					if (this.dungeonLevel === 1) {
-						targetMap = 'town';
+						targetMap = 'town_new';
+						targetRoom = 'town_new';
+						targetX = 75;
+						targetY = 45;
 					} else {
 						targetMap = `dungeonLevel${this.dungeonLevel - 1}`;
+						targetRoom = 'connection_down';
+						targetX = 4;
+						targetY = 4;
 					}
 				}
 
 				connections.push({
 					x: x * TILE_WIDTH,
 					y: y * TILE_HEIGHT,
-					targetMap
+					targetX,
+					targetY,
+					targetRoom,
+					targetMap,
+					targetScene: connection.targetScene
+				});
+			});
+		});
+
+		const doors: Door[] = [];
+		this.rooms.forEach((room, index) => {
+			(room.doors || []).forEach((door) => {
+				const y = door.y + this.roomOffsets[index][0] * BLOCK_SIZE;
+				const x = door.x + this.roomOffsets[index][1] * BLOCK_SIZE;
+
+				doors.push({
+					x: x * TILE_WIDTH,
+					y: y * TILE_HEIGHT,
+					open: door.open,
+					type: door.type,
+					id: `${id}_${room.name}_${door.id}`
+				});
+			});
+		});
+
+		const items: ItemsPositioning[] = [];
+		this.rooms.forEach((room, index) => {
+			(room.items || []).forEach((item) => {
+				const y = item.y + this.roomOffsets[index][0] * BLOCK_SIZE;
+				const x = item.x + this.roomOffsets[index][1] * BLOCK_SIZE;
+
+				items.push({
+					x: x * TILE_WIDTH,
+					y: y * TILE_HEIGHT,
+					id: item.id
 				});
 			});
 		});
@@ -331,7 +378,9 @@ export default class DungeonGenerator {
 			decorationLayout: this.decorationLayout,
 			overlayLayout: this.overlayLayout,
 			npcs: this.npcs,
-			connections
+			connections,
+			doors,
+			items
 		};
 	}
 
@@ -449,6 +498,8 @@ export default class DungeonGenerator {
 			room.npcs?.forEach((npc) => {
 				const [roomYBlockOffset, roomXBlockOffset] = this.roomOffsets[roomIndex];
 				this.npcs.push({
+					facingX: 0,
+					facingY: 0,
 					...npc,
 					id: `${room.name}-${npc.id}`,
 					x: (npc.x + roomXBlockOffset * BLOCK_SIZE) * TILE_WIDTH,

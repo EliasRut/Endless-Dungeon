@@ -4,6 +4,9 @@ import OverlayScreen from './OverlayScreen';
 
 const FONT_SIZE_HEADER = 16;
 const FONT_SIZE_TEXT = 10;
+
+const SCREEN_X = 50;
+const SCREEN_Y = 120;
 export default class StatScreen extends OverlayScreen {
 	lableHealthValue: Phaser.GameObjects.BitmapText;
 	lableDamageValue: Phaser.GameObjects.BitmapText;
@@ -11,12 +14,12 @@ export default class StatScreen extends OverlayScreen {
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
-		super(scene, 64, 120, 200, 220);
+		super(scene, SCREEN_X, SCREEN_Y, 200, 220);
 
 		const header = new Phaser.GameObjects.BitmapText(
 			scene,
-			54,
-			110,
+			SCREEN_X - 10,
+			SCREEN_Y - 10,
 			'pixelfont',
 			'Statistics',
 			FONT_SIZE_HEADER);
@@ -32,15 +35,15 @@ export default class StatScreen extends OverlayScreen {
 
 		const lableHealth = new Phaser.GameObjects.BitmapText(
 			scene,
-			54,
-			150,
+			SCREEN_X - 10,
+			SCREEN_Y + 30,
 			'pixelfont',
 			'Health',
 			FONT_SIZE_TEXT);
 		this.lableHealthValue = new Phaser.GameObjects.BitmapText(
 			scene,
-			136,
-			150,
+			SCREEN_X + 74,
+			SCREEN_Y + 30,
 			'pixelfont',
 			`${currentHealth}/${maxHealth}`,
 			FONT_SIZE_TEXT);
@@ -53,15 +56,15 @@ export default class StatScreen extends OverlayScreen {
 
 		const lableDamage = new Phaser.GameObjects.BitmapText(
 			scene,
-			54,
-			168,
+			SCREEN_X - 10,
+			SCREEN_Y + 48,
 			'pixelfont',
 			'Damage',
 			FONT_SIZE_TEXT);
 		this.lableDamageValue = new Phaser.GameObjects.BitmapText(
 			scene,
-			136,
-			168,
+			SCREEN_X + 74,
+			SCREEN_Y + 48,
 			'pixelfont',
 			`${currentDamage}`,
 			FONT_SIZE_TEXT);
@@ -74,15 +77,15 @@ export default class StatScreen extends OverlayScreen {
 
 		const lableMovSpeed = new Phaser.GameObjects.BitmapText(
 			scene,
-			54,
-			186,
+			SCREEN_X - 10,
+			SCREEN_Y + 66,
 			'pixelfont',
 			'Speed',
 			FONT_SIZE_TEXT);
 		this.lableMovSpeedValue = new Phaser.GameObjects.BitmapText(
 			scene,
-			136,
-			186,
+			SCREEN_X + 74,
+			SCREEN_Y + 66,
 			'pixelfont',
 			`${currentMovSpeed}`,
 			FONT_SIZE_TEXT);

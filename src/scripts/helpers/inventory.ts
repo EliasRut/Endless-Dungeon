@@ -1,7 +1,9 @@
+import { EquippableItemType, equippableTypeNames } from '../../items/itemData';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
-import Item, { ItemStats } from '../worldstate/Item';
-import { EquipmentSlot, INVENTORY_BOXES_X, INVENTORY_BOXES_Y } from './constants';
+import EquippableItem, { ItemStats } from '../worldstate/EquippableItem';
+import Item from '../worldstate/Item';
+import { EquipmentSlot, BAG_BOXES_X, BAG_BOXES_Y } from './constants';
 
 const BASE_HEALTH = 100;
 const BASE_MOVEMENT_SPEED = 200;
@@ -25,14 +27,14 @@ export const updateStats = (char: Character) => {
 	char.damage = (1 + (itemStats.damage || 0)) * char.mainStat;
 };
 
-export const equipItemOnCharacter = (item: Item, char: Character) => {
+export const equipItemOnCharacter = (item: EquippableItem, char: Character) => {
 	// tslint:disable-next-line: no-console
 	console.log(`Equipping item ${JSON.stringify(item)}.`);
 	char.items.push(item);
 	updateStats(char);
 };
 
-export const unequipItemFromCharacter = (itemToUnequip: Item, char: Character) => {
+export const unequipItemFromCharacter = (itemToUnequip: EquippableItem, char: Character) => {
 	// tslint:disable-next-line: no-console
 	console.log(`Unequipping item ${JSON.stringify(itemToUnequip)}.`);
 	const itemIndex = char.items.findIndex((item) => item === itemToUnequip);
@@ -44,8 +46,8 @@ export const unequipItemFromCharacter = (itemToUnequip: Item, char: Character) =
 
 export const placeItemInNextFreeBagSlot = (item: Item) => {
 	const inventory = globalState.inventory;
-	for (let x = 0; x < INVENTORY_BOXES_X; x++) {
-		for (let y = 0; y < INVENTORY_BOXES_Y; y++) {
+	for (let x = 0; x < BAG_BOXES_X; x++) {
+		for (let y = 0; y < BAG_BOXES_Y; y++) {
 			if (inventory.bag[x][y] === 0) {
 				inventory.bag[x][y] = 1;
 				inventory.unequippedItemList.push({
@@ -60,31 +62,26 @@ export const placeItemInNextFreeBagSlot = (item: Item) => {
 	throw new Error('No slot for item found.');
 };
 
-export const unequipItem = (itemToUnequip: Item) => {
+export const unequipItem = (itemToUnequip: EquippableItem) => {
 	unequipItemFromCharacter(itemToUnequip, globalState.playerCharacter);
 	removeItemFromActiveEquippmentSlots(itemToUnequip);
 	return placeItemInNextFreeBagSlot(itemToUnequip);
 };
 
 export const getSlotAndConflictsForEquipAction: (
-	item: Item
-) => [EquipmentSlot, (Item | undefined)[]] = (item: Item) => {
+	item: EquippableItem
+) => [EquipmentSlot, (EquippableItem | undefined)[]] = (item: EquippableItem) => {
 
 // export const unequip = (item: Item) => {
 // 	item.unequip(globalState.playerCharacter);
 // 	this.sortIntoInventory(item.itemToken);
 	const inventory = globalState.inventory;
 	switch (item.type) {
-		case 'weapon': return [EquipmentSlot.MAIN_HAND, [inventory.mainhand]];
-		case 'offhand': return [EquipmentSlot.OFF_HAND, [inventory.offhand]];
-		case 'largeWeapon': return [EquipmentSlot.MAIN_HAND, [inventory.mainhand, inventory.offhand]];
-		case 'chest': return [EquipmentSlot.CHEST, [inventory.chest]];
-		case 'head': return [EquipmentSlot.HEAD, [inventory.head]];
-		case 'gloves': return [EquipmentSlot.GLOVES, [inventory.gloves]];
-		case 'boots': return [EquipmentSlot.BOOTS, [inventory.boots]];
-		case 'necklace': return [EquipmentSlot.NECKLACE, [inventory.necklace]];
-		case 'belt': return [EquipmentSlot.BELT, [inventory.belt]];
-		case 'ring':
+		case EquippableItemType.SOURCE: return [EquipmentSlot.MAIN_HAND, [inventory.mainhand]];
+		case EquippableItemType.CATALYST: return [EquipmentSlot.OFF_HAND, [inventory.offhand]];
+		case EquippableItemType.CHESTPIECE: return [EquipmentSlot.CHESTPIECE, [inventory.chestpiece]];
+		case EquippableItemType.NECKLACE: return [EquipmentSlot.NECKLACE, [inventory.necklace]];
+		case EquippableItemType.RING:
 			if (!inventory.rightRing) return [EquipmentSlot.RIGHT_RING, []];
 			if (!inventory.leftRing) return [EquipmentSlot.LEFT_RING, []];
 			return [EquipmentSlot.RIGHT_RING, [inventory.rightRing]];
@@ -92,10 +89,10 @@ export const getSlotAndConflictsForEquipAction: (
 	throw new Error (`Unknown item type ${item.type} encountered.`);
 };
 
-const removeItemFromBag = (itemToRemove: Item) => {
+export const removeItemFromBagById = (itemIdToRemove: string) => {
 	const inventory = globalState.inventory;
 	const itemPositionIndex = inventory.unequippedItemList.findIndex(
-		({item}) => item.id === itemToRemove.id);
+		({item}) => item.id === itemIdToRemove);
 	if (itemPositionIndex >= 0) {
 		const {x, y} = inventory.unequippedItemList[itemPositionIndex];
 		inventory.bag[x][y] = 0;
@@ -103,7 +100,15 @@ const removeItemFromBag = (itemToRemove: Item) => {
 	}
 };
 
-export const equipItem = (item: Item) => {
+export const removeItemFromBag = (itemToRemove: Item) => {
+	removeItemFromBagById(itemToRemove.id);
+};
+
+export const isEquippable = (item: Item) => {
+	return equippableTypeNames.includes(item.type);
+};
+
+export const equipItem = (item: EquippableItem) => {
 	const inventory = globalState.inventory;
 	const [slot, conflicts] = getSlotAndConflictsForEquipAction(item);
 	removeItemFromBag(item);
@@ -114,22 +119,18 @@ export const equipItem = (item: Item) => {
 	inventory[slot] = item;
 };
 
-export const getItemEquippmentSlot = (item: Item) => {
+export const getItemEquippmentSlot = (item: EquippableItem) => {
 	const inventory = globalState.inventory;
 	if (item.id === inventory.mainhand?.id) return EquipmentSlot.MAIN_HAND;
 	if (item.id === inventory.offhand?.id) return EquipmentSlot.OFF_HAND;
-	if (item.id === inventory.chest?.id) return EquipmentSlot.CHEST;
-	if (item.id === inventory.head?.id) return EquipmentSlot.HEAD;
-	if (item.id === inventory.gloves?.id) return EquipmentSlot.GLOVES;
-	if (item.id === inventory.boots?.id) return EquipmentSlot.BOOTS;
+	if (item.id === inventory.chestpiece?.id) return EquipmentSlot.CHESTPIECE;
 	if (item.id === inventory.necklace?.id) return EquipmentSlot.NECKLACE;
-	if (item.id === inventory.belt?.id) return EquipmentSlot.BELT;
 	if (item.id === inventory.rightRing?.id) return EquipmentSlot.RIGHT_RING;
 	if (item.id === inventory.leftRing?.id) return EquipmentSlot.LEFT_RING;
 	return undefined;
 };
 
-export const removeItemFromActiveEquippmentSlots = (item: Item) => {
+export const removeItemFromActiveEquippmentSlots = (item: EquippableItem) => {
 	const inventory = globalState.inventory;
 	const slot = getItemEquippmentSlot(item);
 	if (slot) {
@@ -137,7 +138,7 @@ export const removeItemFromActiveEquippmentSlots = (item: Item) => {
 	}
 };
 
-export const isEquipped = (item: Item) => {
+export const isEquipped = (item: EquippableItem) => {
 	return getItemEquippmentSlot(item) !== undefined;
 };
 
@@ -146,12 +147,8 @@ export const getEquippedItems = () => {
 	return {
 		[EquipmentSlot.MAIN_HAND]: inventory.mainhand,
 		[EquipmentSlot.OFF_HAND]: inventory.offhand,
-		[EquipmentSlot.CHEST]: inventory.chest,
-		[EquipmentSlot.HEAD]: inventory.head,
-		[EquipmentSlot.GLOVES]: inventory.gloves,
-		[EquipmentSlot.BOOTS]: inventory.boots,
+		[EquipmentSlot.CHESTPIECE]: inventory.chestpiece,
 		[EquipmentSlot.NECKLACE]: inventory.necklace,
-		[EquipmentSlot.BELT]: inventory.belt,
 		[EquipmentSlot.RIGHT_RING]: inventory.rightRing,
 		[EquipmentSlot.LEFT_RING]: inventory.leftRing,
 	};

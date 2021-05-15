@@ -1,5 +1,5 @@
 import { getUrlParam } from '../helpers/browserState';
-import { spriteDirectionList, NUM_DIRECTIONS } from '../helpers/constants';
+import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 
@@ -12,7 +12,7 @@ export default class PreloadScene extends Phaser.Scene {
 		super({ key: 'PreloadScene' });
 	}
 
-	neededAnimations = ['player'];
+	neededAnimations = [{name: 'player',facingRange: FacingRange.ALL_DIRECTIONS}];
 
 	init() {
 		const text = new Phaser.GameObjects.Text(this,
@@ -45,16 +45,32 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('icon-hero', 'assets/img/hero-icon.png');
 		this.load.image('icon-guibase', 'assets/img/gui-base.png');
 		this.load.image('icon-healthbar', 'assets/img/gui-life.png');
-		this.load.image('inventory-borders', 'assets/img/inventory-borders.png');
+		this.load.image('inventory-borders', 'assets/img/inventory-borders-tall.png');
 		this.load.spritesheet('icon-abilities', 'assets/img/abilities-sheet.png',
 			{ frameWidth: 20, frameHeight: 20 });
+
+		// Essences
+		this.load.spritesheet('items-essence', 'assets/sprites/items-essence.png',
+			{ frameWidth: 16, frameHeight: 16 });
 
 		// Items
 		this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
 			{ frameWidth: 16, frameHeight: 16 });
 
-		// load test music
-		this.load.audio('testSound', 'assets/sounds/testSound.MP3');
+		// Doors
+		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png',
+			{ frameWidth: 48, frameHeight: 32 });
+
+		// Dungeon Door
+		this.load.image('dungeon-door', 'assets/img/dungeon-door.png');
+
+		// load music score
+		this.load.audio('score-town', 'assets/sounds/score-town.mp3');
+		this.load.audio('score-dungeon', 'assets/sounds/score-dungeon.mp3');
+
+		// load sound effects
+		this.load.audio('sound-step-grass-l', 'assets/sounds/step-grass-l.wav');
+		this.load.audio('sound-step-grass-r', 'assets/sounds/step-grass-r.wav');
 		this.load.audio('sound-fireball', 'assets/sounds/fireball.wav');
 		this.load.audio('sound-icespike', 'assets/sounds/icespike.wav');
 		this.load.audio('sound-icespike-hit', 'assets/sounds/icespike-hit.wav');
@@ -100,9 +116,23 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// NPCs
 		requiredNpcs.forEach((npc) => {
-		this.load.spritesheet(npc, `assets/sprites/${npc}.png`,
-			{ frameWidth: 40, frameHeight: 40 });
-			this.neededAnimations.push(npc);
+			this.load.spritesheet(
+				npc,
+				npcTypeToFileMap[npc].file,
+				{ frameWidth: 40, frameHeight: 40 }
+			);
+			this.neededAnimations.push({
+				name: npc,
+				facingRange: npcTypeToFileMap[npc].facing
+			});
+			const attackNames = Object.keys(npcTypeToAttackFileMap[npc] || {});
+			attackNames.forEach((attackName) => {
+				this.load.spritesheet(
+					`${npc}-${attackName}`,
+					npcTypeToAttackFileMap[npc][attackName].file,
+					{ frameWidth: 40, frameHeight: 40 }
+				);
+			});
 		});
 	}
 
@@ -124,27 +154,56 @@ export default class PreloadScene extends Phaser.Scene {
 
 			const directionName = spriteDirectionList[directionIndex];
 
-			this.neededAnimations.forEach((tokenName) => {
-				this.anims.create({
-					key: `${tokenName}-idle-${directionName}`,
-					frames: this.anims.generateFrameNumbers(tokenName, {
-						start: idleFrameOffset,
-						end: idleFrameOffset /* Currently only 1 drawn */
-					}),
-					frameRate: 5,
-					repeat: -1
-				});
-				this.anims.create({
-					key: `${tokenName}-walk-${directionName}`,
-					frames: this.anims.generateFrameNumbers(tokenName, {
-						start: walkFrameOffset,
-						end: walkFrameOffset + numWalkFrames - 1
-					}),
-					frameRate: 12,
-					repeat: -1
-				});
+			this.neededAnimations.forEach((token) => {
+				if (directionIndex % token.facingRange === 0) {
+					this.anims.create({
+						key: `${token.name}-idle-${directionName}`,
+						frames: this.anims.generateFrameNumbers(token.name, {
+							start: idleFrameOffset / token.facingRange,
+							end: idleFrameOffset / token.facingRange /* Currently only 1 drawn */
+						}),
+						frameRate: 5,
+						repeat: -1
+					});
+					this.anims.create({
+						key: `${token.name}-walk-${directionName}`,
+						frames: this.anims.generateFrameNumbers(token.name, {
+							start: walkFrameOffset / token.facingRange,
+							end: walkFrameOffset / token.facingRange + numWalkFrames - 1
+						}),
+						frameRate: 12,
+						repeat: -1
+					});
+					const attackNames = Object.keys(npcTypeToAttackFileMap[token.name] || {});
+					const directionFrameMultiplier = Math.floor(directionIndex / token.facingRange);
+					attackNames.forEach((attackName) => {
+						const attackData = npcTypeToAttackFileMap[token.name][attackName];
+						this.anims.create({
+							key: `${token.name}-${attackName}-${directionName}`,
+							frames: this.anims.generateFrameNumbers(`${token.name}-${attackName}`, {
+								start: directionFrameMultiplier * attackData.framesPerDirection,
+								end: (directionFrameMultiplier + 1) * attackData.framesPerDirection  - 1
+							}),
+							frameRate: 8,
+							repeat: 0
+						});
+					})
+				}
 			});
 		}
+
+		// Prepare essence animations
+		essenceNames.forEach((name, index) => {
+			this.anims.create({
+				key: `essence-${name}`,
+				frames: this.anims.generateFrameNumbers('items-essence', {
+					start: index * 8,
+					end: (index + 1) * 8 - 1
+				}),
+				frameRate: 12,
+				repeat: -1
+			});
+		});
 
 		// Construct dungeon for this map
 		if (!globalState.dungeon.levels[globalState.currentLevel]) {

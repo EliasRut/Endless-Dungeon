@@ -25,14 +25,14 @@
   ],
   "npcs": [
     {
-      "id": "rb-1",
-      "type": "red-ball",
+      "id": "zom-1",
+      "type": "enemy-zombie",
       "x": 5,
       "y": 4
     },
     {
-      "id": "rb-2",
-      "type": "red-ball",
+      "id": "zom-2",
+      "type": "enemy-zombie",
       "x": 5,
       "y": 14
     }

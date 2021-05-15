@@ -18,23 +18,35 @@ const DEPTHS = {
 	baseLayer: 1,
 	decorationLayer: 2,
 	overlayLayer: 3,
-	backgroundLibraryLayer: 4,
+	libraryBackgroundLayer: 4,
 	libraryTileLayer: 5,
 	libraryHighlighting: 6
 };
 
-// The main scene handles the actual game play.
+type MapLayout = number[][];
+
+interface MultiLevelLayout {
+	base: MapLayout;
+	decoration: MapLayout;
+	overlay: MapLayout;
+}
+
+type LevelHistory = MultiLevelLayout[];
+
 export default class MapEditor extends Phaser.Scene {
+	fileData: object = {};
 	roomName: string = '';
 
+	isPointerDown: boolean = false;
+
 	tileSetName: string = 'dungeon';
-	roomLayout: number[][] = [];
+	roomLayout: MapLayout = [];
 
 	decorationTileSetName: string = 'dungeon';
-	roomDecorationLayout: number[][] = [];
+	roomDecorationLayout: MapLayout = [];
 
 	overlayTileSetName: string = 'dungeon';
-	roomOverlayLayout: number[][] = [];
+	roomOverlayLayout: MapLayout = [];
 
 	roomWidth = 8;
 	roomHeight = 8;
@@ -48,11 +60,17 @@ export default class MapEditor extends Phaser.Scene {
 
 	mapEditorHighlighting: Phaser.GameObjects.Image;
 
+	oneKey: Phaser.Input.Keyboard.Key;
+	twoKey: Phaser.Input.Keyboard.Key;
+	threeKey: Phaser.Input.Keyboard.Key;
 	wKey: Phaser.Input.Keyboard.Key;
 	aKey: Phaser.Input.Keyboard.Key;
 	sKey: Phaser.Input.Keyboard.Key;
 	dKey: Phaser.Input.Keyboard.Key;
 	tKey: Phaser.Input.Keyboard.Key;
+	zKey: Phaser.Input.Keyboard.Key;
+	ctrlKey: Phaser.Input.Keyboard.Key;
+	shiftKey: Phaser.Input.Keyboard.Key;
 
 	cameraPositionX: number = 0;
 	cameraPositionY: number = 0;
@@ -72,7 +90,14 @@ export default class MapEditor extends Phaser.Scene {
 	activeLayerDropdownElement: HTMLSelectElement;
 
 	wasTKeyDown: boolean = false;
+	wasUndoDown: boolean = false;
 	isLibraryVisible: boolean = false;
+
+	tilesetHistory: LevelHistory = [];
+
+	selectionStartPoint: [number, number] | undefined;
+	selectionEndPoint: [number, number] | undefined;
+	selectedTileValues: Partial<MultiLevelLayout> | undefined;
 
 	constructor() {
 		super({ key: 'MapEditor' });
@@ -154,6 +179,7 @@ export default class MapEditor extends Phaser.Scene {
 			const roomName = this.roomsDropdownElement.value;
 
 			const selectedRoom = globalState.availableRooms[roomName]!;
+			this.fileData = selectedRoom;
 			this.roomNameElement.value = selectedRoom.name;
 
 			this.tilesetDropdownElement.value = selectedRoom.tileset;
@@ -201,6 +227,8 @@ export default class MapEditor extends Phaser.Scene {
 					}
 				}
 			}
+			this.tilesetHistory = [];
+			this.addToHistory();
 		};
 
 		const goButtonElement = document.getElementById('goButton') as HTMLButtonElement;
@@ -209,11 +237,17 @@ export default class MapEditor extends Phaser.Scene {
 		};
 		this.applyConfiguration();
 
+		this.oneKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE, false);
+		this.twoKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO, false);
+		this.threeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE, false);
 		this.wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, false);
 		this.aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A, false);
 		this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, false);
 		this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, false);
 		this.tKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T, false);
+		this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z, false);
+		this.ctrlKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL, false);
+		this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT, false);
 
 		this.exportButtonElement.onclick = () => {
 			const roomNameValue = this.roomNameElement.value;
@@ -222,35 +256,23 @@ export default class MapEditor extends Phaser.Scene {
 			const decorationTilesetValue = this.tilesetDecorationDropdownElement.value;
 			const overlayTilesetValue = this.tilesetOverlayDropdownElement.value;
 
-			let fileRows = '{\n' +
-				`\t"name": "${roomNameValue}",\n` +
-				`\t"tileset": "${tilesetValue}",\n` +
-				`\t"decorationTileset": "${decorationTilesetValue}",\n` +
-				`\t"overlayTileset": "${overlayTilesetValue}",\n` +
-				`\t"openings": [],\n` +
-				`\t"layout": [\n`;
-			this.roomLayout.forEach((row, index) => {
-				fileRows +=
-					`\t\t${JSON.stringify(row)}${index < this.roomLayout.length -1 ? ',' : ''}\n`;
-			});
-			fileRows += `],\n\t"decorations": [\n`;
-			this.roomDecorationLayout.forEach((row, index) => {
-				fileRows +=
-					`\t\t${JSON.stringify(row)}${index < this.roomDecorationLayout.length -1 ? ',' : ''}\n`;
-			});
-			fileRows += `],\n\t"overlays": [\n`;
-			this.roomOverlayLayout.forEach((row, index) => {
-				fileRows +=
-					`\t\t${JSON.stringify(row)}${index < this.roomOverlayLayout.length -1 ? ',' : ''}\n`;
-			});
-			fileRows += `],\n` +
-				`\t"npcs": [],\n` +
-				`\t"items": [],\n` +
-				`\t"scripts": {}\n` +
-				`}`;
+			const fileData = {
+				openings: [],
+				npcs: [],
+				items: [],
+				scripts: [],
+				...this.fileData,
+				name: roomNameValue,
+				tileset: tilesetValue,
+				decorationTileset: decorationTilesetValue,
+				overlayTileset: overlayTilesetValue,
+				layout: this.roomLayout,
+				decorations: this.roomDecorationLayout,
+				overlays: this.roomOverlayLayout,
+			};
 
 			const dataStr = 'data:text/json;charset=utf-8,' +
-				encodeURIComponent(fileRows);
+				encodeURIComponent(JSON.stringify(fileData));
 			const dlAnchorElem = document.getElementById('downloadAnchorElem') as HTMLLinkElement;
 			dlAnchorElem.setAttribute('href', dataStr);
 			dlAnchorElem.setAttribute('download', `${roomNameValue}.json`);
@@ -258,22 +280,52 @@ export default class MapEditor extends Phaser.Scene {
 		};
 
 		this.activeLayerDropdownElement.onchange = () => {
-			const activeLayerValue = this.activeLayerDropdownElement.value;
-			if (activeLayerValue === 'base') {
-				this.tileLayer.setInteractive();
-				this.decorationTileLayer.removeInteractive();
-				this.overlayTileLayer.removeInteractive();
-			} else if (activeLayerValue === 'decoration') {
-				this.tileLayer.removeInteractive();
-				this.decorationTileLayer.setInteractive();
-				this.overlayTileLayer.removeInteractive();
-			} else if (activeLayerValue === 'overlay') {
-				this.tileLayer.removeInteractive();
-				this.decorationTileLayer.removeInteractive();
-				this.overlayTileLayer.setInteractive();
-			}
-			this.drawTileSet();
+			this.updateActiveLayer();
 		};
+
+		this.addToHistory();
+	}
+
+	getTileLayerForName(layerName: string) {
+		switch (layerName) {
+			case 'decoration': return this.decorationTileLayer;
+			case 'overlay': return this.overlayTileLayer;
+			default: return this.tileLayer;
+		}
+	}
+
+	getActiveLayer() {
+		return this.getTileLayerForName(this.activeLayerDropdownElement.value);
+	}
+
+	getLayerValuesForName(layerName: string) {
+		switch (layerName) {
+			case 'decoration': return this.roomDecorationLayout;
+			case 'overlay': return this.roomOverlayLayout;
+			default: return this.roomLayout;
+		}
+	}
+
+	getActiveLayerValues() {
+		return this.getLayerValuesForName(this.activeLayerDropdownElement.value);
+	}
+
+	updateActiveLayer() {
+		const activeLayerValue = this.activeLayerDropdownElement.value;
+		if (activeLayerValue === 'base') {
+			this.tileLayer.setInteractive();
+			this.decorationTileLayer.removeInteractive();
+			this.overlayTileLayer.removeInteractive();
+		} else if (activeLayerValue === 'decoration') {
+			this.tileLayer.removeInteractive();
+			this.decorationTileLayer.setInteractive();
+			this.overlayTileLayer.removeInteractive();
+		} else if (activeLayerValue === 'overlay') {
+			this.tileLayer.removeInteractive();
+			this.decorationTileLayer.removeInteractive();
+			this.overlayTileLayer.setInteractive();
+		}
+		this.drawTileSet();
 	}
 
 	applyConfiguration() {
@@ -380,6 +432,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.libraryLayer = map.createDynamicLayer(0, tileSet, 0, 0).setInteractive();
 			this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
 			this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
+				this.selectedTileValues = undefined;
 				this.libraryLayer.forEachTile((tile) => {
 					tile.clearAlpha();
 				});
@@ -411,18 +464,19 @@ export default class MapEditor extends Phaser.Scene {
 			);
 			this.backgroundLibraryLayer =
 				backgroundMap.createDynamicLayer(0, backgroundTileSet, 0, 0).setInteractive();
-			this.backgroundLibraryLayer.setDepth(DEPTHS.backgroundLibraryLayer);
+			this.backgroundLibraryLayer.setDepth(DEPTHS.libraryBackgroundLayer);
 			this.backgroundLibraryLayer.setScrollFactor(0, 0);
 	}
 
 	getDataFromClick (
-			pointer: {downX: number; downY: number;},
+			posX: number,
+			posY: number,
 			tileLayer: Phaser.Tilemaps.DynamicTilemapLayer
 		) {
 		const clickX =
-			pointer.downX - this.cameras.main.centerX + this.cameraPositionX - tileLayer.x;
+			posX - this.cameras.main.centerX + this.cameraPositionX - tileLayer.x;
 		const clickY =
-			pointer.downY - this.cameras.main.centerY + this.cameraPositionY - tileLayer.y;
+			posY - this.cameras.main.centerY + this.cameraPositionY - tileLayer.y;
 		const tileX = Math.floor(clickX / TILE_WIDTH);
 		const tileY = Math.floor(clickY / TILE_HEIGHT);
 		return [
@@ -430,6 +484,72 @@ export default class MapEditor extends Phaser.Scene {
 			tileY,
 			tileLayer.getTileAt(tileX, tileY)
 		] as [number, number, Phaser.Tilemaps.Tile];
+	}
+
+	addToHistory() {
+		const deepCopyArray: (values: number[][]) => number[][] = (values) => {
+			return JSON.parse(JSON.stringify(values)) as number[][];
+		};
+
+		this.tilesetHistory.push({
+			base: deepCopyArray(this.roomLayout),
+			decoration: deepCopyArray(this.roomDecorationLayout),
+			overlay: deepCopyArray(this.roomOverlayLayout),
+		});
+		// tslint:disable-next-line: no-magic-numbers
+		if (this.tilesetHistory.length > 100) {
+			this.tilesetHistory.shift();
+		}
+	}
+
+	endSelection(wasCtrlPressed: boolean) {
+		if (!this.selectionStartPoint || !this.selectionEndPoint) {
+			return;
+		}
+		const minX = Math.min(this.selectionStartPoint[0], this.selectionEndPoint[0]);
+		const maxX = Math.max(this.selectionStartPoint[0], this.selectionEndPoint[0]);
+		const minY = Math.min(this.selectionStartPoint[1], this.selectionEndPoint[1]);
+		const maxY = Math.max(this.selectionStartPoint[1], this.selectionEndPoint[1]);
+
+		const selectionValues: Partial<MultiLevelLayout> = {};
+		const activeLayers: (keyof MultiLevelLayout)[] = wasCtrlPressed ?
+			['base', 'decoration', 'overlay'] :
+			[this.activeLayerDropdownElement.value as keyof MultiLevelLayout];
+		for (const layer of activeLayers) {
+			selectionValues[layer] = [];
+			for (let y = minY; y <= maxY; y++) {
+				const yIndex = y - minY;
+				selectionValues[layer]![yIndex] = [];
+				for (let x = minX; x <= maxX; x++) {
+					const xIndex = x - minX;
+					selectionValues[layer]![yIndex][xIndex] = this.getLayerValuesForName(layer)[y][x];
+				}
+			}
+		}
+
+		this.selectedTileValues = selectionValues;
+	}
+
+	pasteSelectedValues(tileX: number, tileY: number) {
+		this.addToHistory();
+		if (!this.selectedTileValues) {
+			return;
+		}
+		const layers = Object.keys(this.selectedTileValues).reduce(
+			(obj, tileLayerName) => {
+				obj[tileLayerName] = this.getLayerValuesForName(tileLayerName);
+				return obj;
+			}, {} as {[name: string]: MapLayout});
+		Object.entries(layers).forEach(([layerName, layerValues]) => {
+			const layerKey = layerName as keyof MultiLevelLayout;
+			for (let y = 0; y < this.selectedTileValues![layerKey]!.length; y++) {
+				for (let x = 0; x < this.selectedTileValues![layerKey]![y].length; x++) {
+						layerValues[tileY + y][tileX + x] =
+							this.selectedTileValues![layerKey]![y][x];
+				}
+			}
+		});
+		this.drawRoom();
 	}
 
 	drawRoom() {
@@ -460,13 +580,78 @@ export default class MapEditor extends Phaser.Scene {
 			.createDynamicLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2)
 			.setInteractive();
 		this.tileLayer.setDepth(DEPTHS.baseLayer);
-		this.tileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
-			const [tileX, tileY, clickedTile] = this.getDataFromClick(pointer, this.tileLayer);
-			this.roomLayout[tileY][tileX] = this.selectedId;
+
+		const onPointerDown: (
+			tilemapLayer: Phaser.Tilemaps.DynamicTilemapLayer,
+			layoutValues: MapLayout,
+			x: number,
+			y: number
+		) => void = (tilemapLayer, layoutValues, x, y) => {
+			const [tileX, tileY, clickedTile] = this.getDataFromClick(x, y, tilemapLayer);
+			if (this.shiftKey.isDown) {
+				this.selectionStartPoint = [tileX, tileY];
+				this.selectedTileValues = undefined;
+				return;
+			}
+			if (this.selectedTileValues) {
+				this.pasteSelectedValues(tileX, tileY);
+				return;
+			}
+			this.isPointerDown = true;
+
+			this.addToHistory();
+
+			layoutValues[tileY][tileX] = this.selectedId;
 			if (clickedTile) {
 				clickedTile.index = this.selectedId;
+				if (tilemapLayer !== this.tileLayer) {
+					clickedTile.setVisible(this.selectedId !== 0);
+				}
+				tilemapLayer.update();
+			}
+		};
+
+		const onPointerMove: (
+			tilemapLayer: Phaser.Tilemaps.DynamicTilemapLayer,
+			layoutValues: MapLayout,
+			x: number,
+			y: number
+		) => void = (tilemapLayer, layoutValues, x, y) => {
+			if (!this.isPointerDown || this.shiftKey.isDown) {
+				return;
+			}
+			const [tileX, tileY, clickedTile] = this.getDataFromClick(x, y, tilemapLayer);
+			layoutValues[tileY][tileX] = this.selectedId;
+			if (clickedTile) {
+				clickedTile.index = this.selectedId;
+				if (tilemapLayer !== this.tileLayer) {
+					clickedTile.setVisible(this.selectedId !== 0);
+				}
 				this.tileLayer.update();
 			}
+		};
+
+		const onPointerUp: (
+			tilemapLayer: Phaser.Tilemaps.DynamicTilemapLayer,
+			x: number,
+			y: number
+		) => void = (tilemapLayer, x, y) => {
+			this.isPointerDown = false;
+			if (this.shiftKey.isDown) {
+				const [tileX, tileY] = this.getDataFromClick(x, y, tilemapLayer);
+				this.selectionEndPoint = [tileX, tileY];
+				this.endSelection(this.ctrlKey.isDown);
+			}
+		};
+
+		this.tileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
+			onPointerDown(this.tileLayer, this.roomLayout, pointer.downX, pointer.downY);
+		});
+		this.tileLayer.on('pointermove', (pointer: {position: {x: number; y: number;}}) => {
+			onPointerMove(this.tileLayer, this.roomLayout, pointer.position.x, pointer.position.y);
+		});
+		this.tileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
+			onPointerUp(this.tileLayer, pointer.upX, pointer.upY);
 		});
 
 		const decorationMap = this.make.tilemap({
@@ -487,13 +672,15 @@ export default class MapEditor extends Phaser.Scene {
 			// .setInteractive();
 		this.decorationTileLayer.setDepth(DEPTHS.decorationLayer);
 		this.decorationTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
-			const [tileX, tileY, clickedTile] = this.getDataFromClick(pointer, this.decorationTileLayer);
-			this.roomDecorationLayout[tileY][tileX] = this.selectedId;
-			if (clickedTile) {
-				clickedTile.index = this.selectedId;
-				clickedTile.setVisible(this.selectedId !== 0);
-				this.decorationTileLayer.update();
-			}
+			onPointerDown(this.decorationTileLayer, this.roomDecorationLayout,
+				pointer.downX, pointer.downY);
+		});
+		this.decorationTileLayer.on('pointermove', (pointer: {position: {x: number; y: number;}}) => {
+			onPointerMove(this.decorationTileLayer, this.roomDecorationLayout,
+				pointer.position.x, pointer.position.y);
+		});
+		this.decorationTileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
+			onPointerUp(this.decorationTileLayer, pointer.upX, pointer.upY);
 		});
 
 		const overlayMap = this.make.tilemap({
@@ -511,16 +698,17 @@ export default class MapEditor extends Phaser.Scene {
 		);
 		this.overlayTileLayer = overlayMap
 			.createDynamicLayer(0, overlayTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
-			// .setInteractive();
 		this.overlayTileLayer.setDepth(DEPTHS.overlayLayer);
 		this.overlayTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
-			const [tileX, tileY, clickedTile] = this.getDataFromClick(pointer, this.overlayTileLayer);
-			this.roomOverlayLayout[tileY][tileX] = this.selectedId;
-			if (clickedTile) {
-				clickedTile.index = this.selectedId;
-				clickedTile.setVisible(this.selectedId !== 0);
-				this.overlayTileLayer.update();
-			}
+			onPointerDown(this.overlayTileLayer, this.roomOverlayLayout,
+				pointer.downX, pointer.downY);
+		});
+		this.overlayTileLayer.on('pointermove', (pointer: {position: {x: number; y: number;}}) => {
+			onPointerMove(this.overlayTileLayer, this.roomOverlayLayout,
+				pointer.position.x, pointer.position.y);
+		});
+		this.overlayTileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
+			onPointerUp(this.overlayTileLayer, pointer.upX, pointer.upY);
 		});
 
 		for (let y = 0; y < this.roomHeight; y++) {
@@ -563,7 +751,7 @@ export default class MapEditor extends Phaser.Scene {
 		if (document.activeElement && document.activeElement.nodeName === 'INPUT') {
 			return;
 		}
-			if (this.sKey.isDown) {
+		if (this.sKey.isDown) {
 			this.cameraPositionY = this.cameraPositionY + CAMERA_MOVEMENT_PER_FRAME;
 		}
 		if (this.dKey.isDown) {
@@ -575,6 +763,16 @@ export default class MapEditor extends Phaser.Scene {
 		if (this.aKey.isDown) {
 			this.cameraPositionX = this.cameraPositionX - CAMERA_MOVEMENT_PER_FRAME;
 		}
+		if (this.oneKey.isDown || this.twoKey.isDown || this.threeKey.isDown) {
+			const newLayer = this.oneKey.isDown ? 'base' : (
+				this.twoKey.isDown ? 'decoration' : 'overlay'
+			);
+			const activeLayerValue = this.activeLayerDropdownElement.value;
+			if (activeLayerValue !== newLayer) {
+				this.activeLayerDropdownElement.value = newLayer;
+				this.updateActiveLayer();
+			}
+		}
 		// Phaser will keep saying that tKey is down for multiple update calls, we only care about the
 		// first.
 		if (this.tKey.isDown && !this.wasTKeyDown) {
@@ -583,7 +781,63 @@ export default class MapEditor extends Phaser.Scene {
 			this.backgroundLibraryLayer.setVisible(this.isLibraryVisible);
 			this.mapEditorHighlighting.setVisible(this.isLibraryVisible);
 		}
+		// Phaser will keep saying that undo was down for multiple update calls, we only care about the
+		// first.
+		if (this.zKey.isDown && this.ctrlKey.isDown && !this.wasUndoDown) {
+			this.wasUndoDown = true;
+			const historyEntry = this.tilesetHistory.pop();
+			if (historyEntry) {
+				this.roomLayout = historyEntry.base;
+				this.roomDecorationLayout = historyEntry.decoration;
+				this.roomOverlayLayout = historyEntry.overlay;
+				this.drawRoom();
+			}
+			if (this.tilesetHistory.length === 0) {
+				this.addToHistory();
+			}
+		}
+		this.wasUndoDown = this.zKey.isDown && this.ctrlKey.isDown;
 		this.wasTKeyDown = this.tKey.isDown;
+
+		// tslint:disable no-magic-numbers
+		this.tileLayer.forEachTile((tile) => tile.tint = 0xffffff);
+		this.decorationTileLayer.forEachTile((tile) => tile.tint = 0xffffff);
+		this.overlayTileLayer.forEachTile((tile) => tile.tint = 0xffffff);
+
+		if (this.shiftKey.isDown) {
+			const position = this.input.mousePointer.position;
+			const [_tileX, _tileY, hoveredTile] =
+				this.getDataFromClick(position.x, position.y, this.tileLayer);
+			if (hoveredTile) {
+				hoveredTile.tint = this.ctrlKey.isDown ? 0x9999ff : 0xff9999;
+			}
+			if (this.selectionStartPoint) {
+				const minX = Math.min(this.selectionStartPoint[0], tileX);
+				const maxX = Math.max(this.selectionStartPoint[0], tileX);
+				const minY = Math.min(this.selectionStartPoint[1], tileY);
+				const maxY = Math.max(this.selectionStartPoint[1], tileY);
+				for (let y = minY; y <= maxY; y++) {
+					for (let x = minX; x <= maxX; x++) {
+						const tileLayers: Phaser.Tilemaps.DynamicTilemapLayer[] = [];
+						if (this.ctrlKey.isDown) {
+							tileLayers.push(this.tileLayer, this.decorationTileLayer, this.overlayTileLayer);
+						} else {
+							tileLayers.push(this.getActiveLayer());
+						}
+						tileLayers.forEach((layer) => {
+							const tile = layer.getTileAt(x, y);
+							if (tile) {
+								tile.tint = this.ctrlKey.isDown ? 0x9999ff : 0xff9999;
+							}
+						})
+					}
+				}
+			}
+		} else {
+			this.selectionStartPoint = undefined;
+			this.selectionEndPoint = undefined;
+		}
+		// tslint:enable
 
 		this.cameras.main.centerOn(this.cameraPositionX, this.cameraPositionY);
 	}

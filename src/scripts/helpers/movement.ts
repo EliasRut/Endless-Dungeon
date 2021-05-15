@@ -3,7 +3,7 @@ import { ANIMATION_IDLE, ANIMATION_WALK, Facings, facingToSpriteNameMap } from '
 
 const ROTATION_THRESHOLD = 3;
 
-export const getFacing = (x: number, y: number) => {
+export const getFacing8Dir = (x: number, y: number) => {
 	if (x < 0 && Math.abs(y/x) < ROTATION_THRESHOLD) {
 		if (y < 0 && Math.abs(x/y) < ROTATION_THRESHOLD) {
 			return Facings.NORTH_WEST;
@@ -19,6 +19,33 @@ export const getFacing = (x: number, y: number) => {
 			return Facings.SOUTH_EAST;
 		}
 		// y === 0
+		return Facings.EAST;
+	}
+
+	if (y < 0) {
+		return Facings.NORTH;
+	} else if (y > 0) {
+		return Facings.SOUTH;
+	}
+
+	// x === 0, y === 0
+	return Facings.SOUTH;
+};
+
+export const getFacing4Dir = (x: number, y: number) => {
+	if (x < 0 && Math.abs(y/x) < ROTATION_THRESHOLD) {
+		if (y < 0 && Math.abs(x/y) < 1) {
+			return Facings.NORTH;
+		} else if (y > 0 && Math.abs(x/y) < 1) {
+			return Facings.SOUTH;
+		}
+		return Facings.WEST;
+	} else if (x > 0 && Math.abs(y/x) < ROTATION_THRESHOLD) {
+		if (y < 0 && Math.abs(x/y) < 1) {
+			return Facings.NORTH;
+		} else if (y > 0 && Math.abs(x/y) < 1) {
+			return Facings.SOUTH;
+		}
 		return Facings.EAST;
 	}
 
@@ -60,7 +87,7 @@ export const getRotationInRadiansForFacing = (facing: Facings) => {
 
 export const getCharacterSpeed = (char: Character) => {
 	return char.movementSpeed * char.slowFactor;
-}
+};
 
 export const updateMovingState = (
 		char: Character,
@@ -82,4 +109,4 @@ export const updateMovingState = (
 		char.isWalking = hasMoved;
 		const animationType = char.isWalking ? ANIMATION_WALK : ANIMATION_IDLE;
 		return `${char.animationBase}-${animationType}-${newDirection}`;
-}
+};

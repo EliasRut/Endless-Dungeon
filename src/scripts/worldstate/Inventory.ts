@@ -1,19 +1,16 @@
 import Item from './Item';
-import { INVENTORY_BOXES_X, INVENTORY_BOXES_Y } from '../helpers/constants';
+import { BAG_BOXES_X, BAG_BOXES_Y } from '../helpers/constants';
+import EquippableItem from './EquippableItem';
 export default class Inventory {
 	public itemOffsetX = 0;
 	public itemOffsetY = 0;
 	public bag: integer[][];
-	public head?: Item;
-	public necklace?: Item;
-	public mainhand?: Item;
-	public offhand?: Item;
-	public chest?: Item;
-	public leftRing?: Item;
-	public rightRing?: Item;
-	public belt?: Item;
-	public gloves?: Item;
-	public boots?: Item;
+	public necklace?: EquippableItem;
+	public mainhand?: EquippableItem;
+	public offhand?: EquippableItem;
+	public chestpiece?: EquippableItem;
+	public leftRing?: EquippableItem;
+	public rightRing?: EquippableItem;
 	public unequippedItemList: {
 		x: number,
 		y: number,
@@ -22,9 +19,9 @@ export default class Inventory {
 
 	constructor() {
 		this.bag = [];
-		for (let x = 0; x < INVENTORY_BOXES_X; x++) {
+		for (let x = 0; x < BAG_BOXES_X; x++) {
 			this.bag[x] = [];
-			for (let y = 0; y < INVENTORY_BOXES_Y; y++) {
+			for (let y = 0; y < BAG_BOXES_Y; y++) {
 				this.bag[x][y] = 0;
 			}
 		}

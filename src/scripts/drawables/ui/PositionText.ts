@@ -7,7 +7,7 @@ export default class PositionText extends Phaser.GameObjects.Text {
 		this.setScrollFactor(0);
 		scene.add.existing(this);
 		this.setOrigin(0);
-		this.setDepth(1);
+		this.setDepth(10);
 	}
 
 	public update(yPos: number, xPos: number) {

@@ -1,4 +1,4 @@
-import { getFacing, updateMovingState } from '../../helpers/movement';
+import { getFacing8Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
@@ -72,7 +72,7 @@ export default class MeleeEnemyToken extends EnemyToken {
 					this.setVelocityY(ySpeed);
 					this.emitter.setSpeedX(xSpeed);
 					this.emitter.setSpeedY(ySpeed);
-					const newFacing = getFacing(xSpeed, ySpeed);
+					const newFacing = getFacing8Dir(xSpeed, ySpeed);
 					const animation = updateMovingState(
 						this.stateObject,
 						true,

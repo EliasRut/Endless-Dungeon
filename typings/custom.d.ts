@@ -1,3 +1,5 @@
+import { AbilityType } from "../src/scripts/abilities/abilityData";
+
 export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
 
 export interface NpcScript {
@@ -10,13 +12,17 @@ export interface NpcPositioning {
 	id: string;
 	x: number;
 	y: number;
+	facingX?: number;
+	facingY?: number;
 	script?: NpcScript;
 }
 
 export interface MapConnection {
   x: number;
   y: number;
-  targetMap: string;
+	targetScene?: string;
+  targetMap?: string;
+  targetRoom?: string;
   targetX?: number;
   targetY?: number;
 }
@@ -27,12 +33,28 @@ export interface ItemsPositioning {
 	y: number;
 }
 
+export interface Door {
+	id: string;
+	x: number;
+	y: number;
+	type: string;
+	open: boolean;
+}
+
 export type OpeningDirection = "top" | "left" | "right" | "bottom";
 export type Opening = [number, number, OpeningDirection];
 
 export interface ScriptWait {
 	type: "wait";
 	time: number
+}
+
+export interface ScriptCondition {
+	type: "condition";
+	conditionType: "hasItem" | "scriptState";
+	itemId?: string;
+	scriptId?: string;
+	scriptState?: "new" | "finished";
 }
 
 export interface ScriptDialog {
@@ -46,6 +68,11 @@ export interface ScriptAnimation {
 	target?: string;
 	animation: string;
 	duration: number;
+}
+
+export interface ScriptCast {
+	type: "cast";
+	ability: AbilityType;
 }
 
 export interface ScriptMove {
@@ -65,11 +92,18 @@ export interface ScriptWalk {
 }
 
 export interface ScriptSpawn {
+	facingX?: number;
+	facingY?: number;
 	type: "spawn";
 	npcId: string;
 	npcType: string;
 	posX: number;
 	posY: number;
+}
+
+export interface ScriptOpenDoor {
+	type: "openDoor";
+	doorId: string;
 }
 
 export interface ScriptSceneChange {
@@ -87,8 +121,28 @@ export interface ScriptFadeOut {
 	time: number;
 }
 
+export interface ScriptTakeItem {
+	type: "takeItem";
+	itemId: string;
+	amount: number;
+}
+
+export interface ScriptPlaceItem {
+	type: "placeItem";
+	itemId: string;
+	posX: number;
+	posY: number;
+}
+
+export interface ScriptSetScriptState {
+	type: "setScriptState";
+	scriptId: string;
+	scriptState: "new" | "finished";
+}
+
 export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange |
-	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn;
+	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn | ScriptOpenDoor |
+	ScriptCondition | ScriptSetScriptState | ScriptTakeItem | ScriptCast | ScriptPlaceItem;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];
@@ -112,12 +166,13 @@ export interface Room {
 	overlays?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
 	overlay?: number[][];
 	npcs?: NpcPositioning[]; //place npcs in room
-	connections?: MapConnection[]; //place npcs in room
-	items?: ItemsPositioning[]; //place npcs in room
+	connections?: MapConnection[];
+	items?: ItemsPositioning[];
 	openings: Opening[];
 	name: string;
 	scripts: Scripting;
 	usedNpcTypes?: string[];
+	doors?: Door[];
 }
 
 export interface Weapon {

@@ -54,38 +54,38 @@
   ],
   "npcs": [
     {
-      "id": "rb-1",
-      "type": "red-ball",
+      "id": "zom-1",
+      "type": "enemy-zombie",
       "x": 3,
       "y": 5
     },
     {
-      "id": "rb-2",
-      "type": "red-ball",
+      "id": "zom-2",
+      "type": "enemy-zombie",
       "x": 22,
       "y": 5
     },
     {
-      "id": "rb-3",
-      "type": "red-ball",
+      "id": "zom-3",
+      "type": "enemy-zombie",
       "x": 3,
       "y": 21
     },
     {
-      "id": "rb-4",
-      "type": "red-ball",
+      "id": "zom-4",
+      "type": "enemy-zombie",
       "x": 22,
       "y": 21
     },
     {
-      "id": "rb-5",
-      "type": "red-ball",
+      "id": "zom-5",
+      "type": "enemy-zombie",
       "x": 3,
       "y": 37
     },
     {
-      "id": "rb-6",
-      "type": "red-ball",
+      "id": "zom-6",
+      "type": "enemy-zombie",
       "x": 22,
       "y": 37
     }
