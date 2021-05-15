@@ -113,6 +113,9 @@ export default class MainScene extends Phaser.Scene {
 		Object.values(this.doorMap).forEach((door) => {
 			this.physics.add.collider(this.mainCharacter, door);
 		});
+		Object.values(this.npcMap).forEach((npc) => {
+			this.physics.add.collider(this.mainCharacter, npc);
+		});
 
 		this.fpsText = new FpsText(this);
 		this.backpackIcon = new BackpackIcon(this);
@@ -177,6 +180,9 @@ export default class MainScene extends Phaser.Scene {
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.physics.add.collider(this.npcMap[id], this.tileLayer);
 		this.physics.add.collider(this.npcMap[id], this.decorationLayer);
+		if (this.mainCharacter) {
+			this.physics.add.collider(this.npcMap[id], this.mainCharacter);
+		}
 		this.npcMap[id].script = script;
 	}
 
