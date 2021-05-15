@@ -79,6 +79,8 @@ export default class MainScene extends Phaser.Scene {
 
 	lastStepLeft: number | undefined;
 
+	lastScriptUnpausing: number = Date.now();
+
 	constructor() {
 		super({ key: 'MainScene' });
 	}
@@ -431,6 +433,10 @@ export default class MainScene extends Phaser.Scene {
 		if (Date.now() - this.lastSave > 10 * 1000) {
 			this.lastSave = Date.now();
 			globalState.storeState();
+		}
+
+		if (Date.now() - this.lastScriptUnpausing > 1000) {
+			this.scriptHelper.resumePausedScripts();
 		}
 	}
 

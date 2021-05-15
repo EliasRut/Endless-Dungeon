@@ -1,4 +1,4 @@
-import { NpcScript, ScriptEntry } from '../../../typings/custom';
+import { NpcScript, ScriptEntry, ScriptPausedCondition } from '../../../typings/custom';
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import MainScene from '../scenes/MainScene';
 import DialogScreen from '../screens/DialogScreen';
@@ -9,6 +9,7 @@ import { TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import RoomPositioning from '../worldstate/RoomPositioning';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from './movement';
 import CharacterToken from '../drawables/tokens/CharacterToken';
+import { getUnequippedItemCount } from './inventory';
 
 const DIALOG_TEXT_TIME_MS = 5000;
 
@@ -19,6 +20,10 @@ export interface NpcScriptState {
 	animationFallback?: string;
 }
 
+export interface PausedScriptState {
+	script: ScriptEntry[];
+	scriptStep: number;
+}
 export default class ScriptHelper {
 
 	scene: MainScene;
@@ -29,6 +34,7 @@ export default class ScriptHelper {
 	scriptStepStartMs?: number;
 	scriptAnimationFallback?: string;
 	npcScriptStates: {[npcId: string]: NpcScriptState} = {};
+	pausedScripts: PausedScriptState[] = [];
 
 	constructor (scene: MainScene) {
 		this.scene = scene;
@@ -231,6 +237,15 @@ export default class ScriptHelper {
 				const targetX = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH;
 				const targetY = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT;
 				this.scene.addFixedItem(currentStep.itemId, targetX, targetY);
+				break;
+			}
+			case 'pauseUntilCondition': {
+				this.pausedScripts.push({
+					script: [...this.runningScript!],
+					scriptStep: this.scriptStep!
+				});
+				this.runningScript = undefined;
+				this.scriptStep = 0;
 				break;
 			}
 			case 'condition': {
@@ -447,5 +462,71 @@ export default class ScriptHelper {
 	handleScripts(globalTime: number) {
 		this.handleRoomScripts(globalTime);
 		this.handleNpcScripts(globalTime);
+	}
+
+	resumePausedScripts() {
+		if (this.isScriptRunning()) {
+			return;
+		}
+		if (this.pausedScripts.length === 0) {
+			return;
+		}
+		const firstResumableScriptIndex = this.pausedScripts.findIndex((pausedScript) => {
+			const conditionStep = pausedScript.script[pausedScript.scriptStep] as ScriptPausedCondition;
+			let allConditionsFullfilled = true;
+			if (conditionStep.roomName) {
+				const currentRoom = this.findRoomForToken(this.scene.mainCharacter);
+				if (!currentRoom || currentRoom.roomName !== conditionStep.roomName) {
+					allConditionsFullfilled = false;
+				}
+			}
+			(conditionStep.itemIds || []).forEach((itemId, index) => {
+				const requiredCount = (conditionStep.itemQuantities || [])[index] || 1;
+				if (getUnequippedItemCount(itemId) < requiredCount) {
+					allConditionsFullfilled = false;
+				}
+			});
+			(conditionStep.questIds || []).forEach((questId, index) => {
+				const requiredState = (conditionStep.questStates || [])[index] || 'started';
+				switch (requiredState) {
+					case 'startedOrFinished': {
+						if (!globalState.quests[questId]) {
+							allConditionsFullfilled = false;
+						}
+						break;
+					}
+					case 'started': {
+						if (!globalState.quests[questId] || globalState.quests[questId].questFinished) {
+							allConditionsFullfilled = false;
+						}
+						break;
+					}
+					case 'notStarted': {
+						if (globalState.quests[questId]) {
+							allConditionsFullfilled = false;
+						}
+						break;
+					}
+					case 'finished': {
+						if (!globalState.quests[questId] || !globalState.quests[questId].questFinished) {
+							allConditionsFullfilled = false;
+						}
+						break;
+					}
+					case 'notFinished': {
+						if (globalState.quests[questId] && globalState.quests[questId].questFinished) {
+							allConditionsFullfilled = false;
+						}
+						break;
+					}
+				}
+			});
+			return allConditionsFullfilled;
+		});
+		if (firstResumableScriptIndex > -1) {
+			this.runningScript = this.pausedScripts[firstResumableScriptIndex].script;
+			this.scriptStep = this.pausedScripts[firstResumableScriptIndex].scriptStep + 1;
+			this.pausedScripts.splice(firstResumableScriptIndex, 1);
+		}
 	}
 }

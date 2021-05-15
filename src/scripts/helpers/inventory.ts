@@ -157,3 +157,9 @@ export const getEquippedItems = () => {
 export const getUnequippedItemsWithPositions = () => {
 	return globalState.inventory.unequippedItemList;
 };
+
+export const getUnequippedItemCount = (itemId: string) => {
+	const matchingItems = globalState.inventory.unequippedItemList.filter(
+		(item) => item.item.id === itemId);
+	return matchingItems.reduce((sum, item) => sum + item.item.amount, 0);
+};

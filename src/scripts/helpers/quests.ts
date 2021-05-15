@@ -44,10 +44,18 @@ export const hasAnyOpenQuests: (questGiverId: string) => boolean = (questGiverId
 
 const questScripts: {[name: string]: ScriptEntry[]} = {
 	'hildaTalks': [{
-		type: 'dialog',
-		portrait: 'player_happy',
-		text: ['Finally, today is the day I\'ve waited for so long!']
-	}]
+			type: 'dialog',
+			portrait: 'player_happy',
+			text: ['Finally, today is the day I\'ve waited for so long!']
+		}, {
+			type: 'pauseUntilCondition',
+			roomName: 'town_new'
+		}, {
+			type: 'dialog',
+			portrait: 'player_happy',
+			text: ['I\'m back in nature. Phew. Finally.']
+		},
+	]
 };
 
 export const loadQuestScript: (questId: string) => ScriptEntry[] = (questId) => {
