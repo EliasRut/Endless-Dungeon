@@ -22,6 +22,7 @@ export interface MapConnection {
   y: number;
 	targetScene?: string;
   targetMap?: string;
+  targetRoom?: string;
   targetX?: number;
   targetY?: number;
 }

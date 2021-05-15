@@ -303,20 +303,35 @@ export default class DungeonGenerator {
 				const y = connection.y + this.roomOffsets[index][0] * BLOCK_SIZE;
 				const x = connection.x + this.roomOffsets[index][1] * BLOCK_SIZE;
 
+				let targetX = connection.targetX;
+				let targetY = connection.targetY;
 				let targetMap = connection.targetMap;
+				let targetRoom = connection.targetRoom;
 				if (targetMap === 'NEXT_LEVEL') {
 					targetMap = `dungeonLevel${this.dungeonLevel + 1}`;
+					targetRoom = 'connection_up';
+					targetX = 12;
+					targetY = 5;
 				} else if (targetMap === 'PREVIOUS_LEVEL') {
 					if (this.dungeonLevel === 1) {
-						targetMap = 'town';
+						targetMap = 'town_new';
+						targetRoom = 'town_new';
+						targetX = 75;
+						targetY = 45;
 					} else {
 						targetMap = `dungeonLevel${this.dungeonLevel - 1}`;
+						targetRoom = 'connection_down';
+						targetX = 11;
+						targetY = 6;
 					}
 				}
 
 				connections.push({
 					x: x * TILE_WIDTH,
 					y: y * TILE_HEIGHT,
+					targetX,
+					targetY,
+					targetRoom,
 					targetMap,
 					targetScene: connection.targetScene
 				});

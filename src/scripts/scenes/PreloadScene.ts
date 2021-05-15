@@ -1,5 +1,5 @@
 import { getUrlParam } from '../helpers/browserState';
-import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap } from '../helpers/constants';
+import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 
@@ -48,6 +48,10 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('inventory-borders', 'assets/img/inventory-borders-tall.png');
 		this.load.spritesheet('icon-abilities', 'assets/img/abilities-sheet.png',
 			{ frameWidth: 20, frameHeight: 20 });
+
+		// Essences
+		this.load.spritesheet('items-essence', 'assets/sprites/items-essence.png',
+			{ frameWidth: 16, frameHeight: 16 });
 
 		// Items
 		this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
@@ -128,7 +132,7 @@ export default class PreloadScene extends Phaser.Scene {
 					npcTypeToAttackFileMap[npc][attackName].file,
 					{ frameWidth: 40, frameHeight: 40 }
 				);
-			})
+			});
 		});
 	}
 
@@ -187,6 +191,19 @@ export default class PreloadScene extends Phaser.Scene {
 				}
 			});
 		}
+
+		// Prepare essence animations
+		essenceNames.forEach((name, index) => {
+			this.anims.create({
+				key: `essence-${name}`,
+				frames: this.anims.generateFrameNumbers('items-essence', {
+					start: index * 8,
+					end: (index + 1) * 8 - 1
+				}),
+				frameRate: 12,
+				repeat: -1
+			});
+		});
 
 		// Construct dungeon for this map
 		if (!globalState.dungeon.levels[globalState.currentLevel]) {

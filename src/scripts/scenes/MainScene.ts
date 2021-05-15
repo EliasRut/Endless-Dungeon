@@ -12,23 +12,26 @@ import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
-import { NUM_ITEM_ICONS, UiDepths } from '../helpers/constants';
+import { essenceNames, NUM_ITEM_ICONS, UiDepths } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
 import ScriptHelper from '../helpers/ScriptHelper';
 import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
+import SettingsIcon from '../drawables/ui/SettingsIcon';
 import { spawnNpc } from '../helpers/spawn';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import { NpcScript } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import Item from '../worldstate/Item';
 import { generateRandomItem } from '../helpers/item';
+import SettingsScreen from '../screens/SettingsScreen';
 import DoorToken from '../drawables/tokens/DoorToken';
 
 import fixedItems from '../../items/fixedItems.json';
 import { DungeonRunData } from '../models/DungeonRunData';
+import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -59,6 +62,7 @@ export default class MainScene extends Phaser.Scene {
 		inventory: InventoryScreen;
 		statScreen: StatScreen;
 		dialogScreen: DialogScreen;
+		settingsScreen: SettingsScreen;
 		itemScreen: ItemScreen;
 	};
 	alive: number;
@@ -67,6 +71,7 @@ export default class MainScene extends Phaser.Scene {
 
 	avatar: Avatar;
 	backpackIcon: BackpackIcon;
+	settingsIcon: SettingsIcon;
 	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
@@ -113,17 +118,34 @@ export default class MainScene extends Phaser.Scene {
 		Object.values(this.doorMap).forEach((door) => {
 			this.physics.add.collider(this.mainCharacter, door);
 		});
+		Object.values(this.npcMap).forEach((npc) => {
+			this.physics.add.collider(this.mainCharacter, npc);
+		});
 
 		this.fpsText = new FpsText(this);
 		this.backpackIcon = new BackpackIcon(this);
 		this.avatar = new Avatar(this);
 
+		// essenceNames.forEach((name, index) => {
+		// 	const essence = new Phaser.GameObjects.Sprite(this, 200 + index * 20, 200, 'items-essence', 0);
+		// 	essence.play(`essence-${name}`);
+		// 	essence.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		// 	essence.setScrollFactor(0);
+		// 	this.add.existing(essence);
+		// })
+
 		this.overlayScreens = {
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
+			dialogScreen: new DialogScreen(this),
 			itemScreen: new ItemScreen(this),
-			dialogScreen: new DialogScreen(this)
+			settingsScreen: new SettingsScreen(this)
 		};
+
+		this.fpsText = new FpsText(this);
+		this.backpackIcon = new BackpackIcon(this);
+		this.settingsIcon = new SettingsIcon(this);
+		this.avatar = new Avatar(this);
 
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
@@ -169,6 +191,9 @@ export default class MainScene extends Phaser.Scene {
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.physics.add.collider(this.npcMap[id], this.tileLayer);
 		this.physics.add.collider(this.npcMap[id], this.decorationLayer);
+		if (this.mainCharacter) {
+			this.physics.add.collider(this.npcMap[id], this.mainCharacter);
+		}
 		this.npcMap[id].script = script;
 	}
 
@@ -250,14 +275,29 @@ export default class MainScene extends Phaser.Scene {
 			this.addFixedItem(item.id, item.x, item.y);
 		});
 
-		console.log(`Dropping item at ${startPositionX}, ${startPositionY}`);
-		this.dropItem(
-			startPositionX,
-			startPositionY,
-			generateRandomItem(1, 0, 0, 0, 0)
-		);
+		// console.log(`Dropping item at ${startPositionX}, ${startPositionY}`);
+		// this.dropItem(
+		// 	startPositionX,
+		// 	startPositionY,
+		// 	generateRandomItem(1, 0, 0, 0, 0)
+		// );
 
-		return [startPositionX, startPositionY];
+		const transitionCoordinates = globalState.transitionStack[globalState.currentLevel];
+		let usedStartPositionX = startPositionX;
+		let usedStartPositionY = startPositionY;
+		if (transitionCoordinates) {
+			const targetRoom = globalState.dungeon.levels[globalState.currentLevel]?.rooms.find(
+				(room) => room.roomName === transitionCoordinates.targetRoom);
+			if (targetRoom) {
+				usedStartPositionX = (targetRoom.x + transitionCoordinates.targetX) * TILE_WIDTH;
+				usedStartPositionY = (targetRoom.y + transitionCoordinates.targetY) * TILE_HEIGHT;
+			}
+		}
+
+		return [
+			usedStartPositionX,
+			usedStartPositionY
+		];
 	}
 
 	renderDebugGraphics() {
@@ -355,6 +395,10 @@ export default class MainScene extends Phaser.Scene {
 			item.update(this);
 		});
 
+		Object.values(this.doorMap).forEach((door) => {
+			door.update(this);
+		});
+
 		// Check if the player is close to a connection point and move them if so
 		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections || [];
 		const playerX = globalState.playerCharacter.x;
@@ -367,6 +411,13 @@ export default class MainScene extends Phaser.Scene {
 				globalState.playerCharacter.x = 0;
 				globalState.playerCharacter.y = 0;
 				if (connection.targetMap) {
+					if (connection.targetRoom) {
+						globalState.transitionStack[connection.targetMap] = {
+							targetRoom: connection.targetRoom,
+							targetX: connection.targetX || 0,
+							targetY: connection.targetY || 0
+						};
+					}
 					globalState.currentLevel = connection.targetMap;
 					this.scene.start('RoomPreloaderScene');
 				} else if (connection.targetScene) {

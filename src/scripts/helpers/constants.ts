@@ -135,3 +135,7 @@ export const npcTypeToAttackFileMap: {
 		}
 	}
 };
+
+export const essenceNames = [
+	'wild', 'royal', 'metal', 'passion', 'flux', 'death', 'change', 'blood'
+];
