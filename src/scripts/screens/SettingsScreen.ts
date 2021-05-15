@@ -38,9 +38,10 @@ export default class SettingsScreen extends OverlayScreen {
 
 
 		const fileInput: HTMLInputElement = document.createElement('input');
+		const sc: Phaser.Scene = this.scene;
 		fileInput.type = 'file';
 		fileInput.setAttribute('style','display:none');
-		fileInput.addEventListener('change', this.load, false);
+		fileInput.addEventListener('change', () => {this.load(fileInput);}, false);
 		document.body.appendChild(fileInput);
 
 
@@ -89,18 +90,20 @@ export default class SettingsScreen extends OverlayScreen {
 		jsonData += '"saveGameName": '			+ '"test-save"';
 		jsonData += '}';
 
+		console.log(this.scene.scene);
+
 		this.download(jsonData, 'json.txt', 'text/plain');
 	}
 
-	async load(this: HTMLInputElement, ev: Event): Promise<any> {
+	async load(element: HTMLInputElement): Promise<any> {
 		let savegame: File;
 		let savegameJSON: any;
-		if(this.files === null) {
+		if(element.files === null) {
 			return;
 		}
 
-		savegame = this.files[0];
-		console.log( 'loading file '+this.files[0].name);
+		savegame = element.files[0];
+		console.log( 'loading file '+element.files[0].name);
 
 		const saveStr: string = await savegame.text();
 
@@ -127,16 +130,22 @@ export default class SettingsScreen extends OverlayScreen {
 		localStorage.setItem('inventory', JSON.stringify(savegameJSON.inventory));
 		localStorage.setItem('saveGameName',JSON.stringify(savegameJSON.saveGameName));
 
-		globalState.loadState();
-		signal();
+		// globalState.loadState();
+		globalState.loadGame = true;
+		this.scene.scene.start('RoomPreloaderScene');
+
+
+
 
 		return '';
 	}
 
 	async refresh() {
-		await(globalState.loadGame = true);
-		this.scene.scene.start('RoomPreloaderScene');
-		globalState.loadGame = false;
+		await(globalState.loadGame === true);
+		// this.scene.registry.destroy();
+		// this.scene.events.off;
+		// this.scene.scene.restart();
+		// globalState.loadGame = false;
 	}
 
 	// handleFileLoad(event: Event){
