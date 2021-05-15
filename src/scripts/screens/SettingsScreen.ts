@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { isJSON } from 'validator';
 import { UiDepths } from '../helpers/constants';
+import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import OverlayScreen from './OverlayScreen';
 
@@ -79,9 +80,12 @@ export default class SettingsScreen extends OverlayScreen {
 	save() {
 		let jsonData: string = '{';
 		jsonData += '"playerCharacter": '      + JSON.stringify(globalState.playerCharacter) +',\n';
-		jsonData += '"gameTime": '              + `${globalState.gameTime}` + ',\n';
+		jsonData += '"gameTime": '             + `${globalState.gameTime}` + ',\n';
 		jsonData += '"npcs": '                 + JSON.stringify(globalState.npcs) +',\n';
+		jsonData += '"doors": '                + JSON.stringify(globalState.doors) +',\n';
+		jsonData += '"scripts": '              + JSON.stringify(globalState.scripts) +',\n';
 		jsonData += '"dungeon": '              + JSON.stringify(globalState.dungeon) +',\n';
+		jsonData += '"transitionStack": '      + JSON.stringify(globalState.transitionStack) +',\n';
 		jsonData += '"availableRooms": '       + JSON.stringify(globalState.availableRooms) +',\n';
 		jsonData += '"availableTilesets": '    + JSON.stringify(globalState.availableTilesets) +',\n';
 		jsonData += '"currentLevel": '         + JSON.stringify(globalState.currentLevel) +',\n';
@@ -117,12 +121,13 @@ export default class SettingsScreen extends OverlayScreen {
 			return;
 		}
 
-
-
 		localStorage.setItem('playerCharacter', JSON.stringify(savegameJSON.playerCharacter));
 		localStorage.setItem('gameTime', `${savegameJSON.gameTime}`);
 		localStorage.setItem('npcs', JSON.stringify(savegameJSON.npcs));
+		localStorage.setItem('doors', JSON.stringify(savegameJSON.doors));
+		localStorage.setItem('scripts', JSON.stringify(savegameJSON.scripts));
 		localStorage.setItem('dungeon', JSON.stringify(savegameJSON.dungeon));
+		localStorage.setItem('transitionStack', JSON.stringify(savegameJSON.transitionStack));
 		localStorage.setItem('availableRooms', JSON.stringify(savegameJSON.availableRooms));
 		localStorage.setItem('availableTilesets', JSON.stringify(savegameJSON.availableTilesets));
 		localStorage.setItem('currentLevel', JSON.stringify(savegameJSON.currentLevel));
@@ -133,9 +138,7 @@ export default class SettingsScreen extends OverlayScreen {
 		// globalState.loadState();
 		globalState.loadGame = true;
 		this.scene.scene.start('RoomPreloaderScene');
-
-
-
+		(this.scene as MainScene).resume();
 
 		return '';
 	}
