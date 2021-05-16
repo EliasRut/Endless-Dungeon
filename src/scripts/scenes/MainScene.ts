@@ -142,10 +142,11 @@ export default class MainScene extends Phaser.Scene {
 			settingsScreen: new SettingsScreen(this)
 		};
 
-		this.fpsText = new FpsText(this);
-		this.backpackIcon = new BackpackIcon(this);
+		// Warum wurden die 2 mal geladen?
+//		this.fpsText = new FpsText(this);
+//		this.backpackIcon = new BackpackIcon(this);
 		this.settingsIcon = new SettingsIcon(this);
-		this.avatar = new Avatar(this);
+//		this.avatar = new Avatar(this);
 
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);

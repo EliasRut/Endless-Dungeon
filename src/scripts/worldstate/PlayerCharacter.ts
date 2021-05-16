@@ -29,8 +29,8 @@ export default class PlayerCharacter extends Character {
 		[AbilityKey.FIVE]: AbilityType.NOTHING,
 	};
 }
-export const updateAbility=(scene: MainScene, player: PlayerCharacter, abilitySlot: AbilityKey, ability: AbilityType) => {
-	if (abilitySlot === AbilityKey.FIVE) return;
-	player.abilityKeyMapping[abilitySlot] = ability;
-	scene.avatar.updateAbility(abilitySlot, ability);
+export const updateAbility=(scene: MainScene, player: PlayerCharacter, abilityKey: AbilityKey, ability: AbilityType) => {
+	if (abilityKey === AbilityKey.FIVE) return;
+	player.abilityKeyMapping[abilityKey] = ability;
+	scene.avatar.updateAbility(abilityKey, ability);
 }

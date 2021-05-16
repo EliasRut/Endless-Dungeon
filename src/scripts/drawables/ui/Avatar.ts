@@ -48,7 +48,7 @@ export default class Avatar extends Phaser.GameObjects.Group {
 	}
 
 	updateAbility(abilityKey: AbilityKey, ability: AbilityType) {
-		if(this.abilityIcons.has(abilityKey)) {
+		if(this.abilityIcons.has(abilityKey)) {			
 			this.abilityIcons.get(abilityKey)!.destroy(true);
 			this.abilityIcons.delete(abilityKey);
 		}

@@ -37,7 +37,8 @@ export const equipItemOnCharacter = (item: EquippableItem, char: Character) => {
 export const unequipItemFromCharacter = (itemToUnequip: EquippableItem, char: Character) => {
 	// tslint:disable-next-line: no-console
 	console.log(`Unequipping item ${JSON.stringify(itemToUnequip)}.`);
-	const itemIndex = char.items.findIndex((item) => item === itemToUnequip);
+	const itemIndex = char.items.findIndex((item) => item.id === itemToUnequip.id);
+	console.log(char.items);	
 	if (itemIndex > -1) {
 		char.items.splice(itemIndex, 1);
 		updateStats(char);
@@ -62,7 +63,7 @@ export const placeItemInNextFreeBagSlot = (item: Item) => {
 	throw new Error('No slot for item found.');
 };
 
-export const unequipItem = (itemToUnequip: EquippableItem) => {
+export const unequipItem = (itemToUnequip: EquippableItem) => {	
 	unequipItemFromCharacter(itemToUnequip, globalState.playerCharacter);
 	removeItemFromActiveEquippmentSlots(itemToUnequip);
 	return placeItemInNextFreeBagSlot(itemToUnequip);
@@ -82,8 +83,8 @@ export const getSlotAndConflictsForEquipAction: (
 		case EquippableItemType.CHESTPIECE: return [EquipmentSlot.CHESTPIECE, [inventory.chestpiece]];
 		case EquippableItemType.NECKLACE: return [EquipmentSlot.NECKLACE, [inventory.necklace]];
 		case EquippableItemType.RING:
-			if (!inventory.rightRing) return [EquipmentSlot.RIGHT_RING, []];
 			if (!inventory.leftRing) return [EquipmentSlot.LEFT_RING, []];
+			if (!inventory.rightRing) return [EquipmentSlot.RIGHT_RING, []];
 			return [EquipmentSlot.RIGHT_RING, [inventory.rightRing]];
 	}
 	throw new Error (`Unknown item type ${item.type} encountered.`);
