@@ -1,18 +1,25 @@
-import { UiDepths } from '../../helpers/constants';
+import { AbilityKey, UiDepths } from '../../helpers/constants';
 import globalState from '../../worldstate';
+import {ABILITY_TO_ICON} from '../../screens/InventoryScreen'
+import { AbilityType } from '../../abilities/abilityData';
 
 const HEALTH_BAR_WIDTH = 98;
 
+const ABILITY_COORDINATES = {
+	[AbilityKey.ONE]: [72, 62.5],
+	[AbilityKey.TWO]: [101, 62.5],
+	[AbilityKey.THREE]: [130, 62.5],
+	[AbilityKey.FOUR]: [159, 62.5],
+	[AbilityKey.FIVE]: [159, 62.5],	
+};
+
 export default class Avatar extends Phaser.GameObjects.Group {
 	healthBar: Phaser.GameObjects.Image;
-	abilty1Icon: Phaser.GameObjects.Image;
-	abilty2Icon: Phaser.GameObjects.Image;
-	abilty3Icon: Phaser.GameObjects.Image;
-	abilty4Icon: Phaser.GameObjects.Image;
+	abilityIcons: Map<AbilityKey, Phaser.GameObjects.Image>;
 
 	constructor(scene: Phaser.Scene) {
 		super(scene);
-		this.setDepth(UiDepths.UI_MAIN_LAYER);
+		this.setDepth(UiDepths.UI_MAIN_LAYER);		
 
 		// tslint:disable: no-magic-numbers
 		const heroIcon = scene.add.image(32, 40, 'icon-hero');
@@ -27,45 +34,29 @@ export default class Avatar extends Phaser.GameObjects.Group {
 		this.healthBar.setScrollFactor(0);
 		this.healthBar.setOrigin(0, 0.5);
 		this.healthBar.setDepth(UiDepths.UI_MAIN_LAYER);
-
-		// if (globalState.inventory.mainhand !== undefined) {
-		// 	this.abilty1Icon = scene.add.image(72, 63, 'icon-abilities', 1);
-		// 	this.abilty1Icon.setScrollFactor(0);
-		// 	this.abilty1Icon.setDepth(UiDepths.UI_MAIN_LAYER);
-		// } else {
-		// 	this.abilty1Icon = scene.add.image(72, 63, 'icon-abilities', 0);
-		// 	this.abilty1Icon.setScrollFactor(0);
-		// 	this.abilty1Icon.setDepth(UiDepths.UI_MAIN_LAYER);
-		// }
-		this.abilty1Icon = scene.add.image(72, 62.5, 'icon-abilities', 0);
-		this.abilty1Icon.setScrollFactor(0);
-		this.abilty1Icon.setDepth(UiDepths.UI_MAIN_LAYER);
-		this.abilty2Icon = scene.add.image(101, 62.5, 'icon-abilities', 1);
-		this.abilty2Icon.setScrollFactor(0);
-		this.abilty2Icon.setDepth(UiDepths.UI_MAIN_LAYER);
-		this.abilty3Icon = scene.add.image(130, 62.5, 'icon-abilities', 2);
-		this.abilty3Icon.setScrollFactor(0);
-		this.abilty3Icon.setDepth(UiDepths.UI_MAIN_LAYER);
-		this.abilty4Icon = scene.add.image(159, 62.5, 'icon-abilities', 2);
-		this.abilty4Icon.setScrollFactor(0);
-		this.abilty4Icon.setDepth(UiDepths.UI_MAIN_LAYER);
-		// tslint:enable: no-magic-numbers
+		this.abilityIcons = new Map();
 	}
 
 	update([cooldown1, cooldown2, cooldown3, cooldown4]: number[]) {
 		const healthRatio = globalState.playerCharacter.health / globalState.playerCharacter.maxHealth;
 		this.healthBar.scaleX = Math.max(0, healthRatio * HEALTH_BAR_WIDTH);
 
-		this.abilty1Icon.setAlpha(cooldown1);
-		this.abilty2Icon.setAlpha(cooldown2);
-		this.abilty3Icon.setAlpha(cooldown3);
-		this.abilty4Icon.setAlpha(cooldown4);
+		if(this.abilityIcons.has(AbilityKey.ONE)) this.abilityIcons.get(AbilityKey.ONE)!.setAlpha(cooldown1);
+		if(this.abilityIcons.has(AbilityKey.TWO)) this.abilityIcons.get(AbilityKey.TWO)!.setAlpha(cooldown2);
+		if(this.abilityIcons.has(AbilityKey.THREE)) this.abilityIcons.get(AbilityKey.THREE)!.setAlpha(cooldown3);
+		if(this.abilityIcons.has(AbilityKey.FOUR)) this.abilityIcons.get(AbilityKey.FOUR)!.setAlpha(cooldown4);
 	}
 
-	updatePrimary(scene: Phaser.Scene) {
-		this.abilty1Icon.destroy();
-		this.abilty1Icon = scene.add.image(72, 62.5, 'icon-abilities', 1);
-		this.abilty1Icon.setScrollFactor(0);
-		this.abilty1Icon.setDepth(UiDepths.UI_MAIN_LAYER);
+	updateAbility(abilityKey: AbilityKey, ability: AbilityType) {
+		if(this.abilityIcons.has(abilityKey)) {
+			this.abilityIcons.get(abilityKey)!.destroy(true);
+			this.abilityIcons.delete(abilityKey);
+		}
+		if (ability !== AbilityType.NOTHING) {
+			const abilityIcon = this.scene.add.image(ABILITY_COORDINATES[abilityKey][0], ABILITY_COORDINATES[abilityKey][1], ABILITY_TO_ICON[ability][0] as string, ABILITY_TO_ICON[ability][1]);
+			abilityIcon.setScrollFactor(0);
+			abilityIcon.setDepth(UiDepths.UI_MAIN_LAYER);
+			this.abilityIcons.set(abilityKey, abilityIcon);
+		}
 	}
 }

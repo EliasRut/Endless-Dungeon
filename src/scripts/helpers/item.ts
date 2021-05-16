@@ -39,7 +39,7 @@ export const generateRandomItem = (
 		itemType = EquippableItemType.CHESTPIECE;
 		const randomIndex = Math.floor(Math.random() * Object.keys(ChestPieceData).length);
 		data = Object.values(ChestPieceData)[randomIndex];
-	} else if (rnd < (sourceWeight + catalystWeight + ringWeight) / totalWeight) {
+	} else if (rnd < (sourceWeight + catalystWeight + ringWeight + armorWeight) / totalWeight) {
 		itemType = EquippableItemType.RING;
 		const randomIndex = Math.floor(Math.random() * Object.keys(RingData).length);
 		data = Object.values(RingData)[randomIndex];
@@ -53,9 +53,7 @@ export const generateRandomItem = (
 		Math.random() * MAX_ADDITIONAL_DAMAGE + BASE_DAMAGE,
 		Math.random() * MAX_MOVEMENT_SPEED,
 		Math.random() * MAX_ADDITIONAL_MAIN_STAT + BASE_MAIN_STAT,
-		data.iconFrame,
-		data.description,
-		data.name,
-		itemType
+		itemType,
+		data
 	);
 };

@@ -1,6 +1,7 @@
 import { AbilityType } from '../abilities/abilityData';
 import { AbilityKey, Faction } from '../helpers/constants';
 import Character from './Character';
+import MainScene from '../scenes/MainScene';
 
 // This class handles the players character and all mechanical events associated with it.
 export default class PlayerCharacter extends Character {
@@ -25,9 +26,11 @@ export default class PlayerCharacter extends Character {
 		[AbilityKey.TWO]: AbilityType.ICESPIKE,
 		[AbilityKey.THREE]: AbilityType.DUSTNOVA,
 		[AbilityKey.FOUR]: AbilityType.ROUND_HOUSE_KICK,
+		[AbilityKey.FIVE]: AbilityType.NOTHING,
 	};
-
-	public updatePrimary(primaryAbility:string) {
-		this.abilityKeyMapping[0] = primaryAbility as AbilityType;
-	}
+}
+export const updateAbility=(scene: MainScene, player: PlayerCharacter, abilitySlot: AbilityKey, ability: AbilityType) => {
+	if (abilitySlot === AbilityKey.FIVE) return;
+	player.abilityKeyMapping[abilitySlot] = ability;
+	scene.avatar.updateAbility(abilitySlot, ability);
 }

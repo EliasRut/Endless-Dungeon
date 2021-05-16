@@ -28,6 +28,7 @@ interface AbilityData {
 }
 
 export const enum AbilityType {
+	NOTHING = 'nothing',
 	FIREBALL = 'fireball',
 	ICESPIKE = 'icespike',
 	DUSTNOVA = 'dustnova',
@@ -36,6 +37,12 @@ export const enum AbilityType {
 }
 
 export const Abilities: {[type: string]: AbilityData} = {
+	[AbilityType.NOTHING]: {
+		projectiles: 0,						
+		cooldownMs: 0,
+		damageMultiplier: 0,
+		flavorText: ``
+	},
 	[AbilityType.FIREBALL]: {
 		projectiles: 1,
 		projectileData: {
@@ -66,6 +73,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 0.3,
 		cooldownMs: 1200,
 		damageMultiplier: 0.75,
+		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`
 	},
 	[AbilityType.DUSTNOVA]: {
 		projectiles: 32,

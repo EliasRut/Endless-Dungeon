@@ -1,4 +1,5 @@
-import Item, { NUM_ICON_FRAMES } from './Item';
+import Item from './Item';
+import { ItemData } from '../../items/itemData';
 
 const MAX_HEALTH = 100;
 const BASE_DAMAGE = 1;
@@ -19,23 +20,23 @@ export default class EquippableItem extends Item implements ItemStats {
 	public damage = 1;
 	public movementSpeed = 100;
 	public mainStat = 1;
+	public data: ItemData;
 
 	constructor(
 			maxHealth: number = Math.random() * MAX_HEALTH,
 			damage: number = Math.random() * MAX_ADDITIONAL_DAMAGE + BASE_DAMAGE,
 			movementSpeed: number = Math.random() * MAX_MOVEMENT_SPEED,
 			mainStat: number = Math.random() * MAX_ADDITIONAL_MAIN_STAT + BASE_MAIN_STAT,
-			iconFrame: number = Math.floor(Math.random() * NUM_ICON_FRAMES),
-			description: string = 'A normal item',
-			name: string = 'Item',
 			type: string = 'potion',
+			data: ItemData,
 			itemLocation: number = 0,
-			id?: string
+			id?: string,
 		) {
-		super(description, name, iconFrame, type, itemLocation, id);
+		super(data.description, data.name, data.iconFrame, type, itemLocation, id);
 		this.maxHealth = maxHealth;
 		this.damage = damage;
 		this.movementSpeed = movementSpeed;
 		this.mainStat = mainStat;
+		this.data = data;		
 	}
 }

@@ -1,4 +1,5 @@
-import { EquipmentSlot, UiDepths } from '../helpers/constants';
+import { AbilityKey, EquipmentSlot, UiDepths } from '../helpers/constants';
+import { AbilityType } from '../abilities/abilityData';
 import OverlayScreen from './OverlayScreen';
 import Item from '../worldstate/Item';
 import {
@@ -15,6 +16,17 @@ import { isEquippable } from '../helpers/inventory';
 import EquippableItem from '../worldstate/EquippableItem';
 import globalState from '../worldstate';
 import MainScene from '../scenes/MainScene';
+import {
+	EquippableItemType,
+	SourceData,
+	ItemData,
+	AbilityLinkedItem,
+	CatalystData,
+	ChestPieceData,
+	RingData,
+	AmuletData
+} from '../../items/itemData';
+import { updateAbility } from '../worldstate/PlayerCharacter';
 
 const INVENTORY_START_X = 500;
 const INVENTORY_START_Y = 198;
@@ -32,7 +44,12 @@ const BAG_START_Y = INVENTORY_START_Y - BAG_OFFSET_Y;
 
 const ABILITY_ICON_SIZE = 34;
 const ITEM_ABILITY_COORDINATES = {
-	element: [INVENTORY_START_X - 56, INVENTORY_START_Y+1]
+	[EquipmentSlot.MAIN_HAND]: [INVENTORY_START_X - 56, INVENTORY_START_Y + 1],
+	[EquipmentSlot.OFF_HAND]: [INVENTORY_START_X + 56, INVENTORY_START_Y + 1],
+	[EquipmentSlot.CHESTPIECE]: [INVENTORY_START_X - 16, INVENTORY_START_Y + 1],
+	[EquipmentSlot.NECKLACE]: [INVENTORY_START_X - 0, INVENTORY_START_Y - 15],
+	[EquipmentSlot.RIGHT_RING]: [INVENTORY_START_X + 22, INVENTORY_START_Y + 25],
+	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X - 22, INVENTORY_START_Y + 25],
 };
 
 // tslint:disable: no-magic-numbers
@@ -44,10 +61,29 @@ const EQUIPMENT_SLOT_COORDINATES = {
 	[EquipmentSlot.RIGHT_RING]: [INVENTORY_START_X + 42.5, INVENTORY_START_Y - 45.5],
 	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X - 41, INVENTORY_START_Y - 45.5]
 };
+
+const EQUIPMENT_SLOT_TO_ABILITY_KEY = {
+	[EquipmentSlot.MAIN_HAND]: AbilityKey.ONE,
+	[EquipmentSlot.OFF_HAND]: AbilityKey.TWO,
+	[EquipmentSlot.CHESTPIECE]: 5,
+	[EquipmentSlot.NECKLACE]: AbilityKey.FIVE,
+	[EquipmentSlot.RIGHT_RING]: AbilityKey.FOUR,
+	[EquipmentSlot.LEFT_RING]: AbilityKey.THREE,
+};
+
+export const ABILITY_TO_ICON = {
+	[AbilityType.FIREBALL]: ['icon-abilities', 0],
+	[AbilityType.ICESPIKE]: ['icon-abilities', 1],
+	[AbilityType.DUSTNOVA]: ['icon-abilities', 2],
+	[AbilityType.ROUND_HOUSE_KICK]: ['icon-abilities', 2],
+	[AbilityType.HEALING_LIGHT]: ['icon-abilities', 2],
+	[AbilityType.NOTHING]: ['icon-abilities', 2],
+};
 // tslint:enable
 
 export default class InventoryScreen extends OverlayScreen {
 	itemTokenMap: { [id: string]: InventoryItemToken } = {};
+	abilityIconMap: { [slot: string]: Phaser.GameObjects.Image } = {};
 	focusedItem?: Item;
 	scene: MainScene;
 
@@ -70,12 +106,12 @@ export default class InventoryScreen extends OverlayScreen {
 			.forEach((key) => {
 				const slotKey = key as EquipmentSlot;
 				const item = equippedItems[slotKey]!;
-				if (slotKey === 'mainhand') this.updatePrimaryAbility(true);
 				const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotKey];
 				if (!this.itemTokenMap[item.id]) {
 					this.createItemToken(item, x, y);
 				}
 			});
+		this.updateAbilities(true);
 
 		const uneqippedItemList = getUnequippedItemsWithPositions();
 		uneqippedItemList.forEach((itemPosition) => {
@@ -106,9 +142,7 @@ export default class InventoryScreen extends OverlayScreen {
 						equipItem(equippableItem);
 					}
 					this.update();
-					if (item.type === 'weapon') {
-						this.updatePrimaryAbility(false);
-					}
+					this.updateAbilities(false);
 				}
 			} else {
 				this.focusedItem = item;
@@ -117,29 +151,50 @@ export default class InventoryScreen extends OverlayScreen {
 		});
 	}
 
-	updatePrimaryAbility(contructor: boolean) {
-		const [iconX, iconY] = ITEM_ABILITY_COORDINATES.element;
-		const abilityIcon = new Phaser.GameObjects.Image(
-			this.scene,
-			iconX,
-			iconY,
-			'icon-abilities', 1);
-		abilityIcon.displayWidth = ABILITY_ICON_SIZE;
-		abilityIcon.displayHeight = ABILITY_ICON_SIZE;
-		abilityIcon.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		abilityIcon.setScrollFactor(0);
-		abilityIcon.setInteractive();
-		this.add(abilityIcon, true);
-		this.scene.avatar.updatePrimary(this.scene);
-		if (contructor) abilityIcon.setVisible(false);
-		else {
-			globalState.playerCharacter.updatePrimary('icespike');
-			abilityIcon.setVisible(true);
-		}
-		abilityIcon.on('pointerdown', () => {
-			if (this.focusedItem !== undefined) this.focusedItem = undefined;
-			this.scene.overlayScreens.itemScreen.updateAbility('fireball');
-		});
+	updateAbilities(contructor: boolean) {
+		const equippedItems = getEquippedItems();
+		Object.keys(equippedItems)
+			.forEach((key) => {
+				const slotKey = key as EquipmentSlot;
+				if (slotKey === EquipmentSlot.CHESTPIECE) return;
+				// TODO: NECKLACE
+				if (slotKey === EquipmentSlot.NECKLACE) return;
+
+				// Remove ability if no item is equipped in slot
+				if (equippedItems[slotKey] === undefined) {
+					if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
+					if (slotKey === EquipmentSlot.MAIN_HAND) updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
+					else updateAbility(this.scene, globalState.playerCharacter, EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey], AbilityType.NOTHING);
+					return;
+				}
+
+				const [iconX, iconY] = ITEM_ABILITY_COORDINATES[slotKey];				
+				const abilityLinkedItem = equippedItems[slotKey]!.data as AbilityLinkedItem;
+				const ability = abilityLinkedItem.ability;
+				const abilityIcon = new Phaser.GameObjects.Image(
+					this.scene,
+					iconX,
+					iconY,
+					ABILITY_TO_ICON[ability][0] as string, ABILITY_TO_ICON[ability][1]);
+				abilityIcon.displayWidth = ABILITY_ICON_SIZE;
+				abilityIcon.displayHeight = ABILITY_ICON_SIZE;
+				abilityIcon.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+				abilityIcon.setScrollFactor(0);
+				abilityIcon.setInteractive();
+				this.add(abilityIcon, true);
+				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
+				this.abilityIconMap[slotKey] = abilityIcon;				
+
+				updateAbility(this.scene, globalState.playerCharacter, EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey], ability);
+
+				if (contructor) abilityIcon.setVisible(false);
+				else abilityIcon.setVisible(true);
+
+				abilityIcon.on('pointerdown', () => {
+					if (this.focusedItem !== undefined) this.focusedItem = undefined;
+					this.scene.overlayScreens.itemScreen.updateAbility(ability);
+				});
+			});
 	}
 
 	addToInventory(item: Item) {

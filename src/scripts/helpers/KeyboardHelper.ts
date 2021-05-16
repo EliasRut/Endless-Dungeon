@@ -58,6 +58,7 @@ export default class KeyboardHelper {
 			case AbilityKey.TWO: return this.abilityKey2;
 			case AbilityKey.THREE: return this.abilityKey3;
 			case AbilityKey.FOUR: return this.abilityKey4;
+			case AbilityKey.FIVE: return this.abilityKey4;
 		}
 	}
 
