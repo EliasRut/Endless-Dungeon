@@ -7,14 +7,19 @@ export interface NpcScript {
 	steps: NpcScriptStep [];
 }
 
-export interface NpcPositioning {
+export interface NpcOptions {
+	script?: NpcScript;
+	questGiverId?: string;
+	traderId?: string;
+}
+
+export interface NpcPositioning extends NpcOptions {
 	type: string;
 	id: string;
 	x: number;
 	y: number;
 	facingX?: number;
 	facingY?: number;
-	script?: NpcScript;
 }
 
 export interface MapConnection {
@@ -55,6 +60,15 @@ export interface ScriptCondition {
 	itemId?: string;
 	scriptId?: string;
 	scriptState?: "new" | "finished";
+}
+
+export interface ScriptPausedCondition {
+	type: "pauseUntilCondition";
+	itemIds?: string[];
+	itemQuantities?: number[];
+	questIds?: string[];
+	questStates?: ('started' | 'notStarted' | 'startedOrFinished' | 'finished' | 'notFinished')[];
+	roomName?: string;
 }
 
 export interface ScriptDialog {
@@ -140,9 +154,16 @@ export interface ScriptSetScriptState {
 	scriptState: "new" | "finished";
 }
 
+export interface ScriptQuestState {
+	type: "setQuestState";
+	questId: string;
+	questState: "new" | "finished";
+}
+
 export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange |
 	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn | ScriptOpenDoor |
-	ScriptCondition | ScriptSetScriptState | ScriptTakeItem | ScriptCast | ScriptPlaceItem;
+	ScriptCondition | ScriptSetScriptState | ScriptTakeItem | ScriptCast | ScriptPlaceItem |
+	ScriptPausedCondition | ScriptQuestState;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];

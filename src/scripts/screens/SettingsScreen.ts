@@ -84,6 +84,7 @@ export default class SettingsScreen extends OverlayScreen {
 		jsonData += '"npcs": '                 + JSON.stringify(globalState.npcs) +',\n';
 		jsonData += '"doors": '                + JSON.stringify(globalState.doors) +',\n';
 		jsonData += '"scripts": '              + JSON.stringify(globalState.scripts) +',\n';
+		jsonData += '"quests": '               + JSON.stringify(globalState.quests) +',\n';
 		jsonData += '"dungeon": '              + JSON.stringify(globalState.dungeon) +',\n';
 		jsonData += '"transitionStack": '      + JSON.stringify(globalState.transitionStack) +',\n';
 		jsonData += '"availableRooms": '       + JSON.stringify(globalState.availableRooms) +',\n';
@@ -123,19 +124,20 @@ export default class SettingsScreen extends OverlayScreen {
 
 
 		/* tslint:disable: max-line-length */
-		if(savegameJSON.playerCharacter) 	localStorage.setItem('playerCharacter', JSON.stringify(savegameJSON.playerCharacter));
-		if(savegameJSON.gameTime) 			localStorage.setItem('gameTime', `${savegameJSON.gameTime}`);
-		if(savegameJSON.npcs) 				localStorage.setItem('npcs', JSON.stringify(savegameJSON.npcs));
-		if(savegameJSON.doors) 				localStorage.setItem('doors', JSON.stringify(savegameJSON.doors));
-		if(savegameJSON.scripts) 			localStorage.setItem('scripts', JSON.stringify(savegameJSON.scripts));
-		if(savegameJSON.dungeon) 			localStorage.setItem('dungeon', JSON.stringify(savegameJSON.dungeon));
-		if(savegameJSON.transitionStack) 	localStorage.setItem('transitionStack', JSON.stringify(savegameJSON.transitionStack));
-		if(savegameJSON.availableRooms) 	localStorage.setItem('availableRooms', JSON.stringify(savegameJSON.availableRooms));
-		if(savegameJSON.availableTilesets) 	localStorage.setItem('availableTilesets', JSON.stringify(savegameJSON.availableTilesets));
-		if(savegameJSON.currentLevel) 		localStorage.setItem('currentLevel', JSON.stringify(savegameJSON.currentLevel));
-		if(savegameJSON.roomAssignment) 	localStorage.setItem('roomAssignment', JSON.stringify(savegameJSON.roomAssignment));
-		if(savegameJSON.inventory) 			localStorage.setItem('inventory', JSON.stringify(savegameJSON.inventory));
-		if(savegameJSON.saveGameName) 		localStorage.setItem('saveGameName',JSON.stringify(savegameJSON.saveGameName));
+		if (savegameJSON.playerCharacter) 	localStorage.setItem('playerCharacter', JSON.stringify(savegameJSON.playerCharacter));
+		if (savegameJSON.gameTime) 					localStorage.setItem('gameTime', `${savegameJSON.gameTime}`);
+		if (savegameJSON.npcs) 							localStorage.setItem('npcs', JSON.stringify(savegameJSON.npcs));
+		if (savegameJSON.doors) 						localStorage.setItem('doors', JSON.stringify(savegameJSON.doors));
+		if (savegameJSON.scripts) 					localStorage.setItem('scripts', JSON.stringify(savegameJSON.scripts));
+		if (savegameJSON.quests) 						localStorage.setItem('quests', JSON.stringify(savegameJSON.quests));
+		if (savegameJSON.dungeon) 					localStorage.setItem('dungeon', JSON.stringify(savegameJSON.dungeon));
+		if (savegameJSON.transitionStack) 	localStorage.setItem('transitionStack', JSON.stringify(savegameJSON.transitionStack));
+		if (savegameJSON.availableRooms)	 	localStorage.setItem('availableRooms', JSON.stringify(savegameJSON.availableRooms));
+		if (savegameJSON.availableTilesets)	localStorage.setItem('availableTilesets', JSON.stringify(savegameJSON.availableTilesets));
+		if (savegameJSON.currentLevel) 			localStorage.setItem('currentLevel', JSON.stringify(savegameJSON.currentLevel));
+		if (savegameJSON.roomAssignment) 		localStorage.setItem('roomAssignment', JSON.stringify(savegameJSON.roomAssignment));
+		if (savegameJSON.inventory) 				localStorage.setItem('inventory', JSON.stringify(savegameJSON.inventory));
+		if (savegameJSON.saveGameName) 			localStorage.setItem('saveGameName',JSON.stringify(savegameJSON.saveGameName));
 		/* tslint:enable: max-line-length */
 
 		// globalState.loadState();

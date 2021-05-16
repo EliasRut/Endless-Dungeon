@@ -1,34 +1,18 @@
-import { NpcScript, ScriptEntry } from '../../../typings/custom';
-import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
+import { ScriptEntry, ScriptPausedCondition } from '../../../typings/custom';
 import MainScene from '../scenes/MainScene';
-import DialogScreen from '../screens/DialogScreen';
-import InventoryScreen from '../screens/InventoryScreen';
-import StatScreen from '../screens/StatScreen';
 import globalState from '../worldstate';
 import { TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import RoomPositioning from '../worldstate/RoomPositioning';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from './movement';
 import CharacterToken from '../drawables/tokens/CharacterToken';
+import { getUnequippedItemCount } from './inventory';
 
 const DIALOG_TEXT_TIME_MS = 5000;
-
-export interface NpcScriptState {
-	repetition: number;
-	step?: number;
-	stepStartMs?: number;
-	animationFallback?: string;
-}
 
 export default class ScriptHelper {
 
 	scene: MainScene;
 	currentRoom?: RoomPositioning;
-	runningScript?: ScriptEntry[];
-	scriptStep?: number;
-	scriptSubStep?: number;
-	scriptStepStartMs?: number;
-	scriptAnimationFallback?: string;
-	npcScriptStates: {[npcId: string]: NpcScriptState} = {};
 
 	constructor (scene: MainScene) {
 		this.scene = scene;
@@ -46,78 +30,80 @@ export default class ScriptHelper {
 	}
 
 	handleScriptStep(globalTime: number) {
-		const currentStep = this.runningScript![this.scriptStep!];
+		const currentStep = globalState.scripts.runningScript![globalState.scripts.scriptStep!];
 		let cleanUpStep = false;
 		if (!currentStep) {
-			this.runningScript = undefined;
-			this.scriptStep = undefined;
+			globalState.scripts.runningScript = undefined;
+			globalState.scripts.scriptStep = undefined;
 			return;
 		}
 		switch (currentStep.type) {
 			case 'wait': {
-				if (!this.scriptStepStartMs) {
+				if (!globalState.scripts.scriptStepStartMs) {
 					this.scene.pause();
-					this.scriptStepStartMs = globalTime;
-				} else if ((this.scriptStepStartMs + currentStep.time) < globalTime) {
+					globalState.scripts.scriptStepStartMs = globalTime;
+				} else if ((globalState.scripts.scriptStepStartMs + currentStep.time) < globalTime) {
 					cleanUpStep = true;
 					this.scene.resume();
 				}
 				break;
 			}
 			case 'fadeIn': {
-				if (!this.scriptStepStartMs) {
+				if (!globalState.scripts.scriptStepStartMs) {
 					this.scene.pause();
-					this.scriptStepStartMs = globalTime;
+					globalState.scripts.scriptStepStartMs = globalTime;
 					this.scene.cameras.main.fadeIn(currentStep.time);
-				} else if ((this.scriptStepStartMs + currentStep.time) < globalTime) {
+				} else if ((globalState.scripts.scriptStepStartMs + currentStep.time) < globalTime) {
 					cleanUpStep = true;
 					this.scene.resume();
 				}
 				break;
 			}
 			case 'fadeOut': {
-				if (!this.scriptStepStartMs) {
+				if (!globalState.scripts.scriptStepStartMs) {
 					this.scene.pause();
-					this.scriptStepStartMs = globalTime;
+					globalState.scripts.scriptStepStartMs = globalTime;
 					this.scene.cameras.main.fadeOut(currentStep.time);
-				} else if ((this.scriptStepStartMs + currentStep.time) < globalTime) {
+				} else if ((globalState.scripts.scriptStepStartMs + currentStep.time) < globalTime) {
 					cleanUpStep = true;
 					this.scene.resume();
 				}
 				break;
 			}
 			case 'dialog': {
-				if (!this.scriptStepStartMs) {
+				if (!globalState.scripts.scriptStepStartMs) {
 					this.scene.pause();
-					this.scriptStepStartMs = globalTime;
-					this.scriptSubStep = 0;
-					this.scene.overlayScreens.dialogScreen.setText(currentStep.text[this.scriptSubStep!]);
+					globalState.scripts.scriptStepStartMs = globalTime;
+					globalState.scripts.scriptSubStep = 0;
+					this.scene.overlayScreens.dialogScreen.setText(
+						currentStep.text[globalState.scripts.scriptSubStep!]);
 					this.scene.overlayScreens.dialogScreen.setVisible(true);
-				} else if ((this.scriptStepStartMs + DIALOG_TEXT_TIME_MS) < globalTime) {
-					this.scriptSubStep = this.scriptSubStep! + 1;
-					if (currentStep.text.length <= this.scriptSubStep) {
+				} else if ((globalState.scripts.scriptStepStartMs + DIALOG_TEXT_TIME_MS) < globalTime) {
+					globalState.scripts.scriptSubStep = globalState.scripts.scriptSubStep! + 1;
+					if (currentStep.text.length <= globalState.scripts.scriptSubStep) {
 						this.scene.overlayScreens.dialogScreen.setVisible(false);
 						cleanUpStep = true;
 						this.scene.resume();
 					} else {
-						this.scene.overlayScreens.dialogScreen.setText(currentStep.text[this.scriptSubStep!]);
-						this.scriptStepStartMs = globalTime;
+						this.scene.overlayScreens.dialogScreen.setText(
+							currentStep.text[globalState.scripts.scriptSubStep!]);
+						globalState.scripts.scriptStepStartMs = globalTime;
 					}
 				}
 				break;
 			}
 			case 'animation': {
-				if (!this.scriptStepStartMs) {
+				if (!globalState.scripts.scriptStepStartMs) {
 					this.scene.pause();
-					this.scriptStepStartMs = globalTime;
+					globalState.scripts.scriptStepStartMs = globalTime;
 					if (currentStep.target === 'player') {
-						this.scriptAnimationFallback = this.scene.mainCharacter.anims.currentAnim.key;
+						globalState.scripts.scriptAnimationFallback = this.scene.mainCharacter.anims.currentAnim.key;
 						this.scene.mainCharacter.play(currentStep.animation);
 					}
-				} else if ((this.scriptStepStartMs + currentStep.duration) < globalTime) {
+				} else if ((globalState.scripts.scriptStepStartMs + currentStep.duration) < globalTime) {
 					cleanUpStep = true;
 					this.scene.resume();
-					this.scene.mainCharacter.play(this.scriptAnimationFallback!);
+					this.scene.mainCharacter.play(globalState.scripts.scriptAnimationFallback!);
 				}
 				break;
 			}
@@ -233,6 +219,18 @@ export default class ScriptHelper {
 				this.scene.addFixedItem(currentStep.itemId, targetX, targetY);
 				break;
 			}
+			case 'pauseUntilCondition': {
+				if (!globalState.scripts.pausedScripts) {
+					globalState.scripts.pausedScripts = [];
+				}
+				globalState.scripts.pausedScripts.push({
+					script: [...globalState.scripts.runningScript!],
+					scriptStep: globalState.scripts.scriptStep!
+				});
+				globalState.scripts.runningScript = undefined;
+				globalState.scripts.scriptStep = 0;
+				break;
+			}
 			case 'condition': {
 				if (currentStep.conditionType === 'hasItem') {
 					const hasMatchingItems = !!globalState.inventory.unequippedItemList.find(
@@ -240,26 +238,27 @@ export default class ScriptHelper {
 					if (hasMatchingItems) {
 						cleanUpStep = true;
 					} else {
-						this.runningScript = undefined;
-						this.scriptStep = undefined;
+						globalState.scripts.runningScript = undefined;
+						globalState.scripts.scriptStep = undefined;
 						return;
 					}
 				} else if (currentStep.conditionType === 'scriptState') {
 					const scriptId =
 						`${globalState.currentLevel}_${this.currentRoom!.roomName}_${currentStep.scriptId}`;
 					if (currentStep.scriptState === 'new') {
-						if (!globalState.scripts[scriptId] || globalState.scripts[scriptId].state === 'new') {
+						const state = globalState.scripts.states && globalState.scripts.states[scriptId];
+						if (!state || state.state === 'new') {
 							cleanUpStep = true;
 						} else {
-							this.runningScript = undefined;
-							this.scriptStep = undefined;
+							globalState.scripts.runningScript = undefined;
+							globalState.scripts.scriptStep = undefined;
 							return;
 						}
 					} else if (currentStep.scriptState === 'finished') {
-						if (!globalState.scripts[scriptId]
-								|| globalState.scripts[scriptId].state !== 'finished') {
-							this.runningScript = undefined;
-							this.scriptStep = undefined;
+						const state = globalState.scripts.states && globalState.scripts.states[scriptId];
+						if (!state || state.state !== 'finished') {
+							globalState.scripts.runningScript = undefined;
+							globalState.scripts.scriptStep = undefined;
 							return;
 						} else {
 							cleanUpStep = true;
@@ -268,11 +267,23 @@ export default class ScriptHelper {
 				}
 				break;
 			}
+			case 'setQuestState': {
+				cleanUpStep = true;
+				if (!globalState.quests) {
+					globalState.quests = {};
+				}
+				globalState.quests[currentStep.questId].questFinished =
+					currentStep.questState === 'finished';
+				break;
+			}
 			case 'setScriptState': {
 				cleanUpStep = true;
 				const scriptId =
 					`${globalState.currentLevel}_${this.currentRoom!.roomName}_${currentStep.scriptId}`;
-				globalState.scripts[scriptId] = {
+				if (!globalState.scripts.states) {
+					globalState.scripts.states = {};
+				}
+				globalState.scripts.states[scriptId] = {
 					id: scriptId,
 					state: currentStep.scriptState
 				};
@@ -282,15 +293,15 @@ export default class ScriptHelper {
 			// Implememt item take and drop case (for example wizard scroll)
 		}
 		if (cleanUpStep) {
-			this.scriptStep = this.scriptStep! + 1;
-			this.scriptSubStep = undefined;
-			this.scriptStepStartMs = undefined;
-			this.scriptAnimationFallback = undefined;
+			globalState.scripts.scriptStep = globalState.scripts.scriptStep! + 1;
+			globalState.scripts.scriptSubStep = undefined;
+			globalState.scripts.scriptStepStartMs = undefined;
+			globalState.scripts.scriptAnimationFallback = undefined;
 		}
 	}
 
 	handleNpcScriptStep(globalTime: number, token: CharacterToken) {
-		const scriptState = this.npcScriptStates[token.id];
+		const scriptState = globalState.scripts.npcScriptStates![token.id];
 		const script = token.script!;
 		const currentStepNumber = scriptState.step || 0;
 		const currentStep = script.steps[currentStepNumber];
@@ -317,7 +328,7 @@ export default class ScriptHelper {
 							token.play(currentStep.animation);
 					} else if ((scriptState.stepStartMs + currentStep.duration) < globalTime) {
 						cleanUpStep = true;
-						token.play(this.scriptAnimationFallback!);
+						token.play(globalState.scripts.scriptAnimationFallback!);
 					}
 				} else {
 					cleanUpStep = true;
@@ -391,13 +402,17 @@ export default class ScriptHelper {
 	}
 
 	handleNpcScript(globalTime: number, token: CharacterToken) {
-		if (!this.npcScriptStates[token.id]) {
-			this.npcScriptStates[token.id] = {
+		if(!globalState.scripts.npcScriptStates) {
+			globalState.scripts.npcScriptStates = {};
+		}
+		if (!globalState.scripts.npcScriptStates[token.id]) {
+			globalState.scripts.npcScriptStates[token.id] = {
 				repetition: 0
 			};
 		}
 		const script = token.script!;
-		if (script.repeat === -1 || this.npcScriptStates[token.id].repetition < script.repeat) {
+		if (script.repeat === -1
+		|| globalState.scripts.npcScriptStates[token.id].repetition < script.repeat) {
 			this.handleNpcScriptStep(globalTime, token);
 		}
 	}
@@ -411,29 +426,110 @@ export default class ScriptHelper {
 	}
 
 	handleRoomScripts(globalTime: number) {
-		if (!this.runningScript) {
+		if (!globalState.scripts.runningScript) {
 			const lastRoomName = this.currentRoom?.roomName;
 			this.currentRoom = this.findRoomForToken(this.scene.mainCharacter);
 			const currentRooomName = this.currentRoom?.roomName;
 			if (lastRoomName !== currentRooomName) {
 				if (lastRoomName &&
 						globalState.availableRooms[lastRoomName].scripts.onExit) {
-					this.runningScript = globalState.availableRooms[lastRoomName].scripts.onExit;
-					this.scriptStep = 0;
+					globalState.scripts.runningScript = globalState.availableRooms[lastRoomName].scripts.onExit;
+					globalState.scripts.scriptStep = 0;
 				} else if (currentRooomName &&
 						globalState.availableRooms[currentRooomName].scripts.onEntry) {
-					this.runningScript = globalState.availableRooms[currentRooomName].scripts.onEntry;
-					this.scriptStep = 0;
+					globalState.scripts.runningScript = 
+						globalState.availableRooms[currentRooomName].scripts.onEntry;
+					globalState.scripts.scriptStep = 0;
 				}
 			}
 		}
-		if (this.runningScript) {
+		if (globalState.scripts.runningScript) {
 			this.handleScriptStep(globalTime);
 		}
+	}
+
+	isScriptRunning() {
+		return !!globalState.scripts.runningScript;
+	}
+
+	loadScript(script: ScriptEntry[]) {
+		if (this.isScriptRunning()) {
+			return false;
+		}
+		globalState.scripts.runningScript = script;
+		globalState.scripts.scriptStep = 0;
 	}
 
 	handleScripts(globalTime: number) {
 		this.handleRoomScripts(globalTime);
 		this.handleNpcScripts(globalTime);
+	}
+
+	resumePausedScripts() {
+		if (this.isScriptRunning()) {
+			return;
+		}
+		if (!globalState.scripts.pausedScripts || globalState.scripts.pausedScripts.length === 0) {
+			return;
+		}
+		const firstResumableScriptIndex = globalState.scripts.pausedScripts.findIndex((pausedScript) => {
+			const conditionStep = pausedScript.script[pausedScript.scriptStep] as ScriptPausedCondition;
+			let allConditionsFullfilled = true;
+			if (conditionStep.roomName) {
+				const currentRoom = this.findRoomForToken(this.scene.mainCharacter);
+				if (!currentRoom || currentRoom.roomName !== conditionStep.roomName) {
+					allConditionsFullfilled = false;
+				}
+			}
+			(conditionStep.itemIds || []).forEach((itemId, index) => {
+				const requiredCount = (conditionStep.itemQuantities || [])[index] || 1;
+				if (getUnequippedItemCount(itemId) < requiredCount) {
+					allConditionsFullfilled = false;
+				}
+			});
+			(conditionStep.questIds || []).forEach((questId, index) => {
+				const requiredState = (conditionStep.questStates || [])[index] || 'started';
+				switch (requiredState) {
+					case 'startedOrFinished': {
+						if (!globalState.quests[questId]) {
+							allConditionsFullfilled = false;
+						}
+						break;
+					}
+					case 'started': {
+						if (!globalState.quests[questId] || globalState.quests[questId].questFinished) {
+							allConditionsFullfilled = false;
+						}
+						break;
+					}
+					case 'notStarted': {
+						if (globalState.quests[questId]) {
+							allConditionsFullfilled = false;
+						}
+						break;
+					}
+					case 'finished': {
+						if (!globalState.quests[questId] || !globalState.quests[questId].questFinished) {
+							allConditionsFullfilled = false;
+						}
+						break;
+					}
+					case 'notFinished': {
+						if (globalState.quests[questId] && globalState.quests[questId].questFinished) {
+							allConditionsFullfilled = false;
+						}
+						break;
+					}
+				}
+			});
+			return allConditionsFullfilled;
+		});
+		if (firstResumableScriptIndex > -1) {
+			globalState.scripts.runningScript =
+				globalState.scripts.pausedScripts[firstResumableScriptIndex].script;
+			globalState.scripts.scriptStep =
+				globalState.scripts.pausedScripts[firstResumableScriptIndex].scriptStep + 1;
+			globalState.scripts.pausedScripts.splice(firstResumableScriptIndex, 1);
+		}
 	}
 }
