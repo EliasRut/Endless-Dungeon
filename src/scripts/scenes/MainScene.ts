@@ -129,7 +129,12 @@ export default class MainScene extends Phaser.Scene {
 		this.avatar = new Avatar(this);
 
 		// essenceNames.forEach((name, index) => {
-		// 	const essence = new Phaser.GameObjects.Sprite(this, 200 + index * 20, 200, 'items-essence', 0);
+		// 	const essence = new Phaser.GameObjects.Sprite(
+		// 		this,
+		// 		200 + index * 20,
+		// 		200,
+		// 		'items-essence',
+		// 		0);
 		// 	essence.play(`essence-${name}`);
 		// 	essence.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		// 	essence.setScrollFactor(0);
@@ -145,10 +150,10 @@ export default class MainScene extends Phaser.Scene {
 		};
 
 		// Warum wurden die 2 mal geladen?
-//		this.fpsText = new FpsText(this);
-//		this.backpackIcon = new BackpackIcon(this);
+		// this.fpsText = new FpsText(this);
+		// this.backpackIcon = new BackpackIcon(this);
 		this.settingsIcon = new SettingsIcon(this);
-//		this.avatar = new Avatar(this);
+		// this.avatar = new Avatar(this);
 
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
