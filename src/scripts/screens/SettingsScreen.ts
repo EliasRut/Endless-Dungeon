@@ -6,6 +6,7 @@ import RoomPreloaderScene from '../scenes/RoomPreloaderScene';
 import globalState from '../worldstate';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
 import OverlayScreen from './OverlayScreen';
+import * as data from '../../assets/newgame.json';
 
 export default class SettingsScreen extends OverlayScreen {
 	saveIcon: Phaser.GameObjects.BitmapText;
@@ -17,7 +18,7 @@ export default class SettingsScreen extends OverlayScreen {
 		// tslint:disable: no-magic-numbers
 		const height = scene.sys.game.canvas.height;
 		const width = scene.sys.game.canvas.width;
-		const SETTINGS_START_X = width/3;
+		const SETTINGS_START_X = width/3+30;
 		const SETTINGS_START_Y = height/3;
 		const SETTINGS_WIDTH = width/3;
 		const SETTINGS_HEIGHT = height/3;
@@ -44,7 +45,7 @@ export default class SettingsScreen extends OverlayScreen {
 		const sc: Phaser.Scene = this.scene;
 		fileInput.type = 'file';
 		fileInput.setAttribute('style','display:none');
-		fileInput.addEventListener('change', () => {this.load(fileInput);}, false);
+		fileInput.addEventListener('change', () => {this.load(this.loadJSONFile(fileInput));}, false);
 		document.body.appendChild(fileInput);
 
 
@@ -64,28 +65,13 @@ export default class SettingsScreen extends OverlayScreen {
 
 
 		this.newGameIcon = new Phaser.GameObjects.BitmapText(
-			scene, SETTINGS_START_X+SETTINGS_WIDTH/2-72, SETTINGS_START_Y+50, 'pixelfont', 'New Game', 12);
+			scene, SETTINGS_START_X+SETTINGS_WIDTH/2-80, SETTINGS_START_Y+50, 'pixelfont', 'New Game', 12);
 		// this.dialogText.setOrigin(0, 0);
 		this.newGameIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		this.newGameIcon.setScrollFactor(0);
 		this.newGameIcon.setInteractive();
 		this.newGameIcon.on('pointerdown', () => {
-			globalState.loadGame = false;
-
-			/* clear global state */
-
-			// globalState.transitionStack = {};
-			// globalState.npcs = {};
-			// globalState.doors = {};
-			// globalState.scripts = {};
-			// globalState.quests = {};
-			// globalState.availableRooms = {};
-			// globalState.availableTilesets = [];
-			// globalState.currentLevel = 'town_new';
-			// globalState.playerCharacter = new PlayerCharacter();
-			globalState.resetGlobalState();
-
-			// globalState.loadState();
+			this.load(data);
 			this.scene.scene.start('RoomPreloaderScene');
 			(this.scene as MainScene).resume();
 		});
@@ -119,7 +105,7 @@ export default class SettingsScreen extends OverlayScreen {
 		this.download(jsonData, 'json.txt', 'text/plain');
 	}
 
-	async load(element: HTMLInputElement): Promise<any> {
+	async loadJSONFile(element: HTMLInputElement): Promise<any> {
 		let savegame: File;
 		let savegameJSON: any;
 		if(element.files === null) {
@@ -132,31 +118,33 @@ export default class SettingsScreen extends OverlayScreen {
 		const saveStr: string = await savegame.text();
 
 		if(isJSON(saveStr)) {
-			console.log('parse json');
 			savegameJSON = JSON.parse(saveStr);
 			// console.log(saveStr);
-		} else {
-			console.log('not a json file.');
-			console.log(saveStr);
-			return;
+			return savegameJSON;
 		}
 
+		console.log(element.files[0].name+' is not a json file.');
+		console.log(saveStr);
+		return null;
+	}
+
+	async load(savegame: any): Promise<any> {
 
 		/* tslint:disable: max-line-length */
-		if (savegameJSON.playerCharacter) 	localStorage.setItem('playerCharacter', JSON.stringify(savegameJSON.playerCharacter));
-		if (savegameJSON.gameTime) 					localStorage.setItem('gameTime', `${savegameJSON.gameTime}`);
-		if (savegameJSON.npcs) 							localStorage.setItem('npcs', JSON.stringify(savegameJSON.npcs));
-		if (savegameJSON.doors) 						localStorage.setItem('doors', JSON.stringify(savegameJSON.doors));
-		if (savegameJSON.scripts) 					localStorage.setItem('scripts', JSON.stringify(savegameJSON.scripts));
-		if (savegameJSON.quests) 						localStorage.setItem('quests', JSON.stringify(savegameJSON.quests));
-		if (savegameJSON.dungeon) 					localStorage.setItem('dungeon', JSON.stringify(savegameJSON.dungeon));
-		if (savegameJSON.transitionStack) 	localStorage.setItem('transitionStack', JSON.stringify(savegameJSON.transitionStack));
-		if (savegameJSON.availableRooms)	 	localStorage.setItem('availableRooms', JSON.stringify(savegameJSON.availableRooms));
-		if (savegameJSON.availableTilesets)	localStorage.setItem('availableTilesets', JSON.stringify(savegameJSON.availableTilesets));
-		if (savegameJSON.currentLevel) 			localStorage.setItem('currentLevel', JSON.stringify(savegameJSON.currentLevel));
-		if (savegameJSON.roomAssignment) 		localStorage.setItem('roomAssignment', JSON.stringify(savegameJSON.roomAssignment));
-		if (savegameJSON.inventory) 				localStorage.setItem('inventory', JSON.stringify(savegameJSON.inventory));
-		if (savegameJSON.saveGameName) 			localStorage.setItem('saveGameName',JSON.stringify(savegameJSON.saveGameName));
+		if (savegame.playerCharacter) 	localStorage.setItem('playerCharacter', JSON.stringify(savegame.playerCharacter));
+		if (savegame.gameTime) 			localStorage.setItem('gameTime', `${savegame.gameTime}`);
+		if (savegame.npcs) 				localStorage.setItem('npcs', JSON.stringify(savegame.npcs));
+		if (savegame.doors) 			localStorage.setItem('doors', JSON.stringify(savegame.doors));
+		if (savegame.scripts)			localStorage.setItem('scripts', JSON.stringify(savegame.scripts));
+		if (savegame.quests) 			localStorage.setItem('quests', JSON.stringify(savegame.quests));
+		if (savegame.dungeon)			localStorage.setItem('dungeon', JSON.stringify(savegame.dungeon));
+		if (savegame.transitionStack) 	localStorage.setItem('transitionStack', JSON.stringify(savegame.transitionStack));
+		if (savegame.availableRooms) 	localStorage.setItem('availableRooms', JSON.stringify(savegame.availableRooms));
+		if (savegame.availableTilesets)	localStorage.setItem('availableTilesets', JSON.stringify(savegame.availableTilesets));
+		if (savegame.currentLevel)		localStorage.setItem('currentLevel', JSON.stringify(savegame.currentLevel));
+		if (savegame.roomAssignment)	localStorage.setItem('roomAssignment', JSON.stringify(savegame.roomAssignment));
+		if (savegame.inventory)			localStorage.setItem('inventory', JSON.stringify(savegame.inventory));
+		if (savegame.saveGameName)		localStorage.setItem('saveGameName',JSON.stringify(savegame.saveGameName));
 		/* tslint:enable: max-line-length */
 
 		// globalState.loadState();

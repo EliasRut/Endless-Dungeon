@@ -61,7 +61,8 @@ export const enum UiDepths {
 
 	UI_BACKGROUND_LAYER = 7,
 	UI_MAIN_LAYER = 8,
-	UI_FOREGROUND_LAYER = 9
+	UI_FOREGROUND_LAYER = 9,
+	UI_STICK_LAYER = 10
 }
 
 export const VISITED_TILE_TINT = 0x333333;
