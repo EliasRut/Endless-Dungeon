@@ -380,7 +380,8 @@ export default class DungeonGenerator {
 			npcs: this.npcs,
 			connections,
 			doors,
-			items
+			items,
+			enemyLevel:dungeonLevel
 		};
 	}
 

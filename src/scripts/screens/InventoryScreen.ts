@@ -143,7 +143,7 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 
 	// updates all abilities and icons at once.
-	updateAbilities(constructor: boolean) {		
+	updateAbilities(constructor: boolean) {
 		const equippedItems = getEquippedItems();
 		Object.keys(equippedItems)
 			.forEach((key) => {
@@ -156,8 +156,8 @@ export default class InventoryScreen extends OverlayScreen {
 				if (equippedItems[slotKey] === undefined) {
 					if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 					if (slotKey === EquipmentSlot.MAIN_HAND) {
-						updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);						
-						const abilityIcon = this.createAbilityIcon();						
+						updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
+						const abilityIcon = this.createAbilityIcon();
 						this.handleIconOptions(constructor, abilityIcon, AbilityType.FIREBALL);
 						this.abilityIconMap[EquipmentSlot.MAIN_HAND] = abilityIcon;
 					}
@@ -172,16 +172,16 @@ export default class InventoryScreen extends OverlayScreen {
 					return;
 				}
 				const abilityLinkedItem = equippedItems[slotKey]!.data as AbilityLinkedItem;
-				const ability = abilityLinkedItem.ability;				
+				const ability = abilityLinkedItem.ability;
 				const abilityIcon = this.createAbilityIcon(slotKey, ability);
-				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();				
+				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 				this.abilityIconMap[slotKey] = abilityIcon;
 
 				updateAbility(
-					this.scene, 
-					globalState.playerCharacter, 
-					EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey], 
-					ability);				
+					this.scene,
+					globalState.playerCharacter,
+					EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
+					ability);
 				this.handleIconOptions(constructor, abilityIcon, ability);
 			});
 	}
@@ -200,11 +200,15 @@ export default class InventoryScreen extends OverlayScreen {
 		abilityIcon.displayHeight = ABILITY_ICON_SIZE;
 		abilityIcon.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		abilityIcon.setScrollFactor(0);
-		abilityIcon.setInteractive();		
-		this.add(abilityIcon, true);		
+		abilityIcon.setInteractive();
+		this.add(abilityIcon, true);
 		return abilityIcon;
 	}
-	handleIconOptions(constructor: boolean, abilityIcon: Phaser.GameObjects.Image, ability: AbilityType){
+	handleIconOptions(
+			constructor: boolean,
+			abilityIcon: Phaser.GameObjects.Image,
+			ability: AbilityType
+		){
 		if (constructor) abilityIcon.setVisible(false);
 		else abilityIcon.setVisible(true);
 

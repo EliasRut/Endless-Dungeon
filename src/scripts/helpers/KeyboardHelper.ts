@@ -1,6 +1,7 @@
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { AbilityKey } from './constants';
+import BackpackIcon from '../drawables/ui/BackpackIcon';
 
 const AXIS_MOVEMENT_THRESHOLD = 0.4;
 
@@ -16,6 +17,14 @@ export default class KeyboardHelper {
 	abilityKey4: Phaser.Input.Keyboard.Key;
 	inventoryKey: Phaser.Input.Keyboard.Key;
 	settingsKey: Phaser.Input.Keyboard.Key;
+
+	abilityKeyPressed: {[key: number]: boolean} = {
+		[AbilityKey.ONE]: false,
+		[AbilityKey.TWO]: false,
+		[AbilityKey.THREE]: false,
+		[AbilityKey.FOUR]: false,
+		[AbilityKey.FIVE]: false,
+	};
 
 	gamepad: Phaser.Input.Gamepad.Gamepad |undefined;
 
@@ -97,6 +106,10 @@ export default class KeyboardHelper {
 
 
 		this.isAbility1Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.ONE]) {
+				this.abilityKeyPressed[AbilityKey.ONE] = false;
+				return true;
+			}
 			if (this.abilityKey1.isDown) {
 				return true;
 			}
@@ -104,6 +117,10 @@ export default class KeyboardHelper {
 		};
 
 		this.isAbility2Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.TWO]) {
+				this.abilityKeyPressed[AbilityKey.TWO] = false;
+				return true;
+			}
 			if (this.abilityKey2.isDown) {
 				return true;
 			}
@@ -111,6 +128,10 @@ export default class KeyboardHelper {
 		};
 
 		this.isAbility3Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.THREE]) {
+				this.abilityKeyPressed[AbilityKey.THREE] = false;
+				return true;
+			}
 			if (this.abilityKey3.isDown) {
 				return true;
 			}
@@ -118,6 +139,10 @@ export default class KeyboardHelper {
 		};
 
 		this.isAbility4Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.FOUR]) {
+				this.abilityKeyPressed[AbilityKey.FOUR] = false;
+				return true;
+			}
 			if (this.abilityKey4.isDown) {
 				return true;
 			}
@@ -138,21 +163,21 @@ export default class KeyboardHelper {
 		};
 	}
 
-	getCharacterFacing() {
+	getCharacterFacing(stickDeltaX: number, stickDeltaY: number) {
 		let yFacing = 0;
 		let xFacing = 0;
 
 		this.gamepad = this.scene.input.gamepad?.getPad(0);
 
-		if (this.isMoveUpPressed()) {
+		if (stickDeltaY < -20 || this.isMoveUpPressed()) {
 			yFacing = -1;
-		} else if (this.isMoveDownPressed()) {
+		} else if (stickDeltaY > 20 || this.isMoveDownPressed()) {
 			yFacing = 1;
 		}
 
-		if (this.isMoveLeftPressed()) {
+		if (stickDeltaX < -20 || this.isMoveLeftPressed()) {
 			xFacing = -1;
-		} else if (this.isMoveRightPressed()) {
+		} else if (stickDeltaX > 20 || this.isMoveRightPressed()) {
 			xFacing = 1;
 		}
 
@@ -205,7 +230,7 @@ export default class KeyboardHelper {
 			globalState.playerCharacter.abilityCastTime[AbilityKey.THREE],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.FOUR]
 		].reduce((max, value) => Math.max(max, value), 0);
-
+		
 		return gameTime - lastCast;
 	}
 

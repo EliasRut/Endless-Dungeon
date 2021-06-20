@@ -22,9 +22,8 @@ export const updateStats = (char: Character) => {
 
 	char.maxHealth = BASE_HEALTH + (itemStats.maxHealth || 0);
 	char.health = healthBeforeUpdate + (char.maxHealth - maxHealthBeforeUpdate);
-	char.movementSpeed = BASE_MOVEMENT_SPEED + (itemStats.movementSpeed || 0);
-	char.mainStat = 1 + (itemStats.mainStat || 0);
-	char.damage = (1 + (itemStats.damage || 0)) * char.mainStat;
+	char.movementSpeed = BASE_MOVEMENT_SPEED + (itemStats.movementSpeed || 0);	
+	char.damage = (1 + (itemStats.damage || 0));
 };
 
 export const equipItemOnCharacter = (item: EquippableItem, char: Character) => {

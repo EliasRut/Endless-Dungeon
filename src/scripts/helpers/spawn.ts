@@ -4,6 +4,7 @@ import RangedEnemyToken from '../drawables/tokens/RangedEnemyToken';
 import MainScene from '../scenes/MainScene';
 import NpcToken from '../drawables/tokens/NpcToken';
 import { NpcOptions } from '../../../typings/custom';
+import RedlingBossToken from '../drawables/tokens/RedlingBoss';
 
 export const spawnNpc = (
 		scene: MainScene,
@@ -11,6 +12,7 @@ export const spawnNpc = (
 		id: string,
 		posX: number,
 		posY: number,
+		level: number,
 		options?: NpcOptions
 	) => {
 	switch(type) {
@@ -24,7 +26,10 @@ export const spawnNpc = (
 			return new NpcToken(scene, posX, posY, 'naked-guy', id, options);
 		}
 		case 'enemy-zombie': {
-			return new ZombieToken(scene, posX, posY, type, id);
+			return new ZombieToken(scene, posX, posY, type, level, id);
+		}
+		case 'redling-boss': {
+			return new RedlingBossToken(scene, posX, posY, type, level, id);
 		}
 		default: {
 			throw new Error(`Map called for unknown enemy "${type}".`);

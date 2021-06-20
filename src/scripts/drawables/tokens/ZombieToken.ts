@@ -4,23 +4,29 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 
-const REGULAR_ATTACK_DAMAGE = 20;
+const BASE_ATTACK_DAMAGE = 20;
 const REGULAR_ATTACK_RANGE = 25;
 const REGULAR_MOVEMENT_SPEED = 50;
 const MIN_MOVEMENT_SPEED = 15;
-const REGULAR_HEALTH = 10;
+const BASE_HEALTH = 10;
 
 const ATTACK_DAMAGE_DELAY = 500;
 
 export default class ZombieToken extends EnemyToken {
 	attackExecuted: boolean;
+	startingHealth: number;
+	level: number;
 
-	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
+	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
 		super(scene, x, y, tokenName, id);
-		// cool effects!
+		// cool effects!		
+		this.level = level;
 		this.attackRange = REGULAR_ATTACK_RANGE;
 		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
 		this.attackExecuted = false;
+		this.startingHealth = BASE_HEALTH * this.level;
+		this.stateObject.health = this.startingHealth;
+		this.stateObject.damage = BASE_ATTACK_DAMAGE * this.level;
 	}
 
 	public update(time: number) {
@@ -29,11 +35,11 @@ export default class ZombieToken extends EnemyToken {
 		const player = globalState.playerCharacter;
 
 		this.stateObject.movementSpeed = Math.max(MIN_MOVEMENT_SPEED,
-		REGULAR_MOVEMENT_SPEED * this.stateObject.health / REGULAR_HEALTH);
+		REGULAR_MOVEMENT_SPEED * this.stateObject.health / this.startingHealth);
 
 		// check death
 		if (this.stateObject.health <= 0){
-				this.dropItem();
+				this.dropRandomItem(this.level);
 				this.destroy();
 				return;
 		}
@@ -119,7 +125,7 @@ export default class ZombieToken extends EnemyToken {
 		const distance = this.getDistance(tx, ty);
 
 		if (distance < this.attackRange) {
-			player.health -= REGULAR_ATTACK_DAMAGE;
+			player.health -= this.stateObject.damage;
 			console.log(`player health=${player.health}`);
 		}
 	}

@@ -10,14 +10,15 @@ import {
 	AmuletData
 } from '../../items/itemData';
 
-const MAX_HEALTH = 100;
+const MAX_HEALTH = 20;
 const BASE_DAMAGE = 1;
 const MAX_ADDITIONAL_DAMAGE = 1;
-const MAX_MOVEMENT_SPEED = 100;
+const MAX_MOVEMENT_SPEED = 35;
 const BASE_MAIN_STAT = 1;
 const MAX_ADDITIONAL_MAIN_STAT = 1;
 
 export const generateRandomItem = (
+								level: number = 1,
 								sourceWeight: number = 1,
 								catalystWeight: number = 1,
 								armorWeight: number = 1,
@@ -49,10 +50,10 @@ export const generateRandomItem = (
 		data = Object.values(AmuletData)[randomIndex];
 	}
 	return new EquippableItem(
-		Math.random() * MAX_HEALTH,
-		Math.random() * MAX_ADDITIONAL_DAMAGE + BASE_DAMAGE,
-		Math.random() * MAX_MOVEMENT_SPEED,
-		Math.random() * MAX_ADDITIONAL_MAIN_STAT + BASE_MAIN_STAT,
+		Math.random() * MAX_HEALTH * level,
+		Math.random() * MAX_ADDITIONAL_DAMAGE * (1 + level * 0.5) + BASE_DAMAGE,
+		Math.random() * MAX_MOVEMENT_SPEED * (1 + level * 0.1),
+		Math.random() * MAX_ADDITIONAL_MAIN_STAT * (1 + level * 0.5) + BASE_MAIN_STAT,
 		itemType,
 		data
 	);
