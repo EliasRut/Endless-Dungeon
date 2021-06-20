@@ -126,6 +126,7 @@ export default class MainScene extends Phaser.Scene {
 
 		this.fpsText = new FpsText(this);
 		this.backpackIcon = new BackpackIcon(this);
+		this.settingsIcon = new SettingsIcon(this);
 		this.avatar = new Avatar(this);
 
 		// essenceNames.forEach((name, index) => {
@@ -150,10 +151,9 @@ export default class MainScene extends Phaser.Scene {
 		};
 
 		// Warum wurden die 2 mal geladen?
-		// this.fpsText = new FpsText(this);
-		// this.backpackIcon = new BackpackIcon(this);
-		this.settingsIcon = new SettingsIcon(this);
-		// this.avatar = new Avatar(this);
+//		this.fpsText = new FpsText(this);
+//		this.backpackIcon = new BackpackIcon(this);
+//		this.avatar = new Avatar(this);
 
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
@@ -198,6 +198,9 @@ export default class MainScene extends Phaser.Scene {
 			}
 		}
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
+		Object.entries(this.npcMap).forEach(([key, value]) => {
+				this.physics.add.collider(this.npcMap[id], value);
+		});
 		this.physics.add.collider(this.npcMap[id], this.tileLayer);
 		this.physics.add.collider(this.npcMap[id], this.decorationLayer);
 		if (this.mainCharacter) {

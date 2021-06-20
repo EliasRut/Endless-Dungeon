@@ -16,6 +16,14 @@ export default class SettingsIcon extends Phaser.GameObjects.Text {
 		this.on('pointerdown', () => {
 			scene.pause();
 
+			// Object.values(scene.overlayScreens).forEach(value => {
+			// 		console.log(value.name);
+			// 	if(value.name !== this.name) {
+			// 		// value.setVisible(true);
+			// 		value.setVisible(false);
+			// 	}
+			// });
+
 			scene.overlayScreens.settingsScreen.toggleVisible();
 		});
 
