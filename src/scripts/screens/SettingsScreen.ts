@@ -2,7 +2,9 @@ import { Scene } from 'phaser';
 import { isJSON } from 'validator';
 import { UiDepths } from '../helpers/constants';
 import MainScene from '../scenes/MainScene';
+import RoomPreloaderScene from '../scenes/RoomPreloaderScene';
 import globalState from '../worldstate';
+import PlayerCharacter from '../worldstate/PlayerCharacter';
 import OverlayScreen from './OverlayScreen';
 
 export default class SettingsScreen extends OverlayScreen {
@@ -54,23 +56,40 @@ export default class SettingsScreen extends OverlayScreen {
 		this.loadIcon.setInteractive();
 		this.loadIcon.on('pointerdown', () => {
 			// scene.overlayScreens.settingsScreen.save();
-			console.log('load game')
+			console.log('load game');
 			// this.load(fileInput);
 			fileInput.click();
-			// this.add(this.refreshIcon, true);
 		});
 		this.add(this.loadIcon, true);
 
 
-		// this.newGameIcon = new Phaser.GameObjects.BitmapText(
-		// 	scene, SETTINGS_START_X+SETTINGS_WIDTH/2-72, SETTINGS_START_Y+50, 'pixelfont', 'New Game', 12);
-		// // this.dialogText.setOrigin(0, 0);
-		// this.newGameIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-		// this.newGameIcon.setScrollFactor(0);
-		// this.newGameIcon.setInteractive();
-		// // this.refreshIcon.on('pointerdown', () => {
-		// // 	this.refresh();
-		// // });
+		this.newGameIcon = new Phaser.GameObjects.BitmapText(
+			scene, SETTINGS_START_X+SETTINGS_WIDTH/2-72, SETTINGS_START_Y+50, 'pixelfont', 'New Game', 12);
+		// this.dialogText.setOrigin(0, 0);
+		this.newGameIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.newGameIcon.setScrollFactor(0);
+		this.newGameIcon.setInteractive();
+		this.newGameIcon.on('pointerdown', () => {
+			globalState.loadGame = false;
+
+			/* clear global state */
+
+			// globalState.transitionStack = {};
+			// globalState.npcs = {};
+			// globalState.doors = {};
+			// globalState.scripts = {};
+			// globalState.quests = {};
+			// globalState.availableRooms = {};
+			// globalState.availableTilesets = [];
+			// globalState.currentLevel = 'town_new';
+			// globalState.playerCharacter = new PlayerCharacter();
+			globalState.resetGlobalState();
+
+			// globalState.loadState();
+			this.scene.scene.start('RoomPreloaderScene');
+			(this.scene as MainScene).resume();
+		});
+		this.add(this.newGameIcon, true);
 
 		// tslint:enable
 		scene.add.existing(this);

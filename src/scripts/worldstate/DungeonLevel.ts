@@ -16,4 +16,5 @@ export default class DungeonLevel {
 	connections: MapConnection[];
 	doors: Door[];
 	items: ItemsPositioning[];
+	enemyLevel: number;	
 }

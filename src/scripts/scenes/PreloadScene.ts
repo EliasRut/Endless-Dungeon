@@ -228,7 +228,7 @@ export default class PreloadScene extends Phaser.Scene {
 				globalState.roomAssignment[globalState.currentLevel].rooms,
 				numericLevel
 			);
-
+			
 			globalState.dungeon.levels[globalState.currentLevel] = dungeonLevel;
 		}
 
