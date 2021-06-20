@@ -22,14 +22,7 @@ export default class SettingsIcon extends Phaser.GameObjects.Text implements Ico
 		scene.add.existing(this);
 	}
 	openSetting(){
-		if (this.scene.isPaused) {
-			this.scene.physics.resume();
-			this.scene.time.paused = false;
-		} else {
-			this.scene.physics.pause();
-			this.scene.time.paused = true;
-		}
-		this.scene.isPaused = !this.scene.isPaused;
+		this.togglePause();
 
 		Object.values(this.scene.icons)
 			.filter(e => e.name !== this.name)
@@ -40,6 +33,19 @@ export default class SettingsIcon extends Phaser.GameObjects.Text implements Ico
 	}
 
 	setScreenVisibility(visible: boolean): void {
+		this.togglePause();
 		this.scene.overlayScreens.settingsScreen.setVisible(visible);
+	}
+
+	togglePause() {
+			if (this.scene.isPaused) {
+				this.scene.physics.resume();
+				this.scene.time.paused = false;
+			} else {
+				this.scene.physics.pause();
+				this.scene.time.paused = true;
+			}
+			this.scene.isPaused = !this.scene.isPaused;
+
 	}
 }

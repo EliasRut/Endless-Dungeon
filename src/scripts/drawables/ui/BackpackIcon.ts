@@ -22,15 +22,7 @@ export default class BackpackIcon extends Phaser.GameObjects.Image implements Ic
 	}
 
 	openBackpack(){
-		if (this.scene.isPaused) {
-			this.scene.physics.resume();
-			this.scene.time.paused = false;
-		} else {
-			this.scene.physics.pause();
-			this.scene.time.paused = true;
-		}
-		this.scene.isPaused = !this.scene.isPaused;
-
+		this.togglePause();
 		Object.values(this.scene.icons)
 			.filter(e => e.name !== this.name)
 			.forEach(value => value.setScreenVisibility(false)
@@ -42,8 +34,21 @@ export default class BackpackIcon extends Phaser.GameObjects.Image implements Ic
 	}
 
 	setScreenVisibility(visible: boolean): void {
+		this.togglePause;
 		this.scene.overlayScreens.inventory.setVisible(visible);
 		this.scene.overlayScreens.itemScreen.setVisible(visible);
 		this.scene.overlayScreens.statScreen.setVisible(visible);
+	}
+
+	togglePause() {
+			if (this.scene.isPaused) {
+				this.scene.physics.resume();
+				this.scene.time.paused = false;
+			} else {
+				this.scene.physics.pause();
+				this.scene.time.paused = true;
+			}
+			this.scene.isPaused = !this.scene.isPaused;
+
 	}
 }
