@@ -14,6 +14,8 @@ export default class KeyboardHelper {
 	abilityKey2: Phaser.Input.Keyboard.Key;
 	abilityKey3: Phaser.Input.Keyboard.Key;
 	abilityKey4: Phaser.Input.Keyboard.Key;
+	inventoryKey: Phaser.Input.Keyboard.Key;
+	settingsKey: Phaser.Input.Keyboard.Key;
 
 	gamepad: Phaser.Input.Gamepad.Gamepad |undefined;
 
@@ -25,6 +27,8 @@ export default class KeyboardHelper {
 	isAbility2Pressed: () => boolean;
 	isAbility3Pressed: () => boolean;
 	isAbility4Pressed: () => boolean;
+	isInventoryPressed: () => boolean;
+	isSettingsPressed: () => boolean;
 
 	scene: Phaser.Scene;
 
@@ -34,6 +38,8 @@ export default class KeyboardHelper {
 		this.leftKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
 		this.rightKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 		this.kKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
+		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
 		this.scene = scene;
 		this.isMoveUpPressed = () => {
@@ -68,11 +74,27 @@ export default class KeyboardHelper {
 			const axisValue = axis ? axis.getValue() : 0;
 			return !!this.gamepad?.right || axisValue > AXIS_MOVEMENT_THRESHOLD;
 		};
+		this.isInventoryPressed = () => {
+			if (this.inventoryKey.isDown) {
+				return true;
+			}
+			return false;
+		};
+
+		this.isSettingsPressed = () => {
+			if (this.settingsKey.isDown) {
+				return true;
+			}
+			return false;
+		};
 
 		this.abilityKey1 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 		this.abilityKey2 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
 		this.abilityKey3 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
 		this.abilityKey4 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
+		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
+		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+
 
 		this.isAbility1Pressed = () => {
 			if (this.abilityKey1.isDown) {
@@ -97,6 +119,19 @@ export default class KeyboardHelper {
 
 		this.isAbility4Pressed = () => {
 			if (this.abilityKey4.isDown) {
+				return true;
+			}
+			return !!this.gamepad?.isButtonDown(3);
+		};
+		this.isInventoryPressed = () => {
+			if (this.inventoryKey.isDown) {
+				return true;
+			}
+			return !!this.gamepad?.isButtonDown(3);
+		};
+
+		this.isSettingsPressed = () => {
+			if (this.inventoryKey.isDown) {
 				return true;
 			}
 			return !!this.gamepad?.isButtonDown(3);

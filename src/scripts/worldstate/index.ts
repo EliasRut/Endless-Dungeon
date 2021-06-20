@@ -72,7 +72,11 @@ export class WorldState {
 		'library': {
 			dynamicLighting: false,
 			rooms: ['library']
-		}
+		},
+		'ZombieRoom': {
+			dynamicLighting: true,
+			rooms: ['ZombieRoom']
+		},
 		// 'dungeon': {
 		// 	dynamicLighting: true,
 		// 	rooms: [
