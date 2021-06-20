@@ -17,7 +17,7 @@ export default class RedlingBossToken extends EnemyToken {
         this.stateObject.health = 200 * level;
 		this.stateObject.movementSpeed = 100 * (1 + level * 0.1);
 		this.stateObject.damage = 5 * level;
-        this.stateObject.attackTime = 2000;
+        this.stateObject.attackTime = 4000;
 	}
 
 	public update(time: number,) {

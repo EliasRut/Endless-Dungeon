@@ -64,8 +64,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 	[AbilityType.HAIL_OF_FLAMES]: {
 		projectiles: 5,
 		projectileData: {
-			spread: [-0.2, 0.25],
-			velocity: 300,
+			spread: [-0.15, 0.2],
+			velocity: 150,
 			xOffset: 32,
 			yOffset: 32,
 			effect: FireBallEffect,
@@ -75,8 +75,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
-		cooldownMs: 400,
-		damageMultiplier: 1,
+		cooldownMs: 600,
+		damageMultiplier: 0.25,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`
 	},
 	[AbilityType.ICESPIKE]: {

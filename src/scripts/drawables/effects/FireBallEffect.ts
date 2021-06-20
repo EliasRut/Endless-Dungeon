@@ -54,8 +54,8 @@ export default class FireBallEffect extends AbilityEffect {
 		}
 		if (nearestEnemy) {
 			this.setAcceleration(
-				nearestEnemy.x > this.x ? 700 : -700,
-				nearestEnemy.y > this.y ? 700 : -700);
+				nearestEnemy.x > this.x ? 500 : -500,
+				nearestEnemy.y > this.y ? 500 : -500);
 		}
 	}
 
