@@ -5,7 +5,7 @@ import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
 
-const ATTACK_RANGE = 80;
+const ATTACK_RANGE = 150;
 
 export default class RedlingBossToken extends EnemyToken {
 
@@ -87,7 +87,7 @@ export default class RedlingBossToken extends EnemyToken {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.attackedAt = time;
-			this.scene.abilityHelper.triggerAbility(this.stateObject, AbilityType.FIREBALL);
+			this.scene.abilityHelper.triggerAbility(this.stateObject, AbilityType.HAIL_OF_FLAMES);
 		}
 	}
 }

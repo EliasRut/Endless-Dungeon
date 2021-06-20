@@ -65,17 +65,21 @@ export class WorldState {
 			dynamicLighting: false,
 			rooms: ['woodenHouse']
 		},
-		'tavern': {
+		'tavern_new': {
 			dynamicLighting: false,
-			rooms: ['tavern']
+			rooms: ['tavern_new']
 		},
 		'library': {
 			dynamicLighting: false,
 			rooms: ['library']
 		},
+		'bossRoom': {
+			dynamicLighting: false,
+			rooms: ['bossRoom']
+		},
 		'ZombieRoom': {
 			dynamicLighting: true,
-			rooms: ['ZombieRoom']
+			rooms: ['zombieRoom']
 		},
 		// 'dungeon': {
 		// 	dynamicLighting: true,

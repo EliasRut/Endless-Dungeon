@@ -6,7 +6,7 @@ import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
-import { Faction } from './constants';
+import { Faction, PossibleTargets } from './constants';
 import { getRotationInRadiansForFacing } from './movement';
 
 export default class AbilityHelper {
@@ -42,6 +42,11 @@ export default class AbilityHelper {
 				'',
 				origin.currentFacing
 			);
+			if (projectileData?.targeting) {
+				effect.allowedTargets = origin.faction === Faction.PLAYER ?
+					PossibleTargets.ENEMIES :
+					PossibleTargets.PLAYER; 
+			}
 			effect.setVelocity(xMultiplier, yMultiplier);
 			effect.body.velocity.scale(projectileData!.velocity);
 
