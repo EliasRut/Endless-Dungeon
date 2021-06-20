@@ -29,13 +29,13 @@ export default class BackpackIcon extends Phaser.GameObjects.Image implements Ic
 			this.scene.physics.pause();
 			this.scene.time.paused = true;
 		}
+		this.scene.isPaused = !this.scene.isPaused;
 
 		Object.values(this.scene.icons)
 			.filter(e => e.name !== this.name)
 			.forEach(value => value.setScreenVisibility(false)
 		);
 
-		this.scene.isPaused = !this.scene.isPaused;
 		this.scene.overlayScreens.inventory.toggleVisible();
 		this.scene.overlayScreens.itemScreen.toggleVisible();
 		this.scene.overlayScreens.statScreen.toggleVisible();
