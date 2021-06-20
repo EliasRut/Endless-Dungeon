@@ -79,6 +79,8 @@ export default class MainScene extends Phaser.Scene {
 
 	avatar: Avatar;
 	backpackIcon: BackpackIcon;
+	wasIPressed: boolean=false;
+	wasEscPressed: boolean=false;
 	settingsIcon: SettingsIcon;
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
@@ -426,7 +428,25 @@ export default class MainScene extends Phaser.Scene {
 			globalState.clearState();
 			location.reload();
 		}
+		if (this.keyboardHelper.isInventoryPressed()) {
+			if (this.wasIPressed=== false){
+				this.backpackIcon.openBackpack();
+			}		
+			this.wasIPressed=true;
 
+		} else {
+			this.wasIPressed=false;
+		}
+		if (this.keyboardHelper.isSettingsPressed()) {
+			if (this.wasEscPressed=== false){
+				this.settingsIcon.openSetting();
+			}		
+			this.wasEscPressed=true;
+					
+		} else {
+			this.wasEscPressed=false;
+		}
+		
 		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
 			this.cameras.main.fadeOut(FADE_OUT_TIME_MS);
 			// tslint:disable-next-line: no-console

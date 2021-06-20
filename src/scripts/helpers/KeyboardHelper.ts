@@ -152,14 +152,14 @@ export default class KeyboardHelper {
 			if (this.inventoryKey.isDown) {
 				return true;
 			}
-			return !!this.gamepad?.isButtonDown(3);
+			return !!this.gamepad?.isButtonDown(4);
 		};
 
 		this.isSettingsPressed = () => {
-			if (this.inventoryKey.isDown) {
+			if (this.settingsKey.isDown) {
 				return true;
 			}
-			return !!this.gamepad?.isButtonDown(3);
+			return !!this.gamepad?.isButtonDown(5);
 		};
 	}
 
