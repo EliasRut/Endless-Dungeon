@@ -60,8 +60,9 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 				'town-overlay',
 				'town-decoration',
 				'til-tavern',
-				'til-tavern-decoration'
-				);
+				'til-tavern-decoration',
+				'til-bookshop-decoration'
+			);
 		}
 
 		this.usedRooms.forEach((roomId) => {

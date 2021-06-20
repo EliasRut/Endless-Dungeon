@@ -10,10 +10,10 @@
 	"connections": [{
 		"y": 39,
 		"x": 101,
-		"targetMap": "tavern",
-		"targetRoom": "tavern",
-		"targetX": 12,
-		"targetY": 14
+		"targetMap": "tavern_new",
+		"targetRoom": "tavern_new",
+		"targetX": 1,
+		"targetY": 8
 	}, {
 		"y": 69,
 		"x": 63,
