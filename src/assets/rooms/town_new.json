@@ -12,8 +12,8 @@
 		"x": 101,
 		"targetMap": "tavern_new",
 		"targetRoom": "tavern_new",
-		"targetX": 1,
-		"targetY": 8
+		"targetX": 12,
+		"targetY": 4
 	}, {
 		"y": 69,
 		"x": 63,

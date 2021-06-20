@@ -58,7 +58,7 @@
 	"decorationTileset":"til-tavern-decoration",
 	"overlayTileset":"town-overlay",
 	"connections": [{
-		"y": 16,
+		"y": 2,
 		"x": 11,
 		"targetMap": "town_new",
 		"targetRoom": "town_new",
