@@ -11,9 +11,9 @@ const LIGHTRAY_PRECISION = 10000;
 export default class DynamicLightingHelper {
 
 	lightingLevels: number[][] = [];
-	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-	decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	tileLayer: Phaser.Tilemaps.TilemapLayer;
+	decorationLayer: Phaser.Tilemaps.TilemapLayer;
+	overlayLayer: Phaser.Tilemaps.TilemapLayer;
 	lastLightLevel: number = 255;
 
 	isBlockingTile: boolean[][] = [];
@@ -22,9 +22,9 @@ export default class DynamicLightingHelper {
 	visibleTiles: boolean[][] = [];
 
 	constructor(
-		tileLayer: Phaser.Tilemaps.DynamicTilemapLayer,
-		decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer,
-		overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer
+		tileLayer: Phaser.Tilemaps.TilemapLayer,
+		decorationLayer: Phaser.Tilemaps.TilemapLayer,
+		overlayLayer: Phaser.Tilemaps.TilemapLayer
 	) {
 		this.tileLayer = tileLayer;
 		this.decorationLayer = decorationLayer;

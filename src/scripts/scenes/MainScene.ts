@@ -72,9 +72,9 @@ export default class MainScene extends Phaser.Scene {
 	avatar: Avatar;
 	backpackIcon: BackpackIcon;
 	settingsIcon: SettingsIcon;
-	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-	decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	tileLayer: Phaser.Tilemaps.TilemapLayer;
+	decorationLayer: Phaser.Tilemaps.TilemapLayer;
+	overlayLayer: Phaser.Tilemaps.TilemapLayer;
 
 	useDynamicLighting = false;
 	dungeonRunData: DungeonRunData;
@@ -221,8 +221,8 @@ export default class MainScene extends Phaser.Scene {
 
 	addFixedItem(id: string, x: number, y: number) {
 		this.dropItem(
-			x, //- DEBUG__ITEM_OFFSET_X,
-			y, //- DEBUG__ITEM_OFFSET_Y,
+			x, // - DEBUG__ITEM_OFFSET_X,
+			y, // - DEBUG__ITEM_OFFSET_Y,
 			{
 				...(fixedItems as { [id: string]: Partial<Item> })[id],
 				itemLocation: 0
@@ -446,6 +446,7 @@ export default class MainScene extends Phaser.Scene {
 			globalState.storeState();
 		}
 
+		// tslint:disable-next-line: no-magic-numbers
 		if (Date.now() - this.lastScriptUnpausing > 1000) {
 			this.scriptHelper.resumePausedScripts();
 		}
