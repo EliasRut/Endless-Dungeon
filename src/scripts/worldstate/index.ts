@@ -72,6 +72,10 @@ export class WorldState {
 		'library': {
 			dynamicLighting: false,
 			rooms: ['library']
+		},
+		'boss-room': {
+			dynamicLighting: false,
+			rooms: ['boss-room']
 		}
 		// 'dungeon': {
 		// 	dynamicLighting: true,
