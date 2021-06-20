@@ -16,10 +16,10 @@ const ABILITY_COORDINATES_DESKTOP = {
 
 const ABILITY_COORDINATES_MOBILE = {
 	[AbilityKey.ONE]: [32, 106],
-	[AbilityKey.TWO]: [32, 184],
-	[AbilityKey.THREE]: [32, 248],
-	[AbilityKey.FOUR]: [32, 312],
-	[AbilityKey.FIVE]: [32, 376],
+	[AbilityKey.TWO]: [32, 164],
+	[AbilityKey.THREE]: [32, 222],
+	[AbilityKey.FOUR]: [32, 280],
+	[AbilityKey.FIVE]: [32, 280],
 };
 
 export default class Avatar extends Phaser.GameObjects.Group {
@@ -43,7 +43,7 @@ export default class Avatar extends Phaser.GameObjects.Group {
 		if (scene.isMobile) {
 			abilityBackground = scene.add.image(32, 194, 'ability-background-mobile');
 		} else {
-			abilityBackground = scene.add.image(116, 90, 'ability-background-desktop');
+			abilityBackground = scene.add.image(116, 62, 'ability-background-desktop');
 		}
 		abilityBackground.setScrollFactor(0);
 		abilityBackground.setDepth(UiDepths.UI_MAIN_LAYER);

@@ -4,7 +4,7 @@ import { TILE_HEIGHT, TILE_WIDTH, GID_MULTIPLE } from './generateDungeon';
 // Add tile collision for all tilesets for tile numbers 0-31 and 40-71.
 // tslint:disable: no-magic-numbers
 const COLIDING_TILE_RANGES = [
-	[0, 31],
+	[-1, 31],
 	[40, 71],
 	[80, 111],
 	[120, 151],
