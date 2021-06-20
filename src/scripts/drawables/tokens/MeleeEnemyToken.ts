@@ -41,7 +41,7 @@ export default class MeleeEnemyToken extends EnemyToken {
 
 				// check death
 				if (this.stateObject.health <= 0){
-						this.dropItem();
+						this.dropRandomItem();
 						this.destroy();
 						return;
 				}

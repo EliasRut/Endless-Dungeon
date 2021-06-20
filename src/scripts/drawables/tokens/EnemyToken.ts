@@ -6,8 +6,9 @@ import globalState from '../../worldstate';
 import MainScene from '../../scenes/MainScene';
 import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 import { generateRandomItem } from '../../helpers/item';
+import Item from '../../worldstate/Item';
 
-const BODY_RADIUS = 6;
+const BODY_RADIUS = 12;
 const BODY_X_OFFSET = 10;
 const BODY_Y_OFFSET = 12;
 
@@ -49,12 +50,19 @@ export default abstract class EnemyToken extends CharacterToken {
 		return tile && tile.tint !== VISITED_TILE_TINT && tile.tint > 0;
 	}
 
-	dropItem(level: number = 1) {
+	dropRandomItem(level: number = 1) {
 		if(this.scene === undefined) {
 			// TODO find out when this happens
 			return;
 		}
-		this.scene.dropItem(this.x, this.y, generateRandomItem(level));
+		this.scene.dropItem(this.x, this.y, generateRandomItem(level));		
+	}
+	dropFixedItem(id: string) {
+		if (this.scene === undefined) {
+			//???
+			return;
+		}
+		this.scene.addFixedItem(id, this.x, this.y);
 	}
 
 	private getOccupiedTile() {
