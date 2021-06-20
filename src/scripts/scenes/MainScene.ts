@@ -44,6 +44,11 @@ const CASTING_SPEED_MS = 250;
 const CONNECTION_POINT_THRESHOLD_DISTANCE = 32;
 const STEP_SOUND_TIME = 200;
 
+const MOBILE_PAD_BACKGROUND_X_OFFSET = 96;
+const MOBILE_PAD_FOREGROUND_X_OFFSET = 96;
+
+const DEATH_RESPAWN_TIME = 3000;
+
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
 	fpsText: Phaser.GameObjects.Text;
@@ -69,12 +74,15 @@ export default class MainScene extends Phaser.Scene {
 	isPaused = false;
 	blockUserInteraction = false;
 
+	mobilePadBackgorund?: Phaser.GameObjects.Image;
+	mobilePadStick?: Phaser.GameObjects.Image;
+
 	avatar: Avatar;
 	backpackIcon: BackpackIcon;
 	settingsIcon: SettingsIcon;
-	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-	decorationLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-	overlayLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	tileLayer: Phaser.Tilemaps.TilemapLayer;
+	decorationLayer: Phaser.Tilemaps.TilemapLayer;
+	overlayLayer: Phaser.Tilemaps.TilemapLayer;
 
 	useDynamicLighting = false;
 	dungeonRunData: DungeonRunData;
@@ -89,7 +97,13 @@ export default class MainScene extends Phaser.Scene {
 		super({ key: 'MainScene' });
 	}
 
+	// If nothing is found, we default to desktop
+	isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+		.test(navigator?.userAgent || '');
+
 	create() {
+		this.input.addPointer(2);
+
 		this.alive = 0;
 		// tslint:disable-next-line:no-unused-expression
 		this.cameras.main.fadeIn(FADE_IN_TIME_MS);
@@ -126,10 +140,85 @@ export default class MainScene extends Phaser.Scene {
 
 		this.fpsText = new FpsText(this);
 		this.backpackIcon = new BackpackIcon(this);
+		this.settingsIcon = new SettingsIcon(this);
 		this.avatar = new Avatar(this);
+		if (this.isMobile) {
+			this.mobilePadBackgorund = this.add.image(
+				this.cameras.main.width - MOBILE_PAD_BACKGROUND_X_OFFSET,
+				this.cameras.main.height / 2,
+				'pad-background'
+			);
+			this.mobilePadBackgorund.setScrollFactor(0);
+			this.mobilePadBackgorund.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+			this.add.existing(this.mobilePadBackgorund);
+
+			this.mobilePadStick = this.add.image(
+				this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET,
+				this.cameras.main.height / 2,
+				'pad-stick'
+			);
+			this.mobilePadStick.setScrollFactor(0);
+			this.mobilePadStick.setDepth(UiDepths.UI_STICK_LAYER);
+
+			const hitArea = new Phaser.Geom.Circle(
+				70,
+				70,
+				70);
+			this.mobilePadBackgorund.setInteractive(hitArea, Phaser.Geom.Circle.Contains);
+			this.mobilePadBackgorund.on('pointerup', (event: any) => {
+				this.mobilePadStick!.x = this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET;
+				this.mobilePadStick!.y = this.cameras.main.height / 2;
+			});
+			this.mobilePadBackgorund.on('pointermove', (event: any) => {
+				if (!event.isDown) {
+					this.mobilePadStick!.x = this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET;
+					this.mobilePadStick!.y = this.cameras.main.height / 2;
+					return;
+				}
+
+				this.mobilePadStick!.x = Math.min(
+					this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET + 60,
+					Math.max(
+						this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET - 60,
+						event.position.x
+					));
+				this.mobilePadStick!.y = Math.min(
+					this.cameras.main.height / 2 + 60,
+					Math.max(
+						this.cameras.main.height / 2 - 60,
+						event.position.y
+					));
+			});
+			this.mobilePadBackgorund.on('pointerover', (_: any, event: any) => {
+				if (!event.isDown) {
+					this.mobilePadStick!.x = this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET;
+					this.mobilePadStick!.y = this.cameras.main.height / 2;
+					return;
+				}
+
+				this.mobilePadStick!.x = Math.min(
+					this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET + 60,
+					Math.max(
+						this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET - 60,
+						event.position.x
+					));
+				this.mobilePadStick!.y = Math.min(
+					this.cameras.main.height / 2 + 60,
+					Math.max(
+						this.cameras.main.height / 2 - 60,
+						event.position.y
+					));
+			});
+			this.add.existing(this.mobilePadStick);
+		}
 
 		// essenceNames.forEach((name, index) => {
-		// 	const essence = new Phaser.GameObjects.Sprite(this, 200 + index * 20, 200, 'items-essence', 0);
+		// 	const essence = new Phaser.GameObjects.Sprite(
+		// 		this,
+		// 		200 + index * 20,
+		// 		200,
+		// 		'items-essence',
+		// 		0);
 		// 	essence.play(`essence-${name}`);
 		// 	essence.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		// 	essence.setScrollFactor(0);
@@ -147,7 +236,6 @@ export default class MainScene extends Phaser.Scene {
 		// Warum wurden die 2 mal geladen?
 //		this.fpsText = new FpsText(this);
 //		this.backpackIcon = new BackpackIcon(this);
-		this.settingsIcon = new SettingsIcon(this);
 //		this.avatar = new Avatar(this);
 
 		this.keyboardHelper = new KeyboardHelper(this);
@@ -173,11 +261,12 @@ export default class MainScene extends Phaser.Scene {
 			type: string,
 			x: number,
 			y: number,
+			level: number,
 			facingX: number,
 			facingY: number,
 			options?: NpcOptions
 		) {
-		const npc = spawnNpc(this, type, id, x, y, options);
+		const npc = spawnNpc(this, type, id, x, y, level, options);
 		this.npcMap[id] = npc;
 		if (globalState.npcs[id]) {
 			const facing = getFacing8Dir(facingX, facingY);
@@ -192,6 +281,9 @@ export default class MainScene extends Phaser.Scene {
 			}
 		}
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
+		Object.entries(this.npcMap).forEach(([key, value]) => {
+				this.physics.add.collider(this.npcMap[id], value);
+		});
 		this.physics.add.collider(this.npcMap[id], this.tileLayer);
 		this.physics.add.collider(this.npcMap[id], this.decorationLayer);
 		if (this.mainCharacter) {
@@ -221,8 +313,8 @@ export default class MainScene extends Phaser.Scene {
 
 	addFixedItem(id: string, x: number, y: number) {
 		this.dropItem(
-			x, //- DEBUG__ITEM_OFFSET_X,
-			y, //- DEBUG__ITEM_OFFSET_Y,
+			x, // - DEBUG__ITEM_OFFSET_X,
+			y, // - DEBUG__ITEM_OFFSET_Y,
 			{
 				...(fixedItems as { [id: string]: Partial<Item> })[id],
 				itemLocation: 0
@@ -239,11 +331,11 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	drawRoom() {
-		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];
+		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];		
 		if (!dungeonLevel) {
 			throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
 		}
-
+		
 		const {
 			startPositionX,
 			startPositionY,
@@ -272,6 +364,7 @@ export default class MainScene extends Phaser.Scene {
 				npc.type,
 				npc.x,
 				npc.y,
+				dungeonLevel.enemyLevel,
 				npc.facingX || 0,
 				npc.facingY || 0,
 				{
@@ -338,6 +431,10 @@ export default class MainScene extends Phaser.Scene {
 			this.cameras.main.fadeOut(FADE_OUT_TIME_MS);
 			// tslint:disable-next-line: no-console
 			console.log('you died');
+			setTimeout(() => {
+				globalState.clearState();
+				location.reload();
+			}, DEATH_RESPAWN_TIME);
 			this.alive = 1;
 			// this.scene.pause();
 			return;
@@ -355,7 +452,10 @@ export default class MainScene extends Phaser.Scene {
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalTime);
 			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
 
-			const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing();
+			const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
+				this.mobilePadStick ? (this.mobilePadStick.x - this.mobilePadBackgorund!.x) : 0,
+				this.mobilePadStick ? (this.mobilePadStick.y - this.mobilePadBackgorund!.y) : 0
+			);
 			const newFacing = getFacing8Dir(xFacing, yFacing);
 
 			const hasMoved = isCasting ? false : (xFacing !== 0 || yFacing !== 0);
@@ -363,8 +463,15 @@ export default class MainScene extends Phaser.Scene {
 				globalState.playerCharacter,
 				hasMoved,
 				newFacing);
+			const isWalking = this.mobilePadStick ?
+				(Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40
+					&& Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40) :
+				false;
 			if (playerAnimation) {
-				this.mainCharacter.play(playerAnimation);
+				this.mainCharacter.play({
+					key: playerAnimation,
+					frameRate: globalState.playerCharacter.movementSpeed / (isWalking ? 20 : 10)
+				});
 			}
 			if (hasMoved) {
 				const shouldPlayLeftStepSfx =
@@ -378,7 +485,11 @@ export default class MainScene extends Phaser.Scene {
 				this.lastStepLeft = undefined;
 			}
 
-			const speed = isCasting ? 0 : getCharacterSpeed(globalState.playerCharacter);
+			let speed = isCasting ? 0 : getCharacterSpeed(globalState.playerCharacter);
+
+			if (isWalking) {
+				speed = speed / 2;
+			}
 
 			this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
 			this.mainCharacter.body.velocity.normalize().scale(speed);
@@ -446,6 +557,7 @@ export default class MainScene extends Phaser.Scene {
 			globalState.storeState();
 		}
 
+		// tslint:disable-next-line: no-magic-numbers
 		if (Date.now() - this.lastScriptUnpausing > 1000) {
 			this.scriptHelper.resumePausedScripts();
 		}

@@ -21,6 +21,9 @@ const config: Phaser.Types.Core.GameConfig = {
 		width: DEFAULT_WIDTH,
 		height: DEFAULT_HEIGHT
 	},
+	input: {
+			gamepad: true
+	},
 	scene: [
 		RoomPreloaderScene,
 		PreloadScene,

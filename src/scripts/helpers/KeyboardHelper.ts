@@ -1,6 +1,9 @@
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { AbilityKey } from './constants';
+import BackpackIcon from '../drawables/ui/BackpackIcon';
+
+const AXIS_MOVEMENT_THRESHOLD = 0.4;
 
 export default class KeyboardHelper {
 	upKey: Phaser.Input.Keyboard.Key;
@@ -13,6 +16,27 @@ export default class KeyboardHelper {
 	abilityKey3: Phaser.Input.Keyboard.Key;
 	abilityKey4: Phaser.Input.Keyboard.Key;
 
+	abilityKeyPressed: {[key: number]: boolean} = {
+		[AbilityKey.ONE]: false,
+		[AbilityKey.TWO]: false,
+		[AbilityKey.THREE]: false,
+		[AbilityKey.FOUR]: false,
+		[AbilityKey.FIVE]: false,
+	};
+
+	gamepad: Phaser.Input.Gamepad.Gamepad |undefined;
+
+	isMoveUpPressed: () => boolean;
+	isMoveDownPressed: () => boolean;
+	isMoveLeftPressed: () => boolean;
+	isMoveRightPressed: () => boolean;
+	isAbility1Pressed: () => boolean;
+	isAbility2Pressed: () => boolean;
+	isAbility3Pressed: () => boolean;
+	isAbility4Pressed: () => boolean;
+
+	scene: Phaser.Scene;
+
 	constructor (scene: Phaser.Scene) {
 		this.upKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
 		this.downKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
@@ -20,25 +44,105 @@ export default class KeyboardHelper {
 		this.rightKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 		this.kKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
 
+		this.scene = scene;
+		this.isMoveUpPressed = () => {
+			if (this.upKey.isDown) {
+				return true;
+			}
+			const axis = this.gamepad?.axes[1];
+			const axisValue = axis ? axis.getValue() : 0;
+			return !!this.gamepad?.up || axisValue < -AXIS_MOVEMENT_THRESHOLD;
+		};
+		this.isMoveDownPressed = () => {
+			if (this.downKey.isDown) {
+				return true;
+			}
+			const axis = this.gamepad?.axes[1];
+			const axisValue = axis ? axis.getValue() : 0;
+			return !!this.gamepad?.down || axisValue > AXIS_MOVEMENT_THRESHOLD;
+		};
+		this.isMoveLeftPressed = () => {
+			if (this.leftKey.isDown) {
+				return true;
+			}
+			const axis = this.gamepad?.axes[0];
+			const axisValue = axis ? axis.getValue() : 0;
+			return !!this.gamepad?.left || axisValue < -AXIS_MOVEMENT_THRESHOLD;
+		};
+		this.isMoveRightPressed = () => {
+			if (this.rightKey.isDown) {
+				return true;
+			}
+			const axis = this.gamepad?.axes[0];
+			const axisValue = axis ? axis.getValue() : 0;
+			return !!this.gamepad?.right || axisValue > AXIS_MOVEMENT_THRESHOLD;
+		};
+
 		this.abilityKey1 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 		this.abilityKey2 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
 		this.abilityKey3 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
 		this.abilityKey4 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
+
+		this.isAbility1Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.ONE]) {
+				this.abilityKeyPressed[AbilityKey.ONE] = false;
+				return true;
+			}
+			if (this.abilityKey1.isDown) {
+				return true;
+			}
+			return !!this.gamepad?.isButtonDown(0);
+		};
+
+		this.isAbility2Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.TWO]) {
+				this.abilityKeyPressed[AbilityKey.TWO] = false;
+				return true;
+			}
+			if (this.abilityKey2.isDown) {
+				return true;
+			}
+			return !!this.gamepad?.isButtonDown(1);
+		};
+
+		this.isAbility3Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.THREE]) {
+				this.abilityKeyPressed[AbilityKey.THREE] = false;
+				return true;
+			}
+			if (this.abilityKey3.isDown) {
+				return true;
+			}
+			return !!this.gamepad?.isButtonDown(2);
+		};
+
+		this.isAbility4Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.FOUR]) {
+				this.abilityKeyPressed[AbilityKey.FOUR] = false;
+				return true;
+			}
+			if (this.abilityKey4.isDown) {
+				return true;
+			}
+			return !!this.gamepad?.isButtonDown(3);
+		};
 	}
 
-	getCharacterFacing() {
+	getCharacterFacing(stickDeltaX: number, stickDeltaY: number) {
 		let yFacing = 0;
 		let xFacing = 0;
 
-		if (this.upKey.isDown) {
+		this.gamepad = this.scene.input.gamepad?.getPad(0);
+
+		if (stickDeltaY < -20 || this.isMoveUpPressed()) {
 			yFacing = -1;
-		} else if (this.downKey.isDown) {
+		} else if (stickDeltaY > 20 || this.isMoveDownPressed()) {
 			yFacing = 1;
 		}
 
-		if (this.leftKey.isDown) {
+		if (stickDeltaX < -20 || this.isMoveLeftPressed()) {
 			xFacing = -1;
-		} else if (this.rightKey.isDown) {
+		} else if (stickDeltaX > 20 || this.isMoveRightPressed()) {
 			xFacing = 1;
 		}
 
@@ -52,13 +156,14 @@ export default class KeyboardHelper {
 		return false;
 	}
 
-	getRelevantKeyForEnum(abilityKey: AbilityKey) {
+	getRelevantEvalFunctionForEnum(abilityKey: AbilityKey) {
 		switch (abilityKey) {
-			case AbilityKey.ONE: return this.abilityKey1;
-			case AbilityKey.TWO: return this.abilityKey2;
-			case AbilityKey.THREE: return this.abilityKey3;
-			case AbilityKey.FOUR: return this.abilityKey4;
-			case AbilityKey.FIVE: return this.abilityKey4;
+			case AbilityKey.ONE: return this.isAbility1Pressed;
+			case AbilityKey.TWO: return this.isAbility2Pressed;
+			case AbilityKey.THREE: return this.isAbility3Pressed;
+			case AbilityKey.FOUR: return this.isAbility4Pressed;
+			default:
+				throw new Error(`No Ability Key mapping for key ${abilityKey}.`);
 		}
 	}
 
@@ -90,7 +195,7 @@ export default class KeyboardHelper {
 			globalState.playerCharacter.abilityCastTime[AbilityKey.THREE],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.FOUR]
 		].reduce((max, value) => Math.max(max, value), 0);
-
+		
 		return gameTime - lastCast;
 	}
 
@@ -104,8 +209,8 @@ export default class KeyboardHelper {
 	}
 
 	castIfPressed(abilityKey: AbilityKey, gameTime: number) {
-		const relevantKey = this.getRelevantKeyForEnum(abilityKey);
-		if (!relevantKey.isDown) {
+		const relevantFunction = this.getRelevantEvalFunctionForEnum(abilityKey);
+		if (!relevantFunction()) {
 			return false;
 		}
 		const ability = globalState.playerCharacter.abilityKeyMapping[abilityKey] as AbilityType;

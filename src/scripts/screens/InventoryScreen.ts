@@ -34,6 +34,7 @@ const BAG_START_X = INVENTORY_START_X - BAG_OFFSET_X;
 const BAG_START_Y = INVENTORY_START_Y - BAG_OFFSET_Y;
 
 const ABILITY_ICON_SIZE = 34;
+// tslint:disable: no-magic-numbers
 const ITEM_ABILITY_COORDINATES = {
 	[EquipmentSlot.MAIN_HAND]: [INVENTORY_START_X - 56, INVENTORY_START_Y + 1],
 	[EquipmentSlot.OFF_HAND]: [INVENTORY_START_X - 22, INVENTORY_START_Y + 25],
@@ -43,7 +44,6 @@ const ITEM_ABILITY_COORDINATES = {
 	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X + 22, INVENTORY_START_Y + 25],
 };
 
-// tslint:disable: no-magic-numbers
 const EQUIPMENT_SLOT_COORDINATES = {
 	[EquipmentSlot.MAIN_HAND]: [INVENTORY_START_X - 42, INVENTORY_START_Y - 80],
 	[EquipmentSlot.OFF_HAND]: [INVENTORY_START_X + 42, INVENTORY_START_Y - 80],
@@ -142,7 +142,8 @@ export default class InventoryScreen extends OverlayScreen {
 		});
 	}
 
-	updateAbilities(contructor: boolean) {
+	// updates all abilities and icons at once.
+	updateAbilities(constructor: boolean) {
 		const equippedItems = getEquippedItems();
 		Object.keys(equippedItems)
 			.forEach((key) => {
@@ -156,9 +157,18 @@ export default class InventoryScreen extends OverlayScreen {
 					if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 					if (slotKey === EquipmentSlot.MAIN_HAND) {
 						updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
-						this.createAbilityIcon();
+						const abilityIcon = this.createAbilityIcon();
+						this.handleIconOptions(constructor, abilityIcon, AbilityType.FIREBALL);
+						this.abilityIconMap[EquipmentSlot.MAIN_HAND] = abilityIcon;
 					}
-					else updateAbility(this.scene, globalState.playerCharacter, EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey], AbilityType.NOTHING);
+					else {
+						updateAbility(
+							this.scene,
+							globalState.playerCharacter,
+							EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
+							AbilityType.NOTHING
+						);
+					}
 					return;
 				}
 				const abilityLinkedItem = equippedItems[slotKey]!.data as AbilityLinkedItem;
@@ -167,19 +177,19 @@ export default class InventoryScreen extends OverlayScreen {
 				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 				this.abilityIconMap[slotKey] = abilityIcon;
 
-				updateAbility(this.scene, globalState.playerCharacter, EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey], ability);
-
-				if (contructor) abilityIcon.setVisible(false);
-				else abilityIcon.setVisible(true);
-
-				abilityIcon.on('pointerdown', () => {
-					if (this.focusedItem !== undefined) this.focusedItem = undefined;
-					this.scene.overlayScreens.itemScreen.updateAbility(ability);
-				});
+				updateAbility(
+					this.scene,
+					globalState.playerCharacter,
+					EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
+					ability);
+				this.handleIconOptions(constructor, abilityIcon, ability);
 			});
 	}
 
-	createAbilityIcon(slotKey: EquipmentSlot = EquipmentSlot.MAIN_HAND, ability: AbilityType = AbilityType.FIREBALL){
+	createAbilityIcon(
+			slotKey: EquipmentSlot = EquipmentSlot.MAIN_HAND,
+			ability: AbilityType = AbilityType.FIREBALL
+		){
 		const [iconX, iconY] = ITEM_ABILITY_COORDINATES[slotKey];
 		const abilityIcon = new Phaser.GameObjects.Image(
 			this.scene,
@@ -193,6 +203,19 @@ export default class InventoryScreen extends OverlayScreen {
 		abilityIcon.setInteractive();
 		this.add(abilityIcon, true);
 		return abilityIcon;
+	}
+	handleIconOptions(
+			constructor: boolean,
+			abilityIcon: Phaser.GameObjects.Image,
+			ability: AbilityType
+		){
+		if (constructor) abilityIcon.setVisible(false);
+		else abilityIcon.setVisible(true);
+
+		abilityIcon.on('pointerdown', () => {
+			if (this.focusedItem !== undefined) this.focusedItem = undefined;
+			this.scene.overlayScreens.itemScreen.updateAbility(ability);
+		});
 	}
 	addToInventory(item: Item) {
 		const [x, y] = placeItemInNextFreeBagSlot(item);
