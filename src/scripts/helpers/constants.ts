@@ -120,6 +120,7 @@ export const enum FacingRange {
 
 export const npcTypeToFileMap: {[name: string]:{file: string, facing: FacingRange}} =  {
 	'red-ball'     : {file: 'assets/sprites/red-ball.png',facing: FacingRange.ALL_DIRECTIONS},
+	'redling-boss' : {file: 'assets/sprites/red-ball.png',facing: FacingRange.ALL_DIRECTIONS},
 	'red-link'     : {file: 'assets/sprites/red-link.png',facing: FacingRange.ALL_DIRECTIONS},
 	'naked-guy'    : {file: 'assets/sprites/naked-guy.png',facing: FacingRange.ALL_DIRECTIONS},
 	'enemy-zombie' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW}

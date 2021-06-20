@@ -19,7 +19,7 @@ export default class ZombieToken extends EnemyToken {
 
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
 		super(scene, x, y, tokenName, id);
-		// cool effects!
+		// cool effects!		
 		this.level = level;
 		this.attackRange = REGULAR_ATTACK_RANGE;
 		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
@@ -39,7 +39,7 @@ export default class ZombieToken extends EnemyToken {
 
 		// check death
 		if (this.stateObject.health <= 0){
-				this.dropItem(this.level);
+				this.dropRandomItem(this.level);
 				this.destroy();
 				return;
 		}
