@@ -1,6 +1,7 @@
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { AbilityKey } from './constants';
+import BackpackIcon from '../drawables/ui/BackpackIcon';
 
 export default class KeyboardHelper {
 	upKey: Phaser.Input.Keyboard.Key;
@@ -90,7 +91,7 @@ export default class KeyboardHelper {
 			globalState.playerCharacter.abilityCastTime[AbilityKey.THREE],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.FOUR]
 		].reduce((max, value) => Math.max(max, value), 0);
-
+		
 		return gameTime - lastCast;
 	}
 

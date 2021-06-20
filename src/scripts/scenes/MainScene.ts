@@ -173,11 +173,12 @@ export default class MainScene extends Phaser.Scene {
 			type: string,
 			x: number,
 			y: number,
+			level: number,
 			facingX: number,
 			facingY: number,
 			options?: NpcOptions
 		) {
-		const npc = spawnNpc(this, type, id, x, y, options);
+		const npc = spawnNpc(this, type, id, x, y, level, options);
 		this.npcMap[id] = npc;
 		if (globalState.npcs[id]) {
 			const facing = getFacing8Dir(facingX, facingY);
@@ -239,11 +240,11 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	drawRoom() {
-		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];
+		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];		
 		if (!dungeonLevel) {
 			throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
 		}
-
+		
 		const {
 			startPositionX,
 			startPositionY,
@@ -272,6 +273,7 @@ export default class MainScene extends Phaser.Scene {
 				npc.type,
 				npc.x,
 				npc.y,
+				dungeonLevel.enemyLevel,
 				npc.facingX || 0,
 				npc.facingY || 0,
 				{

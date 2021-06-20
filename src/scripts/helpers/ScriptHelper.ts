@@ -195,6 +195,7 @@ export default class ScriptHelper {
 					currentStep.npcType,
 					targetX,
 					targetY,
+					globalState.dungeon.levels[globalState.currentLevel].enemyLevel,
 					currentStep.facingX || 0,
 					currentStep.facingY || 0);
 				break;

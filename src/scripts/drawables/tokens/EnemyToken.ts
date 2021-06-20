@@ -49,12 +49,12 @@ export default abstract class EnemyToken extends CharacterToken {
 		return tile && tile.tint !== VISITED_TILE_TINT && tile.tint > 0;
 	}
 
-	dropItem() {
+	dropItem(level: number = 1) {
 		if(this.scene === undefined) {
 			// TODO find out when this happens
 			return;
 		}
-		this.scene.dropItem(this.x, this.y, generateRandomItem());
+		this.scene.dropItem(this.x, this.y, generateRandomItem(level));
 	}
 
 	private getOccupiedTile() {
