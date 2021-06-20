@@ -7,18 +7,15 @@
             "title": "Royal crypta - Level 1",
             "style": "death",
             "rooms": [
-                "startRoom",
                 "firstTest",
-                "secondTest",
-                "thirdTest"
+                "secondTest"
             ]
         },
         {
             "title": "Royal crypta - Level 2",
             "style": "death",
             "rooms": [
-                "firstTest",
-                "secondTest"
+                "zombieRoom"
             ]
         },
         {
@@ -26,14 +23,6 @@
             "style": "death",
             "rooms": [
                 "firstTest"
-            ]
-        },
-        {
-            "title": "The kings final resting place",
-            "style": "death",
-            "rooms": [
-                "firstTest",
-                "secondTest"
             ]
         }
     ],

@@ -157,8 +157,7 @@ export default class InventoryScreen extends OverlayScreen {
 				if (equippedItems[slotKey] === undefined) {
 					if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 					if (slotKey === EquipmentSlot.MAIN_HAND) {
-						// updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
-						updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.HAIL_OF_FLAMES);
+						updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
 						const abilityIcon = this.createAbilityIcon();
 						this.handleIconOptions(constructor, abilityIcon, AbilityType.FIREBALL);
 						this.abilityIconMap[EquipmentSlot.MAIN_HAND] = abilityIcon;
