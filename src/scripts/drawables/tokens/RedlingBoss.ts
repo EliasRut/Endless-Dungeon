@@ -5,14 +5,19 @@ import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
 
-const ATTACK_RANGE = 100;
+const ATTACK_RANGE = 80;
 
-export default class RangedEnemyToken extends EnemyToken {
+export default class RedlingBossToken extends EnemyToken {
 
-	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
+	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
 		super(scene, x, y, tokenName, id);
 
+        this.setScale(2);
 		this.attackRange = ATTACK_RANGE; // how close the enemy comes.
+        this.stateObject.health = 250 * level;
+		this.stateObject.movementSpeed = 100 * (1 + level * 0.1);
+		this.stateObject.damage = 5 * level;
+        this.stateObject.attackTime = 1000;
 	}
 
 	public update(time: number,) {
@@ -22,7 +27,7 @@ export default class RangedEnemyToken extends EnemyToken {
 
 		// check death
 		if (this.stateObject.health <= 0) {
-			this.dropRandomItem();
+			this.dropFixedItem("book");
 			this.destroy();
 			return;
 		}
@@ -82,7 +87,7 @@ export default class RangedEnemyToken extends EnemyToken {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.attackedAt = time;
-			this.scene.abilityHelper.triggerAbility(this.stateObject, AbilityType.HAIL_OF_FLAMES);
+			this.scene.abilityHelper.triggerAbility(this.stateObject, AbilityType.FIREBALL);
 		}
 	}
 }

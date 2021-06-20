@@ -8,5 +8,10 @@
 		"iconFrame": 32,
 		"type": "questItem",
 		"id": "graduationScroll"
+	},
+	"book": {
+		"iconFrame": 32,
+		"type": "questItem",
+		"id": "book"
 	}
 }
