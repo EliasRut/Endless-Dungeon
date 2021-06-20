@@ -23,7 +23,7 @@ const createLayer: (
 	layout: number[][],
 	tilesets: string[],
 	layerId: string | number
-) => Phaser.Tilemaps.DynamicTilemapLayer = (scene, layout, tilesets, _layerId) => {
+) => Phaser.Tilemaps.TilemapLayer = (scene, layout, tilesets, _layerId) => {
 	const map = scene.make.tilemap({
 		data: layout,
 		tileWidth: TILE_WIDTH,
@@ -43,16 +43,16 @@ const createLayer: (
 		);
 	});
 
-	const tileLayer = map.createDynamicLayer(0, tileSets, 0, 0);
+	const tileLayer = map.createLayer(0, tileSets, 0, 0);
 
 	return tileLayer;
 };
 
 export const generateTilemap: (scene: Phaser.Scene, dungeonLevel: DungeonLevel) =>
 	[
-		Phaser.Tilemaps.DynamicTilemapLayer,
-		Phaser.Tilemaps.DynamicTilemapLayer,
-		Phaser.Tilemaps.DynamicTilemapLayer
+		Phaser.Tilemaps.TilemapLayer,
+		Phaser.Tilemaps.TilemapLayer,
+		Phaser.Tilemaps.TilemapLayer
 	] = (scene, dungeonLevel) => {
 
 	const tileLayer = createLayer(scene, dungeonLevel.layout, dungeonLevel.tilesets, 0);

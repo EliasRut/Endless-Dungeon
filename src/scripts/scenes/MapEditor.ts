@@ -52,11 +52,11 @@ export default class MapEditor extends Phaser.Scene {
 	roomHeight = 8;
 	selectedId = 32;
 
-	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-	decorationTileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-	overlayTileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-	libraryLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-	backgroundLibraryLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	tileLayer: Phaser.Tilemaps.TilemapLayer;
+	decorationTileLayer: Phaser.Tilemaps.TilemapLayer;
+	overlayTileLayer: Phaser.Tilemaps.TilemapLayer;
+	libraryLayer: Phaser.Tilemaps.TilemapLayer;
+	backgroundLibraryLayer: Phaser.Tilemaps.TilemapLayer;
 
 	mapEditorHighlighting: Phaser.GameObjects.Image;
 
@@ -429,7 +429,7 @@ export default class MapEditor extends Phaser.Scene {
 				1,
 				2
 			);
-			this.libraryLayer = map.createDynamicLayer(0, tileSet, 0, 0).setInteractive();
+			this.libraryLayer = map.createLayer(0, tileSet, 0, 0).setInteractive();
 			this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
 			this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 				this.selectedTileValues = undefined;
@@ -463,7 +463,7 @@ export default class MapEditor extends Phaser.Scene {
 				2
 			);
 			this.backgroundLibraryLayer =
-				backgroundMap.createDynamicLayer(0, backgroundTileSet, 0, 0).setInteractive();
+				backgroundMap.createLayer(0, backgroundTileSet, 0, 0).setInteractive();
 			this.backgroundLibraryLayer.setDepth(DEPTHS.libraryBackgroundLayer);
 			this.backgroundLibraryLayer.setScrollFactor(0, 0);
 	}
@@ -471,7 +471,7 @@ export default class MapEditor extends Phaser.Scene {
 	getDataFromClick (
 			posX: number,
 			posY: number,
-			tileLayer: Phaser.Tilemaps.DynamicTilemapLayer
+			tileLayer: Phaser.Tilemaps.TilemapLayer
 		) {
 		const clickX =
 			posX - this.cameras.main.centerX + this.cameraPositionX - tileLayer.x;
@@ -577,12 +577,12 @@ export default class MapEditor extends Phaser.Scene {
 			2
 		);
 		this.tileLayer = map
-			.createDynamicLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2)
+			.createLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2)
 			.setInteractive();
 		this.tileLayer.setDepth(DEPTHS.baseLayer);
 
 		const onPointerDown: (
-			tilemapLayer: Phaser.Tilemaps.DynamicTilemapLayer,
+			tilemapLayer: Phaser.Tilemaps.TilemapLayer,
 			layoutValues: MapLayout,
 			x: number,
 			y: number
@@ -612,7 +612,7 @@ export default class MapEditor extends Phaser.Scene {
 		};
 
 		const onPointerMove: (
-			tilemapLayer: Phaser.Tilemaps.DynamicTilemapLayer,
+			tilemapLayer: Phaser.Tilemaps.TilemapLayer,
 			layoutValues: MapLayout,
 			x: number,
 			y: number
@@ -632,7 +632,7 @@ export default class MapEditor extends Phaser.Scene {
 		};
 
 		const onPointerUp: (
-			tilemapLayer: Phaser.Tilemaps.DynamicTilemapLayer,
+			tilemapLayer: Phaser.Tilemaps.TilemapLayer,
 			x: number,
 			y: number
 		) => void = (tilemapLayer, x, y) => {
@@ -668,7 +668,7 @@ export default class MapEditor extends Phaser.Scene {
 			2
 		);
 		this.decorationTileLayer = decorationMap
-			.createDynamicLayer(0, decorationTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
+			.createLayer(0, decorationTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
 			// .setInteractive();
 		this.decorationTileLayer.setDepth(DEPTHS.decorationLayer);
 		this.decorationTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
@@ -697,7 +697,7 @@ export default class MapEditor extends Phaser.Scene {
 			2
 		);
 		this.overlayTileLayer = overlayMap
-			.createDynamicLayer(0, overlayTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
+			.createLayer(0, overlayTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
 		this.overlayTileLayer.setDepth(DEPTHS.overlayLayer);
 		this.overlayTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			onPointerDown(this.overlayTileLayer, this.roomOverlayLayout,
@@ -818,7 +818,7 @@ export default class MapEditor extends Phaser.Scene {
 				const maxY = Math.max(this.selectionStartPoint[1], tileY);
 				for (let y = minY; y <= maxY; y++) {
 					for (let x = minX; x <= maxX; x++) {
-						const tileLayers: Phaser.Tilemaps.DynamicTilemapLayer[] = [];
+						const tileLayers: Phaser.Tilemaps.TilemapLayer[] = [];
 						if (this.ctrlKey.isDown) {
 							tileLayers.push(this.tileLayer, this.decorationTileLayer, this.overlayTileLayer);
 						} else {
@@ -829,7 +829,7 @@ export default class MapEditor extends Phaser.Scene {
 							if (tile) {
 								tile.tint = this.ctrlKey.isDown ? 0x9999ff : 0xff9999;
 							}
-						})
+						});
 					}
 				}
 			}

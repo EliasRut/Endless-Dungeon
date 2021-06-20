@@ -205,7 +205,7 @@ export default class DungeonGenerator {
 	decorationLayout: number[][];
 	overlayLayout: number[][];
 	blocksUsed: number[][];
-	tileLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	dungeonLevel: number;
 
 	public generateLevel: (id: string, rooms: string[], dungeonLevel: number) => DungeonLevel =

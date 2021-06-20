@@ -35,7 +35,6 @@ export const areQuestPreconditionsMet: (quest: Quest) => boolean = (quest) => {
 			areAllConditionsMet = false;
 		}
 	});
-	
 	return areAllConditionsMet;
 };
 
