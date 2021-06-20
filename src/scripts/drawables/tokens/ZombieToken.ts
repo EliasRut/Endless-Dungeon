@@ -26,7 +26,7 @@ export default class ZombieToken extends EnemyToken {
 		this.attackExecuted = false;
 		this.startingHealth = BASE_HEALTH * this.level;
 		this.stateObject.health = this.startingHealth;
-		this.stateObject.damage = BASE_ATTACK_DAMAGE * this.level;
+		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
 	}
 
 	public update(time: number) {

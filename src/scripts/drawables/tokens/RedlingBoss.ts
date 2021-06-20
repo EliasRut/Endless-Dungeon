@@ -5,7 +5,7 @@ import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
 
-const ATTACK_RANGE = 150;
+const ATTACK_RANGE = 80;
 
 export default class RedlingBossToken extends EnemyToken {
 
@@ -14,10 +14,10 @@ export default class RedlingBossToken extends EnemyToken {
 
         this.setScale(2);
 		this.attackRange = ATTACK_RANGE; // how close the enemy comes.
-        this.stateObject.health = 250 * level;
+        this.stateObject.health = 200 * level;
 		this.stateObject.movementSpeed = 100 * (1 + level * 0.1);
 		this.stateObject.damage = 5 * level;
-        this.stateObject.attackTime = 1000;
+        this.stateObject.attackTime = 2000;
 	}
 
 	public update(time: number,) {
