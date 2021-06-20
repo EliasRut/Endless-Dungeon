@@ -64,6 +64,7 @@ const EQUIPMENT_SLOT_TO_ABILITY_KEY = {
 
 export const ABILITY_TO_ICON = {
 	[AbilityType.FIREBALL]: ['icon-abilities', 0],
+	[AbilityType.HAIL_OF_FLAMES]: ['icon-abilities', 0],
 	[AbilityType.ICESPIKE]: ['icon-abilities', 1],
 	[AbilityType.DUSTNOVA]: ['icon-abilities', 2],
 	[AbilityType.ROUND_HOUSE_KICK]: ['icon-abilities', 2],
@@ -156,7 +157,8 @@ export default class InventoryScreen extends OverlayScreen {
 				if (equippedItems[slotKey] === undefined) {
 					if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 					if (slotKey === EquipmentSlot.MAIN_HAND) {
-						updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
+						// updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
+						updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.HAIL_OF_FLAMES);
 						const abilityIcon = this.createAbilityIcon();
 						this.handleIconOptions(constructor, abilityIcon, AbilityType.FIREBALL);
 						this.abilityIconMap[EquipmentSlot.MAIN_HAND] = abilityIcon;

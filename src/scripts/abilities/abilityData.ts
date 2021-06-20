@@ -15,6 +15,7 @@ interface ProjectileData {
 	collisionSound?: string;
 	sfxVolume?: number;
 	delay?: number;
+	targeting?: boolean;
 }
 
 interface AbilityData {
@@ -30,6 +31,7 @@ interface AbilityData {
 export const enum AbilityType {
 	NOTHING = 'nothing',
 	FIREBALL = 'fireball',
+	HAIL_OF_FLAMES = 'hailOfFlames',
 	ICESPIKE = 'icespike',
 	DUSTNOVA = 'dustnova',
 	ROUND_HOUSE_KICK = 'roundhousekick',
@@ -38,7 +40,7 @@ export const enum AbilityType {
 
 export const Abilities: {[type: string]: AbilityData} = {
 	[AbilityType.NOTHING]: {
-		projectiles: 0,						
+		projectiles: 0,
 		cooldownMs: 0,
 		damageMultiplier: 0,
 		flavorText: ``
@@ -52,6 +54,24 @@ export const Abilities: {[type: string]: AbilityData} = {
 			effect: FireBallEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.10,
+		cooldownMs: 400,
+		damageMultiplier: 1,
+		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`
+	},
+	[AbilityType.HAIL_OF_FLAMES]: {
+		projectiles: 5,
+		projectileData: {
+			spread: [-0.2, 0.25],
+			velocity: 300,
+			xOffset: 32,
+			yOffset: 32,
+			effect: FireBallEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			targeting: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,

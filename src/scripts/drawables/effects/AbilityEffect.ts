@@ -1,7 +1,8 @@
-import { Facings } from '../../helpers/constants';
+import { Facings, PossibleTargets } from '../../helpers/constants';
 
 export default class AbilityEffect extends Phaser.Physics.Arcade.Sprite {
 		destroyed = false;
+		allowedTargets: PossibleTargets = PossibleTargets.NONE;
 		constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings) {
 			super(scene, x, y, spriteName);
 		}

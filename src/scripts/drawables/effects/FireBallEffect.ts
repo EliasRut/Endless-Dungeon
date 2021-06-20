@@ -1,5 +1,8 @@
-import { Facings } from '../../helpers/constants';
+import { Facings, Faction, PossibleTargets } from '../../helpers/constants';
 import AbilityEffect from './AbilityEffect';
+import MainScene from '../../scenes/MainScene';
+import CharacterToken from '../tokens/CharacterToken';
+import { VISITED_TILE_TINT } from '../../helpers/constants';
 
 const BODY_RADIUS = 6;
 const EXPLOSION_PARTICLE_SPEED = 100;
@@ -29,6 +32,31 @@ export default class FireBallEffect extends AbilityEffect {
 		});
 		this.emitter.startFollow(this.body.gameObject);
 		this.emitter.start();
+	}
+
+	update() {
+		let nearestEnemy: CharacterToken | undefined;
+		if (this.allowedTargets === PossibleTargets.ENEMIES) {
+			const potentialEnemies = Object.values((this.scene as MainScene).npcMap).filter(
+				(npc) => npc.faction === Faction.ENEMIES
+				&& npc.tint !== VISITED_TILE_TINT
+				&& npc.stateObject?.health > 0);
+			let closestDistance = Infinity;
+			nearestEnemy = potentialEnemies.reduce((nearest, token) => {
+				if (Math.hypot(token.x - this.x, token.y - this.y) < closestDistance) {
+					closestDistance = Math.hypot(token.x - this.x, token.y - this.y);
+					return token;
+				}
+				return nearest;
+			}, undefined as CharacterToken | undefined);
+		} else if (this.allowedTargets === PossibleTargets.PLAYER) {
+			nearestEnemy = (this.scene as MainScene).mainCharacter;
+		}
+		if (nearestEnemy) {
+			this.setAcceleration(
+				nearestEnemy.x > this.x ? 700 : -700,
+				nearestEnemy.y > this.y ? 700 : -700);
+		}
 	}
 
 	destroy() {

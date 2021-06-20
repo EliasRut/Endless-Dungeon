@@ -140,3 +140,9 @@ export const npcTypeToAttackFileMap: {
 export const essenceNames = [
 	'wild', 'royal', 'metal', 'passion', 'flux', 'death', 'change', 'blood'
 ];
+
+export const enum PossibleTargets {
+	NONE = 0,
+	PLAYER = 1,
+	ENEMIES = 2
+}
