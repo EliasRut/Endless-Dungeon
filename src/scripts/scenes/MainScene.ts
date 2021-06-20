@@ -78,10 +78,15 @@ export default class MainScene extends Phaser.Scene {
 	mobilePadStick?: Phaser.GameObjects.Image;
 
 	avatar: Avatar;
-	backpackIcon: BackpackIcon;
+
+	icons: {
+		backpackIcon: BackpackIcon;
+		settingsIcon: SettingsIcon;
+	};
+
 	wasIPressed: boolean=false;
 	wasEscPressed: boolean=false;
-	settingsIcon: SettingsIcon;
+
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
 	overlayLayer: Phaser.Tilemaps.TilemapLayer;
@@ -141,8 +146,10 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		this.fpsText = new FpsText(this);
-		this.backpackIcon = new BackpackIcon(this);
-		this.settingsIcon = new SettingsIcon(this);
+		this.icons = {
+			backpackIcon: new BackpackIcon(this),
+			settingsIcon: new SettingsIcon(this)
+		};
 		this.avatar = new Avatar(this);
 		if (this.isMobile) {
 			this.mobilePadBackgorund = this.add.image(
@@ -430,8 +437,8 @@ export default class MainScene extends Phaser.Scene {
 		}
 		if (this.keyboardHelper.isInventoryPressed()) {
 			if (this.wasIPressed=== false){
-				this.backpackIcon.openBackpack();
-			}		
+				this.icons.backpackIcon.openBackpack();
+			}
 			this.wasIPressed=true;
 
 		} else {
@@ -439,14 +446,14 @@ export default class MainScene extends Phaser.Scene {
 		}
 		if (this.keyboardHelper.isSettingsPressed()) {
 			if (this.wasEscPressed=== false){
-				this.settingsIcon.openSetting();
-			}		
+				this.icons.settingsIcon.openSetting();
+			}
 			this.wasEscPressed=true;
-					
+
 		} else {
 			this.wasEscPressed=false;
 		}
-		
+
 		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
 			this.cameras.main.fadeOut(FADE_OUT_TIME_MS);
 			// tslint:disable-next-line: no-console
