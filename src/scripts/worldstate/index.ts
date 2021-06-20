@@ -142,23 +142,6 @@ export class WorldState {
 	clearState() {
 		localStorage.clear();
 	}
-
-	resetGlobalState() {
-			globalState.clearState();
-
-			this.dungeon = new Dungeon();
-			this.inventory = new Inventory();
-			this.itemList = [];
-			this.transitionStack = {};
-			this.npcs = {};
-			this.doors = {};
-			this.scripts = {};
-			this.quests = {};
-			this.availableRooms = {};
-			this.availableTilesets = [];
-			this.currentLevel = 'town_new';
-			this.playerCharacter = new PlayerCharacter();
-	}
 }
 
 // This initializes an instance of the world state. We want this to be a Singleton.
