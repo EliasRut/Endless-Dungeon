@@ -5,7 +5,7 @@ import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
 
-const ATTACK_RANGE = 80;
+const ATTACK_RANGE = 150;
 
 export default class RedlingBossToken extends EnemyToken {
 

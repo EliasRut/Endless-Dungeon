@@ -60,7 +60,7 @@ export default class NpcToken extends CharacterToken {
 				this.openQuestSymbol.y = this.body.y - 12 - yOffset;
 			}
 			const player = globalState.playerCharacter;
-			if (this.getDistance(player.x, player.y) < 48) {
+			if (this.getDistance(player.x, player.y) < 60) {
 				const mainScene = this.scene as MainScene;
 				if (!mainScene.scriptHelper.isScriptRunning()) {
 					const nextQuestId = getNextQuestId(this.questGiverId);

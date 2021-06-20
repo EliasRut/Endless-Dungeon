@@ -22,7 +22,7 @@
             "title": "Royal crypta - Level 3",
             "style": "death",
             "rooms": [
-                "firstTest"
+                "bossRoom"
             ]
         }
     ],
