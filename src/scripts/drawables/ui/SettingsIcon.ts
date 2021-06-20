@@ -2,13 +2,17 @@ import globalState from '../../worldstate/index';
 import { BLOCK_SIZE, TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
 import { UiDepths } from '../../helpers/constants';
+import { Icons } from './Icons';
 
-const X_POSITION = 10;
-const Y_POSITION = 0;
+const ICON = 'Settings';
+export default class SettingsIcon extends Phaser.GameObjects.Text implements Icons {
 
-export default class SettingsIcon extends Phaser.GameObjects.Text {
+	scene: MainScene;
+
 	constructor(scene: MainScene) {
-		super(scene, scene.cameras.main.width - 70, 83, 'Settings', { color: 'white', fontSize: '14px' });
+		super(scene, scene.cameras.main.width - 70, 83, ICON, { color: 'white', fontSize: '14px' });
+		this.scene = scene;
+		this.setName(ICON);
 		this.setScrollFactor(0);
 		this.setInteractive();
 
@@ -16,17 +20,17 @@ export default class SettingsIcon extends Phaser.GameObjects.Text {
 		this.on('pointerdown', () => {
 			scene.pause();
 
-			// Object.values(scene.overlayScreens).forEach(value => {
-			// 		console.log(value.name);
-			// 	if(value.name !== this.name) {
-			// 		// value.setVisible(true);
-			// 		value.setVisible(false);
-			// 	}
-			// });
+			Object.values(this.scene.icons)
+				.filter(e => e.name !== this.name)
+				.forEach(value => value.setScreenVisibility(false)
+			);
 
 			scene.overlayScreens.settingsScreen.toggleVisible();
 		});
 
 		scene.add.existing(this);
+	}
+	setScreenVisibility(visibile: boolean): void {
+		this.scene.overlayScreens.settingsScreen.setVisible(visibile);
 	}
 }

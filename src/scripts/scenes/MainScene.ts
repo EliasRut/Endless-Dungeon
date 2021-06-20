@@ -70,8 +70,11 @@ export default class MainScene extends Phaser.Scene {
 	blockUserInteraction = false;
 
 	avatar: Avatar;
-	backpackIcon: BackpackIcon;
-	settingsIcon: SettingsIcon;
+
+	icons: {
+		backpackIcon: BackpackIcon;
+		settingsIcon: SettingsIcon;
+	};
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
 	overlayLayer: Phaser.Tilemaps.TilemapLayer;
@@ -125,8 +128,10 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		this.fpsText = new FpsText(this);
-		this.backpackIcon = new BackpackIcon(this);
-		this.settingsIcon = new SettingsIcon(this);
+		this.icons = {
+			backpackIcon: new BackpackIcon(this),
+			settingsIcon: new SettingsIcon(this)
+		};
 		this.avatar = new Avatar(this);
 
 		// essenceNames.forEach((name, index) => {
