@@ -15,6 +15,14 @@ export default class KeyboardHelper {
 	abilityKey3: Phaser.Input.Keyboard.Key;
 	abilityKey4: Phaser.Input.Keyboard.Key;
 
+	abilityKeyPressed: {[key: number]: boolean} = {
+		[AbilityKey.ONE]: false,
+		[AbilityKey.TWO]: false,
+		[AbilityKey.THREE]: false,
+		[AbilityKey.FOUR]: false,
+		[AbilityKey.FIVE]: false,
+	};
+
 	gamepad: Phaser.Input.Gamepad.Gamepad |undefined;
 
 	isMoveUpPressed: () => boolean;
@@ -75,6 +83,10 @@ export default class KeyboardHelper {
 		this.abilityKey4 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
 
 		this.isAbility1Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.ONE]) {
+				this.abilityKeyPressed[AbilityKey.ONE] = false;
+				return true;
+			}
 			if (this.abilityKey1.isDown) {
 				return true;
 			}
@@ -82,6 +94,10 @@ export default class KeyboardHelper {
 		};
 
 		this.isAbility2Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.TWO]) {
+				this.abilityKeyPressed[AbilityKey.TWO] = false;
+				return true;
+			}
 			if (this.abilityKey2.isDown) {
 				return true;
 			}
@@ -89,6 +105,10 @@ export default class KeyboardHelper {
 		};
 
 		this.isAbility3Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.THREE]) {
+				this.abilityKeyPressed[AbilityKey.THREE] = false;
+				return true;
+			}
 			if (this.abilityKey3.isDown) {
 				return true;
 			}
@@ -96,6 +116,10 @@ export default class KeyboardHelper {
 		};
 
 		this.isAbility4Pressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.FOUR]) {
+				this.abilityKeyPressed[AbilityKey.FOUR] = false;
+				return true;
+			}
 			if (this.abilityKey4.isDown) {
 				return true;
 			}
@@ -103,21 +127,21 @@ export default class KeyboardHelper {
 		};
 	}
 
-	getCharacterFacing() {
+	getCharacterFacing(stickDeltaX: number, stickDeltaY: number) {
 		let yFacing = 0;
 		let xFacing = 0;
 
 		this.gamepad = this.scene.input.gamepad?.getPad(0);
 
-		if (this.isMoveUpPressed()) {
+		if (stickDeltaY < -20 || this.isMoveUpPressed()) {
 			yFacing = -1;
-		} else if (this.isMoveDownPressed()) {
+		} else if (stickDeltaY > 20 || this.isMoveDownPressed()) {
 			yFacing = 1;
 		}
 
-		if (this.isMoveLeftPressed()) {
+		if (stickDeltaX < -20 || this.isMoveLeftPressed()) {
 			xFacing = -1;
-		} else if (this.isMoveRightPressed()) {
+		} else if (stickDeltaX > 20 || this.isMoveRightPressed()) {
 			xFacing = 1;
 		}
 
