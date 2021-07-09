@@ -7,8 +7,9 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	id: string;
 	type: string;
 	script?: NpcScript;
-	isBeingMoved?: boolean;
 	faction: Faction;
+	isBeingMoved?: boolean;
+	lastMovedTimestamp: number;
 
 	constructor(
 			scene: Phaser.Scene,
@@ -23,6 +24,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		scene.physics.add.existing(this);
 		this.type = type;
 		this.id = id;
+		this.lastMovedTimestamp = -Infinity;
 	}
 
 	public getDistance(px: number, py: number) {

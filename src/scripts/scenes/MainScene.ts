@@ -32,6 +32,8 @@ import DoorToken from '../drawables/tokens/DoorToken';
 import fixedItems from '../../items/fixedItems.json';
 import { DungeonRunData } from '../models/DungeonRunData';
 import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
+import { Catalyst, Source } from '../../items/itemData';
+import { equipItem, placeItemInNextFreeBagSlot } from '../helpers/inventory';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -263,6 +265,56 @@ export default class MainScene extends Phaser.Scene {
 		} else {
 			this.sound.play('score-dungeon', {volume: 0.08, loop: true});
 		}
+
+		if (globalState.playerCharacter.items.length === 0) {
+			const zeroWeights = {
+				sourceWeight: 0,
+				catalystWeight: 0,
+				armorWeight: 0,
+				ringWeight: 0,
+				amuletWeight: 0,
+			};
+			this.overlayScreens.inventory.addToInventory(generateRandomItem({
+				...zeroWeights,
+				sourceWeight: 1,
+				sourceTypes: [Source.FIRE]
+			}));
+			this.overlayScreens.inventory.addToInventory(generateRandomItem({
+				...zeroWeights,
+				sourceWeight: 1,
+				sourceTypes: [Source.ICE]
+			}));
+			this.overlayScreens.inventory.addToInventory(generateRandomItem({
+				...zeroWeights,
+				sourceWeight: 1,
+				sourceTypes: [Source.FORCE]
+			}));
+			this.overlayScreens.inventory.addToInventory(generateRandomItem({
+				...zeroWeights,
+				sourceWeight: 1,
+				sourceTypes: [Source.NECROTIC]
+			}));
+			this.overlayScreens.inventory.addToInventory(generateRandomItem({
+				...zeroWeights,
+				catalystWeight: 1,
+				catalystTypes: [Catalyst.NOVA]
+			}));
+			this.overlayScreens.inventory.addToInventory(generateRandomItem({
+				...zeroWeights,
+				catalystWeight: 1,
+				catalystTypes: [Catalyst.CONE]
+			}));
+			this.overlayScreens.inventory.addToInventory(generateRandomItem({
+				...zeroWeights,
+				catalystWeight: 1,
+				catalystTypes: [Catalyst.STORM]
+			}));
+			this.overlayScreens.inventory.addToInventory(generateRandomItem({
+				...zeroWeights,
+				catalystWeight: 1,
+				catalystTypes: [Catalyst.SUMMON]
+			}));
+		}
 	}
 
 	addNpc(
@@ -344,7 +396,7 @@ export default class MainScene extends Phaser.Scene {
 		if (!dungeonLevel) {
 			throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
 		}
-		
+
 		const {
 			startPositionX,
 			startPositionY,
@@ -527,7 +579,7 @@ export default class MainScene extends Phaser.Scene {
 
 		if (!this.blockUserInteraction) {
 			const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
-			this.abilityHelper.update(castAbilities);
+			this.abilityHelper.update(globalTime, castAbilities);
 		}
 
 		const cooldowns = this.keyboardHelper.getAbilityCooldowns(globalTime);

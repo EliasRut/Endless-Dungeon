@@ -153,7 +153,10 @@ export default class ScriptHelper {
 			}
 			case 'cast': {
 				cleanUpStep = true;
-				this.scene.abilityHelper.triggerAbility(globalState.playerCharacter, currentStep.ability);
+				this.scene.abilityHelper.triggerAbility(
+					globalState.playerCharacter,
+					currentStep.ability,
+					globalTime);
 				break;
 			}
 			case 'walk': {

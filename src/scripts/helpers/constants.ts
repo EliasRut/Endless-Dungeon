@@ -147,3 +147,5 @@ export const enum PossibleTargets {
 	PLAYER = 1,
 	ENEMIES = 2
 }
+
+export const KNOCKBACK_TIME = 250;

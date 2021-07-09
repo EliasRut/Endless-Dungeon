@@ -55,10 +55,10 @@ export default abstract class EnemyToken extends CharacterToken {
 			// TODO find out when this happens
 			return;
 		}
-		if (Math.random() > 0.25) {
+		if (Math.random() > 0.66) {
 			return;
 		}
-		this.scene.dropItem(this.x, this.y, generateRandomItem(level));
+		this.scene.dropItem(this.x, this.y, generateRandomItem({level}));
 	}
 	dropFixedItem(id: string) {
 		if (this.scene === undefined) {

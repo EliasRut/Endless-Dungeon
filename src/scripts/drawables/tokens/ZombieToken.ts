@@ -1,4 +1,4 @@
-import { facingToSpriteNameMap } from '../../helpers/constants';
+import { facingToSpriteNameMap, KNOCKBACK_TIME } from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -6,9 +6,9 @@ import EnemyToken from './EnemyToken';
 
 const BASE_ATTACK_DAMAGE = 20;
 const REGULAR_ATTACK_RANGE = 25;
-const REGULAR_MOVEMENT_SPEED = 50;
-const MIN_MOVEMENT_SPEED = 15;
-const BASE_HEALTH = 10;
+const REGULAR_MOVEMENT_SPEED = 80;
+const MIN_MOVEMENT_SPEED = 25;
+const BASE_HEALTH = 4;
 
 const ATTACK_DAMAGE_DELAY = 500;
 
@@ -42,6 +42,10 @@ export default class ZombieToken extends EnemyToken {
 				this.dropRandomItem(this.level);
 				this.destroy();
 				return;
+		}
+
+		if (this.lastMovedTimestamp + KNOCKBACK_TIME > time) {
+			return;
 		}
 
 		const tx = this.target.x;

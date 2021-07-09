@@ -14,7 +14,6 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 	tileY: number;
 	tile?: Phaser.Tilemaps.Tile;
 
-
 	constructor(scene: MainScene, x: number, y: number, item: Item) {
 		super(scene, x, y, 'test-items-spritesheet', item.iconFrame);
 		const tileX = Math.round(x / TILE_WIDTH);

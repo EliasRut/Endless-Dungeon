@@ -2,7 +2,7 @@ import globalState from '../worldstate';
 import { DEFAULT_TILE_TINT, VISITED_TILE_TINT } from './constants';
 import { DUNGEON_HEIGHT, DUNGEON_WIDTH, GID_MULTIPLE, TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 
-const sightRadius = 12;
+const sightRadius = 14;
 const lightRadius = 8;
 
 const TEN_SECONDS_IN_FRAMES = 600;
