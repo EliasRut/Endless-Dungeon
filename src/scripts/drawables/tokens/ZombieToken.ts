@@ -10,12 +10,13 @@ const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
 const BASE_HEALTH = 4;
 
-const ATTACK_DAMAGE_DELAY = 500;
+const ATTACK_DAMAGE_DELAY = 250;
+
+const DROP_CHANCE = 0.15;
 
 export default class ZombieToken extends EnemyToken {
 	attackExecuted: boolean;
 	startingHealth: number;
-	level: number;
 
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
 		super(scene, x, y, tokenName, id);
@@ -39,9 +40,11 @@ export default class ZombieToken extends EnemyToken {
 
 		// check death
 		if (this.stateObject.health <= 0){
+			if (Math.random() < DROP_CHANCE) {
 				this.dropRandomItem(this.level);
-				this.destroy();
-				return;
+			}
+			this.destroy();
+			return;
 		}
 
 		if (this.lastMovedTimestamp + KNOCKBACK_TIME > time) {

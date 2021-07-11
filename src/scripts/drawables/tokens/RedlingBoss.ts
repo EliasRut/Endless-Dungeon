@@ -19,6 +19,7 @@ export default class RedlingBossToken extends EnemyToken {
 		this.stateObject.movementSpeed = 100 * (1 + level * 0.1);
 		this.stateObject.damage = 5 * level;
 		this.stateObject.attackTime = 4000;
+		this.level = level;
 
 		const particles = scene.add.particles('fire');
 		particles.setDepth(1);
@@ -46,6 +47,9 @@ export default class RedlingBossToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0) {
 			this.dropFixedItem("book");
+			this.dropRandomItem(this.level + 1);
+			this.dropRandomItem(this.level + 1);
+			this.dropRandomItem(this.level + 1);
 			this.destroy();
 			return;
 		}

@@ -192,7 +192,7 @@ export default class PreloadScene extends Phaser.Scene {
 								start: directionFrameMultiplier * attackData.framesPerDirection,
 								end: (directionFrameMultiplier + 1) * attackData.framesPerDirection  - 1
 							}),
-							frameRate: 8,
+							frameRate: 16,
 							repeat: 0
 						});
 					})
