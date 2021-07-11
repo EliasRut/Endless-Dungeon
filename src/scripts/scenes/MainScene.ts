@@ -488,7 +488,7 @@ export default class MainScene extends Phaser.Scene {
 		}
 		if (this.keyboardHelper.isInventoryPressed()) {
 			if (this.wasIPressed=== false){
-				this.icons.backpackIcon.openBackpack();
+				this.icons.backpackIcon.toggleScreen();
 			}
 			this.wasIPressed=true;
 
@@ -497,7 +497,7 @@ export default class MainScene extends Phaser.Scene {
 		}
 		if (this.keyboardHelper.isSettingsPressed()) {
 			if (this.wasEscPressed=== false){
-				this.icons.settingsIcon.openSetting();
+				this.icons.settingsIcon.toggleScreen();
 			}
 			this.wasEscPressed=true;
 
@@ -644,11 +644,13 @@ export default class MainScene extends Phaser.Scene {
 	pause() {
 		this.isPaused = true;
 		this.physics.pause();
+		this.time.paused = true;
 	}
 
 	resume() {
 		this.isPaused = false;
 		this.physics.resume();
+		this.time.paused = false;
 	}
 
 	dropItem(x: number, y: number, item: Item) {

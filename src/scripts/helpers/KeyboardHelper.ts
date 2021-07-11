@@ -112,7 +112,11 @@ export default class KeyboardHelper {
 			if (this.abilityKey1.isDown) {
 				return true;
 			}
-			return !!this.gamepad?.isButtonDown(0);
+			try {
+				return !!this.gamepad?.isButtonDown(0);
+			} catch (err) {
+				return false;
+			}
 		};
 
 		this.isAbility2Pressed = () => {
@@ -123,7 +127,11 @@ export default class KeyboardHelper {
 			if (this.abilityKey2.isDown) {
 				return true;
 			}
-			return !!this.gamepad?.isButtonDown(1);
+			try {
+				return !!this.gamepad?.isButtonDown(2);
+			} catch (err) {
+				return false;
+			}
 		};
 
 		this.isAbility3Pressed = () => {
@@ -134,7 +142,11 @@ export default class KeyboardHelper {
 			if (this.abilityKey3.isDown) {
 				return true;
 			}
-			return !!this.gamepad?.isButtonDown(2);
+			try {
+				return !!this.gamepad?.isButtonDown(1);
+			} catch (err) {
+				return false;
+			}
 		};
 
 		this.isAbility4Pressed = () => {
@@ -145,20 +157,32 @@ export default class KeyboardHelper {
 			if (this.abilityKey4.isDown) {
 				return true;
 			}
-			return !!this.gamepad?.isButtonDown(3);
+			try {
+				return !!this.gamepad?.isButtonDown(3);
+			} catch (err) {
+				return false;
+			}
 		};
 		this.isInventoryPressed = () => {
 			if (this.inventoryKey.isDown) {
 				return true;
 			}
-			return !!this.gamepad?.isButtonDown(8);
+			try {
+				return !!this.gamepad?.isButtonDown(8);
+			} catch (err) {
+				return false;
+			}
 		};
 
 		this.isSettingsPressed = () => {
 			if (this.settingsKey.isDown) {
 				return true;
 			}
-			return !!this.gamepad?.isButtonDown(9);
+			try {
+				return !!this.gamepad?.isButtonDown(9);
+			} catch (err) {
+				return false;
+			}
 		};
 	}
 
