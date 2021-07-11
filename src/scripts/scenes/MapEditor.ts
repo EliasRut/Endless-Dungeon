@@ -1,9 +1,12 @@
 import 'phaser';
-import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
+import { 
+	TILE_WIDTH,
+	TILE_HEIGHT 
+} from '../helpers/generateDungeon';
 import PositionText from '../drawables/ui/PositionText';
 import globalState from '../worldstate';
 import firebase from 'firebase';
-import { DatabaseRoom, Room } from '../../../typings/custom';
+import { DatabaseRoom } from '../../../typings/custom';
 
 const TILE_SPACING = 2;
 
@@ -38,7 +41,7 @@ type LevelHistory = MultiLevelLayout[];
 export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
 
-	fileData: Partial<Room> = {};
+	fileData: Partial<DatabaseRoom> = {};
 	roomName: string = '';
 
 	isPointerDown: boolean = false;
@@ -180,10 +183,17 @@ export default class MapEditor extends Phaser.Scene {
 			this.tilesetOverlayDropdownElement.appendChild(newOption);
 		});
 
-		this.loadButtonElement.onclick = () => {
+		this.loadButtonElement.onclick = async () => {
 			const roomName = this.roomsDropdownElement.value;
 
-			const selectedRoom = globalState.availableRooms[roomName]! as unknown as Room;
+			const selectedRoomDoc = await this.database.doc(roomName).get();
+			const databaseSelectedRoom = selectedRoomDoc.data() as DatabaseRoom;
+			const selectedRoom = {
+				...databaseSelectedRoom,
+				layout: JSON.parse(databaseSelectedRoom.layout),
+				decorations: JSON.parse(databaseSelectedRoom.decorations),
+				overlays: JSON.parse(databaseSelectedRoom.overlays),
+			}
 			this.fileData = selectedRoom;
 			this.roomNameElement.value = selectedRoom.name;
 
