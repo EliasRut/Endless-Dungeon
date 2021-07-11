@@ -265,55 +265,55 @@ export default class MainScene extends Phaser.Scene {
 			this.sound.play('score-dungeon', {volume: 0.08, loop: true});
 		}
 
-		if (globalState.playerCharacter.items.length === 0) {
-			const zeroWeights = {
-				sourceWeight: 0,
-				catalystWeight: 0,
-				armorWeight: 0,
-				ringWeight: 0,
-				amuletWeight: 0,
-			};
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				sourceWeight: 1,
-				sourceTypes: [Source.FIRE]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				sourceWeight: 1,
-				sourceTypes: [Source.ICE]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				sourceWeight: 1,
-				sourceTypes: [Source.FORCE]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				sourceWeight: 1,
-				sourceTypes: [Source.NECROTIC]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				catalystWeight: 1,
-				catalystTypes: [Catalyst.NOVA]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				catalystWeight: 1,
-				catalystTypes: [Catalyst.CONE]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				catalystWeight: 1,
-				catalystTypes: [Catalyst.STORM]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				catalystWeight: 1,
-				catalystTypes: [Catalyst.SUMMON]
-			}));
-		}
+		// if (globalState.inventory.unequippedItemList.length === 0) {
+		// 	const zeroWeights = {
+		// 		sourceWeight: 0,
+		// 		catalystWeight: 0,
+		// 		armorWeight: 0,
+		// 		ringWeight: 0,
+		// 		amuletWeight: 0,
+		// 	};
+		// 	this.overlayScreens.inventory.addToInventory(generateRandomItem({
+		// 		...zeroWeights,
+		// 		sourceWeight: 1,
+		// 		sourceTypes: [Source.FIRE]
+		// 	}));
+		// 	this.overlayScreens.inventory.addToInventory(generateRandomItem({
+		// 		...zeroWeights,
+		// 		sourceWeight: 1,
+		// 		sourceTypes: [Source.ICE]
+		// 	}));
+		// 	this.overlayScreens.inventory.addToInventory(generateRandomItem({
+		// 		...zeroWeights,
+		// 		sourceWeight: 1,
+		// 		sourceTypes: [Source.FORCE]
+		// 	}));
+		// 	this.overlayScreens.inventory.addToInventory(generateRandomItem({
+		// 		...zeroWeights,
+		// 		sourceWeight: 1,
+		// 		sourceTypes: [Source.NECROTIC]
+		// 	}));
+		// 	this.overlayScreens.inventory.addToInventory(generateRandomItem({
+		// 		...zeroWeights,
+		// 		catalystWeight: 1,
+		// 		catalystTypes: [Catalyst.NOVA]
+		// 	}));
+		// 	this.overlayScreens.inventory.addToInventory(generateRandomItem({
+		// 		...zeroWeights,
+		// 		catalystWeight: 1,
+		// 		catalystTypes: [Catalyst.CONE]
+		// 	}));
+		// 	this.overlayScreens.inventory.addToInventory(generateRandomItem({
+		// 		...zeroWeights,
+		// 		catalystWeight: 1,
+		// 		catalystTypes: [Catalyst.STORM]
+		// 	}));
+		// 	this.overlayScreens.inventory.addToInventory(generateRandomItem({
+		// 		...zeroWeights,
+		// 		catalystWeight: 1,
+		// 		catalystTypes: [Catalyst.SUMMON]
+		// 	}));
+		// }
 	}
 
 	addNpc(
@@ -488,7 +488,7 @@ export default class MainScene extends Phaser.Scene {
 		}
 		if (this.keyboardHelper.isInventoryPressed()) {
 			if (this.wasIPressed=== false){
-				this.icons.backpackIcon.openBackpack();
+				this.icons.backpackIcon.toggleScreen();
 			}
 			this.wasIPressed=true;
 
@@ -497,7 +497,7 @@ export default class MainScene extends Phaser.Scene {
 		}
 		if (this.keyboardHelper.isSettingsPressed()) {
 			if (this.wasEscPressed=== false){
-				this.icons.settingsIcon.openSetting();
+				this.icons.settingsIcon.toggleScreen();
 			}
 			this.wasEscPressed=true;
 
@@ -645,11 +645,13 @@ export default class MainScene extends Phaser.Scene {
 	pause() {
 		this.isPaused = true;
 		this.physics.pause();
+		this.time.paused = true;
 	}
 
 	resume() {
 		this.isPaused = false;
 		this.physics.resume();
+		this.time.paused = false;
 	}
 
 	dropItem(x: number, y: number, item: Item) {

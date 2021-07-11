@@ -184,13 +184,13 @@ export default class RoomGenerator {
 
 			// NOTE: This is commented out decrease the number of entrances on average.
 			// Make sure that each orientation is selected only once.
-			// for(let i=0;i<entranceCnt;i++) {
-			// 	if(orientations.includes(orient)) {
-			// 		orient = orient === 3 ? 0 : orient+1;
-			// 	} else {
-			// 		break;
-			// 	}
-			// }
+			for(let i=0;i<entranceCnt;i++) {
+				if(orientations.includes(orient)) {
+					orient = orient === 3 ? 0 : orient+1;
+				} else {
+					break;
+				}
+			}
 
 			// Get the string representation of the orientation and push it 
 			// to the list of entrances to be created.
@@ -266,25 +266,14 @@ export default class RoomGenerator {
 
 		// console.log(debugOutput);
 
-		const npcs: NpcPositioning[] = [];
-		for (let x = 0; x < roomWidth; x++) {
-			for (let y = 0; y < roomHeight; y++) {
-				npcs.push({
-					type: 'zombie',
-					id: `zom-${x}-${y}`,
-					x: x * 8 + 3,
-					y: y * 8 + 3,
-				});
-			}
-		}
-
 		const ret: Room = {
 				tileset: roomTileset,
 				layout: room,
 				openings: orientation.slice(1) as Opening[],
 				name: roomName,
 				scripts: {} as Scripting,
-				npcs
+				// npcs,
+				// usedNpcTypes: ['enemy-zombie']
 		};
 		return ret as Room;
 	}

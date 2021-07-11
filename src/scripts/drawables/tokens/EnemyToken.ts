@@ -27,6 +27,7 @@ export default abstract class EnemyToken extends CharacterToken {
 	aggroLinger: number = 3000;
 	aggro: boolean = false;
 	target: Phaser.Geom.Point;
+	level: number;
 
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
 		super(scene, x, y, tokenName, tokenName, id);
@@ -55,9 +56,7 @@ export default abstract class EnemyToken extends CharacterToken {
 			// TODO find out when this happens
 			return;
 		}
-		if (Math.random() > 0.66) {
-			return;
-		}
+
 		this.scene.dropItem(this.x, this.y, generateRandomItem({level}));
 	}
 	dropFixedItem(id: string) {

@@ -32,7 +32,8 @@ export default class DungeonDoorScene extends Phaser.Scene {
 				height: levelData.height,
 				numberOfRooms: levelData.numberOfRooms,
 				title: levelData.title,
-				style: levelData.style
+				style: levelData.style,
+				enemyBudget: levelData.enemyBudget
 			};
 		});
 

@@ -5,4 +5,5 @@ export default interface RoomAssignment extends PrimaryContentDungeonLevelBaseDa
 	dynamicLighting: boolean;
 	style?: ColorsOfMagic;
 	numberOfRooms?: number;
+	enemyBudget?: number;
 }

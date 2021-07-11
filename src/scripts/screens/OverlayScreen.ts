@@ -1,6 +1,10 @@
 import { UiDepths } from '../helpers/constants';
+import MainScene from '../scenes/MainScene';
 
 export default class OverlayScreen extends Phaser.GameObjects.Group {
+
+	visiblity: boolean;
+
 	constructor(scene: Phaser.Scene, startX: number, startY: number, width: number, height: number) {
 		super(scene);
 
@@ -64,5 +68,11 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 			piece.setScrollFactor(0);
 		});
 		this.addMultiple(pieces, true);
+	}
+
+
+	toggleVisibility() {
+		this.toggleVisible();
+		this.visiblity = !this.visiblity;
 	}
 }

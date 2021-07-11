@@ -17,10 +17,10 @@
 	}, {
 		"y": 69,
 		"x": 63,
-		"targetMap": "library",
-		"targetRoom": "library",
-		"targetX": 12,
-		"targetY": 14
+		"targetMap": "bookshop",
+		"targetRoom": "bookshop",
+		"targetX": 13,
+		"targetY": 4
 	}, {
 		"y": 45,
 		"x": 77,

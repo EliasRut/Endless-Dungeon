@@ -82,9 +82,9 @@ export class WorldState {
 			height: 8,
 			title: 'Bellwick Tavern'
 		},
-		'library': {
+		'bookshop': {
 			dynamicLighting: false,
-			rooms: ['library'],
+			rooms: ['bookshop'],
 			width: 8,
 			height: 8,
 			title: 'Vanyas bookshop'

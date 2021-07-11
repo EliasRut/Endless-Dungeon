@@ -61,15 +61,15 @@ const questScripts: {[name: string]: ScriptEntry[]} = {
 	'hildaTalks': [{
 			type: 'dialog',
 			portrait: 'player_happy',
-			text: ['Go visit Vanya in the library!']
+			text: ['Go visit Vanya in her book shop!']
 		}, {
 			type: 'pauseUntilCondition',
-			roomName: 'library'
+			roomName: 'bookshop'
 		}, {
 			type: 'dialog',
 			portrait: 'player_happy',
 			text: [
-				'This must be the library I\'ve heard about.',
+				'This must be the book shop I\'ve heard about.',
 				'Then this must be Vanya.'
 			]
 		}, {

@@ -1,5 +1,5 @@
 import { getUrlParam } from '../helpers/browserState';
-import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames, ColorsOfMagic } from '../helpers/constants';
+import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames, ColorsOfMagic, enemyBudgetCost } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 
@@ -47,6 +47,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('pad-background', 'assets/img/pad-background.png');
 		this.load.image('pad-stick', 'assets/img/pad-stick.png');
 		this.load.image('icon-backpack', 'assets/img/backpack-icon.png');
+		this.load.image('icon-settings', 'assets/img/settings-icon.png',);
 		this.load.image('icon-hero', 'assets/img/hero-icon.png');
 		this.load.image('icon-healthbar-background', 'assets/img/gui-healthbar.png');
 		this.load.image('ability-background-desktop', 'assets/img/ability-icon-background-desktop.png');
@@ -54,6 +55,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('icon-guibase', 'assets/img/gui-base.png');
 		this.load.image('icon-healthbar', 'assets/img/gui-life.png');
 		this.load.image('inventory-borders', 'assets/img/inventory-borders-tall.png');
+		this.load.image('inventory-selection', 'assets/img/inventory-selection.png');
 		this.load.spritesheet('icon-abilities', 'assets/img/abilities-sheet.png',
 			{ frameWidth: 20, frameHeight: 20 });
 
@@ -192,7 +194,7 @@ export default class PreloadScene extends Phaser.Scene {
 								start: directionFrameMultiplier * attackData.framesPerDirection,
 								end: (directionFrameMultiplier + 1) * attackData.framesPerDirection  - 1
 							}),
-							frameRate: 8,
+							frameRate: 16,
 							repeat: 0
 						});
 					})
@@ -232,6 +234,7 @@ export default class PreloadScene extends Phaser.Scene {
 					rooms: levelData.rooms,
 					width: levelData.width,
 					height: levelData.height,
+					enemyBudget: levelData.enemyBudget || 0,
 					numberOfRooms: levelData.numberOfRooms || 0,
 					style: levelData.style || ColorsOfMagic.DEATH
 				}

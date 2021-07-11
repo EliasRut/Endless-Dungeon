@@ -12,7 +12,7 @@ export default class SettingsScreen extends OverlayScreen {
 	saveIcon: Phaser.GameObjects.BitmapText;
 	loadIcon: Phaser.GameObjects.BitmapText;
 	newGameIcon: Phaser.GameObjects.BitmapText;
-	scene: Phaser.Scene;
+	scene: MainScene;
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
@@ -25,7 +25,7 @@ export default class SettingsScreen extends OverlayScreen {
 
 		super(scene, SETTINGS_START_X, SETTINGS_START_Y , SETTINGS_WIDTH, SETTINGS_HEIGHT);
 
-		this.scene = scene;
+		this.scene = (scene as MainScene);
 
 		this.saveIcon = new Phaser.GameObjects.BitmapText(
 			scene, SETTINGS_START_X+SETTINGS_WIDTH/2-100, SETTINGS_START_Y+5, 'pixelfont', 'Save', 12); //{ color: 'black', fontSize: '14px' }
@@ -80,6 +80,7 @@ export default class SettingsScreen extends OverlayScreen {
 		// tslint:enable
 		scene.add.existing(this);
 		this.setVisible(false);
+		this.visiblity = false;
 	}
 
 	save() {
@@ -150,7 +151,7 @@ export default class SettingsScreen extends OverlayScreen {
 		// globalState.loadState();
 		globalState.loadGame = true;
 		this.scene.scene.start('RoomPreloaderScene');
-		(this.scene as MainScene).resume();
+		this.scene.resume();
 
 		return '';
 	}
