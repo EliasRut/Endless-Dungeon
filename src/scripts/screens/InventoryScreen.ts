@@ -235,10 +235,12 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 	addToInventory(item: Item) {
 		const [x, y] = placeItemInNextFreeBagSlot(item);
-		this.createItemToken(
+		if (x >= 0) this.createItemToken(
 			item,
 			BAG_START_X + x * BOX_SIZE,
 			BAG_START_Y + y * BOX_SIZE);
+		else return false;
+		return true;
 	}
 
 	// We currently ignore amount.

@@ -58,16 +58,17 @@ export const generateDungeonRun: (runes: RuneAssignment) => DungeonRunData = (ru
 
 	const levels: DungeonLevelData[] = selectedPrimaryContent.dungeonLevels.map(
 		(dungeonLevel, level) => ({
-			title: dungeonLevel.title,
-			style: dungeonLevel.style,
+			...dungeonLevel,
 			rooms: [
 				...dungeonLevel.rooms,
 				...(secondaryContentRoomAssignment[level] || [])
-			]
+			],
 	}));
 
 	return {
 		levels,
-		buff: runes.playerBuff
+		buff: runes.playerBuff,
+		primaryContentBlock: selectedPrimaryContent,
+		secondaryContentBlocks
 	};
 };

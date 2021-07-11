@@ -33,7 +33,6 @@ import fixedItems from '../../items/fixedItems.json';
 import { DungeonRunData } from '../models/DungeonRunData';
 import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
 import { Catalyst, Source } from '../../items/itemData';
-import { equipItem, placeItemInNextFreeBagSlot } from '../helpers/inventory';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -266,7 +265,7 @@ export default class MainScene extends Phaser.Scene {
 			this.sound.play('score-dungeon', {volume: 0.08, loop: true});
 		}
 
-		if (globalState.playerCharacter.items.length === 0) {
+		if (globalState.inventory.unequippedItemList.length === 0) {
 			const zeroWeights = {
 				sourceWeight: 0,
 				catalystWeight: 0,
@@ -654,7 +653,7 @@ export default class MainScene extends Phaser.Scene {
 
 	dropItem(x: number, y: number, item: Item) {
 		const itemToken = new WorldItemToken(this, x, y, item);
-		itemToken.setDepth(UiDepths.TOKEN_MAIN_LAYER);
+		itemToken.setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.worldItems.push(itemToken);
 	}
 }

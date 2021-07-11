@@ -1,6 +1,6 @@
 import globalState from '../worldstate';
 import { DEFAULT_TILE_TINT, VISITED_TILE_TINT } from './constants';
-import { DUNGEON_HEIGHT, DUNGEON_WIDTH, GID_MULTIPLE, TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
+import { GID_MULTIPLE, TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 
 const sightRadius = 14;
 const lightRadius = 8;
@@ -32,14 +32,21 @@ export default class DynamicLightingHelper {
 		this.prepareDynamicLighting();
 	}
 
+	getCurrentLevel() {
+		return globalState.roomAssignment[globalState.currentLevel];
+	}
+
 	prepareDynamicLighting() {
+		const {width, height} = this.getCurrentLevel();
+		const dungeonWidth = width * 8;
+		const dungeonHeight = height * 8;
 		this.tileLayer.forEachTile((tile) => tile.tint = 0x000000);
 		this.decorationLayer.forEachTile((tile) => tile.tint = 0x000000);
 		this.overlayLayer.forEachTile((tile) => tile.tint = 0x000000);
-		for (let x = 0; x < DUNGEON_WIDTH; x++) {
+		for (let x = 0; x < dungeonWidth; x++) {
 				this.isBlockingTile[x] = [];
 				this.visitedTiles[x] = [];
-			for (let y = 0; y < DUNGEON_HEIGHT; y++) {
+			for (let y = 0; y < dungeonHeight; y++) {
 				this.visitedTiles[x][y] = 0;
 				const tile = this.tileLayer.getTileAt(x, y);
 				if (!tile) {
@@ -87,6 +94,9 @@ export default class DynamicLightingHelper {
 	reducedLightingArray: number[][] = [];
 
 	updateDynamicLighting() {
+		const {width, height} = this.getCurrentLevel();
+		const dungeonWidth = width * 8;
+		const dungeonHeight = height * 8;
 		// Take time for benchmarking
 		const beforeDynamicLighting = window.performance.now();
 
@@ -99,9 +109,9 @@ export default class DynamicLightingHelper {
 		const playerTileY = Math.round(playerTokenY / TILE_HEIGHT);
 		// We calculate darkness values for 32x32 tiles, seems to be enough visually speaking
 		const lowerBoundX = Math.min(sightRadius, playerTileX) * -1;
-		const upperBoundX = Math.min(sightRadius, DUNGEON_WIDTH - 1 - playerTileX);
+		const upperBoundX = Math.min(sightRadius, dungeonWidth - 1 - playerTileX);
 		const lowerBoundY = Math.min(sightRadius, playerTileY) * -1;
-		const upperBoundY = Math.min(sightRadius, DUNGEON_HEIGHT - 1 - playerTileY);
+		const upperBoundY = Math.min(sightRadius, dungeonHeight - 1 - playerTileY);
 
 		// The player character tile is always fully lit
 		const playerTile = this.tileLayer.getTileAt(playerTileX, playerTileY);

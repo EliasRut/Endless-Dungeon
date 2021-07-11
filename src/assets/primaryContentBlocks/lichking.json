@@ -9,21 +9,33 @@
             "rooms": [
                 "firstTest",
                 "secondTest"
-            ]
+            ],
+            "width": 16,
+            "height": 16,
+            "numberOfRooms": 8,
+            "enemyBudget": 40
         },
         {
             "title": "Royal crypta - Level 2",
             "style": "death",
             "rooms": [
                 "zombieRoom"
-            ]
+            ],
+            "width": 12,
+            "height": 12,
+            "numberOfRooms": 5,
+            "enemyBudget": 40
         },
         {
             "title": "Royal crypta - Level 3",
             "style": "death",
             "rooms": [
                 "bossRoom"
-            ]
+            ],
+            "width": 12,
+            "height": 12,
+            "numberOfRooms": 5,
+            "enemyBudget": 40
         }
     ],
     "themes": [
