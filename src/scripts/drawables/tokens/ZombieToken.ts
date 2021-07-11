@@ -1,4 +1,4 @@
-import { facingToSpriteNameMap } from '../../helpers/constants';
+import { facingToSpriteNameMap, KNOCKBACK_TIME } from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -6,9 +6,9 @@ import EnemyToken from './EnemyToken';
 
 const BASE_ATTACK_DAMAGE = 20;
 const REGULAR_ATTACK_RANGE = 25;
-const REGULAR_MOVEMENT_SPEED = 50;
-const MIN_MOVEMENT_SPEED = 15;
-const BASE_HEALTH = 10;
+const REGULAR_MOVEMENT_SPEED = 80;
+const MIN_MOVEMENT_SPEED = 25;
+const BASE_HEALTH = 4;
 
 const ATTACK_DAMAGE_DELAY = 500;
 
@@ -26,7 +26,7 @@ export default class ZombieToken extends EnemyToken {
 		this.attackExecuted = false;
 		this.startingHealth = BASE_HEALTH * this.level;
 		this.stateObject.health = this.startingHealth;
-		this.stateObject.damage = BASE_ATTACK_DAMAGE * this.level;
+		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
 	}
 
 	public update(time: number) {
@@ -42,6 +42,10 @@ export default class ZombieToken extends EnemyToken {
 				this.dropRandomItem(this.level);
 				this.destroy();
 				return;
+		}
+
+		if (this.lastMovedTimestamp + KNOCKBACK_TIME > time) {
+			return;
 		}
 
 		const tx = this.target.x;
@@ -61,8 +65,9 @@ export default class ZombieToken extends EnemyToken {
 		// follows you only if you're close enough, then runs straight at you,
 		// stop when close enough (proximity)
 
-		if ( this.attackedAt + this.stateObject.attackTime < time
-				&& this.attackRange < distance) {
+		if (this.aggro
+			&& this.attackedAt + this.stateObject.attackTime < time
+			&& this.attackRange < distance) {
 			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
 			const xSpeed = (tx - this.x) / totalDistance * this.stateObject.movementSpeed;
 			const ySpeed = (ty - this.y) / totalDistance * this.stateObject.movementSpeed;

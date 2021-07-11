@@ -8,6 +8,7 @@ import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import { Faction, PossibleTargets } from './constants';
 import { getRotationInRadiansForFacing } from './movement';
+import TargetingEffect from '../drawables/effects/TargetingEffect';
 
 export default class AbilityHelper {
 	scene: MainScene;
@@ -18,7 +19,7 @@ export default class AbilityHelper {
 		this.scene = scene;
 	}
 
-	triggerAbility(origin: Character, type: AbilityType) {
+	triggerAbility(origin: Character, type: AbilityType, globalTime: number) {
 		// We allow for multiple projectiles per ability.
 		// Let's get the data for ability projectiles first.
 		const projectileData = Abilities[type].projectileData;
@@ -43,11 +44,12 @@ export default class AbilityHelper {
 				origin.currentFacing
 			);
 			if (projectileData?.targeting) {
-				effect.allowedTargets = origin.faction === Faction.PLAYER ?
+				(effect as TargetingEffect).allowedTargets = origin.faction === Faction.PLAYER ?
 					PossibleTargets.ENEMIES :
-					PossibleTargets.PLAYER; 
+					PossibleTargets.PLAYER;
 			}
 			effect.setVelocity(xMultiplier, yMultiplier);
+			effect.setMaxVelocity(projectileData!.velocity);
 			effect.body.velocity.scale(projectileData!.velocity);
 
 			effect.setDrag(projectileData!.drag || 0);
@@ -72,6 +74,15 @@ export default class AbilityHelper {
 				collidingEffect.destroy();
 				const enemy = target as CharacterToken;
 				enemy.stateObject.health -= (origin.damage * Abilities[type].damageMultiplier);
+				if (projectileData?.knockback) {
+					enemy.lastMovedTimestamp = globalTime;
+					const angle = Phaser.Math.Angle.Between(
+						effect.x, effect.y,
+						enemy.x, enemy.y);
+					enemy.setVelocity(
+						Math.cos(angle) * projectileData.knockback,
+						Math.sin(angle) * projectileData.knockback);
+				}
 				if (projectileData?.collisionSound) {
 					this.scene.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
 				}
@@ -93,16 +104,16 @@ export default class AbilityHelper {
 		}
 	}
 
-	update(castAbilities: AbilityType[]) {
+	update(time: number, castAbilities: AbilityType[]) {
 		castAbilities.forEach((ability) => {
-			this.triggerAbility(globalState.playerCharacter, ability);
+			this.triggerAbility(globalState.playerCharacter, ability, time);
 		});
 
 		this.abilityEffects = this.abilityEffects.filter(
 			(effect) => !effect.destroyed
 		);
 		this.abilityEffects.forEach((effect) => {
-			effect.update();
+			effect.update(time);
 		});
 	}
 }

@@ -6,6 +6,10 @@ export interface ItemData {
 	iconFrame: number;
 }
 
+export interface CatalystItem extends ItemData {
+	catalystType: Catalyst;
+}
+
 export interface AbilityLinkedItem extends ItemData {
 	ability: AbilityType;
 }
@@ -38,7 +42,7 @@ export const SourceData = {
 		iconFrame: 25,
 	} as AbilityLinkedItem,
 	[Source.FORCE]: {
-		ability: AbilityType.ICESPIKE,
+		ability: AbilityType.ARCANE_BOLT,
 		name: 'Force Source',
 		description: `Invisible forces batter your enemies and throws them back. ` +
 			`They won't even see what's coming.`,
@@ -55,29 +59,29 @@ export const enum Catalyst {
 
 export const CatalystData = {
 	[Catalyst.CONE]: {
-		ability: AbilityType.FIREBALL,
+		catalystType: Catalyst.CONE,
 		name: 'Cone Catalyst',
 		description: 'Pushes your power out in front of you in a directed blast.',
 		iconFrame: 32
-	} as AbilityLinkedItem,
+	} as CatalystItem,
 	[Catalyst.NOVA]: {
-		ability: AbilityType.ICESPIKE,
+		catalystType: Catalyst.NOVA,
 		name: 'Nova Catalyst',
 		description: 'Releases your energy in wave, streaming out in all directions.',
 		iconFrame: 33
-	} as AbilityLinkedItem,
+	} as CatalystItem,
 	[Catalyst.STORM]: {
-		ability: AbilityType.DUSTNOVA,
+		catalystType: Catalyst.STORM,
 		name: 'Storm Catalyst',
 		description: 'Homing projectiles shoot out of your source and hunt your enemies.',
 		iconFrame: 34
-	} as AbilityLinkedItem,
+	} as CatalystItem,
 	[Catalyst.SUMMON]: {
-		ability: AbilityType.ROUND_HOUSE_KICK,
+		catalystType: Catalyst.SUMMON,
 		name: 'Summon Catalyst',
 		description: 'Summons your energy into a self containing force, lending you a helping hand.',
 		iconFrame: 35
-	} as AbilityLinkedItem
+	} as CatalystItem
 };
 
 export const enum Ring {

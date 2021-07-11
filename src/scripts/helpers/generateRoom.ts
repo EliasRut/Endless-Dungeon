@@ -1,4 +1,4 @@
-import { Opening, Room, Scripting } from '../../../typings/custom';
+import { NpcPositioning, Opening, Room, Scripting } from '../../../typings/custom';
 import { generateTilemap } from './drawDungeon';
 
 export const BLOCK_SIZE = 8;
@@ -184,13 +184,13 @@ export default class RoomGenerator {
 
 			// NOTE: This is commented out decrease the number of entrances on average.
 			// Make sure that each orientation is selected only once.
-			// for(let i=0;i<entranceCnt;i++) {
-			// 	if(orientations.includes(orient)) {
-			// 		orient = orient === 3 ? 0 : orient+1;
-			// 	} else {
-			// 		break;
-			// 	}
-			// }
+			for(let i=0;i<entranceCnt;i++) {
+				if(orientations.includes(orient)) {
+					orient = orient === 3 ? 0 : orient+1;
+				} else {
+					break;
+				}
+			}
 
 			// Get the string representation of the orientation and push it 
 			// to the list of entrances to be created.
@@ -233,8 +233,8 @@ export default class RoomGenerator {
 					acutalWidth = room[0].length/BLOCK_SIZE;
 					orientation.push([Math.floor(actualHeight/2),-1, orientationMap[roomOrientation]]);
 					break;
-				default: 
-			} 
+				default:
+			}
 		}
 
 		/* We need an opening in the room for to be connected to any other room.
@@ -253,7 +253,6 @@ export default class RoomGenerator {
 		console.log('Creating ' + roomName + ' of size ' + roomHeight + h1 + 'x' + roomWidth + w1);
 		// end Console output
 
-
 		// let debugOutput = '';
 		// for(let i=0;i<room.length;i++) {
 		// 	for(let j=0;j<room[i].length;j++) {
@@ -267,16 +266,14 @@ export default class RoomGenerator {
 
 		// console.log(debugOutput);
 
-		const ret: {tileset: string,
-								layout: number[][],
-								openings: Opening[],
-								name: string,
-								scripts: Scripting} = {
+		const ret: Room = {
 				tileset: roomTileset,
 				layout: room,
 				openings: orientation.slice(1) as Opening[],
 				name: roomName,
-				scripts: {} as Scripting
+				scripts: {} as Scripting,
+				// npcs,
+				// usedNpcTypes: ['enemy-zombie']
 		};
 		return ret as Room;
 	}

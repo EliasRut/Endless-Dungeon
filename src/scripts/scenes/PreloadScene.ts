@@ -1,5 +1,5 @@
 import { getUrlParam } from '../helpers/browserState';
-import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames } from '../helpers/constants';
+import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames, ColorsOfMagic, enemyBudgetCost } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 
@@ -224,12 +224,21 @@ export default class PreloadScene extends Phaser.Scene {
 					parseInt(globalState.currentLevel.substr(-1), 10) :
 					-1;
 
+			const levelData = globalState.roomAssignment[globalState.currentLevel];
 			const dungeonLevel = new DungeonGenerator().generateLevel(
 				globalState.currentLevel,
-				globalState.roomAssignment[globalState.currentLevel].rooms,
-				numericLevel
+				numericLevel,
+				{
+					title: levelData.title,
+					rooms: levelData.rooms,
+					width: levelData.width,
+					height: levelData.height,
+					enemyBudget: levelData.enemyBudget || 0,
+					numberOfRooms: levelData.numberOfRooms || 0,
+					style: levelData.style || ColorsOfMagic.DEATH
+				}
 			);
-			
+
 			globalState.dungeon.levels[globalState.currentLevel] = dungeonLevel;
 		}
 

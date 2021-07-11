@@ -16,8 +16,9 @@ import { isEquippable } from '../helpers/inventory';
 import EquippableItem from '../worldstate/EquippableItem';
 import globalState from '../worldstate';
 import MainScene from '../scenes/MainScene';
-import { AbilityLinkedItem } from '../../items/itemData';
+import { AbilityLinkedItem, CatalystItem } from '../../items/itemData';
 import { updateAbility } from '../worldstate/PlayerCharacter';
+import { getCatalystAbility } from '../helpers/item';
 
 const INVENTORY_START_X = 500;
 const INVENTORY_START_Y = 198;
@@ -64,7 +65,10 @@ const EQUIPMENT_SLOT_TO_ABILITY_KEY = {
 
 export const ABILITY_TO_ICON = {
 	[AbilityType.FIREBALL]: ['icon-abilities', 0],
+	[AbilityType.ARCANE_BOLT]: ['icon-abilities', 1],
+	[AbilityType.HAIL_OF_BOLTS]: ['icon-abilities', 1],
 	[AbilityType.HAIL_OF_FLAMES]: ['icon-abilities', 0],
+	[AbilityType.HAIL_OF_ICE]: ['icon-abilities', 1],
 	[AbilityType.ICESPIKE]: ['icon-abilities', 1],
 	[AbilityType.DUSTNOVA]: ['icon-abilities', 2],
 	[AbilityType.ROUND_HOUSE_KICK]: ['icon-abilities', 2],
@@ -172,8 +176,19 @@ export default class InventoryScreen extends OverlayScreen {
 					}
 					return;
 				}
-				const abilityLinkedItem = equippedItems[slotKey]!.data as AbilityLinkedItem;
-				const ability = abilityLinkedItem.ability;
+				let ability: AbilityType;
+				if (slotKey === EquipmentSlot.OFF_HAND) {
+					const catalystItem = equippedItems[slotKey]!.data as CatalystItem;
+
+					const baseAbility = equippedItems.mainhand ?
+						(equippedItems.mainhand.data as AbilityLinkedItem).ability :
+						AbilityType.FIREBALL;
+					ability = getCatalystAbility(baseAbility, catalystItem);
+				} else {
+					const abilityLinkedItem = equippedItems[slotKey]!.data as AbilityLinkedItem;
+					ability = abilityLinkedItem.ability;
+				}
+
 				const abilityIcon = this.createAbilityIcon(slotKey, ability);
 				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 				this.abilityIconMap[slotKey] = abilityIcon;
@@ -220,10 +235,12 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 	addToInventory(item: Item) {
 		const [x, y] = placeItemInNextFreeBagSlot(item);
-		this.createItemToken(
+		if (x >= 0) this.createItemToken(
 			item,
 			BAG_START_X + x * BOX_SIZE,
 			BAG_START_Y + y * BOX_SIZE);
+		else return false;
+		return true;
 	}
 
 	// We currently ignore amount.

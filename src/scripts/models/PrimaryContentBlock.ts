@@ -1,9 +1,16 @@
 import { ColorsOfMagic } from '../helpers/constants';
 
-export interface PrimaryContentDungeonLevelData {
+export interface PrimaryContentDungeonLevelBaseData {
 	title: string;
-	style: ColorsOfMagic;
 	rooms: string[];
+	width: number;
+	height: number;
+}
+
+export interface PrimaryContentDungeonLevelData extends PrimaryContentDungeonLevelBaseData {
+	style: ColorsOfMagic;
+	numberOfRooms: number;
+	enemyBudget: number;
 }
 
 export interface PrimaryContentBlock {

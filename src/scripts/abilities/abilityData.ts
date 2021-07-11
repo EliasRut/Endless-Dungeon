@@ -4,6 +4,7 @@ import IceSpikeEffect from '../drawables/effects/IceSpikeEffect';
 import DustNovaEffect from '../drawables/effects/DustNovaEffect';
 import RoundHouseKickEffect from '../drawables/effects/RoundHouseKickEffect';
 import HealingLightEffect from '../drawables/effects/HealingLightEffect';
+import ArcaneBoltEffect from '../drawables/effects/ArcaneBoltEffect';
 
 interface ProjectileData {
 	spread?: [number, number];
@@ -16,6 +17,7 @@ interface ProjectileData {
 	sfxVolume?: number;
 	delay?: number;
 	targeting?: boolean;
+	knockback?: number;
 }
 
 interface AbilityData {
@@ -31,7 +33,10 @@ interface AbilityData {
 export const enum AbilityType {
 	NOTHING = 'nothing',
 	FIREBALL = 'fireball',
+	ARCANE_BOLT = 'arcaneBolt',
+	HAIL_OF_BOLTS = 'hailOfBolts',
 	HAIL_OF_FLAMES = 'hailOfFlames',
+	HAIL_OF_ICE = 'hailOfIce',
 	ICESPIKE = 'icespike',
 	DUSTNOVA = 'dustnova',
 	ROUND_HOUSE_KICK = 'roundhousekick',
@@ -61,10 +66,46 @@ export const Abilities: {[type: string]: AbilityData} = {
 		damageMultiplier: 1,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`
 	},
+	[AbilityType.ARCANE_BOLT]: {
+		projectiles: 1,
+		projectileData: {
+			velocity: 600,
+			xOffset: 8,
+			yOffset: 8,
+			effect: ArcaneBoltEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			knockback: 200
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.10,
+		cooldownMs: 400,
+		damageMultiplier: 0.8,
+		flavorText: `Shooting magic missiles!`
+	},
+	[AbilityType.HAIL_OF_BOLTS]: {
+		projectiles: 5,
+		projectileData: {
+			spread: [-0.06, 0.07],
+			velocity: 600,
+			xOffset: 32,
+			yOffset: 32,
+			effect: ArcaneBoltEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			targeting: true,
+			knockback: 200
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.10,
+		cooldownMs: 1500,
+		damageMultiplier: 0.8,
+		flavorText: `Shooting magic missiles!`
+	},
 	[AbilityType.HAIL_OF_FLAMES]: {
 		projectiles: 5,
 		projectileData: {
-			spread: [-0.2, 0.25],
+			spread: [-0.15, 0.2],
 			velocity: 300,
 			xOffset: 32,
 			yOffset: 32,
@@ -75,9 +116,27 @@ export const Abilities: {[type: string]: AbilityData} = {
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
-		cooldownMs: 400,
-		damageMultiplier: 1,
+		cooldownMs: 1500,
+		damageMultiplier: 0.8,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`
+	},
+	[AbilityType.HAIL_OF_ICE]: {
+		projectiles: 5,
+		projectileData: {
+			spread: [-0.15, 0.2],
+			velocity: 400,
+			xOffset: 16,
+			yOffset: 16,
+			effect: IceSpikeEffect,
+			collisionSound: 'sound-icespike-hit',
+			sfxVolume: 0.2,
+			targeting: true
+		},
+		sound: 'sound-icespike',
+		sfxVolume: 0.3,
+		cooldownMs: 1500,
+		damageMultiplier: 0.8,
+		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`
 	},
 	[AbilityType.ICESPIKE]: {
 		projectiles: 1,
@@ -91,8 +150,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
-		cooldownMs: 1200,
-		damageMultiplier: 0.75,
+		cooldownMs: 400,
+		damageMultiplier: 0.8,
 		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`
 	},
 	[AbilityType.DUSTNOVA]: {
