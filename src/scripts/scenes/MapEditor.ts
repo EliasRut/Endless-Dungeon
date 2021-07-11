@@ -140,12 +140,24 @@ export default class MapEditor extends Phaser.Scene {
 			this.roomsDropdownElement.remove(0);
 		}
 
-		Object.keys(globalState.availableRooms).forEach((roomName) => {
-			const newOption = document.createElement('option');
-			newOption.value = roomName;
-			newOption.innerText = roomName;
-			this.roomsDropdownElement.appendChild(newOption);
-		});
+		Object.keys(this.database
+			.get()
+			.then((query) => {
+				query.forEach((roomDoc) => {
+					const newOption = document.createElement('option');
+					newOption.value = roomDoc.id;
+					newOption.innerText = roomDoc.id;
+					this.roomsDropdownElement.appendChild(newOption);
+				});
+			})
+		);
+
+		// Object.keys(globalState.availableRooms).forEach((roomName) => {
+		// 	const newOption = document.createElement('option');
+		// 	newOption.value = roomName;
+		// 	newOption.innerText = roomName;
+		// 	this.roomsDropdownElement.appendChild(newOption);
+		// });
 
 		// Prepare Base Tileset dropdown
 		while (this.tilesetDropdownElement.firstChild) {
