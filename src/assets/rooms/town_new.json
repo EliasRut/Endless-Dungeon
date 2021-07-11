@@ -17,8 +17,8 @@
 	}, {
 		"y": 69,
 		"x": 63,
-		"targetMap": "library",
-		"targetRoom": "library",
+		"targetMap": "bookshop",
+		"targetRoom": "bookshop",
 		"targetX": 13,
 		"targetY": 4
 	}, {

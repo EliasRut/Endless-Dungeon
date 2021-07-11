@@ -69,9 +69,9 @@ export class WorldState {
 			dynamicLighting: false,
 			rooms: ['tavern_new']
 		},
-		'library': {
+		'bookshop': {
 			dynamicLighting: false,
-			rooms: ['library']
+			rooms: ['bookshop']
 		},
 		'bossRoom': {
 			dynamicLighting: false,

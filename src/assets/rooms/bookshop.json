@@ -12,7 +12,7 @@
 	}],
 	"items":[],
 	"scripts": {},
-	"name": "library",
+	"name": "bookshop",
 	"tileset":"til-tavern",
 	"decorationTileset":"til-tavern-decoration",
 	"overlayTileset":"til-bookshop-decoration",
