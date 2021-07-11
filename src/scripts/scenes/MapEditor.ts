@@ -1,7 +1,12 @@
 import 'phaser';
-import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
+import { 
+	TILE_WIDTH,
+	TILE_HEIGHT 
+} from '../helpers/generateDungeon';
 import PositionText from '../drawables/ui/PositionText';
 import globalState from '../worldstate';
+import firebase from 'firebase';
+import { DatabaseRoom } from '../../../typings/custom';
 
 const TILE_SPACING = 2;
 
@@ -34,7 +39,10 @@ interface MultiLevelLayout {
 type LevelHistory = MultiLevelLayout[];
 
 export default class MapEditor extends Phaser.Scene {
-	fileData: object = {};
+	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
+	backupDatabase: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
+
+	fileData: Partial<DatabaseRoom> = {};
 	roomName: string = '';
 
 	isPointerDown: boolean = false;
@@ -101,6 +109,8 @@ export default class MapEditor extends Phaser.Scene {
 
 	constructor() {
 		super({ key: 'MapEditor' });
+		this.database = firebase.firestore().collection('rooms');
+		this.backupDatabase = firebase.firestore().collection('roomsAutoSave');
 		this.mapEditorMenuElement = document.getElementById('mapEditorMenu') as HTMLDivElement;
 		this.roomsDropdownElement = document.getElementById('roomDropdown') as HTMLSelectElement;
 		this.tilesetDropdownElement = document.getElementById('tilesetDropdown') as HTMLSelectElement;
@@ -132,12 +142,17 @@ export default class MapEditor extends Phaser.Scene {
 			this.roomsDropdownElement.remove(0);
 		}
 
-		Object.keys(globalState.availableRooms).forEach((roomName) => {
-			const newOption = document.createElement('option');
-			newOption.value = roomName;
-			newOption.innerText = roomName;
-			this.roomsDropdownElement.appendChild(newOption);
-		});
+		Object.keys(this.database
+			.get()
+			.then((query) => {
+				query.forEach((roomDoc) => {
+					const newOption = document.createElement('option');
+					newOption.value = roomDoc.id;
+					newOption.innerText = roomDoc.id;
+					this.roomsDropdownElement.appendChild(newOption);
+				});
+			})
+		);
 
 		// Prepare Base Tileset dropdown
 		while (this.tilesetDropdownElement.firstChild) {
@@ -175,10 +190,17 @@ export default class MapEditor extends Phaser.Scene {
 			this.tilesetOverlayDropdownElement.appendChild(newOption);
 		});
 
-		this.loadButtonElement.onclick = () => {
+		this.loadButtonElement.onclick = async () => {
 			const roomName = this.roomsDropdownElement.value;
 
-			const selectedRoom = globalState.availableRooms[roomName]!;
+			const selectedRoomDoc = await this.database.doc(roomName).get();
+			const databaseSelectedRoom = selectedRoomDoc.data() as DatabaseRoom;
+			const selectedRoom = {
+				...databaseSelectedRoom,
+				layout: JSON.parse(databaseSelectedRoom.layout),
+				decorations: JSON.parse(databaseSelectedRoom.decorations),
+				overlays: JSON.parse(databaseSelectedRoom.overlays),
+			}
 			this.fileData = selectedRoom;
 			this.roomNameElement.value = selectedRoom.name;
 
@@ -250,33 +272,9 @@ export default class MapEditor extends Phaser.Scene {
 		this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT, false);
 
 		this.exportButtonElement.onclick = () => {
-			const roomNameValue = this.roomNameElement.value;
+			const data = this.getExportData();
 
-			const tilesetValue = this.tilesetDropdownElement.value;
-			const decorationTilesetValue = this.tilesetDecorationDropdownElement.value;
-			const overlayTilesetValue = this.tilesetOverlayDropdownElement.value;
-
-			const fileData = {
-				openings: [],
-				npcs: [],
-				items: [],
-				scripts: [],
-				...this.fileData,
-				name: roomNameValue,
-				tileset: tilesetValue,
-				decorationTileset: decorationTilesetValue,
-				overlayTileset: overlayTilesetValue,
-				layout: this.roomLayout,
-				decorations: this.roomDecorationLayout,
-				overlays: this.roomOverlayLayout,
-			};
-
-			const dataStr = 'data:text/json;charset=utf-8,' +
-				encodeURIComponent(JSON.stringify(fileData));
-			const dlAnchorElem = document.getElementById('downloadAnchorElem') as HTMLLinkElement;
-			dlAnchorElem.setAttribute('href', dataStr);
-			dlAnchorElem.setAttribute('download', `${roomNameValue}.json`);
-			dlAnchorElem.click();
+			this.database.doc(data.name).set(data);
 		};
 
 		this.activeLayerDropdownElement.onchange = () => {
@@ -370,102 +368,102 @@ export default class MapEditor extends Phaser.Scene {
 	}
 
 	drawTileSet() {
-			if (this.libraryLayer) {
-				this.libraryLayer.destroy(true);
+		if (this.libraryLayer) {
+			this.libraryLayer.destroy(true);
+		}
+		if (this.backgroundLibraryLayer) {
+			this.backgroundLibraryLayer.destroy(true);
+		}
+		let tileSetName: string;
+		let backgroundTileSetName: string;
+		switch (this.activeLayerDropdownElement.value) {
+			case 'decoration': {
+				tileSetName = this.decorationTileSetName;
+				backgroundTileSetName = 'decoration-background';
+				break;
 			}
-			if (this.backgroundLibraryLayer) {
-				this.backgroundLibraryLayer.destroy(true);
+			case 'overlay': {
+				tileSetName = this.overlayTileSetName;
+				backgroundTileSetName = 'overlay-background';
+				break;
 			}
-			let tileSetName: string;
-			let backgroundTileSetName: string;
-			switch (this.activeLayerDropdownElement.value) {
-				case 'decoration': {
-					tileSetName = this.decorationTileSetName;
-					backgroundTileSetName = 'decoration-background';
-					break;
-				}
-				case 'overlay': {
-					tileSetName = this.overlayTileSetName;
-					backgroundTileSetName = 'overlay-background';
-					break;
-				}
-				case 'base':
-				default: {
-					tileSetName = this.tileSetName;
-					backgroundTileSetName = 'base-background';
-					break;
-				}
+			case 'base':
+			default: {
+				tileSetName = this.tileSetName;
+				backgroundTileSetName = 'base-background';
+				break;
 			}
+		}
 
-			const tileSetImage = this.textures.get(tileSetName).source[0];
-			const backgroundTileSetImage = this.textures.get(backgroundTileSetName).source[0];
-			const imageWidth = tileSetImage.width;
-			const imageHeight = tileSetImage.height;
-			const widthInTiles = Math.ceil(imageWidth / (TILE_WIDTH + TILE_SPACING));
-			const heightInTiles = Math.ceil(imageHeight / (TILE_HEIGHT + TILE_SPACING));
+		const tileSetImage = this.textures.get(tileSetName).source[0];
+		const backgroundTileSetImage = this.textures.get(backgroundTileSetName).source[0];
+		const imageWidth = tileSetImage.width;
+		const imageHeight = tileSetImage.height;
+		const widthInTiles = Math.ceil(imageWidth / (TILE_WIDTH + TILE_SPACING));
+		const heightInTiles = Math.ceil(imageHeight / (TILE_HEIGHT + TILE_SPACING));
 
-			const data: number[][] = [];
-			const backgroundData: number[][] = [];
+		const data: number[][] = [];
+		const backgroundData: number[][] = [];
 
-			for (let y = 0; y < heightInTiles; y++) {
-				data[y] = [];
-				backgroundData[y] = [];
-				for (let x = 0; x < widthInTiles; x++) {
-					data[y][x] = y * widthInTiles + x;
-					// backgroundData repeats for every line, so we only care about the x, not the y position
-					backgroundData[y][x] = x;
-				}
+		for (let y = 0; y < heightInTiles; y++) {
+			data[y] = [];
+			backgroundData[y] = [];
+			for (let x = 0; x < widthInTiles; x++) {
+				data[y][x] = y * widthInTiles + x;
+				// backgroundData repeats for every line, so we only care about the x, not the y position
+				backgroundData[y][x] = x;
 			}
-			const map = this.make.tilemap({
-				data,
-				tileWidth: TILE_WIDTH,
-				tileHeight: TILE_HEIGHT,
+		}
+		const map = this.make.tilemap({
+			data,
+			tileWidth: TILE_WIDTH,
+			tileHeight: TILE_HEIGHT,
+		});
+		const tileSet = map.addTilesetImage(
+			`${tileSetName}-lib`,
+			tileSetName,
+			TILE_WIDTH,
+			TILE_HEIGHT,
+			1,
+			2
+		);
+		this.libraryLayer = map.createLayer(0, tileSet, 0, 0).setInteractive();
+		this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
+		this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
+			this.selectedTileValues = undefined;
+			this.libraryLayer.forEachTile((tile) => {
+				tile.clearAlpha();
 			});
-			const tileSet = map.addTilesetImage(
-				`${tileSetName}-lib`,
-				tileSetName,
-				TILE_WIDTH,
-				TILE_HEIGHT,
-				1,
-				2
-			);
-			this.libraryLayer = map.createLayer(0, tileSet, 0, 0).setInteractive();
-			this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
-			this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
-				this.selectedTileValues = undefined;
-				this.libraryLayer.forEachTile((tile) => {
-					tile.clearAlpha();
-				});
-				const clickX = pointer.downX - this.libraryLayer.x;
-				const clickY = pointer.downY - this.libraryLayer.y;
-				const tileX = Math.floor(clickX / TILE_WIDTH);
-				const tileY = Math.floor(clickY / TILE_HEIGHT);
-				const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
-				if (clickedTile) {
-					this.selectedId = clickedTile.index;
-					this.mapEditorHighlighting.x = clickedTile.x * TILE_WIDTH + (TILE_WIDTH / 2);
-					this.mapEditorHighlighting.y = clickedTile.y * TILE_HEIGHT + (TILE_HEIGHT / 2);
-				}
-			});
-			this.libraryLayer.setScrollFactor(0, 0);
+			const clickX = pointer.downX - this.libraryLayer.x;
+			const clickY = pointer.downY - this.libraryLayer.y;
+			const tileX = Math.floor(clickX / TILE_WIDTH);
+			const tileY = Math.floor(clickY / TILE_HEIGHT);
+			const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
+			if (clickedTile) {
+				this.selectedId = clickedTile.index;
+				this.mapEditorHighlighting.x = clickedTile.x * TILE_WIDTH + (TILE_WIDTH / 2);
+				this.mapEditorHighlighting.y = clickedTile.y * TILE_HEIGHT + (TILE_HEIGHT / 2);
+			}
+		});
+		this.libraryLayer.setScrollFactor(0, 0);
 
-			const backgroundMap = this.make.tilemap({
-				data: backgroundData,
-				tileWidth: TILE_WIDTH,
-				tileHeight: TILE_HEIGHT,
-			});
-			const backgroundTileSet = backgroundMap.addTilesetImage(
-				`${backgroundTileSetName}-lib`,
-				backgroundTileSetName,
-				TILE_WIDTH,
-				TILE_HEIGHT,
-				1,
-				2
-			);
-			this.backgroundLibraryLayer =
-				backgroundMap.createLayer(0, backgroundTileSet, 0, 0).setInteractive();
-			this.backgroundLibraryLayer.setDepth(DEPTHS.libraryBackgroundLayer);
-			this.backgroundLibraryLayer.setScrollFactor(0, 0);
+		const backgroundMap = this.make.tilemap({
+			data: backgroundData,
+			tileWidth: TILE_WIDTH,
+			tileHeight: TILE_HEIGHT,
+		});
+		const backgroundTileSet = backgroundMap.addTilesetImage(
+			`${backgroundTileSetName}-lib`,
+			backgroundTileSetName,
+			TILE_WIDTH,
+			TILE_HEIGHT,
+			1,
+			2
+		);
+		this.backgroundLibraryLayer =
+			backgroundMap.createLayer(0, backgroundTileSet, 0, 0).setInteractive();
+		this.backgroundLibraryLayer.setDepth(DEPTHS.libraryBackgroundLayer);
+		this.backgroundLibraryLayer.setScrollFactor(0, 0);
 	}
 
 	getDataFromClick (
@@ -500,6 +498,8 @@ export default class MapEditor extends Phaser.Scene {
 		if (this.tilesetHistory.length > 100) {
 			this.tilesetHistory.shift();
 		}
+
+		this.autoSave();
 	}
 
 	endSelection(wasCtrlPressed: boolean) {
@@ -740,7 +740,6 @@ export default class MapEditor extends Phaser.Scene {
 	}
 
 	update(globalTime: number, delta: number) {
-
 		const pointerPosX = this.input.activePointer.worldX;
 		const tileX = Math.floor((pointerPosX - this.tileLayer.x) / TILE_WIDTH);
 		const pointerPosY = this.input.activePointer.worldY;
@@ -840,5 +839,38 @@ export default class MapEditor extends Phaser.Scene {
 		// tslint:enable
 
 		this.cameras.main.centerOn(this.cameraPositionX, this.cameraPositionY);
+	}
+
+	getExportData() {
+		const roomNameValue = this.roomNameElement.value;
+
+		const tilesetValue = this.tilesetDropdownElement.value;
+		const decorationTilesetValue = this.tilesetDecorationDropdownElement.value;
+		const overlayTilesetValue = this.tilesetOverlayDropdownElement.value;
+
+		return {
+			npcs: [],
+			items: [],
+			scripts: [],
+			...this.fileData,
+			openings: JSON.stringify(this.fileData.openings || []),
+			name: roomNameValue,
+			tileset: tilesetValue,
+			decorationTileset: decorationTilesetValue,
+			overlayTileset: overlayTilesetValue,
+			layout: JSON.stringify(this.roomLayout),
+			decorations: JSON.stringify(this.roomDecorationLayout),
+			overlays: JSON.stringify(this.roomOverlayLayout),
+		};
+	}
+
+	autoSave() {
+		const data = this.getExportData();
+
+		if (!data.name) {
+			return;
+		}
+
+		this.backupDatabase.doc(data.name).set(data);
 	}
 }
