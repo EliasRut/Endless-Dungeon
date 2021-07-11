@@ -179,7 +179,6 @@ export default class InventoryScreen extends OverlayScreen {
 			else return;
 		}
 		const uneqippedItemList = getUnequippedItemsWithPositions();
-		if (uneqippedItemList.length == 0) return;
 
 		let item = this.getNextBagItem(direction);
 		if (item == this.focusedItem) return;
