@@ -1,5 +1,5 @@
 import 'phaser';
-import { BodyPalleteColor, bodyPalleteColors, BodyPalleteLookupData, hexRegex, hexToRgb, hexToSourceRgb, hexToTargetRgb, HairPalleteLookupData, hairPalleteColors, HairPalleteColor } from '../helpers/colors';
+import { BodyPalleteColor, bodyPalleteColors, BodyPalleteLookupData, hexRegex, hexToRgb, hexToSourceRgb, hexToTargetRgb, FourColorPalleteLookupData, hairPalleteColors, HairPalleteColor, shirtPalleteColors, pantsPalleteColors } from '../helpers/colors';
 
 const DEPTHS = {
 	figureLayer: 1,
@@ -21,7 +21,9 @@ const npcs = {
 export default class NpcEditor extends Phaser.Scene {
 	palleteLookup: {
 		body: BodyPalleteLookupData,
-		hair: HairPalleteLookupData
+		hair: FourColorPalleteLookupData,
+		shirt: FourColorPalleteLookupData,
+		pants: FourColorPalleteLookupData
 	} = {
 		body: {
 			baseColor1: {...hexToSourceRgb(bodyPalleteColors['body-1'].baseColor1)!},
@@ -34,6 +36,18 @@ export default class NpcEditor extends Phaser.Scene {
 			color2: {...hexToSourceRgb(hairPalleteColors['hair-1'].color2)!},
 			color3: {...hexToSourceRgb(hairPalleteColors['hair-1'].color3)!},
 			color4: {...hexToSourceRgb(hairPalleteColors['hair-1'].color4)!}
+		},
+		shirt: {
+			color1: {...hexToSourceRgb(shirtPalleteColors['shirt-1'].color1)!},
+			color2: {...hexToSourceRgb(shirtPalleteColors['shirt-1'].color2)!},
+			color3: {...hexToSourceRgb(shirtPalleteColors['shirt-1'].color3)!},
+			color4: {...hexToSourceRgb(shirtPalleteColors['shirt-1'].color4)!}
+		},
+		pants: {
+			color1: {...hexToSourceRgb(pantsPalleteColors['pants-1'].color1)!},
+			color2: {...hexToSourceRgb(pantsPalleteColors['pants-1'].color2)!},
+			color3: {...hexToSourceRgb(pantsPalleteColors['pants-1'].color3)!},
+			color4: {...hexToSourceRgb(pantsPalleteColors['pants-1'].color4)!}
 		}
 	};
 
@@ -55,6 +69,18 @@ export default class NpcEditor extends Phaser.Scene {
 	hairColor3InputElement: HTMLInputElement;
 	hairColor4InputElement: HTMLInputElement;
 
+	// Shirt colors
+	shirtColor1InputElement: HTMLInputElement;
+	shirtColor2InputElement: HTMLInputElement;
+	shirtColor3InputElement: HTMLInputElement;
+	shirtColor4InputElement: HTMLInputElement;
+
+	// Pants colors
+	pantsColor1InputElement: HTMLInputElement;
+	pantsColor2InputElement: HTMLInputElement;
+	pantsColor3InputElement: HTMLInputElement;
+	pantsColor4InputElement: HTMLInputElement;
+
 	bodyLayer: Phaser.GameObjects.Image;
 	hairLayer: Phaser.GameObjects.Image;
 	shirtLayer: Phaser.GameObjects.Image;
@@ -68,6 +94,7 @@ export default class NpcEditor extends Phaser.Scene {
 		this.shirtDropdownElement = document.getElementById('shirtDropdown') as HTMLSelectElement;
 		this.pantsDropdownElement = document.getElementById('pantsDropdown') as HTMLSelectElement;
 
+		// Body Inputs
 		this.bodyColor1InputElement = document.getElementById('bodyColor1') as HTMLInputElement;
 		this.bodyColor2InputElement = document.getElementById('bodyColor2') as HTMLInputElement;
 		this.eyeColorInputElement = document.getElementById('eyeColor') as HTMLInputElement;
@@ -83,6 +110,7 @@ export default class NpcEditor extends Phaser.Scene {
 		this.eyeColorInputElement.onchange = () => this.updateImage();
 		this.bodyOutlineInputElement.onchange = () => this.updateImage();
 
+		// Hair Inputs
 		this.hairColor1InputElement = document.getElementById('hairColor1') as HTMLInputElement;
 		this.hairColor2InputElement = document.getElementById('hairColor2') as HTMLInputElement;
 		this.hairColor3InputElement = document.getElementById('hairColor3') as HTMLInputElement;
@@ -97,6 +125,38 @@ export default class NpcEditor extends Phaser.Scene {
 		this.hairColor2InputElement.onchange = () => this.updateImage();
 		this.hairColor3InputElement.onchange = () => this.updateImage();
 		this.hairColor4InputElement.onchange = () => this.updateImage();
+
+		// Shirt Inputs
+		this.shirtColor1InputElement = document.getElementById('shirtColor1') as HTMLInputElement;
+		this.shirtColor2InputElement = document.getElementById('shirtColor2') as HTMLInputElement;
+		this.shirtColor3InputElement = document.getElementById('shirtColor3') as HTMLInputElement;
+		this.shirtColor4InputElement = document.getElementById('shirtColor4') as HTMLInputElement;
+
+		this.shirtColor1InputElement.value = '#' + shirtPalleteColors['shirt-1'].color1;
+		this.shirtColor2InputElement.value = '#' + shirtPalleteColors['shirt-1'].color2;
+		this.shirtColor3InputElement.value = '#' + shirtPalleteColors['shirt-1'].color3;
+		this.shirtColor4InputElement.value = '#' + shirtPalleteColors['shirt-1'].color4;
+
+		this.shirtColor1InputElement.onchange = () => this.updateImage();
+		this.shirtColor2InputElement.onchange = () => this.updateImage();
+		this.shirtColor3InputElement.onchange = () => this.updateImage();
+		this.shirtColor4InputElement.onchange = () => this.updateImage();
+
+		// Pants Inputs
+		this.pantsColor1InputElement = document.getElementById('pantsColor1') as HTMLInputElement;
+		this.pantsColor2InputElement = document.getElementById('pantsColor2') as HTMLInputElement;
+		this.pantsColor3InputElement = document.getElementById('pantsColor3') as HTMLInputElement;
+		this.pantsColor4InputElement = document.getElementById('pantsColor4') as HTMLInputElement;
+
+		this.pantsColor1InputElement.value = '#' + pantsPalleteColors['pants-1'].color1;
+		this.pantsColor2InputElement.value = '#' + pantsPalleteColors['pants-1'].color2;
+		this.pantsColor3InputElement.value = '#' + pantsPalleteColors['pants-1'].color3;
+		this.pantsColor4InputElement.value = '#' + pantsPalleteColors['pants-1'].color4;
+
+		this.pantsColor1InputElement.onchange = () => this.updateImage();
+		this.pantsColor2InputElement.onchange = () => this.updateImage();
+		this.pantsColor3InputElement.onchange = () => this.updateImage();
+		this.pantsColor4InputElement.onchange = () => this.updateImage();
 
 
 	}
@@ -165,17 +225,15 @@ export default class NpcEditor extends Phaser.Scene {
 
 		this.textures.get('body-temp')?.destroy();
 		this.textures.get('body-canvas')?.destroy();
-		// Create a canvas to draw new image data onto.
+
 		let canvasTexture = this.textures.createCanvas('body-canvas', 320, 240);
 		let canvas = canvasTexture.getSourceImage() as HTMLCanvasElement;
 		let context = canvas.getContext('2d')!;
 
 		let tmpImageData = this.textures.get('body-1').getSourceImage() as any;
 
-		// Copy the sheet.
 		context.drawImage(tmpImageData, 0, 0);
 
-		// Get image data from the new sheet.
 		let imageData = context.getImageData(0, 0, 320, 240);
 
 		let pixelArray = imageData.data;
@@ -207,12 +265,12 @@ export default class NpcEditor extends Phaser.Scene {
 				});
 		}
 
-		// Put our modified pixel data back into the context.
 		context.putImageData(imageData, 0, 0);
 
 		this.textures.addCanvas('body-temp', canvasTexture.getSourceImage() as HTMLCanvasElement);
 		this.bodyLayer.setTexture('body-temp');
 
+		// Hair styling
 		this.palleteLookup.hair.color1 = {
 			...this.palleteLookup.hair.color1,
 			...hexToTargetRgb(this.hairColor1InputElement.value.substr(1))
@@ -232,17 +290,15 @@ export default class NpcEditor extends Phaser.Scene {
 
 		this.textures.get('hair-temp')?.destroy();
 		this.textures.get('hair-canvas')?.destroy();
-		// Create a canvas to draw new image data onto.
+
 		canvasTexture = this.textures.createCanvas('hair-canvas', 320, 240);
 		canvas = canvasTexture.getSourceImage() as HTMLCanvasElement;
 		context = canvas.getContext('2d')!;
 
 		tmpImageData = this.textures.get('hair-1').getSourceImage() as any;
 
-		// Copy the sheet.
 		context.drawImage(tmpImageData, 0, 0);
 
-		// Get image data from the new sheet.
 		imageData = context.getImageData(0, 0, 320, 240);
 
 		pixelArray = imageData.data;
@@ -274,10 +330,139 @@ export default class NpcEditor extends Phaser.Scene {
 				});
 		}
 
-		// Put our modified pixel data back into the context.
 		context.putImageData(imageData, 0, 0);
 
 		this.textures.addCanvas('hair-temp', canvasTexture.getSourceImage() as HTMLCanvasElement);
 		this.hairLayer.setTexture('hair-temp');
+
+		// Shirt styling
+		this.palleteLookup.shirt.color1 = {
+			...this.palleteLookup.shirt.color1,
+			...hexToTargetRgb(this.shirtColor1InputElement.value.substr(1))
+		};
+		this.palleteLookup.shirt.color2 = {
+			...this.palleteLookup.shirt.color2,
+			...hexToTargetRgb(this.shirtColor2InputElement.value.substr(1))
+		};
+		this.palleteLookup.shirt.color3 = {
+			...this.palleteLookup.shirt.color3,
+			...hexToTargetRgb(this.shirtColor3InputElement.value.substr(1))
+		};
+		this.palleteLookup.shirt.color4 = {
+			...this.palleteLookup.shirt.color4,
+			...hexToTargetRgb(this.shirtColor4InputElement.value.substr(1))
+		};
+
+		this.textures.get('shirt-temp')?.destroy();
+		this.textures.get('shirt-canvas')?.destroy();
+
+		canvasTexture = this.textures.createCanvas('shirt-canvas', 320, 240);
+		canvas = canvasTexture.getSourceImage() as HTMLCanvasElement;
+		context = canvas.getContext('2d')!;
+
+		tmpImageData = this.textures.get('shirt-1').getSourceImage() as any;
+
+		context.drawImage(tmpImageData, 0, 0);
+
+		imageData = context.getImageData(0, 0, 320, 240);
+
+		pixelArray = imageData.data;
+
+		// Iterate through every pixel in the image.
+		for (let p = 0; p < pixelArray.length / 4; p++) {
+				let index = 4 * p;
+
+				const r = pixelArray[index];
+				const g = pixelArray[++index];
+				const b = pixelArray[++index];
+				const alpha = pixelArray[++index];
+
+				// If this is a transparent pixel, ignore, move on.
+				if (alpha === 0) {
+					continue;
+				}
+
+				Object.keys(this.palleteLookup.shirt).forEach((palleteName) => {
+					const {sr, sg, sb, tr, tg, tb} = this.palleteLookup.shirt[palleteName as HairPalleteColor];
+					if (tr === undefined || tg === undefined || tb === undefined) {
+						return;
+					}
+					if (r === sr && g === sg && b === sb && alpha === 255) {
+						pixelArray[--index] = tb;
+						pixelArray[--index] = tg;
+						pixelArray[--index] = tr;
+					}
+				});
+		}
+
+		context.putImageData(imageData, 0, 0);
+
+		this.textures.addCanvas('shirt-temp', canvasTexture.getSourceImage() as HTMLCanvasElement);
+		this.shirtLayer.setTexture('shirt-temp');
+
+		// Pants styling
+		this.palleteLookup.pants.color1 = {
+			...this.palleteLookup.pants.color1,
+			...hexToTargetRgb(this.pantsColor1InputElement.value.substr(1))
+		};
+		this.palleteLookup.pants.color2 = {
+			...this.palleteLookup.pants.color2,
+			...hexToTargetRgb(this.pantsColor2InputElement.value.substr(1))
+		};
+		this.palleteLookup.pants.color3 = {
+			...this.palleteLookup.pants.color3,
+			...hexToTargetRgb(this.pantsColor3InputElement.value.substr(1))
+		};
+		this.palleteLookup.pants.color4 = {
+			...this.palleteLookup.pants.color4,
+			...hexToTargetRgb(this.pantsColor4InputElement.value.substr(1))
+		};
+
+		this.textures.get('pants-temp')?.destroy();
+		this.textures.get('pants-canvas')?.destroy();
+
+		canvasTexture = this.textures.createCanvas('pants-canvas', 320, 240);
+		canvas = canvasTexture.getSourceImage() as HTMLCanvasElement;
+		context = canvas.getContext('2d')!;
+
+		tmpImageData = this.textures.get('pants-1').getSourceImage() as any;
+
+		context.drawImage(tmpImageData, 0, 0);
+
+		imageData = context.getImageData(0, 0, 320, 240);
+
+		pixelArray = imageData.data;
+
+		// Iterate through every pixel in the image.
+		for (let p = 0; p < pixelArray.length / 4; p++) {
+				let index = 4 * p;
+
+				const r = pixelArray[index];
+				const g = pixelArray[++index];
+				const b = pixelArray[++index];
+				const alpha = pixelArray[++index];
+
+				// If this is a transparent pixel, ignore, move on.
+				if (alpha === 0) {
+					continue;
+				}
+
+				Object.keys(this.palleteLookup.pants).forEach((palleteName) => {
+					const {sr, sg, sb, tr, tg, tb} = this.palleteLookup.pants[palleteName as HairPalleteColor];
+					if (tr === undefined || tg === undefined || tb === undefined) {
+						return;
+					}
+					if (r === sr && g === sg && b === sb && alpha === 255) {
+						pixelArray[--index] = tb;
+						pixelArray[--index] = tg;
+						pixelArray[--index] = tr;
+					}
+				});
+		}
+
+		context.putImageData(imageData, 0, 0);
+
+		this.textures.addCanvas('pants-temp', canvasTexture.getSourceImage() as HTMLCanvasElement);
+		this.pantsLayer.setTexture('pants-temp');
 	}
 }

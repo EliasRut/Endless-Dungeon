@@ -80,7 +80,7 @@ export interface BodyPalleteLookupData {
 	eyeColor: PalleteLookupEntry;
 }
 
-export interface HairPalleteLookupData {
+export interface FourColorPalleteLookupData {
 	color1: PalleteLookupEntry;
 	color2: PalleteLookupEntry;
 	color3: PalleteLookupEntry;
@@ -102,6 +102,24 @@ export const hairPalleteColors = {
 		color2: '6e6e6e',
 		color3: '4b4b4b',
 		color4: '1a1a1a'
+	}
+};
+
+export const shirtPalleteColors = {
+	'shirt-1': {
+		color1: '407c50',
+		color2: '204b30',
+		color3: '001b10',
+		color4: 'ffffff'
+	}
+};
+
+export const pantsPalleteColors = {
+	'pants-1': {
+		color1: '4e416b',
+		color2: '201c30',
+		color3: '473022',
+		color4: '0c0f14'
 	}
 };
 
