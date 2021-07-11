@@ -73,10 +73,10 @@ export default class NpcEditor extends Phaser.Scene {
 		this.eyeColorInputElement = document.getElementById('eyeColor') as HTMLInputElement;
 		this.bodyOutlineInputElement = document.getElementById('bodyOutlineColor') as HTMLInputElement;
 
-		this.bodyColor1InputElement.value = bodyPalleteColors['body-1'].baseColor1;
-		this.bodyColor2InputElement.value = bodyPalleteColors['body-1'].baseColor2;
-		this.eyeColorInputElement.value = bodyPalleteColors['body-1'].outlineColor;
-		this.bodyOutlineInputElement.value = bodyPalleteColors['body-1'].eyeColor;
+		this.bodyColor1InputElement.value = '#' + bodyPalleteColors['body-1'].baseColor1;
+		this.bodyColor2InputElement.value = '#' + bodyPalleteColors['body-1'].baseColor2;
+		this.eyeColorInputElement.value = '#' + bodyPalleteColors['body-1'].outlineColor;
+		this.bodyOutlineInputElement.value = '#' + bodyPalleteColors['body-1'].eyeColor;
 
 		this.bodyColor1InputElement.onchange = () => this.updateImage();
 		this.bodyColor2InputElement.onchange = () => this.updateImage();
@@ -88,10 +88,10 @@ export default class NpcEditor extends Phaser.Scene {
 		this.hairColor3InputElement = document.getElementById('hairColor3') as HTMLInputElement;
 		this.hairColor4InputElement = document.getElementById('hairColor4') as HTMLInputElement;
 
-		this.hairColor1InputElement.value = hairPalleteColors['hair-1'].color1;
-		this.hairColor2InputElement.value = hairPalleteColors['hair-1'].color2;
-		this.hairColor3InputElement.value = hairPalleteColors['hair-1'].color3;
-		this.hairColor4InputElement.value = hairPalleteColors['hair-1'].color4;
+		this.hairColor1InputElement.value = '#' + hairPalleteColors['hair-1'].color1;
+		this.hairColor2InputElement.value = '#' + hairPalleteColors['hair-1'].color2;
+		this.hairColor3InputElement.value = '#' + hairPalleteColors['hair-1'].color3;
+		this.hairColor4InputElement.value = '#' + hairPalleteColors['hair-1'].color4;
 
 		this.hairColor1InputElement.onchange = () => this.updateImage();
 		this.hairColor2InputElement.onchange = () => this.updateImage();
@@ -136,31 +136,31 @@ export default class NpcEditor extends Phaser.Scene {
 	}
 
 	updateImage() {
-		if (!hexRegex.test(this.bodyColor1InputElement.value)) return;
-		if (!hexRegex.test(this.bodyColor2InputElement.value)) return;
-		if (!hexRegex.test(this.eyeColorInputElement.value)) return;
-		if (!hexRegex.test(this.bodyOutlineInputElement.value)) return;
+		if (!hexRegex.test(this.bodyColor1InputElement.value.substr(1))) return;
+		if (!hexRegex.test(this.bodyColor2InputElement.value.substr(1))) return;
+		if (!hexRegex.test(this.eyeColorInputElement.value.substr(1))) return;
+		if (!hexRegex.test(this.bodyOutlineInputElement.value.substr(1))) return;
 
-		if (!hexRegex.test(this.hairColor1InputElement.value)) return;
-		if (!hexRegex.test(this.hairColor2InputElement.value)) return;
-		if (!hexRegex.test(this.hairColor3InputElement.value)) return;
-		if (!hexRegex.test(this.hairColor4InputElement.value)) return;
+		if (!hexRegex.test(this.hairColor1InputElement.value.substr(1))) return;
+		if (!hexRegex.test(this.hairColor2InputElement.value.substr(1))) return;
+		if (!hexRegex.test(this.hairColor3InputElement.value.substr(1))) return;
+		if (!hexRegex.test(this.hairColor4InputElement.value.substr(1))) return;
 
 		this.palleteLookup.body.baseColor1 = {
 			...this.palleteLookup.body.baseColor1,
-			...hexToTargetRgb(this.bodyColor1InputElement.value)
+			...hexToTargetRgb(this.bodyColor1InputElement.value.substr(1))
 		};
 		this.palleteLookup.body.baseColor2 = {
 			...this.palleteLookup.body.baseColor2,
-			...hexToTargetRgb(this.bodyColor2InputElement.value)
+			...hexToTargetRgb(this.bodyColor2InputElement.value.substr(1))
 		};
 		this.palleteLookup.body.eyeColor = {
 			...this.palleteLookup.body.eyeColor,
-			...hexToTargetRgb(this.eyeColorInputElement.value)
+			...hexToTargetRgb(this.eyeColorInputElement.value.substr(1))
 		};
 		this.palleteLookup.body.outlineColor = {
 			...this.palleteLookup.body.outlineColor,
-			...hexToTargetRgb(this.bodyOutlineInputElement.value)
+			...hexToTargetRgb(this.bodyOutlineInputElement.value.substr(1))
 		};
 
 		this.textures.get('body-temp')?.destroy();
@@ -215,19 +215,19 @@ export default class NpcEditor extends Phaser.Scene {
 
 		this.palleteLookup.hair.color1 = {
 			...this.palleteLookup.hair.color1,
-			...hexToTargetRgb(this.hairColor1InputElement.value)
+			...hexToTargetRgb(this.hairColor1InputElement.value.substr(1))
 		};
 		this.palleteLookup.hair.color2 = {
 			...this.palleteLookup.hair.color2,
-			...hexToTargetRgb(this.hairColor2InputElement.value)
+			...hexToTargetRgb(this.hairColor2InputElement.value.substr(1))
 		};
 		this.palleteLookup.hair.color3 = {
 			...this.palleteLookup.hair.color3,
-			...hexToTargetRgb(this.hairColor3InputElement.value)
+			...hexToTargetRgb(this.hairColor3InputElement.value.substr(1))
 		};
 		this.palleteLookup.hair.color4 = {
 			...this.palleteLookup.hair.color4,
-			...hexToTargetRgb(this.hairColor4InputElement.value)
+			...hexToTargetRgb(this.hairColor4InputElement.value.substr(1))
 		};
 
 		this.textures.get('hair-temp')?.destroy();
