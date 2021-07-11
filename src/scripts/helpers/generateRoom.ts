@@ -1,4 +1,4 @@
-import { Opening, Room, Scripting } from '../../../typings/custom';
+import { NpcPositioning, Opening, Room, Scripting } from '../../../typings/custom';
 import { generateTilemap } from './drawDungeon';
 
 export const BLOCK_SIZE = 8;
@@ -266,18 +266,25 @@ export default class RoomGenerator {
 
 		// console.log(debugOutput);
 
-		const npcs = [];
+		const npcs: NpcPositioning[] = [];
+		for (let x = 0; x < roomWidth; x++) {
+			for (let y = 0; y < roomHeight; y++) {
+				npcs.push({
+					type: 'zombie',
+					id: `zom-${x}-${y}`,
+					x: x * 8 + 3,
+					y: y * 8 + 3,
+				});
+			}
+		}
 
-		const ret: {tileset: string,
-								layout: number[][],
-								openings: Opening[],
-								name: string,
-								scripts: Scripting} = {
+		const ret: Room = {
 				tileset: roomTileset,
 				layout: room,
 				openings: orientation.slice(1) as Opening[],
 				name: roomName,
-				scripts: {} as Scripting
+				scripts: {} as Scripting,
+				npcs
 		};
 		return ret as Room;
 	}
