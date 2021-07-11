@@ -5,6 +5,7 @@ import MainScene from './scenes/MainScene';
 import MapEditor from './scenes/MapEditor';
 import PreloadScene from './scenes/PreloadScene';
 import RoomPreloaderScene from './scenes/RoomPreloaderScene';
+import NpcEditor from './scenes/NpcEditor';
 
 const DEFAULT_WIDTH = 640;
 const DEFAULT_HEIGHT = 360;
@@ -29,6 +30,7 @@ const config: Phaser.Types.Core.GameConfig = {
 		PreloadScene,
 		MainScene,
 		MapEditor,
+		NpcEditor,
 		DungeonDoorPreloadScene,
 		DungeonDoorScene
 	],

@@ -1,5 +1,5 @@
 import { getUrlParam } from '../helpers/browserState';
-import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames, ColorsOfMagic, enemyBudgetCost } from '../helpers/constants';
+import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames, ColorsOfMagic, enemyBudgetCost, activeMode, MODE } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 
@@ -116,8 +116,7 @@ export default class PreloadScene extends Phaser.Scene {
 		});
 
 		// If we are in map editor mode, also load the library background tilesets
-		const mapToEditId = getUrlParam('editMap');
-		if (mapToEditId) {
+		if (activeMode === MODE.MAP_EDITOR) {
 			this.load.image('base-background', 'assets/tilesets/base-background.png');
 			this.load.image('decoration-background', 'assets/tilesets/decoration-background.png');
 			this.load.image('overlay-background', 'assets/tilesets/overlay-background.png');
@@ -147,9 +146,12 @@ export default class PreloadScene extends Phaser.Scene {
 	}
 
 	create() {
-		const mapToEditId = getUrlParam('editMap');
-		if (mapToEditId) {
+		if (activeMode === MODE.MAP_EDITOR) {
 			this.scene.start('MapEditor');
+			return;
+		}
+		if (activeMode === MODE.NPC_EDITOR) {
+			this.scene.start('NpcEditor');
 			return;
 		}
 

@@ -29,7 +29,21 @@ module.exports = {
     }
   },
   plugins: [
-    new HtmlWebpackPlugin({ gameName: 'Project: Endless Dungeon', template: 'src/index.html' }),
+    new HtmlWebpackPlugin({
+      gameName: 'Project: Endless Dungeon',
+      template: 'src/index.html',
+      filename: 'index.html'
+    }),
+    new HtmlWebpackPlugin({
+      gameName: 'Project: Endless Dungeon',
+      template: 'src/mapeditor.html',
+      filename: 'mapeditor.html'
+    }),
+    new HtmlWebpackPlugin({
+      gameName: 'Project: Endless Dungeon',
+      template: 'src/npceditor.html',
+      filename: 'npceditor.html'
+    }),
     new CopyWebpackPlugin([
       { from: 'src/assets', to: 'assets' },
       { from: 'pwa', to: '' },

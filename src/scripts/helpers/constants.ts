@@ -165,3 +165,15 @@ export const enemyBudgetCost = {
 	'enemy-zombie': 1,
 	'redling-boss': 10
 };
+
+export const enum MODE {
+	GAME = 'game',
+	MAP_EDITOR = 'mapEditor',
+	NPC_EDITOR = 'npcEditor'
+}
+
+export const activeMode = window.location.pathname.endsWith('mapeditor.html') ?
+	MODE.MAP_EDITOR :
+		(window.location.pathname.endsWith('npceditor.html') ?
+			MODE.NPC_EDITOR :
+			MODE.GAME);

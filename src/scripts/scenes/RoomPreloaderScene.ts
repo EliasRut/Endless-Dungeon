@@ -1,6 +1,6 @@
 import { Room } from '../../../typings/custom';
 import { getUrlParam } from '../helpers/browserState';
-import { ColorsOfMagic } from '../helpers/constants';
+import { activeMode, ColorsOfMagic, MODE } from '../helpers/constants';
 import RoomGenerator from '../helpers/generateRoom';
 import globalState from '../worldstate';
 
@@ -24,7 +24,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 	preload() {
 		// Rooms
 		const requestedRoomId = getUrlParam('roomName');
-		const mapToEditId = getUrlParam('editMap');
+
 		if (globalState.loadGame) {
 			globalState.loadState();
 		}
@@ -48,7 +48,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 			this.usedRooms.push(...levelRoomAssignment.rooms);
 		}
 
-		if (mapToEditId) {
+		if (activeMode === MODE.MAP_EDITOR) {
 			Object.values(globalState.roomAssignment).forEach((assignment) => {
 				assignment.rooms.forEach((room) => {
 					if (!this.usedRooms.includes(room)) {
