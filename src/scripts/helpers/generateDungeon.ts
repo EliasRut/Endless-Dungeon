@@ -615,6 +615,8 @@ export default class DungeonGenerator {
 			return;
 		}
 
+		let targetOpeningIndex: number;
+
 		// Construct path.
 		let numOpenings = 1;
 		const visitedOpenings: [number, number, number, OpeningDirection][] =
@@ -659,7 +661,8 @@ export default class DungeonGenerator {
 			const sourceRoom = this.rooms[this.startRoomIndex];
 			const sourceOpening = source.slice(1) as [number, number, OpeningDirection];
 
-			const target = targetOpenings[Math.floor(Math.random() * targetOpenings.length)];
+			targetOpeningIndex = Math.floor(Math.random() * targetOpenings.length);
+			const target = targetOpenings[targetOpeningIndex];
 			const targetRoomIndex = target[0];
 			const targetRoom = this.rooms[targetRoomIndex];
 			const targetOpening = target.slice(1) as [number, number, OpeningDirection];
@@ -782,6 +785,7 @@ export default class DungeonGenerator {
 			// If findIndex doesn't find anything, it'll be -1
 			if (entryPosition === -1) {
 				visitedOpenings.push(target);
+				targetOpenings.splice(targetOpeningIndex, 1);
 			}
 		}
 	}
