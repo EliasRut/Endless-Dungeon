@@ -24,7 +24,7 @@ export default abstract class EnemyToken extends CharacterToken {
 	attackRange: number;
 	attackedAt: number = -Infinity;
 	lastUpdate: number = -Infinity;
-	aggroLinger: number = 5000;
+	aggroLinger: number = 3000;
 	aggro: boolean = false;
 	target: Phaser.Geom.Point;
 

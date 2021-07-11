@@ -31,9 +31,10 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		const distance = Math.hypot(this.x - px, this.y - py);
 		// if you run over item, put into inventory
 		if (distance < MAX_INTERACTION_DISTANCE) {
-			scene.overlayScreens.inventory.addToInventory(this.stateObject);
-			this.isDestroyed = true;
-			this.destroy(true);
+			if (scene.overlayScreens.inventory.addToInventory(this.stateObject)) {
+				this.isDestroyed = true;
+				this.destroy(true);
+			}
 		}
 		if (scene?.dynamicLightingHelper && this.tile) {
 			this.tint = this.tile?.tint;
