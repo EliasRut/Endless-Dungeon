@@ -2,6 +2,7 @@ import 'phaser';
 import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
 import PositionText from '../drawables/ui/PositionText';
 import globalState from '../worldstate';
+import firebase from 'firebase';
 
 const TILE_SPACING = 2;
 
@@ -34,6 +35,8 @@ interface MultiLevelLayout {
 type LevelHistory = MultiLevelLayout[];
 
 export default class MapEditor extends Phaser.Scene {
+	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
+
 	fileData: object = {};
 	roomName: string = '';
 
@@ -101,6 +104,7 @@ export default class MapEditor extends Phaser.Scene {
 
 	constructor() {
 		super({ key: 'MapEditor' });
+		this.database = firebase.firestore().collection('rooms');
 		this.mapEditorMenuElement = document.getElementById('mapEditorMenu') as HTMLDivElement;
 		this.roomsDropdownElement = document.getElementById('roomDropdown') as HTMLSelectElement;
 		this.tilesetDropdownElement = document.getElementById('tilesetDropdown') as HTMLSelectElement;
@@ -266,17 +270,20 @@ export default class MapEditor extends Phaser.Scene {
 				tileset: tilesetValue,
 				decorationTileset: decorationTilesetValue,
 				overlayTileset: overlayTilesetValue,
-				layout: this.roomLayout,
-				decorations: this.roomDecorationLayout,
-				overlays: this.roomOverlayLayout,
+				layout: JSON.stringify(this.roomLayout),
+				decorations: JSON.stringify(this.roomDecorationLayout),
+				overlays: JSON.stringify(this.roomOverlayLayout),
 			};
 
-			const dataStr = 'data:text/json;charset=utf-8,' +
-				encodeURIComponent(JSON.stringify(fileData));
-			const dlAnchorElem = document.getElementById('downloadAnchorElem') as HTMLLinkElement;
-			dlAnchorElem.setAttribute('href', dataStr);
-			dlAnchorElem.setAttribute('download', `${roomNameValue}.json`);
-			dlAnchorElem.click();
+			debugger;
+			this.database.doc(roomNameValue).set(fileData);
+
+			// const dataStr = 'data:text/json;charset=utf-8,' +
+			// 	encodeURIComponent(JSON.stringify(fileData));
+			// const dlAnchorElem = document.getElementById('downloadAnchorElem') as HTMLLinkElement;
+			// dlAnchorElem.setAttribute('href', dataStr);
+			// dlAnchorElem.setAttribute('download', `${roomNameValue}.json`);
+			// dlAnchorElem.click();
 		};
 
 		this.activeLayerDropdownElement.onchange = () => {
