@@ -233,8 +233,8 @@ export default class RoomGenerator {
 					acutalWidth = room[0].length/BLOCK_SIZE;
 					orientation.push([Math.floor(actualHeight/2),-1, orientationMap[roomOrientation]]);
 					break;
-				default: 
-			} 
+				default:
+			}
 		}
 
 		/* We need an opening in the room for to be connected to any other room.
@@ -253,7 +253,6 @@ export default class RoomGenerator {
 		console.log('Creating ' + roomName + ' of size ' + roomHeight + h1 + 'x' + roomWidth + w1);
 		// end Console output
 
-
 		// let debugOutput = '';
 		// for(let i=0;i<room.length;i++) {
 		// 	for(let j=0;j<room[i].length;j++) {
@@ -266,6 +265,8 @@ export default class RoomGenerator {
 		// }
 
 		// console.log(debugOutput);
+
+		const npcs = [];
 
 		const ret: {tileset: string,
 								layout: number[][],

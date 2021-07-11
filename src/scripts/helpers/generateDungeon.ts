@@ -1,13 +1,12 @@
 import { ItemsPositioning, MapConnection, NpcPositioning, OpeningDirection, Room } from '../../../typings/custom';
+import { DungeonLevelData } from '../models/DungeonRunData';
 import globalState from '../worldstate';
 import Door from '../worldstate/Door';
 import DungeonLevel from '../worldstate/DungeonLevel';
+import { colorOfMagicToTilesetMap } from './constants';
+import RoomGenerator from './generateRoom';
 
-export const DUNGEON_WIDTH = 160;
 export const BLOCK_SIZE = 8;
-export const DUNGEON_BLOCKS_X = DUNGEON_WIDTH / BLOCK_SIZE;
-export const DUNGEON_HEIGHT = 160;
-export const DUNGEON_BLOCKS_Y = DUNGEON_HEIGHT / BLOCK_SIZE;
 export const TILE_WIDTH = 16;
 export const TILE_HEIGHT = 16;
 
@@ -199,7 +198,7 @@ export default class DungeonGenerator {
 	tileSetCollections: {[name: string]: number[]};
 	tileSetGid: {[name: string]: number};
 	maxGenerationResets = 100;
-	maxRoomPlacementTries = 100;
+	maxRoomPlacementTries = 1000;
 	npcs: NpcPositioning[];
 	combinedLayout: number[][];
 	decorationLayout: number[][];
@@ -208,17 +207,35 @@ export default class DungeonGenerator {
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	dungeonLevel: number;
 
-	public generateLevel: (id: string, rooms: string[], dungeonLevel: number) => DungeonLevel =
-			(id, rooms, dungeonLevel) => {
-		this.rooms = rooms.map((roomName) => globalState.availableRooms[roomName]);
+	fillerTilest: string;
+
+	dungeonWidth: number;
+	dungeonBlocksX: number;
+	dungeonHeight: number;
+	dungeonBlocksY: number;
+
+	public generateLevel: (
+			id: string,
+			dungeonLevel: number,
+			levelData: DungeonLevelData
+		) => DungeonLevel =
+			(id, dungeonLevel, levelData) => {
+		this.rooms = levelData.rooms.map((roomName) => globalState.availableRooms[roomName]);
 		this.dungeonLevel = dungeonLevel;
 
-		// if(id !== 'town') {
-		//   const roomGen = new RoomGenerator();
-		//   const genericRoom = roomGen.generateRoom(this.rooms[0].tileset);
-		//   this.rooms.push(genericRoom);
-		//   globalState.availableRooms[genericRoom.name] = genericRoom;
-		// }
+		this.dungeonBlocksX = levelData.width;
+		this.dungeonBlocksY = levelData.height;
+		this.dungeonWidth = this.dungeonBlocksX * BLOCK_SIZE;
+		this.dungeonHeight =  this.dungeonBlocksY * BLOCK_SIZE;
+
+		this.fillerTilest = colorOfMagicToTilesetMap[levelData.style];
+
+		while (levelData.numberOfRooms > this.rooms.length) {
+			const roomGen = new RoomGenerator();
+			const genericRoom = roomGen.generateRoom(this.fillerTilest);
+			this.rooms.push(genericRoom);
+			globalState.availableRooms[genericRoom.name] = genericRoom;
+		}
 
 		this.startRoomIndex = Math.max(0, this.rooms.findIndex((room) => room.startRoom));
 		this.roomOffsets = [];
@@ -263,11 +280,11 @@ export default class DungeonGenerator {
 		this.combinedLayout = [];
 		this.decorationLayout = [];
 		this.overlayLayout = [];
-		for (let y = 0; y < DUNGEON_HEIGHT; y++) {
+		for (let y = 0; y < this.dungeonHeight; y++) {
 			this.combinedLayout[y] = [];
 			this.decorationLayout[y] = [];
 			this.overlayLayout[y] = [];
-			for (let x = 0; x < DUNGEON_WIDTH; x++) {
+			for (let x = 0; x < this.dungeonWidth; x++) {
 				this.combinedLayout[y][x] = -1;
 				this.decorationLayout[y][x] = -1;
 				this.overlayLayout[y][x] = -1;
@@ -390,9 +407,9 @@ export default class DungeonGenerator {
 
 		// We initialize the array of arrays once and then only reset it's values in
 		// tryRoomPlacement for performance reasons.
-		for (let y = 0; y < DUNGEON_BLOCKS_Y; y++) {
+		for (let y = 0; y < this.dungeonBlocksY; y++) {
 			this.tilesUsed[y] = [];
-			for (let x = 0; x < DUNGEON_BLOCKS_X; x++) {
+			for (let x = 0; x < this.dungeonBlocksX; x++) {
 				this.tilesUsed[y][x] = false;
 			}
 		}
@@ -406,17 +423,18 @@ export default class DungeonGenerator {
 			numResets++;
 		}
 
-		let debugOutput = 'tiles used for rooms\n' +
-			'   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15\n';
-		for (let y = 0; y < DUNGEON_BLOCKS_Y; y++) {
+		let debugOutput = '';
+		let firstLine = 'tiles used for rooms\n';
+		for (let y = 0; y < this.dungeonBlocksY; y++) {
+			firstLine += `${y}  `.substr(0, 3);
 			debugOutput += `${y}`.padStart(2, ' ');
-			for (let x = 0; x < DUNGEON_BLOCKS_X; x++) {
+			for (let x = 0; x < this.dungeonBlocksX; x++) {
 				debugOutput += this.tilesUsed[y][x] ? ' X ' : '   ';
 			}
 			debugOutput += '\n';
 		}
 		// tslint:disable-next-line: no-console
-		console.log(debugOutput);
+		console.log(firstLine + '\n' + debugOutput);
 
 		for (let roomIndex = 0; roomIndex < this.rooms.length; roomIndex++) {
 			const room = this.rooms[roomIndex];
@@ -430,8 +448,8 @@ export default class DungeonGenerator {
 
 	private tryRoomPlacement() {
 		// Reset the map of used blocks
-		for (let y = 0; y < DUNGEON_BLOCKS_Y; y++) {
-			for (let x = 0; x < DUNGEON_BLOCKS_X; x++) {
+		for (let y = 0; y < this.dungeonBlocksY; y++) {
+			for (let x = 0; x < this.dungeonBlocksX; x++) {
 				this.tilesUsed[y][x] = false;
 			}
 		}
@@ -439,9 +457,9 @@ export default class DungeonGenerator {
 
 		// Count how often we have tried to place a room in the dungeon, abort this function if it's
 		// above this.maxRoomPlacementTries
-		let triesInRun = 0;
 		// Go through every room and try to place it. Record it's placement position if successful.
 		for (let roomIndex = 0; roomIndex < this.rooms.length; roomIndex++) {
+			let triesInRun = 0;
 			const room = this.rooms[roomIndex];
 			let isRoomOverlappingOtherRoom = false;
 			let roomXBlockOffset;
@@ -452,8 +470,9 @@ export default class DungeonGenerator {
 			const roomHeight = Math.ceil(room.layout.length / BLOCK_SIZE);
 			// Select a random position
 			do {
-				roomXBlockOffset = 1 + Math.floor(Math.random() * (DUNGEON_BLOCKS_X - roomWidth - 2));
-				roomYBlockOffset = 1 + Math.floor(Math.random() * (DUNGEON_BLOCKS_Y - roomHeight - 2));
+				isRoomOverlappingOtherRoom = false;
+				roomXBlockOffset = 1 + Math.floor(Math.random() * (this.dungeonBlocksX - roomWidth - 2));
+				roomYBlockOffset = 1 + Math.floor(Math.random() * (this.dungeonBlocksY - roomHeight - 2));
 
 				for (let y = -1; y <= roomHeight; y ++) {
 					const rowIndex = y + roomYBlockOffset;
@@ -584,9 +603,9 @@ export default class DungeonGenerator {
 
 	private findPaths() {
 		this.blocksUsed = [];
-		for (let y = 0; y < DUNGEON_HEIGHT / BLOCK_SIZE; y++) {
+		for (let y = 0; y < this.dungeonHeight / BLOCK_SIZE; y++) {
 			this.blocksUsed[y] = [];
-			for (let x = 0; x < DUNGEON_WIDTH / BLOCK_SIZE; x++) {
+			for (let x = 0; x < this.dungeonWidth / BLOCK_SIZE; x++) {
 				this.blocksUsed[y][x] = 0;
 			}
 		}
@@ -680,9 +699,9 @@ export default class DungeonGenerator {
 				[currentBlockY, currentBlockX]
 			]];
 			const exploredBlocks: boolean[][] = [];
-			for (let y = 0; y < DUNGEON_HEIGHT / BLOCK_SIZE; y++) {
+			for (let y = 0; y < this.dungeonHeight / BLOCK_SIZE; y++) {
 				exploredBlocks[y] = [];
-				for (let x = 0; x < DUNGEON_WIDTH / BLOCK_SIZE; x++) {
+				for (let x = 0; x < this.dungeonWidth / BLOCK_SIZE; x++) {
 					exploredBlocks[y][x] = this.tilesUsed[y][x];
 				}
 			}
@@ -697,7 +716,7 @@ export default class DungeonGenerator {
 					return;
 				}
 				const [curY, curX] = history[history.length - 1];
-				if (curY < 0 || curY >= DUNGEON_BLOCKS_Y || curX < 0 || curX >= DUNGEON_BLOCKS_X) {
+				if (curY < 0 || curY >= this.dungeonBlocksY || curX < 0 || curX >= this.dungeonBlocksX) {
 					return;
 				}
 				if (exploredBlocks[curY][curX]) {
@@ -768,8 +787,8 @@ export default class DungeonGenerator {
 	}
 
 	private drawTilesForPaths() {
-		for (let blockY = 0; blockY < DUNGEON_BLOCKS_Y; blockY++) {
-			for (let blockX = 0; blockX < DUNGEON_BLOCKS_X; blockX++) {
+		for (let blockY = 0; blockY < this.dungeonBlocksY; blockY++) {
+			for (let blockX = 0; blockX < this.dungeonBlocksX; blockX++) {
 				if (this.blocksUsed[blockY][blockX]) {
 					const corridorLayoutId = this.blocksUsed[blockY][blockX] as keyof typeof CORRIDOR_LAYOUTS;
 					const blockLayout = CORRIDOR_LAYOUTS[corridorLayoutId];

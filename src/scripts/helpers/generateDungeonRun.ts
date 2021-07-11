@@ -63,11 +63,16 @@ export const generateDungeonRun: (runes: RuneAssignment) => DungeonRunData = (ru
 			rooms: [
 				...dungeonLevel.rooms,
 				...(secondaryContentRoomAssignment[level] || [])
-			]
+			],
+			width: dungeonLevel.width,
+			height: dungeonLevel.height,
+			numberOfRooms: dungeonLevel.numberOfRooms
 	}));
 
 	return {
 		levels,
-		buff: runes.playerBuff
+		buff: runes.playerBuff,
+		primaryContentBlock: selectedPrimaryContent,
+		secondaryContentBlocks
 	};
 };

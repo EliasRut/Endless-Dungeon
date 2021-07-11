@@ -1,4 +1,8 @@
-export default interface RoomAssignment {
+import { ColorsOfMagic } from '../helpers/constants';
+import { PrimaryContentDungeonLevelBaseData } from '../models/PrimaryContentBlock';
+
+export default interface RoomAssignment extends PrimaryContentDungeonLevelBaseData {
 	dynamicLighting: boolean;
-	rooms: string[];
+	style?: ColorsOfMagic;
+	numberOfRooms?: number;
 }
