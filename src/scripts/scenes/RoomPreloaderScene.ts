@@ -1,5 +1,6 @@
 import { Room } from '../../../typings/custom';
 import { getUrlParam } from '../helpers/browserState';
+import { ColorsOfMagic } from '../helpers/constants';
 import RoomGenerator from '../helpers/generateRoom';
 import globalState from '../worldstate';
 
@@ -32,7 +33,12 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 			this.usedRooms.push(requestedRoomId);
 			globalState.roomAssignment = {[`${requestedRoomId}`]: {
 				dynamicLighting: false,
-				rooms: [requestedRoomId]
+				rooms: [requestedRoomId],
+				width: 8,
+				height: 8,
+				style: ColorsOfMagic.DEATH,
+				numberOfRooms: 0,
+				title: 'Room of Requirements'
 			}};
 			globalState.currentLevel = requestedRoomId;
 		} else {

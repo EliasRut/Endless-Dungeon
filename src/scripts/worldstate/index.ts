@@ -35,61 +35,60 @@ export class WorldState {
 	public roomAssignment: {[name: string]: RoomAssignment} = {
 		'intro_dormRoom': {
 			dynamicLighting: false,
-			rooms: ['intro_dormRoom']
+			rooms: ['intro_dormRoom'],
+			width: 8,
+			height: 8,
+			title: 'Dorm room'
 		},
 		'intro_ceremony': {
 			dynamicLighting: false,
-			rooms: ['intro_ceremony']
+			rooms: ['intro_ceremony'],
+			width: 8,
+			height: 8,
+			title: 'Ceremony room'
 		},
 		'intro_dormRoom2': {
 			dynamicLighting: false,
-			rooms: ['intro_dormRoom2']
+			rooms: ['intro_dormRoom2'],
+			width: 8,
+			height: 8,
+			title: 'Dorm room'
 		},
 		'intro_road': {
 			dynamicLighting: false,
-			rooms: ['intro_road']
+			rooms: ['intro_road'],
+			width: 8,
+			height: 8,
+			title: 'Road to Bellwick'
 		},
 		'town': {
 			dynamicLighting: false,
-			rooms: ['town']
+			rooms: ['town'],
+			width: 20,
+			height: 20,
+			title: 'Bellwick'
 		},
 		'town_new': {
 			dynamicLighting: false,
-			rooms: ['town_new']
-		},
-		'doorTest': {
-			dynamicLighting: true,
-			rooms: ['firstTest', 'door_room']
-		},
-		'woodenHouse': {
-			dynamicLighting: false,
-			rooms: ['woodenHouse']
+			rooms: ['town_new'],
+			width: 20,
+			height: 20,
+			title: 'Bellwick'
 		},
 		'tavern_new': {
 			dynamicLighting: false,
-			rooms: ['tavern_new']
+			rooms: ['tavern_new'],
+			width: 8,
+			height: 8,
+			title: 'Bellwick Tavern'
 		},
 		'library': {
 			dynamicLighting: false,
-			rooms: ['library']
+			rooms: ['library'],
+			width: 8,
+			height: 8,
+			title: 'Vanyas bookshop'
 		},
-		'bossRoom': {
-			dynamicLighting: false,
-			rooms: ['bossRoom']
-		},
-		'ZombieRoom': {
-			dynamicLighting: true,
-			rooms: ['zombieRoom']
-		},
-		// 'dungeon': {
-		// 	dynamicLighting: true,
-		// 	rooms: [
-		// 		'firstTest',
-		// 		'secondTest',
-		// 		'thirdTest',
-		// 		'startRoom'
-		// 	]
-		// }
 	};
 	public inventory: Inventory;
 	public itemList: Item[];

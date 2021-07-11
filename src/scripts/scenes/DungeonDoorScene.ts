@@ -27,7 +27,12 @@ export default class DungeonDoorScene extends Phaser.Scene {
 				}
 			globalState.roomAssignment['dungeonLevel' + (level + 1)] = {
 				dynamicLighting: true,
-				rooms: rooms.concat(levelData.rooms)
+				rooms: rooms.concat(levelData.rooms),
+				width: levelData.width,
+				height: levelData.height,
+				numberOfRooms: levelData.numberOfRooms,
+				title: levelData.title,
+				style: levelData.style
 			};
 		});
 
