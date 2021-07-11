@@ -1,4 +1,5 @@
 import 'phaser';
+import firebase from 'firebase';
 import DungeonDoorPreloadScene from './scenes/DungeonDoorPreloadScene';
 import DungeonDoorScene from './scenes/DungeonDoorScene';
 import MainScene from './scenes/MainScene';
@@ -6,6 +7,18 @@ import MapEditor from './scenes/MapEditor';
 import PreloadScene from './scenes/PreloadScene';
 import RoomPreloaderScene from './scenes/RoomPreloaderScene';
 import NpcEditor from './scenes/NpcEditor';
+
+var firebaseConfig = {
+	apiKey: "AIzaSyBwHFZ7A9t8rHi4p6r-D2wr5WDrt9O7Yow",
+	authDomain: "project-endless-dungeon.firebaseapp.com",
+	projectId: "project-endless-dungeon",
+	storageBucket: "project-endless-dungeon.appspot.com",
+	messagingSenderId: "300065738789",
+	appId: "1:300065738789:web:e0a00f15878d7679226fcc"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
 const DEFAULT_WIDTH = 640;
 const DEFAULT_HEIGHT = 360;
@@ -52,3 +65,5 @@ const config: Phaser.Types.Core.GameConfig = {
 window.addEventListener('load', () => {
 	const game = new Phaser.Game(config);
 });
+
+

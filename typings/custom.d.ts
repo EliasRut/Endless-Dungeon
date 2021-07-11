@@ -177,6 +177,26 @@ export interface Scripting {
 	}
 }
 
+export interface DatabaseRoom {
+	startRoom?: boolean;
+	tileset: string; 
+	decorationTileset?: string; 
+	overlayTileset?: string; 
+	layout: string; //The first 32 (0-31) tiles of the tileset are colliding; 
+	decorations: string; //The first 32 (0-31) tiles of the tileset are colliding; 
+	overlays: string; //The first 32 (0-31) tiles of the tileset are colliding; 
+	overlay?: string;
+	npcs?: NpcPositioning[]; //place npcs in room
+	connections?: MapConnection[];
+	items?: ItemsPositioning[];
+	openings: Opening[];
+	name: string;
+	scripts: Scripting;
+	usedNpcTypes?: string[];
+	doors?: Door[];
+}
+
+
 export interface Room {
 	startRoom?: boolean;
 	tileset: string; 

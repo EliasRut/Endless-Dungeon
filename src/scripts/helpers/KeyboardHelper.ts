@@ -1,7 +1,6 @@
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { AbilityKey } from './constants';
-import BackpackIcon from '../drawables/ui/BackpackIcon';
 
 const AXIS_MOVEMENT_THRESHOLD = 0.4;
 
@@ -17,6 +16,7 @@ export default class KeyboardHelper {
 	abilityKey4: Phaser.Input.Keyboard.Key;
 	inventoryKey: Phaser.Input.Keyboard.Key;
 	settingsKey: Phaser.Input.Keyboard.Key;
+	enterKey: Phaser.Input.Keyboard.Key;
 
 	abilityKeyPressed: {[key: number]: boolean} = {
 		[AbilityKey.ONE]: false,
@@ -38,6 +38,7 @@ export default class KeyboardHelper {
 	isAbility4Pressed: () => boolean;
 	isInventoryPressed: () => boolean;
 	isSettingsPressed: () => boolean;
+	isEnterPressed: () => boolean;
 
 	scene: Phaser.Scene;
 
@@ -49,6 +50,7 @@ export default class KeyboardHelper {
 		this.kKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
 		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
 		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
 		this.scene = scene;
 		this.isMoveUpPressed = () => {
@@ -97,12 +99,20 @@ export default class KeyboardHelper {
 			return false;
 		};
 
+		this.isEnterPressed = () => {
+			if (this.enterKey.isDown) {
+				return true;
+			}
+			return false;
+		};
+
 		this.abilityKey1 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 		this.abilityKey2 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
 		this.abilityKey3 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
 		this.abilityKey4 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
 		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
 		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
 		this.isAbility1Pressed = () => {
 			if (this.abilityKeyPressed[AbilityKey.ONE]) {
@@ -186,6 +196,14 @@ export default class KeyboardHelper {
 		};
 	}
 
+	getInventoryKeyPress() {
+		if (this.isMoveDownPressed()) return "down";
+		else if (this.isMoveLeftPressed()) return "left";
+		else if (this.isMoveRightPressed()) return "right";
+		else if(this.isMoveUpPressed()) return "up";
+		else if(this.isEnterPressed()) return "enter";
+		return "nothing";
+	}
 	getCharacterFacing(stickDeltaX: number, stickDeltaY: number) {
 		let yFacing = 0;
 		let xFacing = 0;

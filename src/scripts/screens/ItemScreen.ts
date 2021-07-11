@@ -156,6 +156,12 @@ export default class ItemScreen extends OverlayScreen {
 				textWidth = this.itemName.getBounds().width;
 				variableSize--;
 			}
+		} else {
+			this.lableHealthValue.setText(``);
+			this.lableDamageValue.setText(``);
+			this.lableMovSpeedValue.setText(``);
+			this.flavorText.setText(``);
+			this.itemName.setText(``);
 		}
 	}
 
