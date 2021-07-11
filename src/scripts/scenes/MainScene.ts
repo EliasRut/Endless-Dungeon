@@ -522,7 +522,8 @@ export default class MainScene extends Phaser.Scene {
 
 		this.overlayScreens.statScreen.update();
 
-		if (this.isPaused) {
+		if (this.isPaused) {			
+			this.overlayScreens.inventory.selectNextBox(this.keyboardHelper.getNextBox(), globalTime);
 			return;
 		}
 

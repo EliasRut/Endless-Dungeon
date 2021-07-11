@@ -33,7 +33,7 @@ export default class SettingsIcon extends Phaser.GameObjects.Text implements Ico
 	}
 
 	setScreenVisibility(visible: boolean): void {
-		this.togglePause();
+		//this.togglePause();
 		this.scene.overlayScreens.settingsScreen.setVisible(visible);
 	}
 

@@ -1,7 +1,6 @@
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { AbilityKey } from './constants';
-import BackpackIcon from '../drawables/ui/BackpackIcon';
 
 const AXIS_MOVEMENT_THRESHOLD = 0.4;
 
@@ -163,6 +162,13 @@ export default class KeyboardHelper {
 		};
 	}
 
+	getNextBox() {
+		if (this.isMoveDownPressed()) return "down";
+		else if (this.isMoveLeftPressed()) return "left";
+		else if (this.isMoveRightPressed()) return "right";
+		else if(this.isMoveUpPressed()) return "up";
+		return "nothing";
+	}
 	getCharacterFacing(stickDeltaX: number, stickDeltaY: number) {
 		let yFacing = 0;
 		let xFacing = 0;
