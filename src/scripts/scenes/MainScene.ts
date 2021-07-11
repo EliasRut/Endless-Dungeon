@@ -265,7 +265,7 @@ export default class MainScene extends Phaser.Scene {
 			this.sound.play('score-dungeon', {volume: 0.08, loop: true});
 		}
 
-		if (globalState.playerCharacter.items.length === 0) {
+		if (globalState.inventory.unequippedItemList.length === 0) {
 			const zeroWeights = {
 				sourceWeight: 0,
 				catalystWeight: 0,
