@@ -7,6 +7,7 @@ import MapEditor from './scenes/MapEditor';
 import PreloadScene from './scenes/PreloadScene';
 import RoomPreloaderScene from './scenes/RoomPreloaderScene';
 import NpcEditor from './scenes/NpcEditor';
+import { activeMode, MODE } from './helpers/constants';
 
 var firebaseConfig = {
 	apiKey: "AIzaSyBwHFZ7A9t8rHi4p6r-D2wr5WDrt9O7Yow",
@@ -38,15 +39,19 @@ const config: Phaser.Types.Core.GameConfig = {
 	input: {
 			gamepad: true
 	},
-	scene: [
+	scene: activeMode === MODE.GAME ? [
 		RoomPreloaderScene,
 		PreloadScene,
 		MainScene,
-		MapEditor,
-		NpcEditor,
 		DungeonDoorPreloadScene,
 		DungeonDoorScene
-	],
+	] : (activeMode === MODE.MAP_EDITOR ? [
+		RoomPreloaderScene,
+		PreloadScene,
+		MapEditor
+	] : [
+		NpcEditor
+	]),
 	// We are using Phasers arcade physics library
 	physics: {
 		default: 'arcade',
