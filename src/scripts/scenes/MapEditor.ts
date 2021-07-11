@@ -66,6 +66,8 @@ export default class MapEditor extends Phaser.Scene {
 	libraryLayer: Phaser.Tilemaps.TilemapLayer;
 	backgroundLibraryLayer: Phaser.Tilemaps.TilemapLayer;
 
+	highlightingX = 0;
+	highlightingY = 0;
 	mapEditorHighlighting: Phaser.GameObjects.Image;
 
 	oneKey: Phaser.Input.Keyboard.Key;
@@ -477,8 +479,14 @@ export default class MapEditor extends Phaser.Scene {
 			const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
 			if (clickedTile) {
 				this.selectedId = clickedTile.index;
-				this.mapEditorHighlighting.x = clickedTile.x * TILE_WIDTH + (TILE_WIDTH / 2);
-				this.mapEditorHighlighting.y = clickedTile.y * TILE_HEIGHT + (TILE_HEIGHT / 2);
+				this.highlightingX = clickedTile.x * TILE_WIDTH + (TILE_WIDTH / 2);
+				this.highlightingY = clickedTile.y * TILE_HEIGHT + (TILE_HEIGHT / 2);
+				const zoomedWidth = this.cameras.main.width * (1 / this.zoomFactor);
+				const zoomedHeight = this.cameras.main.height * (1 / this.zoomFactor);
+				const zoomedZeroX = 	(this.cameras.main.width - zoomedWidth) / 2;
+				const zoomedZeroY = (this.cameras.main.height - zoomedHeight) / 2;
+				this.mapEditorHighlighting.x = zoomedZeroX + this.highlightingX * (1 / this.zoomFactor);
+				this.mapEditorHighlighting.y = zoomedZeroY + this.highlightingY * (1 / this.zoomFactor);
 			}
 		});
 		this.libraryLayer.setScrollFactor(0, 0);
@@ -838,6 +846,17 @@ export default class MapEditor extends Phaser.Scene {
 			this.wasZoomInDown = true;
 			this.zoomFactor = Math.min(1, this.zoomFactor * 2); 
 			this.cameras.main.setZoom(this.zoomFactor);
+			this.libraryLayer.setScale(1 / this.zoomFactor);
+			this.backgroundLibraryLayer.setScale(1 / this.zoomFactor);
+			this.mapEditorHighlighting.setScale(1 / this.zoomFactor);
+			const newWidth = this.cameras.main.width * (1 / this.zoomFactor);
+			const newHeight = this.cameras.main.height * (1 / this.zoomFactor);
+			const newX = 	(this.cameras.main.width - newWidth) / 2;
+			const newY = (this.cameras.main.height - newHeight) / 2;
+			this.libraryLayer.setPosition(newX, newY);
+			this.backgroundLibraryLayer.setPosition(newX, newY);
+			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
+			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
 		}
 		this.wasZoomInDown = this.zoomIn.isDown;
 
@@ -845,6 +864,17 @@ export default class MapEditor extends Phaser.Scene {
 			this.wasZoomOutDown = true;
 			this.zoomFactor = Math.max(0.125, this.zoomFactor / 2); 
 			this.cameras.main.setZoom(this.zoomFactor);
+			this.libraryLayer.setScale(1 / this.zoomFactor);
+			this.backgroundLibraryLayer.setScale(1 / this.zoomFactor);
+			this.mapEditorHighlighting.setScale(1 / this.zoomFactor);
+			const newWidth = this.cameras.main.width * (1 / this.zoomFactor);
+			const newHeight = this.cameras.main.height * (1 / this.zoomFactor);
+			const newX = 	(this.cameras.main.width - newWidth) / 2;
+			const newY = (this.cameras.main.height - newHeight) / 2;
+			this.libraryLayer.setPosition(newX, newY);
+			this.backgroundLibraryLayer.setPosition(newX, newY);
+			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
+			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
 		}
 		this.wasZoomOutDown = this.zoomOut.isDown;
 
