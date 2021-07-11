@@ -91,6 +91,7 @@ export default class MapEditor extends Phaser.Scene {
 	tilesetDecorationDropdownElement: HTMLSelectElement;
 	tilesetOverlayDropdownElement: HTMLSelectElement;
 	loadButtonElement: HTMLButtonElement;
+	loadFromAutosaveButtonElement: HTMLButtonElement;
 	roomNameElement: HTMLInputElement;
 	roomHeightElement: HTMLInputElement;
 	roomWidthElement: HTMLInputElement;
@@ -119,12 +120,73 @@ export default class MapEditor extends Phaser.Scene {
 		this.tilesetOverlayDropdownElement =
 			document.getElementById('tilesetOverlayDropdown') as HTMLSelectElement;
 		this.loadButtonElement = document.getElementById('loadRoomButton') as HTMLButtonElement;
+		this.loadFromAutosaveButtonElement = 
+			document.getElementById('loadFromAutosaveRoomButton') as HTMLButtonElement;
 		this.roomNameElement = document.getElementById('roomName') as HTMLInputElement;
 		this.roomHeightElement = document.getElementById('roomHeight') as HTMLInputElement;
 		this.roomWidthElement = document.getElementById('roomWidth') as HTMLInputElement;
 		this.exportButtonElement = document.getElementById('exportButton') as HTMLButtonElement;
 		this.activeLayerDropdownElement =
 			document.getElementById('activeLayerDropdown') as HTMLSelectElement;
+	}
+
+	populateFromDatabase(databaseSelectedRoom: DatabaseRoom) {
+		const selectedRoom = {
+			...databaseSelectedRoom,
+			layout: JSON.parse(databaseSelectedRoom.layout),
+			decorations: JSON.parse(databaseSelectedRoom.decorations),
+			overlays: JSON.parse(databaseSelectedRoom.overlays),
+		}
+		this.fileData = selectedRoom;
+		this.roomNameElement.value = selectedRoom.name;
+
+		this.tilesetDropdownElement.value = selectedRoom.tileset;
+		this.tilesetDecorationDropdownElement.value = selectedRoom.decorationTileset ?
+			selectedRoom.decorationTileset :
+			this.tilesetDecorationDropdownElement.options[0].value;
+		this.tilesetOverlayDropdownElement.value = selectedRoom.overlayTileset ?
+			selectedRoom.overlayTileset :
+			this.tilesetOverlayDropdownElement.options[0].value;
+
+		this.roomHeightElement.value = `${selectedRoom.layout.length}`;
+		this.roomWidthElement.value = `${selectedRoom.layout[0].length}`;
+
+		this.roomLayout = [];
+		this.roomDecorationLayout = [];
+		this.roomOverlayLayout = [];
+
+		this.applyConfiguration();
+
+		for (let y = 0; y < selectedRoom.layout.length; y++) {
+			for (let x = 0; x < selectedRoom.layout[y].length; x++) {
+				this.roomLayout[y][x] = selectedRoom.layout[y][x];
+				this.roomDecorationLayout[y][x] = selectedRoom.decorations ?
+					selectedRoom.decorations[y][x] :
+					0;
+				this.roomOverlayLayout[y][x] = selectedRoom.overlays ?
+					selectedRoom.overlays[y][x] :
+					0;
+
+				const tile = this.tileLayer.getTileAt(x, y);
+				if (tile) {
+					tile.index = selectedRoom.layout[y][x];
+				}
+
+				const decorationTile = this.decorationTileLayer?.getTileAt(x, y);
+				if (decorationTile) {
+					decorationTile.index = this.roomDecorationLayout[y][x];
+					decorationTile.visible = this.roomDecorationLayout[y][x] !== 0;
+				}
+
+				const overlayTile = this.overlayTileLayer?.getTileAt(x, y);
+				if (overlayTile) {
+					overlayTile.index = this.roomOverlayLayout[y][x];
+					overlayTile.visible = this.roomOverlayLayout[y][x] !== 0;
+				}
+			}
+		}
+		this.tilesetHistory = [];
+		this.addToHistory();
 	}
 
 	create() {
@@ -195,62 +257,7 @@ export default class MapEditor extends Phaser.Scene {
 
 			const selectedRoomDoc = await this.database.doc(roomName).get();
 			const databaseSelectedRoom = selectedRoomDoc.data() as DatabaseRoom;
-			const selectedRoom = {
-				...databaseSelectedRoom,
-				layout: JSON.parse(databaseSelectedRoom.layout),
-				decorations: JSON.parse(databaseSelectedRoom.decorations),
-				overlays: JSON.parse(databaseSelectedRoom.overlays),
-			}
-			this.fileData = selectedRoom;
-			this.roomNameElement.value = selectedRoom.name;
-
-			this.tilesetDropdownElement.value = selectedRoom.tileset;
-			this.tilesetDecorationDropdownElement.value = selectedRoom.decorationTileset ?
-				selectedRoom.decorationTileset :
-				this.tilesetDecorationDropdownElement.options[0].value;
-			this.tilesetOverlayDropdownElement.value = selectedRoom.overlayTileset ?
-				selectedRoom.overlayTileset :
-				this.tilesetOverlayDropdownElement.options[0].value;
-
-			this.roomHeightElement.value = `${selectedRoom.layout.length}`;
-			this.roomWidthElement.value = `${selectedRoom.layout[0].length}`;
-
-			this.roomLayout = [];
-			this.roomDecorationLayout = [];
-			this.roomOverlayLayout = [];
-
-			this.applyConfiguration();
-
-			for (let y = 0; y < selectedRoom.layout.length; y++) {
-				for (let x = 0; x < selectedRoom.layout[y].length; x++) {
-					this.roomLayout[y][x] = selectedRoom.layout[y][x];
-					this.roomDecorationLayout[y][x] = selectedRoom.decorations ?
-						selectedRoom.decorations[y][x] :
-						0;
-					this.roomOverlayLayout[y][x] = selectedRoom.overlays ?
-						selectedRoom.overlays[y][x] :
-						0;
-
-					const tile = this.tileLayer.getTileAt(x, y);
-					if (tile) {
-						tile.index = selectedRoom.layout[y][x];
-					}
-
-					const decorationTile = this.decorationTileLayer?.getTileAt(x, y);
-					if (decorationTile) {
-						decorationTile.index = this.roomDecorationLayout[y][x];
-						decorationTile.visible = this.roomDecorationLayout[y][x] !== 0;
-					}
-
-					const overlayTile = this.overlayTileLayer?.getTileAt(x, y);
-					if (overlayTile) {
-						overlayTile.index = this.roomOverlayLayout[y][x];
-						overlayTile.visible = this.roomOverlayLayout[y][x] !== 0;
-					}
-				}
-			}
-			this.tilesetHistory = [];
-			this.addToHistory();
+			this.populateFromDatabase(databaseSelectedRoom);
 		};
 
 		const goButtonElement = document.getElementById('goButton') as HTMLButtonElement;
@@ -270,6 +277,17 @@ export default class MapEditor extends Phaser.Scene {
 		this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z, false);
 		this.ctrlKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL, false);
 		this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT, false);
+		
+		this.loadFromAutosaveButtonElement.onclick = async () => {
+			const roomName = this.roomsDropdownElement.value;
+
+			const selectedRoomDoc = await this.backupDatabase.doc(roomName).get();
+			if (!selectedRoomDoc.exists) {
+				return;
+			}
+			const backupDatabaseSelectedRoom = selectedRoomDoc.data() as DatabaseRoom;
+			this.populateFromDatabase(backupDatabaseSelectedRoom);
+		}
 
 		this.exportButtonElement.onclick = () => {
 			const data = this.getExportData();
