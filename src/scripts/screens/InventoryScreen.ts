@@ -85,6 +85,7 @@ export default class InventoryScreen extends OverlayScreen {
 	keyLastPressed: number = 0;
 	keyCD: number = 250;
 	currentXY: [number, number];
+	inventorySelection: Phaser.GameObjects.Image;
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
@@ -95,6 +96,10 @@ export default class InventoryScreen extends OverlayScreen {
 		inventoryField.setScrollFactor(0);
 		this.add(inventoryField, true);
 		// tslint:enable
+		this.inventorySelection = new Phaser.GameObjects.Image(scene, BAG_START_X, BAG_START_Y, "inventory-selection");
+		this.inventorySelection.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		this.inventorySelection.setScrollFactor(0);
+		this.add(this.inventorySelection, true);		
 
 		scene.add.existing(this);
 		this.setVisible(false);
@@ -121,6 +126,7 @@ export default class InventoryScreen extends OverlayScreen {
 				this.createItemToken(item, x, y);
 			}
 		});
+		this.currentXY = [0, 0];		
 	}
 
 	createItemToken(item: Item, x: number, y: number) {
@@ -131,7 +137,7 @@ export default class InventoryScreen extends OverlayScreen {
 		itemToken.setInteractive();
 		itemToken.setVisible(false);
 		this.add(itemToken, true);
-		itemToken.on('pointerdown', () => {
+		itemToken.on('pointerdown', () => {		
 			this.handleInvetoryItemInteraction(item);
 		});
 	}
@@ -155,13 +161,17 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 
 	//select next item in bag. Handles cd for key press
-	selectNextBox(direction: string, globalTime: number) {
+	interactInventory(direction: string, globalTime: number) {
 		if (direction == "nothing") return;
-		const uneqippedItemList = getUnequippedItemsWithPositions();
-		if (uneqippedItemList.length == 0) return;
-
 		if (globalTime - this.keyLastPressed > this.keyCD) this.keyLastPressed = globalTime;
 		else return;
+		if (direction == "enter") {
+			if (this.focusedItem != undefined) this.handleInvetoryItemInteraction(this.focusedItem);
+			else return;
+		}
+		const uneqippedItemList = getUnequippedItemsWithPositions();
+		if (uneqippedItemList.length == 0) return;
+		
 		let item = this.getNextBagItem(direction);
 		if(item == this.focusedItem) return;		
 		if(item != undefined) this.handleInvetoryItemInteraction(item);
@@ -171,24 +181,21 @@ export default class InventoryScreen extends OverlayScreen {
 		}
 	}
 
-	getNextBagItem(direction: string){
-		if(this.currentXY == undefined) {
-			this.currentXY = [0,0];	
-			return this.getItemAtXY(this.currentXY[0], this.currentXY[1]);		
-		}
+	getNextBagItem(direction: string) {		
 		let x = this.currentXY[0];
 		let y = this.currentXY[1];
-		if (direction == "up") { this.currentXY[1] -= 1}
-		else if (direction == "down") { this.currentXY[1] += 1}
-		else if (direction == "left") { this.currentXY[0] -= 1}
-		else if (direction == "right") {this.currentXY[0] += 1}	
-		if(this.currentXY[0] > BAG_BOXES_X - 1 || 0 > this.currentXY[0]
+		if (direction == "up") { this.currentXY[1] -= 1 }
+		else if (direction == "down") { this.currentXY[1] += 1 }
+		else if (direction == "left") { this.currentXY[0] -= 1 }
+		else if (direction == "right") { this.currentXY[0] += 1 }
+		if (this.currentXY[0] > BAG_BOXES_X - 1 || 0 > this.currentXY[0]
 			|| this.currentXY[1] > BAG_BOXES_Y - 1 || 0 > this.currentXY[1]) {
-				this.currentXY[0] = x;
-				this.currentXY[1] = y;
-				console.log("returning focused")
-				return this.focusedItem;
-			}
+			this.currentXY[0] = x;
+			this.currentXY[1] = y;
+			return this.focusedItem;
+		}
+		this.inventorySelection.setX(BAG_START_X + (BOX_SIZE * this.currentXY[0]));
+		this.inventorySelection.setY(BAG_START_Y + (BOX_SIZE * this.currentXY[1]));
 		return this.getItemAtXY(this.currentXY[0], this.currentXY[1]);
 	}
 
@@ -202,6 +209,17 @@ export default class InventoryScreen extends OverlayScreen {
 			}
 		});
 		return item
+	}
+
+	getXYofItem(item: Item) {
+		let result = undefined;
+		const uneqippedItemList = getUnequippedItemsWithPositions();		
+		uneqippedItemList.forEach((itemPosition) => {			
+			if (item == itemPosition.item) {					
+					result = [itemPosition.x, itemPosition.y]
+			}
+		});	
+		return result;	
 	}
 
 	// updates all abilities and icons at once.

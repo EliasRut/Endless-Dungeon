@@ -234,12 +234,12 @@ export default class MainScene extends Phaser.Scene {
 		// 	essence.setScrollFactor(0);
 		// 	this.add.existing(essence);
 		// })
-
+		
 		this.overlayScreens = {
+			itemScreen: new ItemScreen(this),
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
-			dialogScreen: new DialogScreen(this),
-			itemScreen: new ItemScreen(this),
+			dialogScreen: new DialogScreen(this),			
 			settingsScreen: new SettingsScreen(this)
 		};
 
@@ -489,9 +489,10 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isInventoryPressed()) {
 			if (this.wasIPressed=== false){
 				this.icons.backpackIcon.toggleScreen();
+				this.overlayScreens.inventory.interactInventory("pressed", globalTime);
 			}
 			this.wasIPressed=true;
-
+			
 		} else {
 			this.wasIPressed=false;
 		}
@@ -522,8 +523,9 @@ export default class MainScene extends Phaser.Scene {
 
 		this.overlayScreens.statScreen.update();
 
-		if (this.isPaused) {			
-			this.overlayScreens.inventory.selectNextBox(this.keyboardHelper.getNextBox(), globalTime);
+		if (this.isPaused) {
+			if(this.icons.backpackIcon.screens[0].visiblity)
+			this.overlayScreens.inventory.interactInventory(this.keyboardHelper.getInventoryKeyPress(), globalTime);
 			return;
 		}
 
