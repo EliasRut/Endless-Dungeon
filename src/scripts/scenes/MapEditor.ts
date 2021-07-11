@@ -79,6 +79,8 @@ export default class MapEditor extends Phaser.Scene {
 	zKey: Phaser.Input.Keyboard.Key;
 	ctrlKey: Phaser.Input.Keyboard.Key;
 	shiftKey: Phaser.Input.Keyboard.Key;
+	zoomOut: Phaser.Input.Keyboard.Key;
+	zoomIn: Phaser.Input.Keyboard.Key;
 
 	cameraPositionX: number = 0;
 	cameraPositionY: number = 0;
@@ -100,6 +102,8 @@ export default class MapEditor extends Phaser.Scene {
 
 	wasTKeyDown: boolean = false;
 	wasUndoDown: boolean = false;
+	wasZoomInDown: boolean = false;
+	wasZoomOutDown: boolean = false;
 	isLibraryVisible: boolean = false;
 
 	tilesetHistory: LevelHistory = [];
@@ -107,6 +111,8 @@ export default class MapEditor extends Phaser.Scene {
 	selectionStartPoint: [number, number] | undefined;
 	selectionEndPoint: [number, number] | undefined;
 	selectedTileValues: Partial<MultiLevelLayout> | undefined;
+
+	zoomFactor: number = 1;
 
 	constructor() {
 		super({ key: 'MapEditor' });
@@ -277,7 +283,9 @@ export default class MapEditor extends Phaser.Scene {
 		this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z, false);
 		this.ctrlKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL, false);
 		this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT, false);
-		
+		this.zoomOut = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.NUMPAD_SUBTRACT, false);
+		this.zoomIn = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.NUMPAD_ADD, false);
+
 		this.loadFromAutosaveButtonElement.onclick = async () => {
 			const roomName = this.roomsDropdownElement.value;
 
@@ -288,6 +296,16 @@ export default class MapEditor extends Phaser.Scene {
 			const backupDatabaseSelectedRoom = selectedRoomDoc.data() as DatabaseRoom;
 			this.populateFromDatabase(backupDatabaseSelectedRoom);
 		}
+ 
+    this.cameras.main.setZoom(this.zoomFactor);
+    // this.cameras.main.centerOn(0, 0);
+
+		// if (this.zoomIn.isDown) {
+		// 	const cam = this.cameras.main;
+
+		// 	cam.pan(500, 500, 2000, 'Power2');
+		// 	cam.zoomTo(4, 3000);
+		// }
 
 		this.exportButtonElement.onclick = () => {
 			const data = this.getExportData();
@@ -815,6 +833,20 @@ export default class MapEditor extends Phaser.Scene {
 		}
 		this.wasUndoDown = this.zKey.isDown && this.ctrlKey.isDown;
 		this.wasTKeyDown = this.tKey.isDown;
+
+		if (this.zoomIn.isDown && !this.wasZoomInDown) {
+			this.wasZoomInDown = true;
+			this.zoomFactor = Math.min(1, this.zoomFactor * 2); 
+			this.cameras.main.setZoom(this.zoomFactor);
+		}
+		this.wasZoomInDown = this.zoomIn.isDown;
+
+		if (this.zoomOut.isDown && !this.wasZoomOutDown) {
+			this.wasZoomOutDown = true;
+			this.zoomFactor = Math.max(0.125, this.zoomFactor / 2); 
+			this.cameras.main.setZoom(this.zoomFactor);
+		}
+		this.wasZoomOutDown = this.zoomOut.isDown;
 
 		// tslint:disable no-magic-numbers
 		this.tileLayer.forEachTile((tile) => tile.tint = 0xffffff);
