@@ -46,23 +46,33 @@ export const unequipItemFromCharacter = (itemToUnequip: EquippableItem, char: Ch
 
 export const placeItemInNextFreeBagSlot = (item: Item) => {
 	const inventory = globalState.inventory;
+	const [x, y] = findFreeBagSlot();
+	if (x >= 0) {
+		inventory.bag[x][y] = 1;
+		inventory.unequippedItemList.push({
+			x,
+			y,
+			item
+		});
+	}
+	return [x, y];
+};
+
+export const findFreeBagSlot =() => {
+	const inventory = globalState.inventory;
 	for (let x = 0; x < BAG_BOXES_X; x++) {
 		for (let y = 0; y < BAG_BOXES_Y; y++) {
-			if (inventory.bag[x][y] === 0) {
-				inventory.bag[x][y] = 1;
-				inventory.unequippedItemList.push({
-					x,
-					y,
-					item
-				});
+			if (inventory.bag[x][y] === 0) {						
 				return [x, y];
 			}
 		}
 	}
-	throw new Error('No slot for item found.');
-};
+	return [-1, -1]
+}
 
 export const unequipItem = (itemToUnequip: EquippableItem) => {	
+	const [x,y] = findFreeBagSlot();	
+	if(x == -1) return;
 	unequipItemFromCharacter(itemToUnequip, globalState.playerCharacter);
 	removeItemFromActiveEquippmentSlots(itemToUnequip);
 	return placeItemInNextFreeBagSlot(itemToUnequip);

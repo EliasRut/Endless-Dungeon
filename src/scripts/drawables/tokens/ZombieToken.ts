@@ -65,8 +65,9 @@ export default class ZombieToken extends EnemyToken {
 		// follows you only if you're close enough, then runs straight at you,
 		// stop when close enough (proximity)
 
-		if ( this.attackedAt + this.stateObject.attackTime < time
-				&& this.attackRange < distance) {
+		if (this.aggro
+			&& this.attackedAt + this.stateObject.attackTime < time
+			&& this.attackRange < distance) {
 			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
 			const xSpeed = (tx - this.x) / totalDistance * this.stateObject.movementSpeed;
 			const ySpeed = (ty - this.y) / totalDistance * this.stateObject.movementSpeed;
