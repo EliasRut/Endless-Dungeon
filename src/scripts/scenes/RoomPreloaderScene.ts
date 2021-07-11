@@ -65,6 +65,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 				'dungeon-decoration',
 				'town-overlay',
 				'town-decoration',
+				'til-town-base',
 				'til-tavern',
 				'til-tavern-decoration',
 				'til-bookshop-decoration',
