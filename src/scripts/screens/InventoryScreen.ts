@@ -92,7 +92,7 @@ export default class InventoryScreen extends OverlayScreen {
 	focusedItem?: Item;
 	scene: MainScene;
 	keyLastPressed: number = 0;
-	keyCD: number = 250;
+	keyCD: number = 150;
 	currentXY: [number, number];
 	inventorySelection: Phaser.GameObjects.Image;
 
@@ -178,7 +178,6 @@ export default class InventoryScreen extends OverlayScreen {
 			if (this.focusedItem != undefined) this.handleInvetoryItemInteraction(this.focusedItem);
 			else return;
 		}
-		const uneqippedItemList = getUnequippedItemsWithPositions();
 
 		let item = this.getNextBagItem(direction);
 		if (item == this.focusedItem) return;
