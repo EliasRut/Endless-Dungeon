@@ -10,6 +10,7 @@ export interface PrimaryContentDungeonLevelBaseData {
 export interface PrimaryContentDungeonLevelData extends PrimaryContentDungeonLevelBaseData {
 	style: ColorsOfMagic;
 	numberOfRooms: number;
+	enemyBudget: number;
 }
 
 export interface PrimaryContentBlock {

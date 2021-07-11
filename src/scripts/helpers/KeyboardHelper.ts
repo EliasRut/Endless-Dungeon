@@ -26,7 +26,7 @@ export default class KeyboardHelper {
 		[AbilityKey.FIVE]: false,
 	};
 
-	gamepad: Phaser.Input.Gamepad.Gamepad |undefined;
+	gamepad: Phaser.Input.Gamepad.Gamepad | undefined;
 
 	isMoveUpPressed: () => boolean;
 	isMoveDownPressed: () => boolean;
@@ -104,7 +104,6 @@ export default class KeyboardHelper {
 		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
 		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
-
 		this.isAbility1Pressed = () => {
 			if (this.abilityKeyPressed[AbilityKey.ONE]) {
 				this.abilityKeyPressed[AbilityKey.ONE] = false;
@@ -152,14 +151,14 @@ export default class KeyboardHelper {
 			if (this.inventoryKey.isDown) {
 				return true;
 			}
-			return !!this.gamepad?.isButtonDown(4);
+			return !!this.gamepad?.isButtonDown(8);
 		};
 
 		this.isSettingsPressed = () => {
 			if (this.settingsKey.isDown) {
 				return true;
 			}
-			return !!this.gamepad?.isButtonDown(5);
+			return !!this.gamepad?.isButtonDown(9);
 		};
 	}
 

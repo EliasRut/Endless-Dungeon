@@ -3,7 +3,7 @@ import { DungeonLevelData } from '../models/DungeonRunData';
 import globalState from '../worldstate';
 import Door from '../worldstate/Door';
 import DungeonLevel from '../worldstate/DungeonLevel';
-import { colorOfMagicToTilesetMap } from './constants';
+import { colorOfMagicToTilesetMap, enemyBudgetCost } from './constants';
 import RoomGenerator from './generateRoom';
 
 export const BLOCK_SIZE = 8;
@@ -213,6 +213,7 @@ export default class DungeonGenerator {
 	dungeonBlocksX: number;
 	dungeonHeight: number;
 	dungeonBlocksY: number;
+	enemyBudget: number;
 
 	public generateLevel: (
 			id: string,
@@ -222,6 +223,8 @@ export default class DungeonGenerator {
 			(id, dungeonLevel, levelData) => {
 		this.rooms = levelData.rooms.map((roomName) => globalState.availableRooms[roomName]);
 		this.dungeonLevel = dungeonLevel;
+
+		this.enemyBudget = levelData.enemyBudget;
 
 		this.dungeonBlocksX = levelData.width;
 		this.dungeonBlocksY = levelData.height;
@@ -385,6 +388,34 @@ export default class DungeonGenerator {
 			});
 		});
 
+		if (this.enemyBudget > 0) {
+			let lastId = 0;
+			const potentialEnemyFields: {x: number, y: number}[] = [];
+			for (let y = 0; y < this.dungeonWidth; y++) {
+				for (let x = 0; x < this.dungeonHeight; x++) {
+					if (this.combinedLayout[y][x] === 32) {
+						potentialEnemyFields.push({y, x});
+					}
+				}
+			}
+			while (this.enemyBudget > 0 && potentialEnemyFields.length > 0) {
+				const randomIndex = Math.floor(potentialEnemyFields.length * Math.random());
+				const {x, y} = potentialEnemyFields[randomIndex];
+				this.enemyBudget--;
+				this.npcs.push({
+					facingX: 0,
+					facingY: 0,
+					type: 'enemy-zombie',
+					id: `filler-${lastId++}`,
+					x: x * TILE_WIDTH,
+					y: y * TILE_HEIGHT
+				});
+				console.log(`Placed npc 'enemy-zombie' at ${x * TILE_WIDTH}, ${y * TILE_HEIGHT}. ` +
+					`Budget left: ${this.enemyBudget}`);
+				potentialEnemyFields.splice(randomIndex, 1);
+			}
+		}
+
 		return {
 			id,
 			startPositionX: cameraOffsetX,
@@ -517,6 +548,8 @@ export default class DungeonGenerator {
 			const room = this.rooms[roomIndex];
 			room.npcs?.forEach((npc) => {
 				const [roomYBlockOffset, roomXBlockOffset] = this.roomOffsets[roomIndex];
+				const budgetCost = (enemyBudgetCost as {[name: string]: number})[npc.type] || 1;
+				this.enemyBudget -= budgetCost;
 				this.npcs.push({
 					facingX: 0,
 					facingY: 0,

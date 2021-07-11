@@ -160,3 +160,8 @@ export const colorOfMagicToTilesetMap = {
 	[ColorsOfMagic.WILD]: 'dungeon',
 	[ColorsOfMagic.ROYAL]: 'dungeon',
 };
+
+export const enemyBudgetCost = {
+	'enemy-zombie': 1,
+	'redling-boss': 10
+};

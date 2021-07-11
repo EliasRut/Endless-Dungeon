@@ -1,5 +1,5 @@
 import { getUrlParam } from '../helpers/browserState';
-import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames, ColorsOfMagic } from '../helpers/constants';
+import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames, ColorsOfMagic, enemyBudgetCost } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 
@@ -232,6 +232,7 @@ export default class PreloadScene extends Phaser.Scene {
 					rooms: levelData.rooms,
 					width: levelData.width,
 					height: levelData.height,
+					enemyBudget: levelData.enemyBudget || 0,
 					numberOfRooms: levelData.numberOfRooms || 0,
 					style: levelData.style || ColorsOfMagic.DEATH
 				}
