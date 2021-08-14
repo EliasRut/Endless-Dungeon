@@ -410,8 +410,7 @@ export default class DungeonGenerator {
 					x: x * TILE_WIDTH,
 					y: y * TILE_HEIGHT
 				});
-				console.log(`Placed npc 'enemy-zombie' at ${x * TILE_WIDTH}, ${y * TILE_HEIGHT}. ` +
-					`Budget left: ${this.enemyBudget}`);
+
 				potentialEnemyFields.splice(randomIndex, 1);
 			}
 		}
@@ -429,7 +428,9 @@ export default class DungeonGenerator {
 			connections,
 			doors,
 			items,
-			enemyLevel:dungeonLevel
+			enemyLevel: dungeonLevel,
+			name: levelData.title,
+			dynamicLighting: levelData.title.startsWith('dungeonLevel')
 		};
 	}
 

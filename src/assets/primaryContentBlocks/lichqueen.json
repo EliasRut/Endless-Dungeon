@@ -7,8 +7,6 @@
             "title": "Queens crypta - Level 1",
             "style": "death",
             "rooms": [
-                "firstTest",
-                "secondTest"
             ]
         },
         {
@@ -20,8 +18,6 @@
             "title": "The queens final resting place",
             "style": "death",
             "rooms": [
-                "firstTest",
-                "secondTest"
             ]
         }
     ],

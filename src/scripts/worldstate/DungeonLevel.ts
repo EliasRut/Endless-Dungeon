@@ -17,4 +17,6 @@ export default class DungeonLevel {
 	doors: Door[];
 	items: ItemsPositioning[];
 	enemyLevel: number;
+	name: string;
+	dynamicLighting: boolean;
 }

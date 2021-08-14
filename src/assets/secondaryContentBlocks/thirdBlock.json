@@ -2,5 +2,5 @@
     "title": "Third Side Quest",
     "description": "This is a side quest where you have to do absoultey nothing ",
     "themes": "death",
-    "rooms": [ ["thirdTest"] ]
+    "rooms": [ ["zombieRoom"] ]
 }

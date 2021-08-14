@@ -1,4 +1,5 @@
 import { AbilityType } from "../src/scripts/abilities/abilityData";
+import { ColorsOfMagic } from "../src/scripts/helpers/constants";
 
 export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
 
@@ -189,7 +190,7 @@ export interface DatabaseRoom {
 	npcs?: NpcPositioning[]; //place npcs in room
 	connections?: MapConnection[];
 	items?: ItemsPositioning[];
-	openings: Opening[];
+	openings: string;
 	name: string;
 	scripts: Scripting;
 	usedNpcTypes?: string[];
@@ -205,7 +206,6 @@ export interface Room {
 	layout: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
 	decorations?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
 	overlays?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
-	overlay?: number[][];
 	npcs?: NpcPositioning[]; //place npcs in room
 	connections?: MapConnection[];
 	items?: ItemsPositioning[];
@@ -214,10 +214,29 @@ export interface Room {
 	scripts: Scripting;
 	usedNpcTypes?: string[];
 	doors?: Door[];
+	title?: string;
+	colorOfMagic?: ColorsOfMagic;
 }
 
 export interface Weapon {
 	itemgroup: string;
 	abilities: string[];
 	tile: number[][];
+}
+
+export type HexValue = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f';
+export type HashtagHexColor = string;
+export interface NpcData {
+	name: string;
+	bodyTemplate: string;
+	bodyColor: HashtagHexColor;
+	eyeColor: HashtagHexColor;
+	hairTemplate: string;
+	hairColor: HashtagHexColor;
+	shirtTemplate: string;
+	shirtColor1: HashtagHexColor;
+	shirtColor2: HashtagHexColor;
+	pantsTemplate: string;
+	pantsColor: HashtagHexColor;
+	shoesColor: HashtagHexColor;
 }

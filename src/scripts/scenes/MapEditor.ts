@@ -1,12 +1,13 @@
 import 'phaser';
-import { 
+import {
 	TILE_WIDTH,
-	TILE_HEIGHT 
+	TILE_HEIGHT
 } from '../helpers/generateDungeon';
 import PositionText from '../drawables/ui/PositionText';
 import globalState from '../worldstate';
 import firebase from 'firebase';
-import { DatabaseRoom } from '../../../typings/custom';
+import { DatabaseRoom, Room } from '../../../typings/custom';
+import { deserializeRoom } from '../helpers/serialization';
 
 const TILE_SPACING = 2;
 
@@ -42,7 +43,7 @@ export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
 	backupDatabase: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
 
-	fileData: Partial<DatabaseRoom> = {};
+	fileData: Partial<Room> = {};
 	roomName: string = '';
 
 	isPointerDown: boolean = false;
@@ -128,7 +129,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.tilesetOverlayDropdownElement =
 			document.getElementById('tilesetOverlayDropdown') as HTMLSelectElement;
 		this.loadButtonElement = document.getElementById('loadRoomButton') as HTMLButtonElement;
-		this.loadFromAutosaveButtonElement = 
+		this.loadFromAutosaveButtonElement =
 			document.getElementById('loadFromAutosaveRoomButton') as HTMLButtonElement;
 		this.roomNameElement = document.getElementById('roomName') as HTMLInputElement;
 		this.roomHeightElement = document.getElementById('roomHeight') as HTMLInputElement;
@@ -139,12 +140,7 @@ export default class MapEditor extends Phaser.Scene {
 	}
 
 	populateFromDatabase(databaseSelectedRoom: DatabaseRoom) {
-		const selectedRoom = {
-			...databaseSelectedRoom,
-			layout: JSON.parse(databaseSelectedRoom.layout),
-			decorations: JSON.parse(databaseSelectedRoom.decorations),
-			overlays: JSON.parse(databaseSelectedRoom.overlays),
-		}
+		const selectedRoom = deserializeRoom(databaseSelectedRoom);
 		this.fileData = selectedRoom;
 		this.roomNameElement.value = selectedRoom.name;
 
@@ -194,7 +190,7 @@ export default class MapEditor extends Phaser.Scene {
 			}
 		}
 		this.tilesetHistory = [];
-		this.addToHistory();
+		this.addToHistory(false);
 	}
 
 	create() {
@@ -212,17 +208,14 @@ export default class MapEditor extends Phaser.Scene {
 			this.roomsDropdownElement.remove(0);
 		}
 
-		Object.keys(this.database
-			.get()
-			.then((query) => {
-				query.forEach((roomDoc) => {
-					const newOption = document.createElement('option');
-					newOption.value = roomDoc.id;
-					newOption.innerText = roomDoc.id;
-					this.roomsDropdownElement.appendChild(newOption);
-				});
-			})
-		);
+		this.database.get().then((query) => {
+			query.forEach((roomDoc) => {
+				const newOption = document.createElement('option');
+				newOption.value = roomDoc.id;
+				newOption.innerText = roomDoc.id;
+				this.roomsDropdownElement.appendChild(newOption);
+			});
+		});
 
 		// Prepare Base Tileset dropdown
 		while (this.tilesetDropdownElement.firstChild) {
@@ -319,7 +312,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.updateActiveLayer();
 		};
 
-		this.addToHistory();
+		this.addToHistory(true);
 	}
 
 	getTileLayerForName(layerName: string) {
@@ -528,7 +521,7 @@ export default class MapEditor extends Phaser.Scene {
 		] as [number, number, Phaser.Tilemaps.Tile];
 	}
 
-	addToHistory() {
+	addToHistory(autosave: boolean) {
 		const deepCopyArray: (values: number[][]) => number[][] = (values) => {
 			return JSON.parse(JSON.stringify(values)) as number[][];
 		};
@@ -543,7 +536,9 @@ export default class MapEditor extends Phaser.Scene {
 			this.tilesetHistory.shift();
 		}
 
-		this.autoSave();
+		if (autosave) {
+			this.autoSave();
+		}
 	}
 
 	endSelection(wasCtrlPressed: boolean) {
@@ -575,7 +570,7 @@ export default class MapEditor extends Phaser.Scene {
 	}
 
 	pasteSelectedValues(tileX: number, tileY: number) {
-		this.addToHistory();
+		this.addToHistory(true);
 		if (!this.selectedTileValues) {
 			return;
 		}
@@ -643,7 +638,7 @@ export default class MapEditor extends Phaser.Scene {
 			}
 			this.isPointerDown = true;
 
-			this.addToHistory();
+			this.addToHistory(true);
 
 			layoutValues[tileY][tileX] = this.selectedId;
 			if (clickedTile) {
@@ -836,7 +831,7 @@ export default class MapEditor extends Phaser.Scene {
 				this.drawRoom();
 			}
 			if (this.tilesetHistory.length === 0) {
-				this.addToHistory();
+				this.addToHistory(true);
 			}
 		}
 		this.wasUndoDown = this.zKey.isDown && this.ctrlKey.isDown;
@@ -933,7 +928,7 @@ export default class MapEditor extends Phaser.Scene {
 			items: [],
 			scripts: [],
 			...this.fileData,
-			openings: JSON.stringify(this.fileData.openings || []),
+			openings: this.fileData.openings || [],
 			name: roomNameValue,
 			tileset: tilesetValue,
 			decorationTileset: decorationTilesetValue,
