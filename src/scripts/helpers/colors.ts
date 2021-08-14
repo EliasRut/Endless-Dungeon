@@ -1,3 +1,10 @@
+import {
+	CHARACTER_SPRITE_HEIGHT,
+	CHARACTER_SPRITE_WIDTH
+} from './constants';
+
+const RGB_MAX_VALUE = 255;
+
 export const rgbToHex = (rgb: string | number) => {
 	let hex = Number(rgb).toString(16);
 	if (hex.length < 2) {
@@ -6,6 +13,12 @@ export const rgbToHex = (rgb: string | number) => {
 	return hex;
 };
 
+export interface RGBColor {
+	r: number;
+	g: number;
+	b: number;
+}
+
 export const fullColorHex = (r: string | number, g: string | number, b: string | number) => {
 	const red = rgbToHex(r);
 	const green = rgbToHex(g);
@@ -13,7 +26,7 @@ export const fullColorHex = (r: string | number, g: string | number, b: string |
 	return red + green + blue;
 };
 
-export const hexToRgb = (hex: string) => {
+export const hexToRgb: (hex: string) => RGBColor | null = (hex) => {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	return result ? {
 		r: parseInt(result[1], 16),
@@ -33,6 +46,10 @@ export const hexToTargetRgb = (hex: string) => {
 	if (!rgb) return null;
 	return {tr: rgb.r, tg: rgb.g, tb: rgb.b};
 };
+
+export const rgbToTargetRgb = (rgb: RGBColor) => {
+	return {tr: rgb.r, tg: rgb.g, tb: rgb.b};
+}
 
 export interface BodyPalleteData {
 	baseColor1: string;
@@ -124,3 +141,71 @@ export const pantsPalleteColors = {
 };
 
 export const hexRegex = /^[0-9a-f]{6}$/i;
+
+export interface ColorPallete {
+	[name: string]: PalleteLookupEntry;
+}
+
+export const replaceColors = (
+		canvasTexture: Phaser.Textures.CanvasTexture,
+		sourceImage: CanvasImageSource,
+		pallete: ColorPallete
+	) => {
+
+	const canvas = canvasTexture.getSourceImage() as HTMLCanvasElement;
+	const context = canvas.getContext('2d')!;
+
+	context.drawImage(sourceImage, 0, 0);
+
+	const imageData = context.getImageData(0, 0, CHARACTER_SPRITE_WIDTH, CHARACTER_SPRITE_HEIGHT);
+
+	const pixelArray = imageData.data;
+
+	// Iterate through every pixel in the image.
+	for (let p = 0; p < pixelArray.length / 4; p++) {
+			let index = 4 * p;
+
+			const r = pixelArray[index];
+			const g = pixelArray[++index];
+			const b = pixelArray[++index];
+			const alpha = pixelArray[++index];
+
+			// If this is a transparent pixel, ignore, move on.
+			if (alpha === 0) {
+				continue;
+			}
+
+			Object.keys(pallete).forEach((palleteName) => {
+				const {sr, sg, sb, tr, tg, tb} = pallete[palleteName];
+				if (tr === undefined || tg === undefined || tb === undefined) {
+					return;
+				}
+				if (r === sr && g === sg && b === sb && alpha === RGB_MAX_VALUE) {
+					pixelArray[--index] = tb;
+					pixelArray[--index] = tg;
+					pixelArray[--index] = tr;
+				}
+			});
+		}
+
+		context.putImageData(imageData, 0, 0);
+		return canvasTexture.getSourceImage() as HTMLCanvasElement;
+};
+
+export const darkenColor: (color: RGBColor, factor: number) => RGBColor = (color, factor) => {
+	const newLightness = 1 - factor;
+	return {
+		r: Math.round(color.r * newLightness),
+		g: Math.round(color.g * newLightness),
+		b: Math.round(color.b * newLightness),
+	};
+};
+
+export const brightenColor: (color: RGBColor, factor: number) => RGBColor = (color, factor) => {
+	const newLightness = 1 + factor;
+	return {
+		r: Math.min(RGB_MAX_VALUE, Math.round(color.r * newLightness)),
+		g: Math.min(RGB_MAX_VALUE, Math.round(color.g * newLightness)),
+		b: Math.min(RGB_MAX_VALUE, Math.round(color.b * newLightness)),
+	};
+};
