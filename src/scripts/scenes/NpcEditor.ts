@@ -293,7 +293,7 @@ export default class NpcEditor extends Phaser.Scene {
 		};
 		this.palleteLookup.shirt.color3 = {
 			...this.palleteLookup.shirt.color3,
-			...rgbToTargetRgb(darkenColor(shirt1BaseRgb, DARKENING_FACTORS.shirtDarker))
+			...rgbToTargetRgb(darkenColor(shirt1BaseRgb, DARKENING_FACTORS.shirtOutline))
 		};
 		this.palleteLookup.shirt.color4 = {
 			...this.palleteLookup.shirt.color4,
