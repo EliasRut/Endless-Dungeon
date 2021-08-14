@@ -52,6 +52,7 @@ const config: Phaser.Types.Core.GameConfig = {
 		DungeonDoorScene
 	] : (activeMode === MODE.MAP_EDITOR ? [
 		RoomPreloaderScene,
+		NpcGenerationScene,
 		PreloadScene,
 		MapEditor
 	] : [
