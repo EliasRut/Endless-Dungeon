@@ -199,7 +199,7 @@ export default class PreloadScene extends Phaser.Scene {
 							frameRate: 16,
 							repeat: 0
 						});
-					})
+					});
 				}
 			});
 		}
@@ -218,8 +218,8 @@ export default class PreloadScene extends Phaser.Scene {
 		});
 
 		// Construct dungeon for this map
-		if (!globalState.dungeon.levels[globalState.currentLevel]) {
-
+		if (!globalState.dungeon.levels[globalState.currentLevel] &&
+			globalState.currentLevel.startsWith('dungeonLevel')) {
 			// Town is 0, "dungeonLevelx"s are their last character (that's a bit hacky)
 			// everything else is -1
 			const numericLevel = globalState.currentLevel === 'town' ? 0 :
@@ -243,6 +243,31 @@ export default class PreloadScene extends Phaser.Scene {
 			);
 
 			globalState.dungeon.levels[globalState.currentLevel] = dungeonLevel;
+
+		} else if (!globalState.dungeon.levels[globalState.currentLevel]) {
+
+			// Town is 0, "dungeonLevelx"s are their last character (that's a bit hacky)
+			// everything else is -1
+			const numericLevel = globalState.currentLevel.startsWith('town') ? 0 : -1;
+
+			const roomData = globalState.availableRooms[globalState.currentLevel];
+
+			// const levelData = globalState.roomAssignment[globalState.currentLevel];
+			const roomLevelData = new DungeonGenerator().generateLevel(
+				globalState.currentLevel,
+				numericLevel,
+				{
+					title: roomData.title || '',
+					rooms: [globalState.currentLevel],
+					width: Math.ceil(roomData.layout[0].length / 8) + 2,
+					height: Math.ceil(roomData.layout.length / 8) + 2,
+					enemyBudget: 0,
+					numberOfRooms: 1,
+					style: roomData.colorOfMagic || ColorsOfMagic.DEATH
+				}
+			);
+
+			globalState.dungeon.levels[globalState.currentLevel] = roomLevelData;
 		}
 
 		this.scene.start('MainScene');
