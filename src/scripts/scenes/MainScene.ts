@@ -33,6 +33,7 @@ import fixedItems from '../../items/fixedItems.json';
 import { DungeonRunData } from '../models/DungeonRunData';
 import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
 import { Catalyst, Source } from '../../items/itemData';
+import { AbilityType } from '../abilities/abilityData';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -248,15 +249,14 @@ export default class MainScene extends Phaser.Scene {
 //		this.backpackIcon = new BackpackIcon(this);
 //		this.avatar = new Avatar(this);
 
+// var pointers = this.input.activePointer;
+// this.input.on('pointerdown', function () {
+// 	console.log("mouse x", pointers.x);
+// 	console.log("mouse y", pointers.y);
+// 	});
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
 		this.scriptHelper = new ScriptHelper(this);
-
-		// var pointers = this.input.activePointer;
-		// this.input.on('pointerdown', function () {
-		// 	console.log("mouse x", pointers.x);
-		// 	console.log("mouse y", pointers.y);
-		// });
 
 		this.sound.stopAll();
 		if (globalState.currentLevel === 'town') {
@@ -376,8 +376,7 @@ export default class MainScene extends Phaser.Scene {
 			x, // - DEBUG__ITEM_OFFSET_X,
 			y, // - DEBUG__ITEM_OFFSET_Y,
 			{
-				...(fixedItems as { [id: string]: Partial<Item> })[id],
-				itemLocation: 0
+				...(fixedItems as { [id: string]: Partial<Item> })[id]
 			} as Item
 		);
 	}
@@ -581,6 +580,19 @@ export default class MainScene extends Phaser.Scene {
 
 		if (!this.blockUserInteraction) {
 			const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
+			if(castAbilities[0] === AbilityType.FIREBALL){
+				let pointers = this.input.activePointer;
+				console.log(pointers.x)
+				console.log(pointers.y)
+				this.addNpc(
+					"test1",
+					"enemy-zombie",
+					globalState.playerCharacter.x+1,
+					globalState.playerCharacter.y+1,
+					1,
+					0,
+					0);
+			}
 			this.abilityHelper.update(globalTime, castAbilities);
 		}
 

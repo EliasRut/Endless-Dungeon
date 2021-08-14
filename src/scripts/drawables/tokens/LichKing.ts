@@ -7,7 +7,7 @@ import EnemyToken from './EnemyToken';
 
 const ATTACK_RANGE = 80;
 
-export default class RedlingBossToken extends EnemyToken {
+export default class LichtKingToken extends EnemyToken {
 
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {

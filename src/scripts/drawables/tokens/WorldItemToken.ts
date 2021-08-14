@@ -6,6 +6,7 @@ import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 
 const MAX_INTERACTION_DISTANCE = 30;
 const MAX_EQUIPPABLE_ITEM_LOCATION = 80;
+const HEAL_PERCENTAGE = 1/2;
 
 export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 	stateObject: Item;
@@ -31,7 +32,15 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		const distance = Math.hypot(this.x - px, this.y - py);
 		// if you run over item, put into inventory
 		if (distance < MAX_INTERACTION_DISTANCE) {
-			if (scene.overlayScreens.inventory.addToInventory(this.stateObject)) {
+			if (this.stateObject.type === 'health') {
+				const heal = Math.round(globalState.playerCharacter.maxHealth / HEAL_PERCENTAGE);
+				globalState.playerCharacter.health =
+				globalState.playerCharacter.health + heal > globalState.playerCharacter.maxHealth ?
+				globalState.playerCharacter.maxHealth : globalState.playerCharacter.health + heal;
+				this.isDestroyed = true;
+				this.destroy(true);
+			}
+			else if (scene.overlayScreens.inventory.addToInventory(this.stateObject)) {
 				this.isDestroyed = true;
 				this.destroy(true);
 			}
