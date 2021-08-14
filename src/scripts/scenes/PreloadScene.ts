@@ -1,5 +1,14 @@
-import { getUrlParam } from '../helpers/browserState';
-import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames, ColorsOfMagic, enemyBudgetCost, activeMode, MODE } from '../helpers/constants';
+import {
+	spriteDirectionList,
+	NUM_DIRECTIONS,
+	npcTypeToFileMap,
+	FacingRange,
+	npcTypeToAttackFileMap,
+	essenceNames,
+	ColorsOfMagic,
+	activeMode,
+	MODE
+} from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 
@@ -92,6 +101,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Find out which files we need by going through all rendered rooms
 		const requiredNpcs = new Set<string>();
+		requiredNpcs.add('enemy-zombie');
 		Object.values(globalState.availableRooms).forEach((room) => {
 			if (!globalState.availableTilesets.includes(room.tileset)) {
 				globalState.availableTilesets.push(room.tileset);
@@ -125,22 +135,9 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// NPCs
 		requiredNpcs.forEach((npc) => {
-			this.load.spritesheet(
-				npc,
-				npcTypeToFileMap[npc].file,
-				{ frameWidth: 40, frameHeight: 40 }
-			);
 			this.neededAnimations.push({
 				name: npc,
-				facingRange: npcTypeToFileMap[npc].facing
-			});
-			const attackNames = Object.keys(npcTypeToAttackFileMap[npc] || {});
-			attackNames.forEach((attackName) => {
-				this.load.spritesheet(
-					`${npc}-${attackName}`,
-					npcTypeToAttackFileMap[npc][attackName].file,
-					{ frameWidth: 40, frameHeight: 40 }
-				);
+				facingRange: npcTypeToFileMap[npc]?.facing || FacingRange.ONLY_NESW
 			});
 		});
 	}
@@ -199,7 +196,7 @@ export default class PreloadScene extends Phaser.Scene {
 							frameRate: 16,
 							repeat: 0
 						});
-					})
+					});
 				}
 			});
 		}
@@ -218,8 +215,8 @@ export default class PreloadScene extends Phaser.Scene {
 		});
 
 		// Construct dungeon for this map
-		if (!globalState.dungeon.levels[globalState.currentLevel]) {
-
+		if (!globalState.dungeon.levels[globalState.currentLevel] &&
+			globalState.currentLevel.startsWith('dungeonLevel')) {
 			// Town is 0, "dungeonLevelx"s are their last character (that's a bit hacky)
 			// everything else is -1
 			const numericLevel = globalState.currentLevel === 'town' ? 0 :
@@ -243,6 +240,31 @@ export default class PreloadScene extends Phaser.Scene {
 			);
 
 			globalState.dungeon.levels[globalState.currentLevel] = dungeonLevel;
+
+		} else if (!globalState.dungeon.levels[globalState.currentLevel]) {
+
+			// Town is 0, "dungeonLevelx"s are their last character (that's a bit hacky)
+			// everything else is -1
+			const numericLevel = globalState.currentLevel.startsWith('town') ? 0 : -1;
+
+			const roomData = globalState.availableRooms[globalState.currentLevel];
+
+			// const levelData = globalState.roomAssignment[globalState.currentLevel];
+			const roomLevelData = new DungeonGenerator().generateLevel(
+				globalState.currentLevel,
+				numericLevel,
+				{
+					title: roomData.title || '',
+					rooms: [globalState.currentLevel],
+					width: Math.ceil(roomData.layout[0].length / 8) + 2,
+					height: Math.ceil(roomData.layout.length / 8) + 2,
+					enemyBudget: 0,
+					numberOfRooms: 1,
+					style: roomData.colorOfMagic || ColorsOfMagic.DEATH
+				}
+			);
+
+			globalState.dungeon.levels[globalState.currentLevel] = roomLevelData;
 		}
 
 		this.scene.start('MainScene');

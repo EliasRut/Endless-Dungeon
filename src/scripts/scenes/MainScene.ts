@@ -34,6 +34,7 @@ import { DungeonRunData } from '../models/DungeonRunData';
 import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
 import { Catalyst, Source } from '../../items/itemData';
 import Minimap from '../drawables/ui/Minimap';
+import { AbilityType } from '../abilities/abilityData';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -123,7 +124,7 @@ export default class MainScene extends Phaser.Scene {
 		this.worldItems = [];
 		const [startX, startY] = this.drawRoom();
 
-		this.useDynamicLighting = globalState.roomAssignment[globalState.currentLevel].dynamicLighting;
+		this.useDynamicLighting = globalState.currentLevel.startsWith('dungeonLevel');
 
 		if (this.useDynamicLighting) {
 			this.dynamicLightingHelper = new DynamicLightingHelper(
@@ -251,15 +252,14 @@ export default class MainScene extends Phaser.Scene {
 //		this.backpackIcon = new BackpackIcon(this);
 //		this.avatar = new Avatar(this);
 
+// var pointers = this.input.activePointer;
+// this.input.on('pointerdown', function () {
+// 	console.log("mouse x", pointers.x);
+// 	console.log("mouse y", pointers.y);
+// 	});
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
 		this.scriptHelper = new ScriptHelper(this);
-
-		// var pointers = this.input.activePointer;
-		// this.input.on('pointerdown', function () {
-		// 	console.log("mouse x", pointers.x);
-		// 	console.log("mouse y", pointers.y);
-		// });
 
 		this.sound.stopAll();
 		if (globalState.currentLevel === 'town') {
@@ -379,8 +379,7 @@ export default class MainScene extends Phaser.Scene {
 			x, // - DEBUG__ITEM_OFFSET_X,
 			y, // - DEBUG__ITEM_OFFSET_Y,
 			{
-				...(fixedItems as { [id: string]: Partial<Item> })[id],
-				itemLocation: 0
+				...(fixedItems as { [id: string]: Partial<Item> })[id]
 			} as Item
 		);
 	}
@@ -436,6 +435,15 @@ export default class MainScene extends Phaser.Scene {
 					traderId: npc.traderId
 				});
 		});
+		this.addNpc(
+			"lichking",
+			'lich-king',
+			globalState.playerCharacter.x+1,
+			globalState.playerCharacter.y+1,
+			1,
+			0,
+			0
+		)
 
 		doors.forEach((door) => {
 			this.addDoor(door.id, door.type, door.x, door.y, door.open);
@@ -493,10 +501,10 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isInventoryPressed()) {
 			if (this.wasIPressed=== false){
 				this.icons.backpackIcon.toggleScreen();
-				this.overlayScreens.inventory.interactInventory("pressed", globalTime);
+				this.overlayScreens.inventory.interactInventory('pressed', globalTime);
 			}
 			this.wasIPressed=true;
-			
+
 		} else {
 			this.wasIPressed=false;
 		}
@@ -529,10 +537,15 @@ export default class MainScene extends Phaser.Scene {
 
 		if (this.isPaused) {
 			if(this.icons.backpackIcon.screens[0].visiblity)
-			this.overlayScreens.inventory.interactInventory(this.keyboardHelper.getInventoryKeyPress(), globalTime);
+			this.overlayScreens.inventory.interactInventory(
+				this.keyboardHelper.getInventoryKeyPress(),
+				globalTime);
 			return;
 		}
 
+		Object.values(this.npcMap).forEach((curNpc) => {
+			curNpc.update(globalTime);
+		});
 		if (!this.blockUserInteraction) {
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalTime);
 			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
@@ -594,10 +607,6 @@ export default class MainScene extends Phaser.Scene {
 		if (this.useDynamicLighting && this.dynamicLightingHelper) {
 			this.dynamicLightingHelper.updateDynamicLighting();
 		}
-
-		Object.values(this.npcMap).forEach((curNpc) => {
-			curNpc.update(globalTime);
-		});
 
 		// TODO: remove items that are picked up
 		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);

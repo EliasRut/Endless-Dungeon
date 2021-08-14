@@ -18,7 +18,7 @@ import {
 import { AbilityType } from '../abilities/abilityData';
 
 const MAX_HEALTH = 20;
-const BASE_DAMAGE = 1;
+const BASE_DAMAGE = 0;
 const MAX_ADDITIONAL_DAMAGE = 1;
 const MAX_MOVEMENT_SPEED = 35;
 const BASE_MAIN_STAT = 1;
@@ -117,7 +117,7 @@ export const generateRandomItem = (options: Partial<RandomItemOptions>) => {
 		}
 	}
 	return new EquippableItem(
-		Math.random() * MAX_HEALTH * level,
+		Math.random() * MAX_HEALTH * (1 + level),
 		Math.random() * MAX_ADDITIONAL_DAMAGE * (1 + level * 0.5) + BASE_DAMAGE,
 		Math.random() * MAX_MOVEMENT_SPEED * (1 + level * 0.1),
 		Math.random() * MAX_ADDITIONAL_MAIN_STAT * (1 + level * 0.5) + BASE_MAIN_STAT,

@@ -1,5 +1,5 @@
 import { AbilityKey, BAG_BOXES_X, BAG_BOXES_Y, EquipmentSlot, UiDepths } from '../helpers/constants';
-import { AbilityType } from '../abilities/abilityData';
+import { AbilityType, Abilities } from '../abilities/abilityData';
 import OverlayScreen from './OverlayScreen';
 import Item from '../worldstate/Item';
 import {
@@ -55,12 +55,12 @@ const EQUIPMENT_SLOT_COORDINATES = {
 };
 
 const COORDINATES_TO_SLOT: { [id: string]: EquipmentSlot } = {
-	"0_-2": EquipmentSlot.MAIN_HAND,
-	"2_-2": EquipmentSlot.OFF_HAND,
-	"1_-1": EquipmentSlot.CHESTPIECE,
-	"1_-2": EquipmentSlot.NECKLACE,
-	"2_-1": EquipmentSlot.RIGHT_RING,
-	"0_-1": EquipmentSlot.LEFT_RING
+	'0_-2': EquipmentSlot.MAIN_HAND,
+	'2_-2': EquipmentSlot.OFF_HAND,
+	'1_-1': EquipmentSlot.CHESTPIECE,
+	'1_-2': EquipmentSlot.NECKLACE,
+	'2_-1': EquipmentSlot.RIGHT_RING,
+	'0_-1': EquipmentSlot.LEFT_RING
 };
 
 const EQUIPMENT_SLOT_TO_ABILITY_KEY = {
@@ -70,19 +70,6 @@ const EQUIPMENT_SLOT_TO_ABILITY_KEY = {
 	[EquipmentSlot.NECKLACE]: AbilityKey.FIVE,
 	[EquipmentSlot.RIGHT_RING]: AbilityKey.FOUR,
 	[EquipmentSlot.LEFT_RING]: AbilityKey.THREE,
-};
-
-export const ABILITY_TO_ICON = {
-	[AbilityType.FIREBALL]: ['icon-abilities', 0],
-	[AbilityType.ARCANE_BOLT]: ['icon-abilities', 1],
-	[AbilityType.HAIL_OF_BOLTS]: ['icon-abilities', 1],
-	[AbilityType.HAIL_OF_FLAMES]: ['icon-abilities', 0],
-	[AbilityType.HAIL_OF_ICE]: ['icon-abilities', 1],
-	[AbilityType.ICESPIKE]: ['icon-abilities', 1],
-	[AbilityType.DUSTNOVA]: ['icon-abilities', 2],
-	[AbilityType.ROUND_HOUSE_KICK]: ['icon-abilities', 2],
-	[AbilityType.HEALING_LIGHT]: ['icon-abilities', 2],
-	[AbilityType.NOTHING]: ['icon-abilities', 2],
 };
 // tslint:enable
 
@@ -253,8 +240,7 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 
 	// move highlighted field
-	moveSelection(x: number, y: number) {
-		console.log(x, y)
+	moveSelection(x: number, y: number) {		
 		if (y >= 0) {
 			this.inventorySelection.setX(BAG_START_X + (BOX_SIZE * x));
 			this.inventorySelection.setY(BAG_START_Y + (BOX_SIZE * y));
@@ -329,7 +315,7 @@ export default class InventoryScreen extends OverlayScreen {
 			this.scene,
 			iconX,
 			iconY,
-			ABILITY_TO_ICON[ability][0] as string, ABILITY_TO_ICON[ability][1]);
+			Abilities[ability].icon![0], Abilities[ability].icon![1]);
 		abilityIcon.displayWidth = ABILITY_ICON_SIZE;
 		abilityIcon.displayHeight = ABILITY_ICON_SIZE;
 		abilityIcon.setDepth(UiDepths.UI_BACKGROUND_LAYER);

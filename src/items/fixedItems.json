@@ -13,5 +13,10 @@
 		"iconFrame": 32,
 		"type": "questItem",
 		"id": "book"
+	},
+	"health": {
+		"iconFrame": 0,
+		"type": "health",
+		"id": "health"
 	}
 }

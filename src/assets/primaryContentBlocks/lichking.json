@@ -7,8 +7,7 @@
             "title": "Royal crypta - Level 1",
             "style": "death",
             "rooms": [
-                "firstTest",
-                "secondTest"
+                "COM-death-key"
             ],
             "width": 16,
             "height": 16,
@@ -19,7 +18,8 @@
             "title": "Royal crypta - Level 2",
             "style": "death",
             "rooms": [
-                "zombieRoom"
+                "zombieRoom",
+                "COM-death-key"
             ],
             "width": 12,
             "height": 12,

@@ -27,6 +27,7 @@ interface AbilityData {
 	sfxVolume?: number;
 	cooldownMs?: number;
 	flavorText?: string;
+	icon?: [string, number];
 	damageMultiplier: number;
 }
 
@@ -41,6 +42,7 @@ export const enum AbilityType {
 	DUSTNOVA = 'dustnova',
 	ROUND_HOUSE_KICK = 'roundhousekick',
 	HEALING_LIGHT = 'healinglight',
+	ARCANE_BLADE = 'arcaneBlade',
 }
 
 export const Abilities: {[type: string]: AbilityData} = {
@@ -48,7 +50,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		projectiles: 0,
 		cooldownMs: 0,
 		damageMultiplier: 0,
-		flavorText: ``
+		flavorText: ``,
+		icon: ['icon-abilities', 2]
 	},
 	[AbilityType.FIREBALL]: {
 		projectiles: 1,
@@ -64,7 +67,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 0.10,
 		cooldownMs: 400,
 		damageMultiplier: 1,
-		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`
+		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
+		icon: ['icon-abilities', 0]
 	},
 	[AbilityType.ARCANE_BOLT]: {
 		projectiles: 1,
@@ -81,7 +85,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 0.10,
 		cooldownMs: 400,
 		damageMultiplier: 0.8,
-		flavorText: `Shooting magic missiles!`
+		flavorText: `Shooting magic missiles!`,
+		icon: ['icon-abilities', 1]
 	},
 	[AbilityType.HAIL_OF_BOLTS]: {
 		projectiles: 5,
@@ -100,7 +105,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 0.10,
 		cooldownMs: 1500,
 		damageMultiplier: 0.8,
-		flavorText: `Shooting magic missiles!`
+		flavorText: `Shooting magic missiles!`,
+		icon: ['icon-abilities', 1]
 	},
 	[AbilityType.HAIL_OF_FLAMES]: {
 		projectiles: 5,
@@ -118,7 +124,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 0.10,
 		cooldownMs: 1500,
 		damageMultiplier: 0.8,
-		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`
+		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
+		icon: ['icon-abilities', 0]
 	},
 	[AbilityType.HAIL_OF_ICE]: {
 		projectiles: 5,
@@ -136,7 +143,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 0.3,
 		cooldownMs: 1500,
 		damageMultiplier: 0.8,
-		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`
+		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`,
+		icon: ['icon-abilities', 1]
 	},
 	[AbilityType.ICESPIKE]: {
 		projectiles: 1,
@@ -152,7 +160,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 0.3,
 		cooldownMs: 400,
 		damageMultiplier: 0.8,
-		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`
+		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`,
+		icon: ['icon-abilities', 1]
 	},
 	[AbilityType.DUSTNOVA]: {
 		projectiles: 32,
@@ -170,6 +179,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 1.4,
 		cooldownMs: 1200,
 		damageMultiplier: 0.05,
+		icon: ['icon-abilities', 2],
 	},
 	[AbilityType.ROUND_HOUSE_KICK]: {
 		projectiles: 16,
@@ -188,6 +198,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 1.4,
 		cooldownMs: 1200,
 		damageMultiplier: 0.1,
+		icon: ['icon-abilities', 2],
 	},
 	[AbilityType.HEALING_LIGHT]: {
 		projectiles: 1,
@@ -203,5 +214,24 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 1.4,
 		cooldownMs: 1200,
 		damageMultiplier: 1,
-	}
+		icon: ['icon-abilities', 2],
+	},
+	[AbilityType.ARCANE_BLADE]: {
+		projectiles: 50,
+		projectileData: {
+			spread: [-0.2, 0.2],
+			velocity: 200,
+			xOffset: 32,
+			yOffset: 32,
+			effect: ArcaneBoltEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.10,
+		cooldownMs: 400,
+		damageMultiplier: 0.2,
+		flavorText: `A blade of arcane power.`,
+		icon: ['icon-abilities', 1]
+	},
 };

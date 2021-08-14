@@ -4,11 +4,18 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
+import { isCollidingTile } from '../../helpers/movement';
 
 const ATTACK_RANGE = 80;
+const SUMMON_SPEED = 1000;
+const CAST_DURATION = 5000;
 
-export default class RedlingBossToken extends EnemyToken {
+export default class LichtKingToken extends EnemyToken {
 
+	summonCD = 30000;
+	summonedAt = -Infinity;
+	casting = 0;
+	addsCounter: number = 0;
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
 		super(scene, x, y, tokenName, id);
@@ -50,6 +57,11 @@ export default class RedlingBossToken extends EnemyToken {
 			this.dropRandomItem(this.level + 1);
 			this.emitter.stop();
 			this.destroy();
+			return;
+		}
+
+		if (this.casting > 0) {
+			this.summon(time);
 			return;
 		}
 
@@ -108,14 +120,66 @@ export default class RedlingBossToken extends EnemyToken {
 	}
 
 	attack(time: number) {
-		if (this.attackedAt + this.stateObject.attackTime < time) {
+		if (this.summonedAt + this.summonCD < time) {
+			this.summon(time);
+		}
+		else if (this.attackedAt + this.stateObject.attackTime < time) {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.attackedAt = time;
 			this.scene.abilityHelper.triggerAbility(
 				this.stateObject,
-				AbilityType.HAIL_OF_FLAMES,
+				AbilityType.ARCANE_BLADE,
 				time);
 		}
+	}	
+	summon(time: number) {
+		if(this.casting === 0) {
+			this.casting = SUMMON_SPEED;
+			this.summonedAt = time;
+		}
+		if(this.casting >= CAST_DURATION) {
+			this.casting = 0;
+			return;
+		}
+		if (time - this.summonedAt > this.casting) {
+			if ((this.casting / 1000) % 2 === 0) {
+				let xy = this.getUncollidingXY(this.target.x, this.target.y);
+				this.scene.addNpc(
+					"LichAdd_" + this.addsCounter.toString(),
+					"red-link",
+					xy[0],
+					xy[1],
+					1,
+					0,
+					0);
+				this.addsCounter++;
+				this.casting += SUMMON_SPEED;
+			} else {
+				let xy = this.getUncollidingXY(this.stateObject.x, this.stateObject.y);
+				this.scene.addNpc(
+					"LichAdd_" + this.addsCounter.toString(),
+					"enemy-zombie",
+					xy[0],
+					xy[1],
+					1,
+					0,
+					0);
+				this.addsCounter++;
+				this.casting += SUMMON_SPEED;
+			}
+		}
+	}
+	getUncollidingXY(x: number, y: number) {
+		let newX = x + Math.round(Math.random() * 100);
+		let newY = y + Math.round(Math.random() * 100);
+		let tile = this.scene.tileLayer.getTileAtWorldXY(newX, newY);
+		console.log(tile.index);
+		while (isCollidingTile(tile.index) === true) {
+			newX = x + Math.round(Math.random() * 500);
+			newY = y + Math.round(Math.random() * 500);
+			tile = this.scene.tileLayer.getTileAtWorldXY(newX, newY);
+		}
+		return [newX, newY];
 	}
 }

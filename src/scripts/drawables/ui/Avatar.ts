@@ -1,7 +1,6 @@
 import { AbilityKey, UiDepths } from '../../helpers/constants';
 import globalState from '../../worldstate';
-import {ABILITY_TO_ICON} from '../../screens/InventoryScreen'
-import { AbilityType } from '../../abilities/abilityData';
+import { AbilityType, Abilities} from '../../abilities/abilityData';
 import MainScene from '../../scenes/MainScene';
 
 const HEALTH_BAR_WIDTH = 98;
@@ -86,7 +85,7 @@ export default class Avatar extends Phaser.GameObjects.Group {
 			const abilityIcon = this.scene.add.image(
 				coordinate[0],
 				coordinate[1],
-				ABILITY_TO_ICON[ability][0] as string, ABILITY_TO_ICON[ability][1]
+				Abilities[ability].icon![0], Abilities[ability].icon![1]
 			);
 			if (mainScene.isMobile) {
 				abilityIcon.setScale(2);

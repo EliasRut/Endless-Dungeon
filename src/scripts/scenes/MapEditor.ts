@@ -6,7 +6,8 @@ import {
 import PositionText from '../drawables/ui/PositionText';
 import globalState from '../worldstate';
 import firebase from 'firebase';
-import { DatabaseRoom } from '../../../typings/custom';
+import { DatabaseRoom, Room } from '../../../typings/custom';
+import { deserializeRoom } from '../helpers/serialization';
 
 const TILE_SPACING = 2;
 
@@ -42,7 +43,7 @@ export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
 	backupDatabase: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
 
-	fileData: Partial<DatabaseRoom> = {};
+	fileData: Partial<Room> = {};
 	roomName: string = '';
 
 	isPointerDown: boolean = false;
@@ -120,7 +121,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.tilesetOverlayDropdownElement =
 			document.getElementById('tilesetOverlayDropdown') as HTMLSelectElement;
 		this.loadButtonElement = document.getElementById('loadRoomButton') as HTMLButtonElement;
-		this.loadFromAutosaveButtonElement = 
+		this.loadFromAutosaveButtonElement =
 			document.getElementById('loadFromAutosaveRoomButton') as HTMLButtonElement;
 		this.roomNameElement = document.getElementById('roomName') as HTMLInputElement;
 		this.roomHeightElement = document.getElementById('roomHeight') as HTMLInputElement;
@@ -131,12 +132,7 @@ export default class MapEditor extends Phaser.Scene {
 	}
 
 	populateFromDatabase(databaseSelectedRoom: DatabaseRoom) {
-		const selectedRoom = {
-			...databaseSelectedRoom,
-			layout: JSON.parse(databaseSelectedRoom.layout),
-			decorations: JSON.parse(databaseSelectedRoom.decorations),
-			overlays: JSON.parse(databaseSelectedRoom.overlays),
-		}
+		const selectedRoom = deserializeRoom(databaseSelectedRoom);
 		this.fileData = selectedRoom;
 		this.roomNameElement.value = selectedRoom.name;
 
@@ -274,7 +270,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z, false);
 		this.ctrlKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL, false);
 		this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT, false);
-		
+
 		this.loadFromAutosaveButtonElement.onclick = async () => {
 			const roomName = this.roomsDropdownElement.value;
 
@@ -284,7 +280,7 @@ export default class MapEditor extends Phaser.Scene {
 			}
 			const backupDatabaseSelectedRoom = selectedRoomDoc.data() as DatabaseRoom;
 			this.populateFromDatabase(backupDatabaseSelectedRoom);
-		}
+		};
 
 		this.exportButtonElement.onclick = () => {
 			const data = this.getExportData();

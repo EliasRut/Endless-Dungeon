@@ -7,21 +7,20 @@
             "title": "Queens crypta - Level 1",
             "style": "death",
             "rooms": [
-                "firstTest",
-                "secondTest"
+                "COM-death-key"
             ]
         },
         {
             "title": "Queens crypta - Level 2",
             "style": "death",
-            "rooms": []
+            "rooms": [
+                "COM-death-key"
+            ]
         },
         {
             "title": "The queens final resting place",
             "style": "death",
             "rooms": [
-                "firstTest",
-                "secondTest"
             ]
         }
     ],
