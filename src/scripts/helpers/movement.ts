@@ -113,7 +113,7 @@ export const updateMovingState = (
 		return `${char.animationBase}-${animationType}-${newDirection}`;
 };
 
-export const COLIDING_TILE_RANGES = [
+export const COLLIDING_TILE_RANGES = [
 	// [-1, -1],
 	// tslint:disable: no-magic-numbers
 	[0, 31],
@@ -132,8 +132,8 @@ export const COLIDING_TILE_RANGES = [
 
 export const isCollidingTile = (tileNumber: number) => {
 	const normedNumber = tileNumber % 1000;
-	const firstColiding =
-		COLIDING_TILE_RANGES.find(([lower, upper]) =>
+	const firstColliding =
+		COLLIDING_TILE_RANGES.find(([lower, upper]) =>
 			lower <= normedNumber && normedNumber <= upper );
-	return !!firstColiding;
+	return !!firstColliding;
 }

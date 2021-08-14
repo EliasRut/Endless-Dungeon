@@ -4,6 +4,7 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
+import { isCollidingTile } from '../../helpers/movement';
 
 const ATTACK_RANGE = 80;
 const SUMMON_SPEED = 1000;
@@ -132,7 +133,7 @@ export default class LichtKingToken extends EnemyToken {
 				time);
 		}
 	}	
-	summon(time: number) {		
+	summon(time: number) {
 		if(this.casting === 0) {
 			this.casting = SUMMON_SPEED;
 			this.summonedAt = time;
@@ -143,22 +144,24 @@ export default class LichtKingToken extends EnemyToken {
 		}
 		if (time - this.summonedAt > this.casting) {
 			if ((this.casting / 1000) % 2 === 0) {
+				let xy = this.getUncollidingXY(this.target.x, this.target.y);
 				this.scene.addNpc(
 					"LichAdd_" + this.addsCounter.toString(),
 					"red-link",
-					this.target.x + 1,
-					this.target.y + 1,
+					xy[0],
+					xy[1],
 					1,
 					0,
 					0);
 				this.addsCounter++;
 				this.casting += SUMMON_SPEED;
 			} else {
+				let xy = this.getUncollidingXY(this.stateObject.x, this.stateObject.y);
 				this.scene.addNpc(
 					"LichAdd_" + this.addsCounter.toString(),
 					"enemy-zombie",
-					this.stateObject.x + 1,
-					this.stateObject.y + 1,
+					xy[0],
+					xy[1],
 					1,
 					0,
 					0);
@@ -166,5 +169,17 @@ export default class LichtKingToken extends EnemyToken {
 				this.casting += SUMMON_SPEED;
 			}
 		}
+	}
+	getUncollidingXY(x: number, y: number) {
+		let newX = x + Math.round(Math.random() * 100);
+		let newY = y + Math.round(Math.random() * 100);
+		let tile = this.scene.tileLayer.getTileAtWorldXY(newX, newY);
+		console.log(tile.index);
+		while (isCollidingTile(tile.index) === true) {
+			newX = x + Math.round(Math.random() * 500);
+			newY = y + Math.round(Math.random() * 500);
+			tile = this.scene.tileLayer.getTileAtWorldXY(newX, newY);
+		}
+		return [newX, newY];
 	}
 }

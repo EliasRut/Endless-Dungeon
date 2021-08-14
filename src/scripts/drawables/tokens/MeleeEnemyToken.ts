@@ -10,6 +10,9 @@ const AURA_DAMAGE_PER_TICK = 0.01;
 const REGULAR_ATTACK_DAMAGE = 0;
 const REGULAR_ATTACK_RANGE = 15;
 
+const ITEM_DROP_CHANCE = 0.15;
+const HEALTH_DROP_CHANCE = 0.06;
+
 export default class MeleeEnemyToken extends EnemyToken {
 
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
@@ -42,9 +45,11 @@ export default class MeleeEnemyToken extends EnemyToken {
 
 				// check death
 				if (this.stateObject.health <= 0){
-						this.dropRandomItem();
-						this.destroy();
-						return;
+					if (Math.random() < ITEM_DROP_CHANCE) {
+						this.dropRandomItem(this.level);
+					} else if (Math.random() < HEALTH_DROP_CHANCE) this.dropFixedItem('health');
+					this.destroy();
+					return;
 				}
 
 				const tx = this.target.x;
