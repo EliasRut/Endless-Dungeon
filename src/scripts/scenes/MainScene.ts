@@ -122,7 +122,7 @@ export default class MainScene extends Phaser.Scene {
 		this.worldItems = [];
 		const [startX, startY] = this.drawRoom();
 
-		this.useDynamicLighting = globalState.roomAssignment[globalState.currentLevel].dynamicLighting;
+		this.useDynamicLighting = globalState.currentLevel.startsWith('dungeonLevel');
 
 		if (this.useDynamicLighting) {
 			this.dynamicLightingHelper = new DynamicLightingHelper(
