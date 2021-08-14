@@ -1,5 +1,14 @@
-import { getUrlParam } from '../helpers/browserState';
-import { spriteDirectionList, NUM_DIRECTIONS, npcTypeToFileMap, FacingRange, npcTypeToAttackFileMap, essenceNames, ColorsOfMagic, enemyBudgetCost, activeMode, MODE } from '../helpers/constants';
+import {
+	spriteDirectionList,
+	NUM_DIRECTIONS,
+	npcTypeToFileMap,
+	FacingRange,
+	npcTypeToAttackFileMap,
+	essenceNames,
+	ColorsOfMagic,
+	activeMode,
+	MODE
+} from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 
@@ -92,6 +101,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Find out which files we need by going through all rendered rooms
 		const requiredNpcs = new Set<string>();
+		requiredNpcs.add('enemy-zombie');
 		Object.values(globalState.availableRooms).forEach((room) => {
 			if (!globalState.availableTilesets.includes(room.tileset)) {
 				globalState.availableTilesets.push(room.tileset);

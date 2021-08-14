@@ -94,12 +94,15 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 	create() {
 		const db = firebase.firestore().collection('rooms');
 		const roomPromises = this.usedRooms.map((roomId) => {
-			return db.doc(roomId).get();
-		});
+			return db.doc(roomId).get().then((data) => [roomId, data]);
+		}) as Promise<[string, firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>]>[];
 
 		Promise.all(roomPromises).then((roomDocs) => {
-			roomDocs.forEach((roomDoc) => {
+			roomDocs.forEach(([roomId, roomDoc]) => {
 				const roomDbData = roomDoc.data() as DatabaseRoom;
+				if (!roomDbData) {
+					throw new Error(`Room ${roomId} not found in the database.`);
+				}
 				const room = deserializeRoom(roomDbData);
 				this.cache.json.add(`room-${roomDoc.id}`, roomDoc.data());
 				globalState.availableRooms[room.name] = room;
