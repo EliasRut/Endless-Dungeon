@@ -1,4 +1,5 @@
 import { AbilityType } from "../src/scripts/abilities/abilityData";
+import { ColorsOfMagic } from "../src/scripts/helpers/constants";
 
 export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
 
@@ -189,7 +190,7 @@ export interface DatabaseRoom {
 	npcs?: NpcPositioning[]; //place npcs in room
 	connections?: MapConnection[];
 	items?: ItemsPositioning[];
-	openings: Opening[];
+	openings: string;
 	name: string;
 	scripts: Scripting;
 	usedNpcTypes?: string[];
@@ -213,6 +214,8 @@ export interface Room {
 	scripts: Scripting;
 	usedNpcTypes?: string[];
 	doors?: Door[];
+	title?: string;
+	colorOfMagic?: ColorsOfMagic;
 }
 
 export interface Weapon {
