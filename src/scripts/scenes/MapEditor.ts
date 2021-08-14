@@ -866,7 +866,7 @@ export default class MapEditor extends Phaser.Scene {
 			items: [],
 			scripts: [],
 			...this.fileData,
-			openings: this.fileData.openings || [],
+			openings: JSON.stringify(this.fileData.openings || []),
 			name: roomNameValue,
 			tileset: tilesetValue,
 			decorationTileset: decorationTilesetValue,
