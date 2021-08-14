@@ -219,7 +219,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 	[AbilityType.ARCANE_BLADE]: {
 		projectiles: 50,
 		projectileData: {
-			spread: [-0.15, 0.15],
+			spread: [-0.2, 0.2],
 			velocity: 200,
 			xOffset: 32,
 			yOffset: 32,
@@ -230,7 +230,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
 		cooldownMs: 400,
-		damageMultiplier: 1,
+		damageMultiplier: 0.2,
 		flavorText: `A blade of arcane power.`,
 		icon: ['icon-abilities', 1]
 	},

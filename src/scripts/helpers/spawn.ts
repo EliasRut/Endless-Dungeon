@@ -18,7 +18,7 @@ export const spawnNpc = (
 	) => {
 	switch(type) {
 		case 'red-link': {
-			return new MeleeEnemyToken(scene, posX, posY, type, id);
+			return new MeleeEnemyToken(scene, posX, posY, 'enemy-zombie', id);
 		}
 		case 'red-ball': {
 			return new RangedEnemyToken(scene, posX, posY, type, id);
@@ -30,7 +30,7 @@ export const spawnNpc = (
 			return new RedlingBossToken(scene, posX, posY, type, level, id);
 		}
 		case 'lich-king': {
-			return new LichKingToken(scene, posX, posY, type, level, id);
+			return new LichKingToken(scene, posX, posY, 'enemy-zombie', level, id);
 		}
 		default: {
 			return new NpcToken(scene, posX, posY, type, id, options);

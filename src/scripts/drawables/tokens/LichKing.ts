@@ -132,7 +132,7 @@ export default class LichtKingToken extends EnemyToken {
 				time);
 		}
 	}	
-	summon(time: number) {
+	summon(time: number) {		
 		if(this.casting === 0) {
 			this.casting = SUMMON_SPEED;
 			this.summonedAt = time;
