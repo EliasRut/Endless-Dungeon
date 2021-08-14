@@ -297,10 +297,10 @@ export default class MapEditor extends Phaser.Scene {
 			}
 			const backupDatabaseSelectedRoom = selectedRoomDoc.data() as DatabaseRoom;
 			this.populateFromDatabase(backupDatabaseSelectedRoom);
-		}
- 
-    this.cameras.main.setZoom(this.zoomFactor);
-    // this.cameras.main.centerOn(0, 0);
+		};
+
+		this.cameras.main.setZoom(this.zoomFactor);
+		// this.cameras.main.centerOn(0, 0);
 
 		// if (this.zoomIn.isDown) {
 		// 	const cam = this.cameras.main;
