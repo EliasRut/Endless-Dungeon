@@ -152,14 +152,14 @@ export const enum PossibleTargets {
 export const KNOCKBACK_TIME = 250;
 
 export const colorOfMagicToTilesetMap = {
-	[ColorsOfMagic.FLUX]: 'dungeon-blue',
-	[ColorsOfMagic.METAL]: 'dungeon-blue',
-	[ColorsOfMagic.CHANGE]: 'dungeon-blue',
-	[ColorsOfMagic.BLOOD]: 'dungeon-blue',
-	[ColorsOfMagic.DEATH]: 'dungeon',
-	[ColorsOfMagic.PASSION]: 'dungeon',
-	[ColorsOfMagic.WILD]: 'dungeon',
-	[ColorsOfMagic.ROYAL]: 'dungeon',
+	[ColorsOfMagic.FLUX]: 'COM-death-B',
+	[ColorsOfMagic.METAL]: 'COM-death-B',
+	[ColorsOfMagic.CHANGE]: 'COM-death-B',
+	[ColorsOfMagic.BLOOD]: 'COM-death-B',
+	[ColorsOfMagic.DEATH]: 'COM-death-B',
+	[ColorsOfMagic.PASSION]: 'COM-death-B',
+	[ColorsOfMagic.WILD]: 'COM-death-B',
+	[ColorsOfMagic.ROYAL]: 'COM-death-B',
 };
 
 export const enemyBudgetCost = {

@@ -12,8 +12,8 @@
             ],
             "width": 16,
             "height": 16,
-            "numberOfRooms": 3,
-            "enemyBudget": 10
+            "numberOfRooms": 8,
+            "enemyBudget": 0
         },
         {
             "title": "Royal crypta - Level 2",
