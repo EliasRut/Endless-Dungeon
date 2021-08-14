@@ -174,8 +174,8 @@ export default class LichtKingToken extends EnemyToken {
 		let newX = x + Math.round(Math.random() * 100);
 		let newY = y + Math.round(Math.random() * 100);
 		let tile = this.scene.tileLayer.getTileAtWorldXY(newX, newY);
-		console.log(tile.index);
-		while (isCollidingTile(tile.index) === true) {
+		console.log(tile?.index);
+		while (isCollidingTile(tile?.index) === true) {
 			newX = x + Math.round(Math.random() * 500);
 			newY = y + Math.round(Math.random() * 500);
 			tile = this.scene.tileLayer.getTileAtWorldXY(newX, newY);
