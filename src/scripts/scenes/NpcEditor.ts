@@ -16,6 +16,8 @@ import {
 	brightenColor,
 	ColorPallete
 } from '../helpers/colors';
+import firebase from 'firebase';
+import { NpcData } from '../../../typings/custom';
 
 const LAYER_WIDTH = 320;
 const LAYER_HEIGHT = 240;
@@ -45,16 +47,8 @@ const DEPTHS = {
 	hairLayer: 4,
 };
 
-const npcs = {
-	'vanya': {
-		name: 'Vanya',
-		figure: 'male',
-		hair: 'buzzcut',
-		shirt: 'shirt',
-		trousers: 'shorts',
-	}
-};
 export default class NpcEditor extends Phaser.Scene {
+	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
 	palleteLookup: {
 		body: ColorPallete,
 		hair: ColorPallete,
@@ -89,10 +83,17 @@ export default class NpcEditor extends Phaser.Scene {
 	};
 
 	npcDropdownElement: HTMLSelectElement;
+	loadButton: HTMLButtonElement;
+
 	bodyDropdownElement: HTMLSelectElement;
 	hairDropdownElement: HTMLSelectElement;
 	shirtDropdownElement: HTMLSelectElement;
 	pantsDropdownElement: HTMLSelectElement;
+
+	exportButton: HTMLButtonElement;
+
+	npcIdInputElement: HTMLInputElement;
+	npcNameInputElement: HTMLInputElement;
 
 	// Body colors
 	bodyColorInputElement: HTMLInputElement;
@@ -116,11 +117,22 @@ export default class NpcEditor extends Phaser.Scene {
 
 	constructor() {
 		super({ key: 'NpcEditor' });
+		this.database = firebase.firestore().collection('npcs');
+
+		this.npcIdInputElement = document.getElementById('npcId') as HTMLInputElement;
+		this.npcNameInputElement = document.getElementById('npcName') as HTMLInputElement;
+
 		this.npcDropdownElement = document.getElementById('npcDropdown') as HTMLSelectElement;
 		this.bodyDropdownElement = document.getElementById('bodyDropdown') as HTMLSelectElement;
 		this.hairDropdownElement = document.getElementById('hairDropdown') as HTMLSelectElement;
 		this.shirtDropdownElement = document.getElementById('shirtDropdown') as HTMLSelectElement;
 		this.pantsDropdownElement = document.getElementById('pantsDropdown') as HTMLSelectElement;
+
+		this.loadButton = document.getElementById('loadNpcButton') as HTMLButtonElement;
+		this.loadButton.onclick = () => this.loadNpc();
+
+		this.exportButton = document.getElementById('exportButton') as HTMLButtonElement;
+		this.exportButton.onclick = () => this.exportNpc();
 
 		// Body Inputs
 		this.bodyColorInputElement = document.getElementById('bodyColor') as HTMLInputElement;
@@ -174,17 +186,80 @@ export default class NpcEditor extends Phaser.Scene {
 		this.load.image('pants-1', 'assets/npcSets/pants/pants1.png');
 	}
 
+	async loadNpcList() {
+		while (this.npcDropdownElement.hasChildNodes()) {
+			this.npcDropdownElement.removeChild(this.npcDropdownElement.childNodes[0]);
+		}
+
+		const query = await this.database.get();
+		const defaultOption = document.createElement('option');
+		defaultOption.value = 'new';
+		defaultOption.innerText = 'New Npc';
+		this.npcDropdownElement.appendChild(defaultOption);
+
+		query.docs.forEach((doc) => {
+			const newOption = document.createElement('option');
+			newOption.value = doc.id;
+			newOption.innerText = doc.get('name');
+			this.npcDropdownElement.appendChild(newOption);
+		});
+	}
+
+	async loadNpc() {
+		const npcId = this.npcDropdownElement.value;
+		if (!npcId) {
+			return;
+		}
+		const npcDoc = await this.database.doc(npcId).get();
+		const npc = npcDoc.data() as NpcData;
+
+		this.npcIdInputElement.value = npcDoc.id;
+		this.npcNameInputElement.value = npc.name;
+		this.bodyColorInputElement.value = '#' + npc.bodyColor;
+		this.eyeColorInputElement.value = '#' + npc.eyeColor;
+		this.hairColorInputElement.value = '#' + npc.hairColor;
+		this.shirtColor1InputElement.value = '#' + npc.shirtColor1;
+		this.shirtColor2InputElement.value = '#' + npc.shirtColor2;
+		this.pantsColorInputElement.value = '#' + npc.pantsColor;
+		this.shoesColorInputElement.value = '#' + npc.shoesColor;
+		this.bodyDropdownElement.value = npc.bodyTemplate;
+		this.hairDropdownElement.value = npc.hairTemplate;
+		this.shirtDropdownElement.value = npc.shirtTemplate;
+		this.pantsDropdownElement.value = npc.pantsTemplate;
+
+		this.updateImage();
+	}
+
+	async exportNpc() {
+		if (!this.npcIdInputElement.value || !this.npcNameInputElement.value) {
+			alert('Npc needs an ID and a name.');
+		}
+
+		await this.database.doc(this.npcIdInputElement.value!).set({
+			name: this.npcNameInputElement.value,
+			bodyColor: this.bodyColorInputElement.value.substr(1),
+			eyeColor: this.eyeColorInputElement.value.substr(1),
+			hairColor: this.hairColorInputElement.value.substr(1),
+			shirtColor1: this.shirtColor1InputElement.value.substr(1),
+			shirtColor2: this.shirtColor2InputElement.value.substr(1),
+			pantsColor: this.pantsColorInputElement.value.substr(1),
+			shoesColor: this.shoesColorInputElement.value.substr(1),
+			bodyTemplate: this.bodyDropdownElement.value,
+			hairTemplate: this.hairDropdownElement.value,
+			shirtTemplate: this.shirtDropdownElement.value,
+			pantsTemplate: this.pantsDropdownElement.value,
+		});
+
+		await this.loadNpcList();
+		this.npcDropdownElement.value = this.npcIdInputElement.value;
+	}
+
 	create() {
 		while (this.npcDropdownElement.firstChild) {
 			this.npcDropdownElement.remove(0);
 		}
 
-		Object.entries(npcs).forEach(([npcId, npc]) => {
-			const newOption = document.createElement('option');
-			newOption.value = npcId;
-			newOption.innerText = npc.name;
-			this.npcDropdownElement.appendChild(newOption);
-		});
+		this.loadNpcList();
 
 		this.bodyLayer = this.add.image(
 			LAYER_X_OFFSET,
