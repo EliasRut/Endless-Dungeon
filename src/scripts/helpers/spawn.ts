@@ -23,9 +23,6 @@ export const spawnNpc = (
 		case 'red-ball': {
 			return new RangedEnemyToken(scene, posX, posY, type, id);
 		}
-		case 'naked-guy': {
-			return new NpcToken(scene, posX, posY, 'naked-guy', id, options);
-		}
 		case 'enemy-zombie': {
 			return new ZombieToken(scene, posX, posY, type, level, id);
 		}
@@ -36,7 +33,7 @@ export const spawnNpc = (
 			return new LichKingToken(scene, posX, posY, type, level, id);
 		}
 		default: {
-			throw new Error(`Map called for unknown enemy "${type}".`);
+			return new NpcToken(scene, posX, posY, type, id, options);
 		}
 	}
 };

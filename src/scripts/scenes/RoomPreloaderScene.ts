@@ -108,7 +108,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 				globalState.availableRooms[room.name] = room;
 			});
 		}).then(() => {
-			this.scene.start('PreloadScene');
+			this.scene.start('NpcGenerationScene');
 		});
 	}
 }

@@ -8,6 +8,7 @@ import PreloadScene from './scenes/PreloadScene';
 import RoomPreloaderScene from './scenes/RoomPreloaderScene';
 import NpcEditor from './scenes/NpcEditor';
 import { activeMode, MODE } from './helpers/constants';
+import NpcGenerationScene from './scenes/NpcGenerationScene';
 
 const firebaseConfig = {
 	apiKey: 'AIzaSyBwHFZ7A9t8rHi4p6r-D2wr5WDrt9O7Yow',
@@ -44,12 +45,14 @@ const config: Phaser.Types.Core.GameConfig = {
 	},
 	scene: activeMode === MODE.GAME ? [
 		RoomPreloaderScene,
+		NpcGenerationScene,
 		PreloadScene,
 		MainScene,
 		DungeonDoorPreloadScene,
 		DungeonDoorScene
 	] : (activeMode === MODE.MAP_EDITOR ? [
 		RoomPreloaderScene,
+		NpcGenerationScene,
 		PreloadScene,
 		MapEditor
 	] : [

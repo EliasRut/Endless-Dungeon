@@ -135,22 +135,9 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// NPCs
 		requiredNpcs.forEach((npc) => {
-			this.load.spritesheet(
-				npc,
-				npcTypeToFileMap[npc].file,
-				{ frameWidth: 40, frameHeight: 40 }
-			);
 			this.neededAnimations.push({
 				name: npc,
-				facingRange: npcTypeToFileMap[npc].facing
-			});
-			const attackNames = Object.keys(npcTypeToAttackFileMap[npc] || {});
-			attackNames.forEach((attackName) => {
-				this.load.spritesheet(
-					`${npc}-${attackName}`,
-					npcTypeToAttackFileMap[npc][attackName].file,
-					{ frameWidth: 40, frameHeight: 40 }
-				);
+				facingRange: npcTypeToFileMap[npc]?.facing || FacingRange.ONLY_NESW
 			});
 		});
 	}
