@@ -1,13 +1,17 @@
 import globalState from '../../worldstate/index';
 import { BLOCK_SIZE, TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 import { TILE_SIZE } from '../../helpers/generateRoom';
+import { isCollidingTile } from '../../helpers/movement';
 
 const X_POSITION = 10;
 const Y_POSITION = 180;
 
 export default class Minimap extends Phaser.GameObjects.Text {
 	constructor(scene: Phaser.Scene) {
-		super(scene, X_POSITION, Y_POSITION, '', { color: 'white', fontSize: '10px' });
+		super(scene, X_POSITION, Y_POSITION, '', {
+			color: 'white',
+			fontSize: '5px'
+		});
 		this.setScrollFactor(0);
 		scene.add.existing(this);
 		this.setOrigin(0);
@@ -15,8 +19,8 @@ export default class Minimap extends Phaser.GameObjects.Text {
 	}
 
 	public update() {
-		const xPos = Math.round(globalState.playerCharacter.x / BLOCK_SIZE / TILE_WIDTH);
-		const yPos = Math.round(globalState.playerCharacter.y / BLOCK_SIZE / TILE_HEIGHT);
+		const xPos = Math.floor(globalState.playerCharacter.x / BLOCK_SIZE / TILE_WIDTH);
+		const yPos = Math.floor(globalState.playerCharacter.y / BLOCK_SIZE / TILE_HEIGHT);
 		const xxPos = xPos * BLOCK_SIZE;
 		const yyPos = yPos * BLOCK_SIZE;
 		// if(globalState.dg) {
@@ -42,23 +46,109 @@ export default class Minimap extends Phaser.GameObjects.Text {
 
 			let marker: string = ' X ';
 
-			for (let y = Math.max(0,yDown); y < Math.min(height,yUp); y+=BLOCK_SIZE) {
-				for (let x = Math.max(0,xLeft); x < Math.min(width,xRight); x+=BLOCK_SIZE) {
-					// marker = y === yyPos && x === xxPos ? ' O ' : ' X ';
-					const tile = layout[y][x]
-					if(y === yyPos && x === xxPos) {
-						marker = ' O ';
-					} else {
-						marker = ' X ';
-						if(tile === 32) { // todo generalize for all floor tiles
-							marker = ' . ';
-						}
-					}
-					map += tile !== -1 ? marker : '   ';
-				}
-				map += '\n';
-			}
+			let firstRow: string = '';
+			let secondRow: string = '';
+			let thirdRow: string = '';
 
+			for (let y = Math.max(0, yDown); y < Math.min(height, yUp); y += BLOCK_SIZE) {
+				firstRow = '';
+				secondRow = '';
+				thirdRow = '';
+				for (let x = Math.max(0, xLeft); x < Math.min(width, xRight); x += BLOCK_SIZE) {
+					// marker = y === yyPos && x === xxPos ? ' O ' : ' X ';
+					if (layout[y][x] % 1000 === 13) {
+						marker = '┌';
+					} else if (layout[y][x] % 1000 === 9) {
+						marker = '┘';
+					} else if (layout[y][x] % 1000 === 8) {
+						marker = '─';
+					} else if (layout[y][x] % 1000 === 6) {
+						marker = '|';
+					} else if (layout[y][x] % 1000 !== -1) {
+						marker = ' ';
+					} else {
+						marker = ' ';
+					}
+					if (layout[y][x + 4] % 1000 === 8) {
+						marker += '─';
+					} else if (layout[y][x + 4] % 1000 !== -1) {
+						marker += ' ';
+					} else {
+						marker += ' ';
+					}
+					if (layout[y][x + 7] % 1000 === 12) {
+						marker += '┐';
+					} else if (layout[y][x + 7] % 1000 === 7) {
+						marker += '└';
+					} else if (layout[y][x + 7] % 1000 === 8) {
+						marker += '─';
+					} else if (layout[y][x + 7] % 1000 === 4) {
+						marker += '|';
+					} else if (layout[y][x + 7] % 1000 !== -1) {
+						marker += ' ';
+					} else {
+						marker += ' ';
+					}
+					firstRow += marker;
+
+					if (layout[y + 4][x] % 1000 === 6) {
+						marker = '|';
+					} else {
+						marker = ' ';
+					}
+					if (y === yyPos && x === xxPos) {
+						marker += 'O';
+					} else if (layout[y + 4][x + 4] % 1000 !== -1) {
+						marker += ' ';
+					} else {
+						marker += '.';
+					}
+
+					if (layout[y + 4][x + 7] % 1000 === 4) {
+						marker += '|';
+					} else {
+						marker += ' ';
+					}
+					secondRow += marker;
+
+					if (layout[y + 7][x] % 1000 === 11) {
+						marker = '└';
+					} else if (layout[y + 7][x] % 1000 === 3) {
+						marker = '┐';
+					} else if (layout[y + 7][x] % 1000 === 6) {
+						marker = '|';
+					} else if (layout[y + 7][x] % 1000 === 2) {
+						marker = '─';
+					} else if (layout[y + 7][x] % 1000 !== -1) {
+						marker = ' ';
+					} else {
+						marker = ' ';
+					}
+					if (layout[y + 7][x + 4] % 1000 === 2) {
+						marker += '─';
+					} else if (layout[y + 7][x + 4] % 1000 !== -1) {
+						marker += ' ';
+					} else {
+						marker += ' ';
+					}
+					if (layout[y + 7][x + 7] % 1000 === 1) {
+						marker += '┌';
+					} else if (layout[y + 7][x + 7] % 1000 === 10) {
+						marker += '┘';
+					} else if (layout[y + 7][x + 7] % 1000 === 2) {
+						marker += '─';
+					} else if (layout[y + 7][x + 7] % 1000 === 4) {
+						marker += '|';
+					} else if (layout[y + 7][x + 7] % 1000 !== -1) {
+						marker += ' ';
+					} else {
+						marker += ' ';
+					}
+					thirdRow += marker;
+					// map += tile !== -1 ? marker : '   ';
+				}
+				map += `${firstRow}\n${secondRow}\n${thirdRow}\n`;
+			}
 
 			//yPos: ${Math.floor(yyPos)}, xPos:  ${Math.floor(xxPos)}\n\n
 			this.setText(`${globalState.currentLevel}\n\n${map}`);

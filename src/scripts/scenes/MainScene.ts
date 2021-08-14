@@ -435,15 +435,15 @@ export default class MainScene extends Phaser.Scene {
 					traderId: npc.traderId
 				});
 		});
-		this.addNpc(
-			"lichking",
-			'lich-king',
-			globalState.playerCharacter.x+1,
-			globalState.playerCharacter.y+1,
-			1,
-			0,
-			0
-		)
+		// this.addNpc(
+		// 	"lichking",
+		// 	'lich-king',
+		// 	globalState.playerCharacter.x+1,
+		// 	globalState.playerCharacter.y+1,
+		// 	1,
+		// 	0,
+		// 	0
+		// )
 
 		doors.forEach((door) => {
 			this.addDoor(door.id, door.type, door.x, door.y, door.open);

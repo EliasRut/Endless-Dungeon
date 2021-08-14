@@ -124,7 +124,8 @@ export const npcTypeToFileMap: {[name: string]:{file: string, facing: FacingRang
 	'redling-boss' : {file: 'assets/sprites/red-ball.png',facing: FacingRange.ALL_DIRECTIONS},
 	'red-link'     : {file: 'assets/sprites/red-link.png',facing: FacingRange.ALL_DIRECTIONS},
 	'naked-guy'    : {file: 'assets/sprites/naked-guy.png',facing: FacingRange.ALL_DIRECTIONS},
-	'enemy-zombie' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW}
+	'enemy-zombie' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW},
+	'lich-king' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW}
 };
 
 export const npcTypeToAttackFileMap: {
