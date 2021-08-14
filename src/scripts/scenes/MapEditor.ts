@@ -460,13 +460,21 @@ export default class MapEditor extends Phaser.Scene {
 		);
 		this.libraryLayer = map.createLayer(0, tileSet, 0, 0).setInteractive();
 		this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
-		this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
+		this.libraryLayer.on('pointerdown', (
+				pointer: { downX: number; downY: number; }, 
+				_x: number,
+				_y: number,
+				event: any
+			) => {
+			// Stop touch event from triggering on underlying layers.
+			event.stopPropagation();
+
 			this.selectedTileValues = undefined;
 			this.libraryLayer.forEachTile((tile) => {
 				tile.clearAlpha();
 			});
-			const clickX = pointer.downX - this.libraryLayer.x;
-			const clickY = pointer.downY - this.libraryLayer.y;
+			const clickX = pointer.downX;// - this.libraryLayer.x;
+			const clickY = pointer.downY;// - this.libraryLayer.y;
 			const tileX = Math.floor(clickX / TILE_WIDTH);
 			const tileY = Math.floor(clickY / TILE_HEIGHT);
 			const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
@@ -509,11 +517,11 @@ export default class MapEditor extends Phaser.Scene {
 			tileLayer: Phaser.Tilemaps.TilemapLayer
 		) {
 		const clickX =
-			posX - this.cameras.main.centerX + this.cameraPositionX - tileLayer.x;
+			posX - this.cameras.main.centerX + (this.cameraPositionX - tileLayer.x) * this.zoomFactor;
 		const clickY =
-			posY - this.cameras.main.centerY + this.cameraPositionY - tileLayer.y;
-		const tileX = Math.floor(clickX / TILE_WIDTH);
-		const tileY = Math.floor(clickY / TILE_HEIGHT);
+			posY - this.cameras.main.centerY + (this.cameraPositionY - tileLayer.y) * this.zoomFactor;
+		const tileX = Math.floor(clickX / (TILE_WIDTH * this.zoomFactor));
+		const tileY = Math.floor(clickY / (TILE_HEIGHT * this.zoomFactor));
 		return [
 			tileX,
 			tileY,
@@ -615,9 +623,14 @@ export default class MapEditor extends Phaser.Scene {
 			1,
 			2
 		);
+
+		const activeLayerValue = this.activeLayerDropdownElement.value;
+
 		this.tileLayer = map
-			.createLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2)
-			.setInteractive();
+			.createLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
+		if (activeLayerValue === 'base') {
+			this.tileLayer.setInteractive();
+		}
 		this.tileLayer.setDepth(DEPTHS.baseLayer);
 
 		const onPointerDown: (
@@ -683,6 +696,10 @@ export default class MapEditor extends Phaser.Scene {
 			}
 		};
 
+		const onPointerOut: () => void = () => {
+			this.isPointerDown = false;
+		};
+
 		this.tileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			onPointerDown(this.tileLayer, this.roomLayout, pointer.downX, pointer.downY);
 		});
@@ -691,6 +708,9 @@ export default class MapEditor extends Phaser.Scene {
 		});
 		this.tileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
 			onPointerUp(this.tileLayer, pointer.upX, pointer.upY);
+		});
+		this.tileLayer.on('pointerout', () => {
+			onPointerOut();
 		});
 
 		const decorationMap = this.make.tilemap({
@@ -708,7 +728,9 @@ export default class MapEditor extends Phaser.Scene {
 		);
 		this.decorationTileLayer = decorationMap
 			.createLayer(0, decorationTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
-			// .setInteractive();
+		if (activeLayerValue === 'decoration') {
+				this.decorationTileLayer.setInteractive();
+		}
 		this.decorationTileLayer.setDepth(DEPTHS.decorationLayer);
 		this.decorationTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			onPointerDown(this.decorationTileLayer, this.roomDecorationLayout,
@@ -720,6 +742,9 @@ export default class MapEditor extends Phaser.Scene {
 		});
 		this.decorationTileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
 			onPointerUp(this.decorationTileLayer, pointer.upX, pointer.upY);
+		});
+		this.decorationTileLayer.on('pointerout', () => {
+			onPointerOut();
 		});
 
 		const overlayMap = this.make.tilemap({
@@ -737,6 +762,9 @@ export default class MapEditor extends Phaser.Scene {
 		);
 		this.overlayTileLayer = overlayMap
 			.createLayer(0, overlayTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
+		if (activeLayerValue === 'overlay') {
+			this.overlayTileLayer.setInteractive();
+		}
 		this.overlayTileLayer.setDepth(DEPTHS.overlayLayer);
 		this.overlayTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			onPointerDown(this.overlayTileLayer, this.roomOverlayLayout,
@@ -748,6 +776,9 @@ export default class MapEditor extends Phaser.Scene {
 		});
 		this.overlayTileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
 			onPointerUp(this.overlayTileLayer, pointer.upX, pointer.upY);
+		});
+		this.overlayTileLayer.on('pointerout', () => {
+			onPointerOut();
 		});
 
 		for (let y = 0; y < this.roomHeight; y++) {
@@ -853,9 +884,8 @@ export default class MapEditor extends Phaser.Scene {
 			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
 			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
 			this.positionText.setScale(1 / this.zoomFactor);
-			console.log(newHeight - POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor));
-			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET,
-				340);
+			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET * (1 / this.zoomFactor),
+				this.cameras.main.height - (POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor)) - newY);
 		}
 		this.wasZoomInDown = this.zoomIn.isDown;
 
@@ -875,8 +905,8 @@ export default class MapEditor extends Phaser.Scene {
 			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
 			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
 			this.positionText.setScale(1 / this.zoomFactor);
-			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET,
-				340);
+			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET* (1 / this.zoomFactor),
+				this.cameras.main.height - (POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor)) - newY);
 		}
 		this.wasZoomOutDown = this.zoomOut.isDown;
 
