@@ -86,7 +86,9 @@ export const getRotationInRadiansForFacing = (facing: Facings) => {
 };
 
 export const getCharacterSpeed = (char: Character) => {
-	return char.movementSpeed * char.slowFactor;
+	const ms = char.movementSpeed * char.slowFactor;
+	char.slowFactor = 1;
+	return ms;
 };
 
 export const updateMovingState = (
@@ -111,7 +113,8 @@ export const updateMovingState = (
 		return `${char.animationBase}-${animationType}-${newDirection}`;
 };
 
-export const COLIDING_TILE_RANGES = [
+export const COLLIDING_TILE_RANGES = [
+	// [-1, -1],
 	// tslint:disable: no-magic-numbers
 	[0, 31],
 	[40, 71],
@@ -128,9 +131,10 @@ export const COLIDING_TILE_RANGES = [
 ];
 
 export const isCollidingTile = (tileNumber: number) => {
+	// tslint:disable-next-line: no-magic-numbers
 	const normedNumber = tileNumber % 1000;
-	const firstColiding =
-		COLIDING_TILE_RANGES.find(([lower, upper]) =>
+	const firstColliding =
+		COLLIDING_TILE_RANGES.find(([lower, upper]) =>
 			lower <= normedNumber && normedNumber <= upper );
-	return !!firstColiding;
-}
+	return !!firstColliding;
+};
