@@ -3,7 +3,7 @@ import {
 	TILE_WIDTH,
 	TILE_HEIGHT
 } from '../helpers/generateDungeon';
-import PositionText from '../drawables/ui/PositionText';
+import PositionText, { POSITION_TEXT_X_OFFSET, POSITION_TEXT_Y_OFFSET } from '../drawables/ui/PositionText';
 import globalState from '../worldstate';
 import firebase from 'firebase';
 import { DatabaseRoom, Room } from '../../../typings/custom';
@@ -839,7 +839,7 @@ export default class MapEditor extends Phaser.Scene {
 
 		if (this.zoomIn.isDown && !this.wasZoomInDown) {
 			this.wasZoomInDown = true;
-			this.zoomFactor = Math.min(1, this.zoomFactor * 2); 
+			this.zoomFactor = Math.min(1, this.zoomFactor * 2);
 			this.cameras.main.setZoom(this.zoomFactor);
 			this.libraryLayer.setScale(1 / this.zoomFactor);
 			this.backgroundLibraryLayer.setScale(1 / this.zoomFactor);
@@ -852,12 +852,16 @@ export default class MapEditor extends Phaser.Scene {
 			this.backgroundLibraryLayer.setPosition(newX, newY);
 			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
 			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
+			this.positionText.setScale(1 / this.zoomFactor);
+			console.log(newHeight - POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor));
+			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET,
+				340);
 		}
 		this.wasZoomInDown = this.zoomIn.isDown;
 
 		if (this.zoomOut.isDown && !this.wasZoomOutDown) {
 			this.wasZoomOutDown = true;
-			this.zoomFactor = Math.max(0.125, this.zoomFactor / 2); 
+			this.zoomFactor = Math.max(0.125, this.zoomFactor / 2);
 			this.cameras.main.setZoom(this.zoomFactor);
 			this.libraryLayer.setScale(1 / this.zoomFactor);
 			this.backgroundLibraryLayer.setScale(1 / this.zoomFactor);
@@ -870,6 +874,9 @@ export default class MapEditor extends Phaser.Scene {
 			this.backgroundLibraryLayer.setPosition(newX, newY);
 			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
 			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
+			this.positionText.setScale(1 / this.zoomFactor);
+			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET,
+				340);
 		}
 		this.wasZoomOutDown = this.zoomOut.isDown;
 
