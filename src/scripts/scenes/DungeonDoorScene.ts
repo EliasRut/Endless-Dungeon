@@ -21,9 +21,9 @@ export default class DungeonDoorScene extends Phaser.Scene {
 		const dungeonRun = generateDungeonRun(runeAssignment);
 
 		dungeonRun.levels.forEach((levelData, level) => {
-			const rooms = ['connection_up'];
+			const rooms = ['COM-death-connection-up'];
 				if (level < dungeonRun.levels.length - 1) {
-					rooms.push('connection_down');
+					rooms.push('COM-death-connection-down');
 				}
 			globalState.roomAssignment['dungeonLevel' + (level + 1)] = {
 				dynamicLighting: true,

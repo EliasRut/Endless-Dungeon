@@ -2,6 +2,7 @@ import globalState from '../../worldstate/index';
 import { BLOCK_SIZE, TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 import { TILE_SIZE } from '../../helpers/generateRoom';
 import { isCollidingTile } from '../../helpers/movement';
+import MainScene from '../../scenes/MainScene';
 
 const X_POSITION = 10;
 const Y_POSITION = 180;
@@ -50,70 +51,84 @@ export default class Minimap extends Phaser.GameObjects.Text {
 			let secondRow: string = '';
 			let thirdRow: string = '';
 
+			const mainScene = this.scene as MainScene;
+
 			for (let y = Math.max(0, yDown); y < Math.min(height, yUp); y += BLOCK_SIZE) {
 				firstRow = '';
 				secondRow = '';
 				thirdRow = '';
 				for (let x = Math.max(0, xLeft); x < Math.min(width, xRight); x += BLOCK_SIZE) {
 					// marker = y === yyPos && x === xxPos ? ' O ' : ' X ';
-					if (layout[y][x] % 1000 === 164) {
+					const topLeftTile = mainScene.tileLayer.getTileAt(x, y);
+					const topMiddleTile = mainScene.tileLayer.getTileAt(x + 4, y);
+					const topRightTile = mainScene.tileLayer.getTileAt(x + 7, y);
+
+					if (!topLeftTile || topLeftTile.tint === 0 || topLeftTile.index % 1000 === -1) {
+						marker = ' ';
+					} else if (topLeftTile.index % 1000 === 164) {
 						marker = '┌';
-					} else if (layout[y][x] % 1000 === 202) {
+					} else if (topLeftTile.index % 1000 === 202) {
 						marker = '┘';
-					} else if (layout[y][x] % 1000 === 201) {
+					} else if (topLeftTile.index % 1000 === 201) {
 						marker = '─';
-					} else if (layout[y][x] % 1000 === 162) {
+					} else if (topLeftTile.index % 1000 === 162) {
 						marker = '|';
-					} else if (layout[y][x] % 1000 !== -1) {
-						marker = ' ';
-					} else {
+					} else if (topLeftTile.index % 1000 !== -1) {
 						marker = ' ';
 					}
-					if (layout[y][x + 4] % 1000 === 201) {
+
+					if (!topMiddleTile || topMiddleTile.tint === 0 || topMiddleTile.index % 1000 === -1) {
+						marker = ' ';
+					} else if (topMiddleTile.index % 1000 === 201) {
 						marker += '─';
-					} else if (layout[y][x + 4] % 1000 !== -1) {
-						marker += ' ';
-					} else {
-						marker += ' ';
 					}
-					if (layout[y][x + 7] % 1000 === 163) {
+
+					if (!topRightTile || topRightTile.tint === 0 || topRightTile.index % 1000 === -1) {
+						marker += ' ';
+					} else if (topRightTile.index % 1000 === 163) {
 						marker += '┐';
-					} else if (layout[y][x + 7] % 1000 === 200) {
+					} else if (topRightTile.index % 1000 === 200) {
 						marker += '└';
-					} else if (layout[y][x + 7] % 1000 === 201) {
+					} else if (topRightTile.index % 1000 === 201) {
 						marker += '─';
-					} else if (layout[y][x + 7] % 1000 === 160) {
+					} else if (topRightTile.index % 1000 === 160) {
 						marker += '|';
-					} else if (layout[y][x + 7] % 1000 !== -1) {
-						marker += ' ';
-					} else {
-						marker += ' ';
 					}
 					firstRow += marker;
 
-					if (layout[y + 4][x] % 1000 === 162) {
-						marker = '|';
-					} else {
+					const middleLeftTile = mainScene.tileLayer.getTileAt(x, y + 4);
+					const middleMiddleTile = mainScene.tileLayer.getTileAt(x + 4, y + 4);
+					const middleRightTile = mainScene.tileLayer.getTileAt(x + 7, y + 4);
+
+					if (!middleLeftTile || middleLeftTile.tint === 0 || middleLeftTile.index % 1000 === -1) {
 						marker = ' ';
+					} else if (middleLeftTile.index % 1000 === 162) {
+						marker = '|';
 					}
-					if (y === yyPos && x === xxPos) {
-						marker += 'O';
-					} else if (layout[y + 4][x + 4] % 1000 !== -1) {
+
+					if (!middleMiddleTile || middleMiddleTile.tint === 0 || middleMiddleTile.index % 1000 === -1) {
 						marker += ' ';
-					} else {
+					} else if (y === yyPos && x === xxPos) {
+						marker += 'O';
+					} else if (middleMiddleTile.index % 1000 !== -1) {
 						marker += '.';
 					}
 
-					if (layout[y + 4][x + 7] % 1000 === 160) {
-						marker += '|';
-					} else {
+					if (!middleRightTile || middleRightTile.tint === 0 || middleRightTile.index % 1000 === -1) {
 						marker += ' ';
+					} else if (middleRightTile.index % 1000 === 160) {
+						marker += '|';
 					}
 					secondRow += marker;
 
+
+					const bottomLeftTile = mainScene.tileLayer.getTileAt(x, y + 7);
+					const bottomMiddleTile = mainScene.tileLayer.getTileAt(x + 4, y + 7);
+					const bottomRightTile = mainScene.tileLayer.getTileAt(x + 7, y + 7);
+
 					if (layout[y + 7][x] % 1000 === 124) {
 						marker = '└';
-					} else if (layout[y + 7][x] % 1000 === 121) {
+					} else if (layout[y + 7][x] % 1000 === 122) {
 						marker = '┐';
 					} else if (layout[y + 7][x] % 1000 === 162) {
 						marker = '|';
@@ -145,7 +160,6 @@ export default class Minimap extends Phaser.GameObjects.Text {
 						marker += ' ';
 					}
 					thirdRow += marker;
-					// map += tile !== -1 ? marker : '   ';
 				}
 				map += `${firstRow}\n${secondRow}\n${thirdRow}\n`;
 			}

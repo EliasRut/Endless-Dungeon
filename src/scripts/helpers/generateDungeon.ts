@@ -54,7 +54,7 @@ const CAP_WEST = [
 	[164,201,201,201,201,201,201,201],
 	[162,  1,  2,  8,  2,  2,  8,  2],
 	[162, 41, 42, 48, 42, 42, 48, 42],
-	[162, 31, 32, 38, 32, 32, 38, 32],
+	[162, 32, 32, 38, 32, 32, 38, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
@@ -84,7 +84,7 @@ const CORRIDOR_UP_RIGHT = [
 	[164,201,201,201,201,201,201,201],
 	[162,  1,  8,  2,  2,  8,  2,  2],
 	[162, 41, 48, 42, 42, 48, 42, 42],
-	[162, 31, 38, 32, 32, 38, 32, 32],
+	[162, 32, 38, 32, 32, 38, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
@@ -94,7 +94,7 @@ const CORRIDOR_UP_LEFT = [
 	[201,201,201,201,201,201,201,163],
 	[  2,  8,  2,  2,  8,  2,  3,160],
 	[ 42, 48, 42, 42, 48, 42, 43,160],
-	[ 32, 38, 32, 32, 38, 32, 33,160],
+	[ 32, 38, 32, 32, 38, 32, 32,160],
 	[ 32, 32, 32, 32, 32, 32, 32,160],
 	[ 32, 32, 32, 32, 32, 32, 32,160],
 	[ 32, 32, 32, 32, 32, 32, 32,160],
@@ -236,6 +236,7 @@ export default class DungeonGenerator {
 		while (levelData.numberOfRooms > this.rooms.length) {
 			const roomGen = new RoomGenerator();
 			const genericRoom = roomGen.generateRoom(this.fillerTilest);
+			genericRoom.layout
 			this.rooms.push(genericRoom);
 			globalState.availableRooms[genericRoom.name] = genericRoom;
 		}
@@ -333,7 +334,7 @@ export default class DungeonGenerator {
 				let targetRoom = connection.targetRoom;
 				if (targetMap === 'NEXT_LEVEL') {
 					targetMap = `dungeonLevel${this.dungeonLevel + 1}`;
-					targetRoom = 'connection_up';
+					targetRoom = 'COM-death-connection-up';
 					targetX = 12;
 					targetY = 5;
 				} else if (targetMap === 'PREVIOUS_LEVEL') {
@@ -344,7 +345,7 @@ export default class DungeonGenerator {
 						targetY = 45;
 					} else {
 						targetMap = `dungeonLevel${this.dungeonLevel - 1}`;
-						targetRoom = 'connection_down';
+						targetRoom = 'COM-death-connection-down';
 						targetX = 11;
 						targetY = 6;
 					}
