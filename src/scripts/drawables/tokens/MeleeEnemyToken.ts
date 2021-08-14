@@ -34,6 +34,7 @@ export default class MeleeEnemyToken extends EnemyToken {
 		});
 		this.emitter.startFollow(this.body.gameObject);
 		this.emitter.start();
+		this.stateObject.health = 2;
 		this.attackRange = REGULAR_ATTACK_RANGE;
 		this.stateObject.movementSpeed = 0;
 	}

@@ -6,13 +6,14 @@ import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
 import { isCollidingTile } from '../../helpers/movement';
 
-const ATTACK_RANGE = 80;
-const SUMMON_SPEED = 1000;
-const CAST_DURATION = 5000;
+const ATTACK_RANGE = 120;
+const SUMMON_SPEED = 500;
+const CAST_DURATION = 2500;
+const SPAWN_SEARCH_RADIUS = 250;
 
 export default class LichtKingToken extends EnemyToken {
 
-	summonCD = 30000;
+	summonCD = 20000;
 	summonedAt = -Infinity;
 	casting = 0;
 	addsCounter: number = 0;
@@ -144,10 +145,10 @@ export default class LichtKingToken extends EnemyToken {
 		}
 		if (time - this.summonedAt > this.casting) {
 			if ((this.casting / 1000) % 2 === 0) {
-				let xy = this.getUncollidingXY(this.target.x, this.target.y);
+				const xy = this.getUncollidingXY(this.target.x, this.target.y);
 				this.scene.addNpc(
-					"LichAdd_" + this.addsCounter.toString(),
-					"red-link",
+					'LichAdd_' + this.addsCounter.toString(),
+					'red-link',
 					xy[0],
 					xy[1],
 					1,
@@ -156,10 +157,10 @@ export default class LichtKingToken extends EnemyToken {
 				this.addsCounter++;
 				this.casting += SUMMON_SPEED;
 			} else {
-				let xy = this.getUncollidingXY(this.stateObject.x, this.stateObject.y);
+				const xy = this.getUncollidingXY(this.stateObject.x, this.stateObject.y);
 				this.scene.addNpc(
-					"LichAdd_" + this.addsCounter.toString(),
-					"enemy-zombie",
+					'LichAdd_' + this.addsCounter.toString(),
+					'enemy-zombie',
 					xy[0],
 					xy[1],
 					1,
@@ -171,13 +172,12 @@ export default class LichtKingToken extends EnemyToken {
 		}
 	}
 	getUncollidingXY(x: number, y: number) {
-		let newX = x + Math.round(Math.random() * 100);
-		let newY = y + Math.round(Math.random() * 100);
+		let newX = x + Math.round(Math.random() * SPAWN_SEARCH_RADIUS);
+		let newY = y + Math.round(Math.random() * SPAWN_SEARCH_RADIUS);
 		let tile = this.scene.tileLayer.getTileAtWorldXY(newX, newY);
-		console.log(tile?.index);
-		while (isCollidingTile(tile?.index) === true) {
-			newX = x + Math.round(Math.random() * 500);
-			newY = y + Math.round(Math.random() * 500);
+		while (tile === null || isCollidingTile(tile?.index) === true) {
+			newX = x + Math.round(Math.random() * SPAWN_SEARCH_RADIUS);
+			newY = y + Math.round(Math.random() * SPAWN_SEARCH_RADIUS);
 			tile = this.scene.tileLayer.getTileAtWorldXY(newX, newY);
 		}
 		return [newX, newY];

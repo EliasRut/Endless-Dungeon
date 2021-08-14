@@ -12,8 +12,8 @@ const BODY_RADIUS = 12;
 const BODY_X_OFFSET = 10;
 const BODY_Y_OFFSET = 12;
 
-const ENEMY_DAMAGE = 10;
-const ENEMY_HEALTH = 10;
+const ENEMY_DAMAGE = 5;
+const ENEMY_HEALTH = 4;
 const ENEMY_SPEED = 35;
 
 export default abstract class EnemyToken extends CharacterToken {
