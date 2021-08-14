@@ -86,7 +86,9 @@ export const getRotationInRadiansForFacing = (facing: Facings) => {
 };
 
 export const getCharacterSpeed = (char: Character) => {
-	return char.movementSpeed * char.slowFactor;
+	const ms = char.movementSpeed * char.slowFactor;
+	char.slowFactor = 1;
+	return ms;
 };
 
 export const updateMovingState = (

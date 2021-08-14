@@ -6,9 +6,15 @@ import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
 
 const ATTACK_RANGE = 80;
+const SUMMON_SPEED = 1000;
+const CAST_DURATION = 5000;
 
 export default class LichtKingToken extends EnemyToken {
 
+	summonCD = 30000;
+	summonedAt = -Infinity;
+	casting = 0;
+	addsCounter: number = 0;
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
 		super(scene, x, y, tokenName, id);
@@ -50,6 +56,11 @@ export default class LichtKingToken extends EnemyToken {
 			this.dropRandomItem(this.level + 1);
 			this.emitter.stop();
 			this.destroy();
+			return;
+		}
+
+		if (this.casting > 0) {
+			this.summon(time);
 			return;
 		}
 
@@ -108,14 +119,52 @@ export default class LichtKingToken extends EnemyToken {
 	}
 
 	attack(time: number) {
-		if (this.attackedAt + this.stateObject.attackTime < time) {
+		if (this.summonedAt + this.summonCD < time) {
+			this.summon(time);
+		}
+		else if (this.attackedAt + this.stateObject.attackTime < time) {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.attackedAt = time;
 			this.scene.abilityHelper.triggerAbility(
 				this.stateObject,
-				AbilityType.HAIL_OF_FLAMES,
+				AbilityType.ARCANE_BLADE,
 				time);
+		}
+	}	
+	summon(time: number) {
+		if(this.casting === 0) {
+			this.casting = SUMMON_SPEED;
+			this.summonedAt = time;
+		}
+		if(this.casting >= CAST_DURATION) {
+			this.casting = 0;
+			return;
+		}
+		if (time - this.summonedAt > this.casting) {
+			if ((this.casting / 1000) % 2 === 0) {
+				this.scene.addNpc(
+					"LichAdd_" + this.addsCounter.toString(),
+					"red-link",
+					this.target.x + 1,
+					this.target.y + 1,
+					1,
+					0,
+					0);
+				this.addsCounter++;
+				this.casting += SUMMON_SPEED;
+			} else {
+				this.scene.addNpc(
+					"LichAdd_" + this.addsCounter.toString(),
+					"enemy-zombie",
+					this.stateObject.x + 1,
+					this.stateObject.y + 1,
+					1,
+					0,
+					0);
+				this.addsCounter++;
+				this.casting += SUMMON_SPEED;
+			}
 		}
 	}
 }

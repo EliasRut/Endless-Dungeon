@@ -432,6 +432,15 @@ export default class MainScene extends Phaser.Scene {
 					traderId: npc.traderId
 				});
 		});
+		this.addNpc(
+			"lichking",
+			'lich-king',
+			globalState.playerCharacter.x+1,
+			globalState.playerCharacter.y+1,
+			1,
+			0,
+			0
+		)
 
 		doors.forEach((door) => {
 			this.addDoor(door.id, door.type, door.x, door.y, door.open);
@@ -488,10 +497,10 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isInventoryPressed()) {
 			if (this.wasIPressed=== false){
 				this.icons.backpackIcon.toggleScreen();
-				this.overlayScreens.inventory.interactInventory("pressed", globalTime);
+				this.overlayScreens.inventory.interactInventory('pressed', globalTime);
 			}
 			this.wasIPressed=true;
-			
+
 		} else {
 			this.wasIPressed=false;
 		}
@@ -524,10 +533,15 @@ export default class MainScene extends Phaser.Scene {
 
 		if (this.isPaused) {
 			if(this.icons.backpackIcon.screens[0].visiblity)
-			this.overlayScreens.inventory.interactInventory(this.keyboardHelper.getInventoryKeyPress(), globalTime);
+			this.overlayScreens.inventory.interactInventory(
+				this.keyboardHelper.getInventoryKeyPress(),
+				globalTime);
 			return;
 		}
 
+		Object.values(this.npcMap).forEach((curNpc) => {
+			curNpc.update(globalTime);
+		});
 		if (!this.blockUserInteraction) {
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalTime);
 			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
@@ -580,19 +594,6 @@ export default class MainScene extends Phaser.Scene {
 
 		if (!this.blockUserInteraction) {
 			const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
-			if(castAbilities[0] === AbilityType.FIREBALL){
-				let pointers = this.input.activePointer;
-				console.log(pointers.x)
-				console.log(pointers.y)
-				this.addNpc(
-					"test1",
-					"enemy-zombie",
-					globalState.playerCharacter.x+1,
-					globalState.playerCharacter.y+1,
-					1,
-					0,
-					0);
-			}
 			this.abilityHelper.update(globalTime, castAbilities);
 		}
 
@@ -602,10 +603,6 @@ export default class MainScene extends Phaser.Scene {
 		if (this.useDynamicLighting && this.dynamicLightingHelper) {
 			this.dynamicLightingHelper.updateDynamicLighting();
 		}
-
-		Object.values(this.npcMap).forEach((curNpc) => {
-			curNpc.update(globalTime);
-		});
 
 		// TODO: remove items that are picked up
 		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);

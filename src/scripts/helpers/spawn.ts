@@ -5,6 +5,7 @@ import MainScene from '../scenes/MainScene';
 import NpcToken from '../drawables/tokens/NpcToken';
 import { NpcOptions } from '../../../typings/custom';
 import RedlingBossToken from '../drawables/tokens/RedlingBoss';
+import LichKingToken from '../drawables/tokens/LichKing';
 
 export const spawnNpc = (
 		scene: MainScene,
@@ -30,6 +31,9 @@ export const spawnNpc = (
 		}
 		case 'redling-boss': {
 			return new RedlingBossToken(scene, posX, posY, type, level, id);
+		}
+		case 'lich-king': {
+			return new LichKingToken(scene, posX, posY, type, level, id);
 		}
 		default: {
 			throw new Error(`Map called for unknown enemy "${type}".`);
