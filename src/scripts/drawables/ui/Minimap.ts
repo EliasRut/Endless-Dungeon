@@ -56,33 +56,33 @@ export default class Minimap extends Phaser.GameObjects.Text {
 				thirdRow = '';
 				for (let x = Math.max(0, xLeft); x < Math.min(width, xRight); x += BLOCK_SIZE) {
 					// marker = y === yyPos && x === xxPos ? ' O ' : ' X ';
-					if (layout[y][x] % 1000 === 13) {
+					if (layout[y][x] % 1000 === 164) {
 						marker = '┌';
-					} else if (layout[y][x] % 1000 === 9) {
+					} else if (layout[y][x] % 1000 === 202) {
 						marker = '┘';
-					} else if (layout[y][x] % 1000 === 8) {
+					} else if (layout[y][x] % 1000 === 201) {
 						marker = '─';
-					} else if (layout[y][x] % 1000 === 6) {
+					} else if (layout[y][x] % 1000 === 162) {
 						marker = '|';
 					} else if (layout[y][x] % 1000 !== -1) {
 						marker = ' ';
 					} else {
 						marker = ' ';
 					}
-					if (layout[y][x + 4] % 1000 === 8) {
+					if (layout[y][x + 4] % 1000 === 201) {
 						marker += '─';
 					} else if (layout[y][x + 4] % 1000 !== -1) {
 						marker += ' ';
 					} else {
 						marker += ' ';
 					}
-					if (layout[y][x + 7] % 1000 === 12) {
+					if (layout[y][x + 7] % 1000 === 163) {
 						marker += '┐';
-					} else if (layout[y][x + 7] % 1000 === 7) {
+					} else if (layout[y][x + 7] % 1000 === 200) {
 						marker += '└';
-					} else if (layout[y][x + 7] % 1000 === 8) {
+					} else if (layout[y][x + 7] % 1000 === 201) {
 						marker += '─';
-					} else if (layout[y][x + 7] % 1000 === 4) {
+					} else if (layout[y][x + 7] % 1000 === 160) {
 						marker += '|';
 					} else if (layout[y][x + 7] % 1000 !== -1) {
 						marker += ' ';
@@ -91,7 +91,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 					}
 					firstRow += marker;
 
-					if (layout[y + 4][x] % 1000 === 6) {
+					if (layout[y + 4][x] % 1000 === 162) {
 						marker = '|';
 					} else {
 						marker = ' ';
@@ -104,40 +104,40 @@ export default class Minimap extends Phaser.GameObjects.Text {
 						marker += '.';
 					}
 
-					if (layout[y + 4][x + 7] % 1000 === 4) {
+					if (layout[y + 4][x + 7] % 1000 === 160) {
 						marker += '|';
 					} else {
 						marker += ' ';
 					}
 					secondRow += marker;
 
-					if (layout[y + 7][x] % 1000 === 11) {
+					if (layout[y + 7][x] % 1000 === 124) {
 						marker = '└';
-					} else if (layout[y + 7][x] % 1000 === 3) {
+					} else if (layout[y + 7][x] % 1000 === 121) {
 						marker = '┐';
-					} else if (layout[y + 7][x] % 1000 === 6) {
+					} else if (layout[y + 7][x] % 1000 === 162) {
 						marker = '|';
-					} else if (layout[y + 7][x] % 1000 === 2) {
+					} else if (layout[y + 7][x] % 1000 === 121) {
 						marker = '─';
 					} else if (layout[y + 7][x] % 1000 !== -1) {
 						marker = ' ';
 					} else {
 						marker = ' ';
 					}
-					if (layout[y + 7][x + 4] % 1000 === 2) {
+					if (layout[y + 7][x + 4] % 1000 === 121) {
 						marker += '─';
 					} else if (layout[y + 7][x + 4] % 1000 !== -1) {
 						marker += ' ';
 					} else {
 						marker += ' ';
 					}
-					if (layout[y + 7][x + 7] % 1000 === 1) {
+					if (layout[y + 7][x + 7] % 1000 === 120) {
 						marker += '┌';
-					} else if (layout[y + 7][x + 7] % 1000 === 10) {
+					} else if (layout[y + 7][x + 7] % 1000 === 123) {
 						marker += '┘';
-					} else if (layout[y + 7][x + 7] % 1000 === 2) {
+					} else if (layout[y + 7][x + 7] % 1000 === 121) {
 						marker += '─';
-					} else if (layout[y + 7][x + 7] % 1000 === 4) {
+					} else if (layout[y + 7][x + 7] % 1000 === 160) {
 						marker += '|';
 					} else if (layout[y + 7][x + 7] % 1000 !== -1) {
 						marker += ' ';
