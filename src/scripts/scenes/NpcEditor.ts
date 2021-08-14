@@ -23,6 +23,21 @@ const LAYER_HEIGHT = 240;
 const LAYER_X_OFFSET = LAYER_WIDTH / 2;
 const LAYER_Y_OFFSET = LAYER_HEIGHT / 2;
 
+const DARKENING_FACTORS = {
+	bodyDarker: 0.35,
+	bodyOutline: 0.8,
+	hairDarker: 0.3,
+	hairDarkest: 0.6,
+	shirtDarker: 0.35,
+	shirtOutline: 0.8,
+	pantsOutline: 0.8,
+	shoesOutline: 0.8
+};
+
+const LIGHTNING_FACTORS = {
+	hairLighter: 0.4
+};
+
 const DEPTHS = {
 	figureLayer: 1,
 	trouserLayer: 2,
@@ -209,7 +224,7 @@ export default class NpcEditor extends Phaser.Scene {
 		};
 		this.palleteLookup.body.baseColor2 = {
 			...this.palleteLookup.body.baseColor2,
-			...rgbToTargetRgb(darkenColor(bodyBaseRgb, 0.5))
+			...rgbToTargetRgb(darkenColor(bodyBaseRgb, DARKENING_FACTORS.bodyDarker))
 		};
 		this.palleteLookup.body.eyeColor = {
 			...this.palleteLookup.body.eyeColor,
@@ -217,7 +232,7 @@ export default class NpcEditor extends Phaser.Scene {
 		};
 		this.palleteLookup.body.outlineColor = {
 			...this.palleteLookup.body.outlineColor,
-			...rgbToTargetRgb(darkenColor(bodyBaseRgb, 0.8))
+			...rgbToTargetRgb(darkenColor(bodyBaseRgb, DARKENING_FACTORS.bodyOutline))
 		};
 
 		this.textures.get('body-temp')?.destroy();
@@ -235,7 +250,7 @@ export default class NpcEditor extends Phaser.Scene {
 		// Hair styling
 		this.palleteLookup.hair.color1 = {
 			...this.palleteLookup.hair.color1,
-			...rgbToTargetRgb(brightenColor(hairBaseRgb, 0.4))
+			...rgbToTargetRgb(brightenColor(hairBaseRgb, LIGHTNING_FACTORS.hairLighter))
 		};
 		this.palleteLookup.hair.color2 = {
 			...this.palleteLookup.hair.color2,
@@ -243,15 +258,15 @@ export default class NpcEditor extends Phaser.Scene {
 		};
 		this.palleteLookup.hair.color3 = {
 			...this.palleteLookup.hair.color3,
-			...rgbToTargetRgb(darkenColor(hairBaseRgb, 0.3))
+			...rgbToTargetRgb(darkenColor(hairBaseRgb, DARKENING_FACTORS.hairDarker))
 		};
 		this.palleteLookup.hair.color4 = {
 			...this.palleteLookup.hair.color4,
-			...rgbToTargetRgb(darkenColor(hairBaseRgb, 0.6))
+			...rgbToTargetRgb(darkenColor(hairBaseRgb, DARKENING_FACTORS.hairDarkest))
 		};
 		this.palleteLookup.hair.bodyColor = {
 			...this.palleteLookup.body.baseColor2,
-			...rgbToTargetRgb(darkenColor(bodyBaseRgb, 0.5))
+			...rgbToTargetRgb(darkenColor(bodyBaseRgb, DARKENING_FACTORS.bodyDarker))
 		};
 
 		this.textures.get('hair-temp')?.destroy();
@@ -274,11 +289,11 @@ export default class NpcEditor extends Phaser.Scene {
 		};
 		this.palleteLookup.shirt.color2 = {
 			...this.palleteLookup.shirt.color2,
-			...rgbToTargetRgb(darkenColor(shirt1BaseRgb, 0.2))
+			...rgbToTargetRgb(darkenColor(shirt1BaseRgb, DARKENING_FACTORS.shirtDarker))
 		};
 		this.palleteLookup.shirt.color3 = {
 			...this.palleteLookup.shirt.color3,
-			...rgbToTargetRgb(darkenColor(shirt1BaseRgb, 0.8))
+			...rgbToTargetRgb(darkenColor(shirt1BaseRgb, DARKENING_FACTORS.shirtDarker))
 		};
 		this.palleteLookup.shirt.color4 = {
 			...this.palleteLookup.shirt.color4,
@@ -305,7 +320,7 @@ export default class NpcEditor extends Phaser.Scene {
 		};
 		this.palleteLookup.pants.color2 = {
 			...this.palleteLookup.pants.color2,
-			...rgbToTargetRgb(darkenColor(pantsBaseRgb, 0.8))
+			...rgbToTargetRgb(darkenColor(pantsBaseRgb, DARKENING_FACTORS.pantsOutline))
 		};
 		this.palleteLookup.pants.color3 = {
 			...this.palleteLookup.pants.color3,
@@ -313,7 +328,7 @@ export default class NpcEditor extends Phaser.Scene {
 		};
 		this.palleteLookup.pants.color4 = {
 			...this.palleteLookup.pants.color4,
-			...rgbToTargetRgb(darkenColor(shoesBaseRgb, 0.8))
+			...rgbToTargetRgb(darkenColor(shoesBaseRgb, DARKENING_FACTORS.shoesOutline))
 		};
 
 		this.textures.get('pants-temp')?.destroy();
