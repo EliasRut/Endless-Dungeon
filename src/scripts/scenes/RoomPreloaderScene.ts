@@ -74,6 +74,9 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 				'til-tavern-decoration',
 				'til-bookshop-decoration',
 				'til-town-base',
+				'COM-death-B',
+				'COM-death-D',
+				'COM-death-O',
 			);
 		}
 
@@ -93,7 +96,9 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 
 	create() {
 		const db = firebase.firestore().collection('rooms');
-		const roomPromises = this.usedRooms.map((roomId) => {
+		const roomPromises = this.usedRooms.filter(
+			(roomId) => !roomId.startsWith('awsomeRoom')
+		).map((roomId) => {
 			return db.doc(roomId).get().then((data) => [roomId, data]);
 		}) as Promise<[string, firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>]>[];
 
@@ -108,7 +113,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 				globalState.availableRooms[room.name] = room;
 			});
 		}).then(() => {
-			this.scene.start('PreloadScene');
+			this.scene.start('NpcGenerationScene');
 		});
 	}
 }

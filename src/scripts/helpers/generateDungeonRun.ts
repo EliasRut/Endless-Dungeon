@@ -2,7 +2,6 @@ import { DungeonLevelData, DungeonRunData } from '../models/DungeonRunData';
 import { SecondaryContentBlock } from '../models/SecondaryContentBlock';
 import { RuneAssignment } from './constants';
 import ContentDataLibrary from './ContentDataLibrary';
-import DungeonLevel from '../worldstate/DungeonLevel';
 
 const CHANCE_FOR_MATCHING_SECONDARY_CONTENT = 0.5;
 

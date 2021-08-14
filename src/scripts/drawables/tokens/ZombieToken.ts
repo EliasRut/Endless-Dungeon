@@ -4,7 +4,7 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 
-const BASE_ATTACK_DAMAGE = 20;
+const BASE_ATTACK_DAMAGE = 10;
 const REGULAR_ATTACK_RANGE = 25;
 const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
@@ -12,7 +12,8 @@ const BASE_HEALTH = 4;
 
 const ATTACK_DAMAGE_DELAY = 250;
 
-const DROP_CHANCE = 0.15;
+const ITEM_DROP_CHANCE = 0.15;
+const HEALTH_DROP_CHANCE = 0.06;
 
 export default class ZombieToken extends EnemyToken {
 	attackExecuted: boolean;
@@ -21,11 +22,11 @@ export default class ZombieToken extends EnemyToken {
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
 		super(scene, x, y, tokenName, id);
 		// cool effects!
-		this.level = level;
+		this.level = level - 1;
 		this.attackRange = REGULAR_ATTACK_RANGE;
 		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
 		this.attackExecuted = false;
-		this.startingHealth = BASE_HEALTH * this.level;
+		this.startingHealth = BASE_HEALTH * (1 + this.level * 0.5);
 		this.stateObject.health = this.startingHealth;
 		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
 	}
@@ -40,9 +41,9 @@ export default class ZombieToken extends EnemyToken {
 
 		// check death
 		if (this.stateObject.health <= 0){
-			if (Math.random() < DROP_CHANCE) {
+			if (Math.random() < ITEM_DROP_CHANCE) {
 				this.dropRandomItem(this.level);
-			}
+			} else if (Math.random() < HEALTH_DROP_CHANCE) this.dropFixedItem('health');
 			this.destroy();
 			return;
 		}

@@ -3,12 +3,15 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 
-const MAX_SLOW_DISTANCE = 30;
+const MAX_SLOW_DISTANCE = 100;
 const SLOW_FACTOR = 0.5;
 const AURA_DAMAGE_PER_TICK = 0.01;
 
-const REGULAR_ATTACK_DAMAGE = 5;
+const REGULAR_ATTACK_DAMAGE = 0;
 const REGULAR_ATTACK_RANGE = 15;
+
+const ITEM_DROP_CHANCE = 0.15;
+const HEALTH_DROP_CHANCE = 0.06;
 
 export default class MeleeEnemyToken extends EnemyToken {
 
@@ -22,9 +25,9 @@ export default class MeleeEnemyToken extends EnemyToken {
 				alpha: { start: 0.3, end: 0.0 },
 				scale: { start: 0.0, end: 2 },
 				tint: 0x1c092d,
-				speed: 0,
+				speed: 1000,
 				rotate: { min: -180, max: 180 },
-				lifespan: { min: 1000, max: 1100 },
+				lifespan: { min: 5000, max: 5000 },
 				blendMode: Phaser.BlendModes.DARKEN,
 				frequency: 50,
 				maxParticles: 200,
@@ -32,6 +35,7 @@ export default class MeleeEnemyToken extends EnemyToken {
 		this.emitter.startFollow(this.body.gameObject);
 		this.emitter.start();
 		this.attackRange = REGULAR_ATTACK_RANGE;
+		this.stateObject.movementSpeed = 0;
 	}
 
 	public update(time: number) {
@@ -41,9 +45,11 @@ export default class MeleeEnemyToken extends EnemyToken {
 
 				// check death
 				if (this.stateObject.health <= 0){
-						this.dropRandomItem();
-						this.destroy();
-						return;
+					if (Math.random() < ITEM_DROP_CHANCE) {
+						this.dropRandomItem(this.level);
+					} else if (Math.random() < HEALTH_DROP_CHANCE) this.dropFixedItem('health');
+					this.destroy();
+					return;
 				}
 
 				const tx = this.target.x;
@@ -54,9 +60,6 @@ export default class MeleeEnemyToken extends EnemyToken {
 				if (distance < MAX_SLOW_DISTANCE) {
 					player.slowFactor = SLOW_FACTOR;
 					player.health -= AURA_DAMAGE_PER_TICK;
-				}
-				else {
-					player.slowFactor = 1;
 				}
 
 				// follows you only if you're close enough, then runs straight at you,

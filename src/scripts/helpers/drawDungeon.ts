@@ -1,23 +1,6 @@
 import DungeonLevel from '../worldstate/DungeonLevel';
 import { TILE_HEIGHT, TILE_WIDTH, GID_MULTIPLE } from './generateDungeon';
-
-// Add tile collision for all tilesets for tile numbers 0-31 and 40-71.
-// tslint:disable: no-magic-numbers
-const COLIDING_TILE_RANGES = [
-	// [-1, -1],
-	[0, 31],
-	[40, 71],
-	[80, 111],
-	[120, 151],
-	[160, 191],
-	[200, 231],
-	[240, 271],
-	[280, 311],
-	[320, 351],
-	[360, 391],
-	[400, 431],
-];
-// tslint:enable
+import { COLLIDING_TILE_RANGES } from './movement';
 
 const createLayer: (
 	scene: Phaser.Scene,
@@ -76,7 +59,7 @@ export const generateTilemap: (scene: Phaser.Scene, dungeonLevel: DungeonLevel) 
 	dungeonLevel.tilesets.map((tileSetName, index) => {
 		const gid = index * GID_MULTIPLE;
 
-		COLIDING_TILE_RANGES.forEach(([first, last]) => {
+		COLLIDING_TILE_RANGES.forEach(([first, last]) => {
 			tileLayer.setCollisionBetween(gid + first, gid + last, true);
 			decorationTileLayer.setCollisionBetween(gid + first, gid + last, true);
 		});
