@@ -49,7 +49,7 @@ export const hexToTargetRgb = (hex: string) => {
 
 export const rgbToTargetRgb = (rgb: RGBColor) => {
 	return {tr: rgb.r, tg: rgb.g, tb: rgb.b};
-}
+};
 
 export interface BodyPalleteData {
 	baseColor1: string;
