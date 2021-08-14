@@ -96,7 +96,9 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 
 	create() {
 		const db = firebase.firestore().collection('rooms');
-		const roomPromises = this.usedRooms.map((roomId) => {
+		const roomPromises = this.usedRooms.filter(
+			(roomId) => !roomId.startsWith('awsomeRoom')
+		).map((roomId) => {
 			return db.doc(roomId).get().then((data) => [roomId, data]);
 		}) as Promise<[string, firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>]>[];
 
