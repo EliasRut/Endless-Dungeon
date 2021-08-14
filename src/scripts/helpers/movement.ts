@@ -112,7 +112,6 @@ export const updateMovingState = (
 };
 
 export const COLIDING_TILE_RANGES = [
-	// [-1, -1],
 	// tslint:disable: no-magic-numbers
 	[0, 31],
 	[40, 71],
