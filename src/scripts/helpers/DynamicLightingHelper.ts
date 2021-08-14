@@ -38,8 +38,8 @@ export default class DynamicLightingHelper {
 
 	prepareDynamicLighting() {
 		const {width, height} = this.getCurrentLevel();
-		const dungeonWidth = width * 8;
-		const dungeonHeight = height * 8;
+		const dungeonWidth = width * TILE_WIDTH;
+		const dungeonHeight = height * TILE_HEIGHT;
 		this.tileLayer.forEachTile((tile) => tile.tint = 0x000000);
 		this.decorationLayer.forEachTile((tile) => tile.tint = 0x000000);
 		this.overlayLayer.forEachTile((tile) => tile.tint = 0x000000);
@@ -95,8 +95,8 @@ export default class DynamicLightingHelper {
 
 	updateDynamicLighting() {
 		const {width, height} = this.getCurrentLevel();
-		const dungeonWidth = width * 8;
-		const dungeonHeight = height * 8;
+		const dungeonWidth = width * TILE_WIDTH;
+		const dungeonHeight = height * TILE_HEIGHT;
 		// Take time for benchmarking
 		const beforeDynamicLighting = window.performance.now();
 
