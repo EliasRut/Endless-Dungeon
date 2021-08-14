@@ -3,7 +3,7 @@ import {
 	TILE_WIDTH,
 	TILE_HEIGHT
 } from '../helpers/generateDungeon';
-import PositionText from '../drawables/ui/PositionText';
+import PositionText, { POSITION_TEXT_X_OFFSET, POSITION_TEXT_Y_OFFSET } from '../drawables/ui/PositionText';
 import globalState from '../worldstate';
 import firebase from 'firebase';
 import { DatabaseRoom, Room } from '../../../typings/custom';
@@ -67,6 +67,8 @@ export default class MapEditor extends Phaser.Scene {
 	libraryLayer: Phaser.Tilemaps.TilemapLayer;
 	backgroundLibraryLayer: Phaser.Tilemaps.TilemapLayer;
 
+	highlightingX = 0;
+	highlightingY = 0;
 	mapEditorHighlighting: Phaser.GameObjects.Image;
 
 	oneKey: Phaser.Input.Keyboard.Key;
@@ -80,6 +82,8 @@ export default class MapEditor extends Phaser.Scene {
 	zKey: Phaser.Input.Keyboard.Key;
 	ctrlKey: Phaser.Input.Keyboard.Key;
 	shiftKey: Phaser.Input.Keyboard.Key;
+	zoomOut: Phaser.Input.Keyboard.Key;
+	zoomIn: Phaser.Input.Keyboard.Key;
 
 	cameraPositionX: number = 0;
 	cameraPositionY: number = 0;
@@ -101,6 +105,8 @@ export default class MapEditor extends Phaser.Scene {
 
 	wasTKeyDown: boolean = false;
 	wasUndoDown: boolean = false;
+	wasZoomInDown: boolean = false;
+	wasZoomOutDown: boolean = false;
 	isLibraryVisible: boolean = false;
 
 	tilesetHistory: LevelHistory = [];
@@ -108,6 +114,8 @@ export default class MapEditor extends Phaser.Scene {
 	selectionStartPoint: [number, number] | undefined;
 	selectionEndPoint: [number, number] | undefined;
 	selectedTileValues: Partial<MultiLevelLayout> | undefined;
+
+	zoomFactor: number = 1;
 
 	constructor() {
 		super({ key: 'MapEditor' });
@@ -270,6 +278,8 @@ export default class MapEditor extends Phaser.Scene {
 		this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z, false);
 		this.ctrlKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL, false);
 		this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT, false);
+		this.zoomOut = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.NUMPAD_SUBTRACT, false);
+		this.zoomIn = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.NUMPAD_ADD, false);
 
 		this.loadFromAutosaveButtonElement.onclick = async () => {
 			const roomName = this.roomsDropdownElement.value;
@@ -281,6 +291,16 @@ export default class MapEditor extends Phaser.Scene {
 			const backupDatabaseSelectedRoom = selectedRoomDoc.data() as DatabaseRoom;
 			this.populateFromDatabase(backupDatabaseSelectedRoom);
 		};
+
+		this.cameras.main.setZoom(this.zoomFactor);
+		// this.cameras.main.centerOn(0, 0);
+
+		// if (this.zoomIn.isDown) {
+		// 	const cam = this.cameras.main;
+
+		// 	cam.pan(500, 500, 2000, 'Power2');
+		// 	cam.zoomTo(4, 3000);
+		// }
 
 		this.exportButtonElement.onclick = () => {
 			const data = this.getExportData();
@@ -440,20 +460,34 @@ export default class MapEditor extends Phaser.Scene {
 		);
 		this.libraryLayer = map.createLayer(0, tileSet, 0, 0).setInteractive();
 		this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
-		this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
+		this.libraryLayer.on('pointerdown', (
+				pointer: { downX: number; downY: number; }, 
+				_x: number,
+				_y: number,
+				event: any
+			) => {
+			// Stop touch event from triggering on underlying layers.
+			event.stopPropagation();
+
 			this.selectedTileValues = undefined;
 			this.libraryLayer.forEachTile((tile) => {
 				tile.clearAlpha();
 			});
-			const clickX = pointer.downX - this.libraryLayer.x;
-			const clickY = pointer.downY - this.libraryLayer.y;
+			const clickX = pointer.downX;// - this.libraryLayer.x;
+			const clickY = pointer.downY;// - this.libraryLayer.y;
 			const tileX = Math.floor(clickX / TILE_WIDTH);
 			const tileY = Math.floor(clickY / TILE_HEIGHT);
 			const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
 			if (clickedTile) {
 				this.selectedId = clickedTile.index;
-				this.mapEditorHighlighting.x = clickedTile.x * TILE_WIDTH + (TILE_WIDTH / 2);
-				this.mapEditorHighlighting.y = clickedTile.y * TILE_HEIGHT + (TILE_HEIGHT / 2);
+				this.highlightingX = clickedTile.x * TILE_WIDTH + (TILE_WIDTH / 2);
+				this.highlightingY = clickedTile.y * TILE_HEIGHT + (TILE_HEIGHT / 2);
+				const zoomedWidth = this.cameras.main.width * (1 / this.zoomFactor);
+				const zoomedHeight = this.cameras.main.height * (1 / this.zoomFactor);
+				const zoomedZeroX = 	(this.cameras.main.width - zoomedWidth) / 2;
+				const zoomedZeroY = (this.cameras.main.height - zoomedHeight) / 2;
+				this.mapEditorHighlighting.x = zoomedZeroX + this.highlightingX * (1 / this.zoomFactor);
+				this.mapEditorHighlighting.y = zoomedZeroY + this.highlightingY * (1 / this.zoomFactor);
 			}
 		});
 		this.libraryLayer.setScrollFactor(0, 0);
@@ -483,11 +517,11 @@ export default class MapEditor extends Phaser.Scene {
 			tileLayer: Phaser.Tilemaps.TilemapLayer
 		) {
 		const clickX =
-			posX - this.cameras.main.centerX + this.cameraPositionX - tileLayer.x;
+			posX - this.cameras.main.centerX + (this.cameraPositionX - tileLayer.x) * this.zoomFactor;
 		const clickY =
-			posY - this.cameras.main.centerY + this.cameraPositionY - tileLayer.y;
-		const tileX = Math.floor(clickX / TILE_WIDTH);
-		const tileY = Math.floor(clickY / TILE_HEIGHT);
+			posY - this.cameras.main.centerY + (this.cameraPositionY - tileLayer.y) * this.zoomFactor;
+		const tileX = Math.floor(clickX / (TILE_WIDTH * this.zoomFactor));
+		const tileY = Math.floor(clickY / (TILE_HEIGHT * this.zoomFactor));
 		return [
 			tileX,
 			tileY,
@@ -589,9 +623,14 @@ export default class MapEditor extends Phaser.Scene {
 			1,
 			2
 		);
+
+		const activeLayerValue = this.activeLayerDropdownElement.value;
+
 		this.tileLayer = map
-			.createLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2)
-			.setInteractive();
+			.createLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
+		if (activeLayerValue === 'base') {
+			this.tileLayer.setInteractive();
+		}
 		this.tileLayer.setDepth(DEPTHS.baseLayer);
 
 		const onPointerDown: (
@@ -657,6 +696,10 @@ export default class MapEditor extends Phaser.Scene {
 			}
 		};
 
+		const onPointerOut: () => void = () => {
+			this.isPointerDown = false;
+		};
+
 		this.tileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			onPointerDown(this.tileLayer, this.roomLayout, pointer.downX, pointer.downY);
 		});
@@ -665,6 +708,9 @@ export default class MapEditor extends Phaser.Scene {
 		});
 		this.tileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
 			onPointerUp(this.tileLayer, pointer.upX, pointer.upY);
+		});
+		this.tileLayer.on('pointerout', () => {
+			onPointerOut();
 		});
 
 		const decorationMap = this.make.tilemap({
@@ -682,7 +728,9 @@ export default class MapEditor extends Phaser.Scene {
 		);
 		this.decorationTileLayer = decorationMap
 			.createLayer(0, decorationTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
-			// .setInteractive();
+		if (activeLayerValue === 'decoration') {
+				this.decorationTileLayer.setInteractive();
+		}
 		this.decorationTileLayer.setDepth(DEPTHS.decorationLayer);
 		this.decorationTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			onPointerDown(this.decorationTileLayer, this.roomDecorationLayout,
@@ -694,6 +742,9 @@ export default class MapEditor extends Phaser.Scene {
 		});
 		this.decorationTileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
 			onPointerUp(this.decorationTileLayer, pointer.upX, pointer.upY);
+		});
+		this.decorationTileLayer.on('pointerout', () => {
+			onPointerOut();
 		});
 
 		const overlayMap = this.make.tilemap({
@@ -711,6 +762,9 @@ export default class MapEditor extends Phaser.Scene {
 		);
 		this.overlayTileLayer = overlayMap
 			.createLayer(0, overlayTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
+		if (activeLayerValue === 'overlay') {
+			this.overlayTileLayer.setInteractive();
+		}
 		this.overlayTileLayer.setDepth(DEPTHS.overlayLayer);
 		this.overlayTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			onPointerDown(this.overlayTileLayer, this.roomOverlayLayout,
@@ -722,6 +776,9 @@ export default class MapEditor extends Phaser.Scene {
 		});
 		this.overlayTileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
 			onPointerUp(this.overlayTileLayer, pointer.upX, pointer.upY);
+		});
+		this.overlayTileLayer.on('pointerout', () => {
+			onPointerOut();
 		});
 
 		for (let y = 0; y < this.roomHeight; y++) {
@@ -810,6 +867,48 @@ export default class MapEditor extends Phaser.Scene {
 		}
 		this.wasUndoDown = this.zKey.isDown && this.ctrlKey.isDown;
 		this.wasTKeyDown = this.tKey.isDown;
+
+		if (this.zoomIn.isDown && !this.wasZoomInDown) {
+			this.wasZoomInDown = true;
+			this.zoomFactor = Math.min(1, this.zoomFactor * 2);
+			this.cameras.main.setZoom(this.zoomFactor);
+			this.libraryLayer.setScale(1 / this.zoomFactor);
+			this.backgroundLibraryLayer.setScale(1 / this.zoomFactor);
+			this.mapEditorHighlighting.setScale(1 / this.zoomFactor);
+			const newWidth = this.cameras.main.width * (1 / this.zoomFactor);
+			const newHeight = this.cameras.main.height * (1 / this.zoomFactor);
+			const newX = 	(this.cameras.main.width - newWidth) / 2;
+			const newY = (this.cameras.main.height - newHeight) / 2;
+			this.libraryLayer.setPosition(newX, newY);
+			this.backgroundLibraryLayer.setPosition(newX, newY);
+			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
+			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
+			this.positionText.setScale(1 / this.zoomFactor);
+			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET * (1 / this.zoomFactor),
+				this.cameras.main.height - (POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor)) - newY);
+		}
+		this.wasZoomInDown = this.zoomIn.isDown;
+
+		if (this.zoomOut.isDown && !this.wasZoomOutDown) {
+			this.wasZoomOutDown = true;
+			this.zoomFactor = Math.max(0.125, this.zoomFactor / 2);
+			this.cameras.main.setZoom(this.zoomFactor);
+			this.libraryLayer.setScale(1 / this.zoomFactor);
+			this.backgroundLibraryLayer.setScale(1 / this.zoomFactor);
+			this.mapEditorHighlighting.setScale(1 / this.zoomFactor);
+			const newWidth = this.cameras.main.width * (1 / this.zoomFactor);
+			const newHeight = this.cameras.main.height * (1 / this.zoomFactor);
+			const newX = 	(this.cameras.main.width - newWidth) / 2;
+			const newY = (this.cameras.main.height - newHeight) / 2;
+			this.libraryLayer.setPosition(newX, newY);
+			this.backgroundLibraryLayer.setPosition(newX, newY);
+			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
+			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
+			this.positionText.setScale(1 / this.zoomFactor);
+			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET* (1 / this.zoomFactor),
+				this.cameras.main.height - (POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor)) - newY);
+		}
+		this.wasZoomOutDown = this.zoomOut.isDown;
 
 		// tslint:disable no-magic-numbers
 		this.tileLayer.forEachTile((tile) => tile.tint = 0xffffff);

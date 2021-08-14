@@ -1,9 +1,10 @@
-const X_OFFSET = 10;
-const Y_OFFSET = 340;
+export const POSITION_TEXT_X_OFFSET = 10;
+export const POSITION_TEXT_Y_OFFSET = 20;
 
 export default class PositionText extends Phaser.GameObjects.Text {
 	constructor(scene: Phaser.Scene) {
-		super(scene, X_OFFSET, Y_OFFSET, '', { color: 'white', fontSize: '14px' });
+		super(scene, POSITION_TEXT_X_OFFSET, scene.cameras.main.height - POSITION_TEXT_Y_OFFSET, '',
+			{ color: 'white', fontSize: '14px' });
 		this.setScrollFactor(0);
 		scene.add.existing(this);
 		this.setOrigin(0);
