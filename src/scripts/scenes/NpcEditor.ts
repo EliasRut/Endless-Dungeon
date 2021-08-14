@@ -207,7 +207,7 @@ export default class NpcEditor extends Phaser.Scene {
 
 	async loadNpc() {
 		const npcId = this.npcDropdownElement.value;
-		if (!npcId) {
+		if (!npcId || npcId === 'new') {
 			return;
 		}
 		const npcDoc = await this.database.doc(npcId).get();

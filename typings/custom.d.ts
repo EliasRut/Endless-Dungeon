@@ -205,7 +205,6 @@ export interface Room {
 	layout: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
 	decorations?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
 	overlays?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
-	overlay?: number[][];
 	npcs?: NpcPositioning[]; //place npcs in room
 	connections?: MapConnection[];
 	items?: ItemsPositioning[];
