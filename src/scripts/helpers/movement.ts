@@ -110,3 +110,28 @@ export const updateMovingState = (
 		const animationType = char.isWalking ? ANIMATION_WALK : ANIMATION_IDLE;
 		return `${char.animationBase}-${animationType}-${newDirection}`;
 };
+
+export const COLIDING_TILE_RANGES = [
+	// [-1, -1],
+	// tslint:disable: no-magic-numbers
+	[0, 31],
+	[40, 71],
+	[80, 111],
+	[120, 151],
+	[160, 191],
+	[200, 231],
+	[240, 271],
+	[280, 311],
+	[320, 351],
+	[360, 391],
+	[400, 431],
+	// tslint:enable
+];
+
+export const isCollidingTile = (tileNumber: number) => {
+	const normedNumber = tileNumber % 1000;
+	const firstColiding =
+		COLIDING_TILE_RANGES.find(([lower, upper]) =>
+			lower <= normedNumber && normedNumber <= upper );
+	return !!firstColiding;
+}
