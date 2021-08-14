@@ -1,12 +1,19 @@
 import globalState from '../worldstate';
 import { DEFAULT_TILE_TINT, VISITED_TILE_TINT } from './constants';
 import { GID_MULTIPLE, TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
+import { isCollidingTile } from './movement';
 
 const sightRadius = 14;
 const lightRadius = 8;
 
 const TEN_SECONDS_IN_FRAMES = 600;
 const LIGHTRAY_PRECISION = 10000;
+
+const lightPassingTileIds = [
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+	41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
+	84, 85, 86, 90, 91, 92
+];
 
 export default class DynamicLightingHelper {
 
@@ -55,7 +62,9 @@ export default class DynamicLightingHelper {
 					const tileIdNormalized = tile.index % GID_MULTIPLE;
 					// tslint:disable: no-magic-numbers
 					this.isBlockingTile[x][y] =
-						tileIdNormalized < 15 || (tileIdNormalized >= 45 && tileIdNormalized < 60);
+						isCollidingTile(tile.index) &&
+							!lightPassingTileIds.includes(tileIdNormalized);
+						// tileIdNormalized < 15 || (tileIdNormalized >= 45 && tileIdNormalized < 60);
 					// tslint:enable: no-magic-numbers
 				}
 			}
