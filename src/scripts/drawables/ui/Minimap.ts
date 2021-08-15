@@ -7,7 +7,7 @@ import {
 import MainScene from '../../scenes/MainScene';
 
 const X_POSITION = 10;
-const Y_POSITION = 180;
+const Y_POSITION = 200;
 
 const isTileVisible = (tile: Phaser.Tilemaps.Tile) => {
 	// tslint:disable-next-line: no-magic-numbers

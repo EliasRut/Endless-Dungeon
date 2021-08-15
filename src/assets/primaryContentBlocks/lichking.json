@@ -11,19 +11,18 @@
             ],
             "width": 16,
             "height": 16,
-            "numberOfRooms": 5,
+            "numberOfRooms": 6,
             "enemyBudget": 25
         },
         {
             "title": "Royal crypta - Level 2",
             "style": "death",
             "rooms": [
-                "zombieRoom",
-                "COM-death-key"
+                "COM-death-combat-1"
             ],
             "width": 12,
             "height": 12,
-            "numberOfRooms": 5,
+            "numberOfRooms": 4,
             "enemyBudget": 25
         },
         {
@@ -34,8 +33,8 @@
             ],
             "width": 12,
             "height": 12,
-            "numberOfRooms": 5,
-            "enemyBudget": 40
+            "numberOfRooms": 3,
+            "enemyBudget": 15
         }
     ],
     "themes": [
