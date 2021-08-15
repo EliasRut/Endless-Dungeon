@@ -32,7 +32,7 @@ export default class DungeonDoorPreloadScene extends Phaser.Scene {
 			key: `runeSocket-anim`,
 			frames: this.anims.generateFrameNumbers('runeSocket', {
 				start: 0,
-				end: 6 /* Currently only 1 drawn */
+				end: 5 /* Currently only 1 drawn */
 			}),
 			frameRate: 6,
 			repeat: -1

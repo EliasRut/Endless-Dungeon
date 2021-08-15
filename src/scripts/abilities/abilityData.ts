@@ -57,8 +57,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		projectiles: 1,
 		projectileData: {
 			velocity: 300,
-			xOffset: 32,
-			yOffset: 32,
+			xOffset: 0,
+			yOffset: 0,
 			effect: FireBallEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
@@ -74,8 +74,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		projectiles: 1,
 		projectileData: {
 			velocity: 600,
-			xOffset: 8,
-			yOffset: 8,
+			xOffset: 0,
+			yOffset: 0,
 			effect: ArcaneBoltEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
@@ -93,8 +93,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		projectileData: {
 			spread: [-0.06, 0.07],
 			velocity: 600,
-			xOffset: 32,
-			yOffset: 32,
+			xOffset: 0,
+			yOffset: 0,
 			effect: ArcaneBoltEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
@@ -113,8 +113,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 		projectileData: {
 			spread: [-0.15, 0.2],
 			velocity: 300,
-			xOffset: 32,
-			yOffset: 32,
+			xOffset: 0,
+			yOffset: 0,
 			effect: FireBallEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,

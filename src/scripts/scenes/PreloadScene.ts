@@ -7,10 +7,12 @@ import {
 	essenceNames,
 	ColorsOfMagic,
 	activeMode,
-	MODE
+	MODE,
+	NUM_COLORS_OF_MAGIC
 } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
+import { BLOCK_SIZE } from '../helpers/generateRoom';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -206,8 +208,8 @@ export default class PreloadScene extends Phaser.Scene {
 			this.anims.create({
 				key: `essence-${name}`,
 				frames: this.anims.generateFrameNumbers('items-essence', {
-					start: index * 8,
-					end: (index + 1) * 8 - 1
+					start: index * NUM_COLORS_OF_MAGIC,
+					end: (index + 1) * NUM_COLORS_OF_MAGIC - 1
 				}),
 				frameRate: 12,
 				repeat: -1
@@ -256,8 +258,8 @@ export default class PreloadScene extends Phaser.Scene {
 				{
 					title: roomData.title || '',
 					rooms: [globalState.currentLevel],
-					width: Math.ceil(roomData.layout[0].length / 8) + 2,
-					height: Math.ceil(roomData.layout.length / 8) + 2,
+					width: Math.ceil(roomData.layout[0].length / BLOCK_SIZE) + 2,
+					height: Math.ceil(roomData.layout.length / BLOCK_SIZE) + 2,
 					enemyBudget: 0,
 					numberOfRooms: 1,
 					style: roomData.colorOfMagic || ColorsOfMagic.DEATH

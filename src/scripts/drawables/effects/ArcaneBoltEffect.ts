@@ -14,6 +14,8 @@ const RED_MAX = 0xff0000;
 const RED_DIFF = 0x010000;
 const GREEN_DIFF = 0x000100;
 
+const VISIBILITY_DELAY = 25;
+
 export default class ArcaneBoltEffect extends TargetingEffect {
 	coreEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	trailEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -27,6 +29,7 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 		this.body.setCircle(BODY_RADIUS, 0, 0);
 		this.body.setMass(100);
 		this.tint = 0xff00ff;
+		this.setVisible(false);
 
 		this.seekingSpeed = 3000;
 
@@ -48,8 +51,6 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 			frequency: 0,
 			maxParticles: 200,
 		});
-		this.trailEmitter.startFollow(this.body.gameObject);
-		this.trailEmitter.start();
 
 		this.coreEmitter = particles.createEmitter({
 			alpha: { start: 1, end: 0, ease: 'ease-out' },
@@ -61,13 +62,13 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 			lifespan: 300,
 			blendMode: Phaser.BlendModes.ADD,
 			tint: {onEmit: (particle) => {
-				return RED_MIN + RED_DIFF * Math.floor(Math.random() * 128) + Math.floor(Math.random() * 256)// + 128;
+				return RED_MIN + RED_DIFF * 
+					// tslint:disable-next-line: no-magic-numbers
+					Math.floor(Math.random() * 128) + Math.floor(Math.random() * 256);
 			}},
 			frequency: 0,
 			maxParticles: 2000,
 		});
-		this.coreEmitter.startFollow(this.body.gameObject);
-		this.coreEmitter.start();
 	}
 
 	destroy() {
@@ -92,5 +93,17 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 		}
 
 		super.destroy();
+	}
+
+		update(time: number) {
+		super.update(time);
+		if (time - this.castTime > VISIBILITY_DELAY && !this.isStarted) {
+			this.trailEmitter.startFollow(this.body.gameObject);
+			this.trailEmitter.start();
+			this.coreEmitter.startFollow(this.body.gameObject);
+			this.coreEmitter.start();
+			this.setVisible(true);
+			this.isStarted = true;
+		}
 	}
 }

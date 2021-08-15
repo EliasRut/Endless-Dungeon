@@ -50,7 +50,7 @@ module.exports = {
       { from: 'src/favicon.ico', to: '' }
     ]),
     new InjectManifest({
-      swSrc: path.resolve(__dirname, '../pwa/sw.js')
+      swSrc: path.resolve(__dirname, '../pwa/sw.js'),
     })
   ]
 }

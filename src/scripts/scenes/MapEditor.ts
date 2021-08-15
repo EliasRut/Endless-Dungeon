@@ -9,6 +9,8 @@ import firebase from 'firebase';
 import { DatabaseRoom, Room } from '../../../typings/custom';
 import { deserializeRoom } from '../helpers/serialization';
 
+const MIN_ZOOM_LEVEL = 0.125;
+
 const TILE_SPACING = 2;
 
 const DEFAULT_TILE = 32;
@@ -461,7 +463,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.libraryLayer = map.createLayer(0, tileSet, 0, 0).setInteractive();
 		this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
 		this.libraryLayer.on('pointerdown', (
-				pointer: { downX: number; downY: number; }, 
+				pointer: { downX: number; downY: number; },
 				_x: number,
 				_y: number,
 				event: any
@@ -891,7 +893,7 @@ export default class MapEditor extends Phaser.Scene {
 
 		if (this.zoomOut.isDown && !this.wasZoomOutDown) {
 			this.wasZoomOutDown = true;
-			this.zoomFactor = Math.max(0.125, this.zoomFactor / 2);
+			this.zoomFactor = Math.max(MIN_ZOOM_LEVEL, this.zoomFactor / 2);
 			this.cameras.main.setZoom(this.zoomFactor);
 			this.libraryLayer.setScale(1 / this.zoomFactor);
 			this.backgroundLibraryLayer.setScale(1 / this.zoomFactor);
@@ -905,7 +907,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
 			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
 			this.positionText.setScale(1 / this.zoomFactor);
-			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET* (1 / this.zoomFactor),
+			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET * (1 / this.zoomFactor),
 				this.cameras.main.height - (POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor)) - newY);
 		}
 		this.wasZoomOutDown = this.zoomOut.isDown;

@@ -35,6 +35,7 @@ import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
 import { Catalyst, Source } from '../../items/itemData';
 import Minimap from '../drawables/ui/Minimap';
 import { AbilityType } from '../abilities/abilityData';
+import LevelName from '../drawables/ui/LevelName';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -55,7 +56,8 @@ const DEATH_RESPAWN_TIME = 3000;
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
 	fpsText: Phaser.GameObjects.Text;
-	minimap: Phaser.GameObjects.Text;
+	levelName?: LevelName;
+	minimap?: Minimap;
 
 	keyboardHelper: KeyboardHelper;
 	dynamicLightingHelper?: DynamicLightingHelper;
@@ -154,7 +156,10 @@ export default class MainScene extends Phaser.Scene {
 			backpackIcon: new BackpackIcon(this),
 			settingsIcon: new SettingsIcon(this)
 		};
-		this.minimap = new Minimap(this);
+		if (globalState.currentLevel.startsWith('dungeonLevel')) {
+			this.levelName = new LevelName(this);
+			this.minimap = new Minimap(this);
+		}
 		this.avatar = new Avatar(this);
 		if (this.isMobile) {
 			this.mobilePadBackgorund = this.add.image(
@@ -238,7 +243,7 @@ export default class MainScene extends Phaser.Scene {
 		// 	essence.setScrollFactor(0);
 		// 	this.add.existing(essence);
 		// })
-		
+
 		this.overlayScreens = {
 			itemScreen: new ItemScreen(this),
 			statScreen: new StatScreen(this),
@@ -248,9 +253,9 @@ export default class MainScene extends Phaser.Scene {
 		};
 
 		// Warum wurden die 2 mal geladen?
-//		this.fpsText = new FpsText(this);
-//		this.backpackIcon = new BackpackIcon(this);
-//		this.avatar = new Avatar(this);
+		//		this.fpsText = new FpsText(this);
+		//		this.backpackIcon = new BackpackIcon(this);
+		//		this.avatar = new Avatar(this);
 
 // var pointers = this.input.activePointer;
 // this.input.on('pointerdown', function () {
@@ -393,7 +398,7 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	drawRoom() {
-		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];		
+		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];
 		if (!dungeonLevel) {
 			throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
 		}
@@ -492,7 +497,7 @@ export default class MainScene extends Phaser.Scene {
 	update(globalTime: number, _delta: number) {
 		globalState.gameTime = globalTime;
 		this.fpsText.update();
-		this.minimap.update();
+		this.minimap?.update();
 
 		if (this.keyboardHelper.isKKeyPressed()) {
 			globalState.clearState();

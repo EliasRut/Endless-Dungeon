@@ -103,6 +103,8 @@ export const ColorsArray = [
 	ColorsOfMagic.BLOOD,
 ];
 
+export const NUM_COLORS_OF_MAGIC = 8;
+
 export interface RuneAssignment {
 	primaryContent: ColorsOfMagic;
 	secondaryContent: ColorsOfMagic;

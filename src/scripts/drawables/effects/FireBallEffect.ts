@@ -3,7 +3,7 @@ import TargetingEffect from './TargetingEffect';
 
 const BODY_RADIUS = 6;
 const EXPLOSION_PARTICLE_SPEED = 100;
-const EXPLOSION_PARTICLE_COUNT = 10;
+const VISIBILITY_DELAY = 50;
 
 export default class FireBallEffect extends TargetingEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -25,10 +25,8 @@ export default class FireBallEffect extends TargetingEffect {
 			lifespan: { min: 400, max: 600 },
 			blendMode: Phaser.BlendModes.ADD,
 			frequency: 30,
-			maxParticles: 200,
+			maxParticles: 200
 		});
-		this.emitter.startFollow(this.body.gameObject);
-		this.emitter.start();
 	}
 
 	destroy() {
@@ -40,5 +38,14 @@ export default class FireBallEffect extends TargetingEffect {
 		}
 
 		super.destroy();
+	}
+
+	update(time: number) {
+		super.update(time);
+		if (time - this.castTime > VISIBILITY_DELAY && !this.isStarted) {
+			this.emitter.startFollow(this.body.gameObject);
+			this.emitter.start();
+			this.isStarted = true;
+		}
 	}
 }

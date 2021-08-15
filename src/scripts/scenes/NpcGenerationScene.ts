@@ -27,6 +27,7 @@ export default class NpcGenerationScene extends Phaser.Scene {
 	npcForGeneration: string[] = [];
 
 	preload() {
+		this.npcForGeneration = [];
 		const requiredNpcs = new Set<string>();
 		requiredNpcs.add('enemy-zombie');
 		Object.values(globalState.availableRooms).forEach((room) => {
@@ -54,7 +55,9 @@ export default class NpcGenerationScene extends Phaser.Scene {
 					);
 				});
 			} else {
-				this.npcForGeneration.push(npc);
+				if (!this.textures.exists(npc)) {
+					this.npcForGeneration.push(npc);
+				}
 			}
 		});
 

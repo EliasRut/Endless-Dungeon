@@ -27,7 +27,6 @@ const LAYER_HEIGHT = 240;
 const LAYER_X_OFFSET = LAYER_WIDTH / 2;
 const LAYER_Y_OFFSET = LAYER_HEIGHT / 2;
 
-
 const DEPTHS = {
 	figureLayer: 1,
 	trouserLayer: 2,
