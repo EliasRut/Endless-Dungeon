@@ -7,13 +7,12 @@
             "title": "Royal crypta - Level 1",
             "style": "death",
             "rooms": [
-                "COM-death-key",
-                "COM-death-throne-room"
+                "COM-death-key"
             ],
             "width": 16,
             "height": 16,
-            "numberOfRooms": 3,
-            "enemyBudget": 0
+            "numberOfRooms": 5,
+            "enemyBudget": 25
         },
         {
             "title": "Royal crypta - Level 2",
@@ -25,13 +24,13 @@
             "width": 12,
             "height": 12,
             "numberOfRooms": 5,
-            "enemyBudget": 40
+            "enemyBudget": 25
         },
         {
             "title": "Royal crypta - Level 3",
             "style": "death",
             "rooms": [
-                "bossRoom"
+                "COM-death-throne-room"
             ],
             "width": 12,
             "height": 12,

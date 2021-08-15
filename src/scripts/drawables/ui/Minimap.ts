@@ -1,7 +1,9 @@
 import globalState from '../../worldstate/index';
-import { BLOCK_SIZE, TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
-import { TILE_SIZE } from '../../helpers/generateRoom';
-import { isCollidingTile } from '../../helpers/movement';
+import {
+	BLOCK_SIZE,
+	TILE_WIDTH,
+	TILE_HEIGHT
+} from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
 
 const X_POSITION = 10;
@@ -14,9 +16,10 @@ export default class Minimap extends Phaser.GameObjects.Text {
 			fontSize: '5px'
 		});
 		this.setScrollFactor(0);
-		scene.add.existing(this);
-		this.setOrigin(0);
-
+		if (globalState.currentLevel.startsWith('dungeonLevel')) {
+			scene.add.existing(this);
+			this.setOrigin(0);
+		}
 	}
 
 	public update() {
@@ -63,7 +66,8 @@ export default class Minimap extends Phaser.GameObjects.Text {
 					const topMiddleTile = mainScene.tileLayer.getTileAt(x + 4, y);
 					const topRightTile = mainScene.tileLayer.getTileAt(x + 7, y);
 
-					if (!topLeftTile || topLeftTile.tint === 0 || topLeftTile.index % 1000 === -1) {
+					// tslint:disable: no-magic-numbers
+					if (!topLeftTile || topLeftTile.tint <= 0x010101 || topLeftTile.index % 1000 === -1) {
 						marker = ' ';
 					} else if (topLeftTile.index % 1000 === 164) {
 						marker = '┌';
@@ -73,17 +77,19 @@ export default class Minimap extends Phaser.GameObjects.Text {
 						marker = '─';
 					} else if (topLeftTile.index % 1000 === 162) {
 						marker = '|';
-					} else if (topLeftTile.index % 1000 !== -1) {
+					} else {
 						marker = ' ';
 					}
 
-					if (!topMiddleTile || topMiddleTile.tint === 0 || topMiddleTile.index % 1000 === -1) {
-						marker = ' ';
+					if (!topMiddleTile || topMiddleTile.tint <= 0x010101 || topMiddleTile.index % 1000 === -1) {
+						marker += ' ';
 					} else if (topMiddleTile.index % 1000 === 201) {
 						marker += '─';
+					} else {
+						marker += ' ';
 					}
 
-					if (!topRightTile || topRightTile.tint === 0 || topRightTile.index % 1000 === -1) {
+					if (!topRightTile || topRightTile.tint <= 0x010101 || topRightTile.index % 1000 === -1) {
 						marker += ' ';
 					} else if (topRightTile.index % 1000 === 163) {
 						marker += '┐';
@@ -93,6 +99,8 @@ export default class Minimap extends Phaser.GameObjects.Text {
 						marker += '─';
 					} else if (topRightTile.index % 1000 === 160) {
 						marker += '|';
+					} else {
+						marker += ' ';
 					}
 					firstRow += marker;
 
@@ -100,62 +108,69 @@ export default class Minimap extends Phaser.GameObjects.Text {
 					const middleMiddleTile = mainScene.tileLayer.getTileAt(x + 4, y + 4);
 					const middleRightTile = mainScene.tileLayer.getTileAt(x + 7, y + 4);
 
-					if (!middleLeftTile || middleLeftTile.tint === 0 || middleLeftTile.index % 1000 === -1) {
+					if (!middleLeftTile || middleLeftTile.tint <= 0x010101 || middleLeftTile.index % 1000 === -1) {
 						marker = ' ';
 					} else if (middleLeftTile.index % 1000 === 162) {
 						marker = '|';
+					} else {
+						marker = ' ';
 					}
 
-					if (!middleMiddleTile || middleMiddleTile.tint === 0 || middleMiddleTile.index % 1000 === -1) {
+					if (!middleMiddleTile || middleMiddleTile.tint <= 0x010101 || middleMiddleTile.index % 1000 === -1) {
 						marker += ' ';
 					} else if (y === yyPos && x === xxPos) {
 						marker += 'O';
 					} else if (middleMiddleTile.index % 1000 !== -1) {
 						marker += '.';
+					} else {
+						marker += ' ';
 					}
 
-					if (!middleRightTile || middleRightTile.tint === 0 || middleRightTile.index % 1000 === -1) {
+					if (!middleRightTile || middleRightTile.tint <= 0x010101 || middleRightTile.index % 1000 === -1) {
 						marker += ' ';
 					} else if (middleRightTile.index % 1000 === 160) {
 						marker += '|';
+					} else {
+						marker += ' ';
 					}
 					secondRow += marker;
-
 
 					const bottomLeftTile = mainScene.tileLayer.getTileAt(x, y + 7);
 					const bottomMiddleTile = mainScene.tileLayer.getTileAt(x + 4, y + 7);
 					const bottomRightTile = mainScene.tileLayer.getTileAt(x + 7, y + 7);
 
-					if (layout[y + 7][x] % 1000 === 124) {
+					if (!bottomLeftTile || bottomLeftTile.tint <= 0x010101 || bottomLeftTile.index % 1000 === -1) {
+						marker = ' ';
+					} else if (bottomLeftTile.index % 1000 === 124) {
 						marker = '└';
-					} else if (layout[y + 7][x] % 1000 === 122) {
+					} else if (bottomLeftTile.index % 1000 === 122) {
 						marker = '┐';
-					} else if (layout[y + 7][x] % 1000 === 162) {
+					} else if (bottomLeftTile.index % 1000 === 162) {
 						marker = '|';
-					} else if (layout[y + 7][x] % 1000 === 121) {
+					} else if (bottomLeftTile.index % 1000 === 121) {
 						marker = '─';
-					} else if (layout[y + 7][x] % 1000 !== -1) {
-						marker = ' ';
 					} else {
 						marker = ' ';
 					}
-					if (layout[y + 7][x + 4] % 1000 === 121) {
+
+					if (!bottomMiddleTile || bottomMiddleTile.tint <= 0x010101 || bottomMiddleTile.index % 1000 === -1) {
+						marker += ' ';
+					} else if (bottomMiddleTile.index % 1000 === 121) {
 						marker += '─';
-					} else if (layout[y + 7][x + 4] % 1000 !== -1) {
-						marker += ' ';
 					} else {
 						marker += ' ';
 					}
-					if (layout[y + 7][x + 7] % 1000 === 120) {
+
+					if (!bottomRightTile || bottomRightTile.tint <= 0x010101 || bottomRightTile.index % 1000 === -1) {
+						marker += ' ';
+					} else if (bottomRightTile.index % 1000 === 120) {
 						marker += '┌';
-					} else if (layout[y + 7][x + 7] % 1000 === 123) {
+					} else if (bottomRightTile.index % 1000 === 123) {
 						marker += '┘';
-					} else if (layout[y + 7][x + 7] % 1000 === 121) {
+					} else if (bottomRightTile.index % 1000 === 121) {
 						marker += '─';
-					} else if (layout[y + 7][x + 7] % 1000 === 160) {
+					} else if (bottomRightTile.index % 1000 === 160) {
 						marker += '|';
-					} else if (layout[y + 7][x + 7] % 1000 !== -1) {
-						marker += ' ';
 					} else {
 						marker += ' ';
 					}
@@ -163,7 +178,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 				}
 				map += `${firstRow}\n${secondRow}\n${thirdRow}\n`;
 			}
-
+			// tslint:enable: no-magic-numbers
 			//yPos: ${Math.floor(yyPos)}, xPos:  ${Math.floor(xxPos)}\n\n
 			this.setText(`${globalState.currentLevel}\n\n${map}`);
 		// }

@@ -53,13 +53,6 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 		}
 
 		if (activeMode === MODE.MAP_EDITOR) {
-			Object.values(globalState.roomAssignment).forEach((assignment) => {
-				assignment.rooms.forEach((room) => {
-					if (!this.usedRooms.includes(room)) {
-						this.usedRooms.push(room);
-					}
-				});
-			});
 			// We need to load all tilesets if we are going to use the map editor
 			globalState.availableTilesets.push(
 				'dungeon',
