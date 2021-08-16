@@ -9,7 +9,7 @@ export default class BackpackIcon extends MenuIcon {
 	}
 
 	setScreens() {
-		if(!this.screens) {
+		if (!this.screens) {
 			this.screens = [this.scene.overlayScreens.inventory,
 							this.scene.overlayScreens.itemScreen,
 							this.scene.overlayScreens.statScreen];

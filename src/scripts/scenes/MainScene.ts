@@ -248,20 +248,13 @@ export default class MainScene extends Phaser.Scene {
 			itemScreen: new ItemScreen(this),
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
-			dialogScreen: new DialogScreen(this),			
+			dialogScreen: new DialogScreen(this),
 			settingsScreen: new SettingsScreen(this)
 		};
 
-		// Warum wurden die 2 mal geladen?
-		//		this.fpsText = new FpsText(this);
-		//		this.backpackIcon = new BackpackIcon(this);
-		//		this.avatar = new Avatar(this);
+		this.icons.backpackIcon.setScreens();
+		this.icons.settingsIcon.setScreens();
 
-// var pointers = this.input.activePointer;
-// this.input.on('pointerdown', function () {
-// 	console.log("mouse x", pointers.x);
-// 	console.log("mouse y", pointers.y);
-// 	});
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
 		this.scriptHelper = new ScriptHelper(this);

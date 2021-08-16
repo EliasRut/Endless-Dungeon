@@ -81,7 +81,7 @@ export default class MapEditor extends Phaser.Scene {
 	sKey: Phaser.Input.Keyboard.Key;
 	dKey: Phaser.Input.Keyboard.Key;
 	tKey: Phaser.Input.Keyboard.Key;
-	zKey: Phaser.Input.Keyboard.Key;
+	rKey: Phaser.Input.Keyboard.Key;
 	ctrlKey: Phaser.Input.Keyboard.Key;
 	shiftKey: Phaser.Input.Keyboard.Key;
 	zoomOut: Phaser.Input.Keyboard.Key;
@@ -277,7 +277,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, false);
 		this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, false);
 		this.tKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T, false);
-		this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z, false);
+		this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R, false);
 		this.ctrlKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL, false);
 		this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT, false);
 		this.zoomOut = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.NUMPAD_SUBTRACT, false);
@@ -342,6 +342,11 @@ export default class MapEditor extends Phaser.Scene {
 	}
 
 	updateActiveLayer() {
+		// drawTileSet registers the library layers pointerdown event listener, and the first event
+		// listener to be defined is the one that get's triggered when there are multiple stacked
+		// elements with listeners. Therefore, this.drawTileSet must come before changeing the
+		// interactivity.
+		this.drawTileSet();
 		const activeLayerValue = this.activeLayerDropdownElement.value;
 		if (activeLayerValue === 'base') {
 			this.tileLayer.setInteractive();
@@ -356,7 +361,6 @@ export default class MapEditor extends Phaser.Scene {
 			this.decorationTileLayer.removeInteractive();
 			this.overlayTileLayer.setInteractive();
 		}
-		this.drawTileSet();
 	}
 
 	applyConfiguration() {
@@ -462,15 +466,7 @@ export default class MapEditor extends Phaser.Scene {
 		);
 		this.libraryLayer = map.createLayer(0, tileSet, 0, 0).setInteractive();
 		this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
-		this.libraryLayer.on('pointerdown', (
-				pointer: { downX: number; downY: number; },
-				_x: number,
-				_y: number,
-				event: any
-			) => {
-			// Stop touch event from triggering on underlying layers.
-			event.stopPropagation();
-
+		this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
 			this.selectedTileValues = undefined;
 			this.libraryLayer.forEachTile((tile) => {
 				tile.clearAlpha();
@@ -854,7 +850,7 @@ export default class MapEditor extends Phaser.Scene {
 		}
 		// Phaser will keep saying that undo was down for multiple update calls, we only care about the
 		// first.
-		if (this.zKey.isDown && this.ctrlKey.isDown && !this.wasUndoDown) {
+		if (this.rKey.isDown && !this.wasUndoDown) {
 			this.wasUndoDown = true;
 			const historyEntry = this.tilesetHistory.pop();
 			if (historyEntry) {
@@ -867,7 +863,7 @@ export default class MapEditor extends Phaser.Scene {
 				this.addToHistory(true);
 			}
 		}
-		this.wasUndoDown = this.zKey.isDown && this.ctrlKey.isDown;
+		this.wasUndoDown = this.rKey.isDown;
 		this.wasTKeyDown = this.tKey.isDown;
 
 		if (this.zoomIn.isDown && !this.wasZoomInDown) {

@@ -1,5 +1,5 @@
 import { NpcOptions } from '../../../../typings/custom';
-import { Faction } from '../../helpers/constants';
+import { Faction, UiDepths } from '../../helpers/constants';
 import globalState from '../../worldstate';
 import Character from '../../worldstate/Character';
 import CharacterToken from './CharacterToken';
@@ -55,6 +55,7 @@ export default class NpcToken extends CharacterToken {
 					this.body.y - 12 - yOffset,
 					'quest'
 				);
+				this.openQuestSymbol.setDepth(UiDepths.TOKEN_FOREGROUND_LAYER);
 			} else {
 				this.openQuestSymbol.x = this.body.x + 10;
 				this.openQuestSymbol.y = this.body.y - 12 - yOffset;
