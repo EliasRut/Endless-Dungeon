@@ -123,6 +123,10 @@ const questScripts: {[name: string]: QuestScripts} = {
 				ringWeight: 0,
 				amuletWeight: 0,
 			}
+		}, {
+			type: 'dialog',
+			portrait: 'player_happy',
+			text: ['Take this Force Source, it\'ll come in handy!']
 		}]
 	}
 };

@@ -50,8 +50,6 @@ export default class MeleeEnemyToken extends EnemyToken {
 						this.dropRandomItem(this.level);
 					} else if (Math.random() < HEALTH_DROP_CHANCE) {
 						this.dropFixedItem('health');
-					} else {
-						this.dropFixedItem('book');
 					}
 
 					this.destroy();
