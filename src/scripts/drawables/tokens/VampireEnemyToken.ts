@@ -118,7 +118,7 @@ export default class VampireToken extends EnemyToken {
 			const xSpeed = (tx - this.x);
 			const ySpeed = (ty - this.y);
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const attackAnimationName = `enemy-vampire-charge-prepare-${facingToSpriteNameMap[newFacing]}`;
+			const attackAnimationName = `enemy-vampire-prepare-${facingToSpriteNameMap[newFacing]}`;
 			this.play(attackAnimationName);
 
 			this.setVelocityX(0);
@@ -132,7 +132,7 @@ export default class VampireToken extends EnemyToken {
 			const xSpeed = (tx - this.x) / totalDistance * this.stateObject.movementSpeed;
 			const ySpeed = (ty - this.y) / totalDistance * this.stateObject.movementSpeed;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const attackAnimationName = `enemy-vampire-charge-fly-${facingToSpriteNameMap[newFacing]}`;
+			const attackAnimationName = `enemy-vampire-fly-${facingToSpriteNameMap[newFacing]}`;
 			this.play(attackAnimationName);		
 
 			this.setVelocityX(xSpeed * 3);
@@ -141,12 +141,19 @@ export default class VampireToken extends EnemyToken {
 	}
 
 	onCollide(withEnemy: boolean) {
-		if(this.launched && withEnemy) {
-			globalState.playerCharacter.health -= this.stateObject.damage;
-			stun(globalState.gameTime, 1000, globalState.playerCharacter);
-			stun(globalState.gameTime, 1000, this.stateObject);			
-		} else if(this.launched) {
+		if (this.launched) {
 			stun(globalState.gameTime, 1000, this.stateObject);
+			const tx = this.target.x;
+			const ty = this.target.y;
+			const xSpeed = (tx - this.x);
+			const ySpeed = (ty - this.y);
+			const newFacing = getFacing4Dir(xSpeed, ySpeed);
+			const attackAnimationName = `enemy-vampire-stun-${facingToSpriteNameMap[newFacing]}`;
+			this.play(attackAnimationName);
+			if (withEnemy) {
+				globalState.playerCharacter.health -= this.stateObject.damage;
+				stun(globalState.gameTime, 1000, globalState.playerCharacter);
+			}
 		}
 	}
 }

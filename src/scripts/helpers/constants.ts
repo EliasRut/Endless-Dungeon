@@ -150,7 +150,7 @@ export const npcTypeToAttackFileMap: {
 			file: 'assets/sprites/enemy-vampire-charge.png',
 			framesPerDirection: 16,
 			frameOffset: 0,
-			animationFrames: 8
+			animationFrames: 9
 		},
 		'fly': {
 			file: 'assets/sprites/enemy-vampire-charge.png',
@@ -162,7 +162,7 @@ export const npcTypeToAttackFileMap: {
 			file: 'assets/sprites/enemy-vampire-charge.png',
 			framesPerDirection: 16,
 			frameOffset: 10,
-			animationFrames: 4
+			animationFrames: 6
 		},
 		'recover': {
 			file: 'assets/sprites/enemy-vampire-charge.png',
