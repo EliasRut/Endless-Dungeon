@@ -41,6 +41,8 @@ interface MultiLevelLayout {
 
 type LevelHistory = MultiLevelLayout[];
 
+const npcKeys = ['hilda-base', 'vanya-base', 'enemy-zombie'];
+
 export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
 	backupDatabase: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
@@ -68,10 +70,14 @@ export default class MapEditor extends Phaser.Scene {
 	overlayTileLayer: Phaser.Tilemaps.TilemapLayer;
 	libraryLayer: Phaser.Tilemaps.TilemapLayer;
 	backgroundLibraryLayer: Phaser.Tilemaps.TilemapLayer;
+	npcLibraryLayer: Phaser.GameObjects.Group;
+	npcTokens: Phaser.GameObjects.Image[];
 
 	highlightingX = 0;
 	highlightingY = 0;
 	mapEditorHighlighting: Phaser.GameObjects.Image;
+
+	selectedLibraryNpcIndex: number = -1;
 
 	oneKey: Phaser.Input.Keyboard.Key;
 	twoKey: Phaser.Input.Keyboard.Key;
@@ -200,9 +206,10 @@ export default class MapEditor extends Phaser.Scene {
 		this.mapEditorMenuElement.style.display = 'flex';
 
 		this.mapEditorHighlighting = new Phaser.GameObjects.Image(
-			this, TILE_WIDTH / 2, TILE_HEIGHT / 2, 'map-editor-highlighting');
+			this, 0, 0, 'map-editor-highlighting');
 		this.mapEditorHighlighting.setDepth(DEPTHS.libraryHighlighting);
 		this.mapEditorHighlighting.setScrollFactor(0, 0);
+		this.mapEditorHighlighting.setOrigin(0);
 		this.mapEditorHighlighting.alpha = 0.5;
 		this.add.existing(this.mapEditorHighlighting);
 
@@ -314,6 +321,27 @@ export default class MapEditor extends Phaser.Scene {
 			this.updateActiveLayer();
 		};
 
+		this.npcLibraryLayer = new Phaser.GameObjects.Group(this);
+
+		this.npcTokens = [];
+		npcKeys.forEach((key, index) => {
+			const token = new Phaser.GameObjects.Image(this, 0, 0, key);
+			token.setPosition(index * 40, 0); // + ((40 - token.width) / 2), (token.height / 2));
+			token.setOrigin(0);
+			token.setScrollFactor(0);
+			token.setDepth(100);
+			token.addListener('pointerdown', () => {
+				console.log('Pointer down.');
+				this.selectedLibraryNpcIndex = index;
+				this.mapEditorHighlighting.setPosition(index * 40, 0);
+			});
+			token.setInteractive();
+			this.npcTokens.push(token);
+			this.npcLibraryLayer.add(token, true);
+		});
+		this.npcLibraryLayer.setVisible(this.activeLayerDropdownElement.value === 'npcs');
+		this.add.existing(this.npcLibraryLayer);
+
 		this.addToHistory(true);
 	}
 
@@ -352,14 +380,26 @@ export default class MapEditor extends Phaser.Scene {
 			this.tileLayer.setInteractive();
 			this.decorationTileLayer.removeInteractive();
 			this.overlayTileLayer.removeInteractive();
+			this.mapEditorHighlighting.setScale(1);
+			this.npcLibraryLayer.setVisible(false);
 		} else if (activeLayerValue === 'decoration') {
 			this.tileLayer.removeInteractive();
 			this.decorationTileLayer.setInteractive();
 			this.overlayTileLayer.removeInteractive();
+			this.mapEditorHighlighting.setScale(1);
+			this.npcLibraryLayer.setVisible(false);
 		} else if (activeLayerValue === 'overlay') {
 			this.tileLayer.removeInteractive();
 			this.decorationTileLayer.removeInteractive();
 			this.overlayTileLayer.setInteractive();
+			this.mapEditorHighlighting.setScale(1);
+			this.npcLibraryLayer.setVisible(false);
+		} else if (activeLayerValue === 'npcs') {
+			this.tileLayer.removeInteractive();
+			this.decorationTileLayer.removeInteractive();
+			this.overlayTileLayer.removeInteractive();
+			this.mapEditorHighlighting.setScale(2.5);
+			this.npcLibraryLayer.setVisible(true);
 		}
 	}
 
@@ -424,11 +464,13 @@ export default class MapEditor extends Phaser.Scene {
 				backgroundTileSetName = 'overlay-background';
 				break;
 			}
-			case 'base':
-			default: {
+			case 'base': {
 				tileSetName = this.tileSetName;
 				backgroundTileSetName = 'base-background';
 				break;
+			}
+			default: {
+				return;
 			}
 		}
 
@@ -478,8 +520,8 @@ export default class MapEditor extends Phaser.Scene {
 			const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
 			if (clickedTile) {
 				this.selectedId = clickedTile.index;
-				this.highlightingX = clickedTile.x * TILE_WIDTH + (TILE_WIDTH / 2);
-				this.highlightingY = clickedTile.y * TILE_HEIGHT + (TILE_HEIGHT / 2);
+				this.highlightingX = clickedTile.x * TILE_WIDTH;
+				this.highlightingY = clickedTile.y * TILE_HEIGHT;
 				const zoomedWidth = this.cameras.main.width * (1 / this.zoomFactor);
 				const zoomedHeight = this.cameras.main.height * (1 / this.zoomFactor);
 				const zoomedZeroX = 	(this.cameras.main.width - zoomedWidth) / 2;

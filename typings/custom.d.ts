@@ -226,6 +226,7 @@ export interface Room {
 	doors?: Door[];
 	title?: string;
 	colorOfMagic?: ColorsOfMagic;
+	noRandomEnemies?: boolean;
 }
 
 export interface Weapon {

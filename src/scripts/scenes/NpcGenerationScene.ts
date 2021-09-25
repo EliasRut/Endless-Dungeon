@@ -31,6 +31,8 @@ export default class NpcGenerationScene extends Phaser.Scene {
 		const requiredNpcs = new Set<string>();
 		requiredNpcs.add('enemy-zombie');
 		requiredNpcs.add('enemy-vampire');
+		requiredNpcs.add('vanya-base');
+		requiredNpcs.add('hilda-base');
 		Object.values(globalState.availableRooms).forEach((room) => {
 			room.npcs?.forEach((npc) => {
 				if (!npc.type) {
@@ -45,6 +47,7 @@ export default class NpcGenerationScene extends Phaser.Scene {
 				requiredNpcs.add(npcType);
 			});
 		});
+		
 		// NPCs
 		requiredNpcs.forEach((npc) => {
 			if (npcTypeToFileMap[npc]) {

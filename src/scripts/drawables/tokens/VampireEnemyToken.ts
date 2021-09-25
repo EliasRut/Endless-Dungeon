@@ -31,13 +31,7 @@ export default class VampireToken extends EnemyToken {
 		this.startingHealth = BASE_HEALTH * (1 + this.level * 0.5);
 		this.stateObject.health = this.startingHealth;
 		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
-		this.stateObject.attackTime = 1500;	
-		this.scene.anims.create({
-			key: 'fly',
-			frames: this.anims.generateFrameNumbers('enemy-vampire-charge', { start: 9, end: 9 }),
-			frameRate: 16,
-			repeat: -1
-	});	
+		this.stateObject.attackTime = 1500;
 	}
 
 	public update(time: number) {
@@ -124,7 +118,7 @@ export default class VampireToken extends EnemyToken {
 			const xSpeed = (tx - this.x);
 			const ySpeed = (ty - this.y);
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const attackAnimationName = `enemy-vampire-charge-${facingToSpriteNameMap[newFacing]}`;
+			const attackAnimationName = `enemy-vampire-charge-prepare-${facingToSpriteNameMap[newFacing]}`;
 			this.play(attackAnimationName);
 
 			this.setVelocityX(0);
@@ -138,10 +132,8 @@ export default class VampireToken extends EnemyToken {
 			const xSpeed = (tx - this.x) / totalDistance * this.stateObject.movementSpeed;
 			const ySpeed = (ty - this.y) / totalDistance * this.stateObject.movementSpeed;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const attackAnimationName = `enemy-vampire-charge-${facingToSpriteNameMap[newFacing]}`;
-			//this.play(attackAnimationName);
-		this.play('fly');
-			
+			const attackAnimationName = `enemy-vampire-charge-fly-${facingToSpriteNameMap[newFacing]}`;
+			this.play(attackAnimationName);		
 
 			this.setVelocityX(xSpeed * 3);
 			this.setVelocityY(ySpeed * 3);
