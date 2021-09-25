@@ -1,6 +1,8 @@
 import { Facings } from '../../helpers/constants';
 import { getRotationInRadiansForFacing, getVelocitiesForFacing } from '../../helpers/movement';
 import AbilityEffect from './AbilityEffect';
+import { ProjectileData } from '../../abilities/abilityData';
+
 
 const SPRITE_SCALE = 0.5;
 const BODY_RADIUS = 14;
@@ -14,8 +16,8 @@ export default class IceSpikeEffect extends AbilityEffect {
 	spikeEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	stuckEnemy?: Phaser.Physics.Arcade.Body;
 	stuckEnemyOffset?: {x: number, y: number};
-	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings) {
-		super(scene, x, y, 'ice', facing);
+	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings, projectileData: ProjectileData) {
+		super(scene, x, y, 'ice', facing, projectileData);
 		this.setScale(SPRITE_SCALE);
 		this.setRotation(getRotationInRadiansForFacing(facing));
 		scene.add.existing(this);

@@ -4,6 +4,7 @@ import MainScene from '../../scenes/MainScene';
 import CharacterToken from '../tokens/CharacterToken';
 import { VISITED_TILE_TINT } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
+import { ProjectileData } from '../../abilities/abilityData';
 
 const BODY_RADIUS = 6;
 const EXPLOSION_PARTICLE_SPEED = 200;
@@ -19,8 +20,8 @@ const VISIBILITY_DELAY = 25;
 export default class ArcaneBoltEffect extends TargetingEffect {
 	coreEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	trailEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings) {
-		super(scene, x, y, 'rock', facing);
+	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings, projectileData: ProjectileData) {
+		super(scene, x, y, 'rock', facing, projectileData);
 		this.setScale(0.025);
 		this.setOrigin(0.5, 0.5);
 		scene.add.existing(this);

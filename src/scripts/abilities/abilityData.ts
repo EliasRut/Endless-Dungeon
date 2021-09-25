@@ -5,8 +5,9 @@ import DustNovaEffect from '../drawables/effects/DustNovaEffect';
 import RoundHouseKickEffect from '../drawables/effects/RoundHouseKickEffect';
 import HealingLightEffect from '../drawables/effects/HealingLightEffect';
 import ArcaneBoltEffect from '../drawables/effects/ArcaneBoltEffect';
+import ConeEffect from '../drawables/effects/ConeEffect';
 
-interface ProjectileData {
+export interface ProjectileData {
 	spread?: [number, number];
 	velocity: number;
 	drag?: number;
@@ -18,6 +19,7 @@ interface ProjectileData {
 	delay?: number;
 	targeting?: boolean;
 	knockback?: number;
+	timeToLive?: number;
 }
 
 interface AbilityData {
@@ -44,6 +46,7 @@ export const enum AbilityType {
 	ROUND_HOUSE_KICK = 'roundhousekick',
 	HEALING_LIGHT = 'healinglight',
 	ARCANE_BLADE = 'arcaneBlade',
+	FIRE_CONE = 'fireCone'
 }
 
 export const Abilities: {[type: string]: AbilityData} = {
@@ -235,5 +238,25 @@ export const Abilities: {[type: string]: AbilityData} = {
 		damageMultiplier: 0.2,
 		flavorText: `A blade of arcane power.`,
 		icon: ['icon-abilities', 1]
+	},
+	[AbilityType.FIRE_CONE]: {
+		projectiles: 10,
+		projectileData: {
+			spread: [-0.1, 0.1],
+			velocity: 300,
+			xOffset: 0,
+			yOffset: 0,
+			effect: FireBallEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			timeToLive: 500,
+			targeting: false
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.10,
+		cooldownMs: 1500,
+		damageMultiplier: 0.8,
+		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
+		icon: ['icon-abilities', 0]
 	},
 };
