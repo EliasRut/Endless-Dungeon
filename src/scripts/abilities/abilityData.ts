@@ -29,6 +29,7 @@ interface AbilityData {
 	flavorText?: string;
 	icon?: [string, number];
 	damageMultiplier: number;
+	stun?: number;
 }
 
 export const enum AbilityType {
@@ -67,6 +68,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sfxVolume: 0.10,
 		cooldownMs: 400,
 		damageMultiplier: 1,
+		stun: 3000,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0]
 	},

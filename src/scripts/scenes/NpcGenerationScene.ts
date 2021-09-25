@@ -30,6 +30,7 @@ export default class NpcGenerationScene extends Phaser.Scene {
 		this.npcForGeneration = [];
 		const requiredNpcs = new Set<string>();
 		requiredNpcs.add('enemy-zombie');
+		requiredNpcs.add('enemy-vampire');
 		Object.values(globalState.availableRooms).forEach((room) => {
 			room.npcs?.forEach((npc) => {
 				if (!npc.type) {

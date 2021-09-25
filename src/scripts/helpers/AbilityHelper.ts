@@ -74,6 +74,9 @@ export default class AbilityHelper {
 				collidingEffect.destroy();
 				const enemy = target as CharacterToken;
 				enemy.stateObject.health -= (origin.damage * Abilities[type].damageMultiplier);
+				if (Abilities[type].stun) {
+					stun(globalTime, Abilities[type].stun!, enemy.stateObject)
+				}
 				if (projectileData?.knockback) {
 					enemy.lastMovedTimestamp = globalTime;
 					const angle = Phaser.Math.Angle.Between(
@@ -103,7 +106,6 @@ export default class AbilityHelper {
 			this.scene.sound.play(Abilities[type].sound!, {volume: Abilities[type].sfxVolume!});
 		}
 	}
-
 	update(time: number, castAbilities: AbilityType[]) {
 		castAbilities.forEach((ability) => {
 			this.triggerAbility(globalState.playerCharacter, ability, time);
@@ -116,4 +118,10 @@ export default class AbilityHelper {
 			effect.update(time);
 		});
 	}
+
+}
+export const stun = (time: number, duration: number, character: Character) => {
+	character.stunned = true;
+	character.stunnedAt = time;
+	character.stunDuration = duration;
 }

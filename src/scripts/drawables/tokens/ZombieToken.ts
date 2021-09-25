@@ -3,6 +3,7 @@ import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
+import { updateStatus } from '../../worldstate/Character';
 
 const BASE_ATTACK_DAMAGE = 10;
 const REGULAR_ATTACK_RANGE = 25;
@@ -33,9 +34,7 @@ export default class ZombieToken extends EnemyToken {
 
 	public update(time: number) {
 		super.update(time);
-
-		const player = globalState.playerCharacter;
-
+		
 		this.stateObject.movementSpeed = Math.max(MIN_MOVEMENT_SPEED,
 		REGULAR_MOVEMENT_SPEED * this.stateObject.health / this.startingHealth);
 
@@ -47,6 +46,8 @@ export default class ZombieToken extends EnemyToken {
 			this.destroy();
 			return;
 		}
+		updateStatus(time, this.stateObject);
+		if (this.stateObject.stunned) return;
 
 		if (this.lastMovedTimestamp + KNOCKBACK_TIME > time) {
 			return;
@@ -107,9 +108,7 @@ export default class ZombieToken extends EnemyToken {
 		super.destroy();
 	}
 
-	attack(time: number) {
-		const player = globalState.playerCharacter;
-
+	attack(time: number) {		
 		if (this.attackedAt + this.stateObject.attackTime < time) {
 			const tx = this.target.x;
 			const ty = this.target.y;

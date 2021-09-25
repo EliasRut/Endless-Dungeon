@@ -127,6 +127,7 @@ export const npcTypeToFileMap: {[name: string]:{file: string, facing: FacingRang
 	'red-link'     : {file: 'assets/sprites/red-link.png',facing: FacingRange.ALL_DIRECTIONS},
 	'naked-guy'    : {file: 'assets/sprites/naked-guy.png',facing: FacingRange.ALL_DIRECTIONS},
 	'enemy-zombie' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW},
+	'enemy-vampire' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW},
 	'lich-king' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW}
 };
 
@@ -166,6 +167,7 @@ export const colorOfMagicToTilesetMap = {
 
 export const enemyBudgetCost = {
 	'enemy-zombie': 1,
+	'enemy-vampire': 1,
 	'redling-boss': 10
 };
 
