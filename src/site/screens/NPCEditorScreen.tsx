@@ -22,7 +22,7 @@ export const NPCEditorScreen = () => {
 			<NavigationWrapper>
 				<StyledLink to='/mapEditor'>Map Editor</StyledLink>
 				<StyledLink to='/npcEditor'>NPC Editor</StyledLink>
-				<StyledLink to='/game'>Script Editor</StyledLink>
+				<StyledLink to='/game'>Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>
 				<MenueWrapper id='npcEditorMenu'>
