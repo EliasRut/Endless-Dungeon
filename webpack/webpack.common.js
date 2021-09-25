@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { InjectManifest } = require('workbox-webpack-plugin')
 
 module.exports = {
-  entry: ['./src/scripts/game.ts', './webpack/credits.js'],
+  entry: ['./src/site/index.tsx', './webpack/credits.js'],
   output: {
     path: path.resolve(__dirname, '../dist'),
     filename: '[name].bundle.js',
@@ -14,7 +14,18 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js']
   },
   module: {
-    rules: [{ test: /\.tsx?$/, include: path.join(__dirname, '../src'), loader: 'ts-loader' }]
+    rules: [
+      {
+        test: /\.tsx?$/,
+        include: path.join(__dirname, '../src'),
+        use: 'ts-loader'
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+        include: path.join(__dirname, '../src'),
+      },
+    ]
   },
   optimization: {
     splitChunks: {
@@ -33,16 +44,6 @@ module.exports = {
       gameName: 'Project: Endless Dungeon',
       template: 'src/index.html',
       filename: 'index.html'
-    }),
-    new HtmlWebpackPlugin({
-      gameName: 'Project: Endless Dungeon',
-      template: 'src/mapeditor.html',
-      filename: 'mapeditor.html'
-    }),
-    new HtmlWebpackPlugin({
-      gameName: 'Project: Endless Dungeon',
-      template: 'src/npceditor.html',
-      filename: 'npceditor.html'
     }),
     new CopyWebpackPlugin([
       { from: 'src/assets', to: 'assets' },

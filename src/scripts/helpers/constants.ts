@@ -175,11 +175,11 @@ export const enum MODE {
 	NPC_EDITOR = 'npcEditor'
 }
 
-export const activeMode = window.location.pathname.endsWith('mapeditor.html') ?
-	MODE.MAP_EDITOR :
-		(window.location.pathname.endsWith('npceditor.html') ?
-			MODE.NPC_EDITOR :
-			MODE.GAME);
+export let activeMode = MODE.GAME;
+
+export const setActiveMode = (mode: MODE) => {
+	activeMode = mode;
+};
 
 export const CHARACTER_SPRITE_WIDTH = 320;
 export const CHARACTER_SPRITE_HEIGHT = 240;
