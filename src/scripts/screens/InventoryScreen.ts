@@ -1,4 +1,10 @@
-import { AbilityKey, BAG_BOXES_X, BAG_BOXES_Y, EquipmentSlot, UiDepths } from '../helpers/constants';
+import {
+	AbilityKey,
+	BAG_BOXES_X,
+	BAG_BOXES_Y,
+	EquipmentSlot,
+	UiDepths
+} from '../helpers/constants';
 import { AbilityType, Abilities } from '../abilities/abilityData';
 import OverlayScreen from './OverlayScreen';
 import Item from '../worldstate/Item';
