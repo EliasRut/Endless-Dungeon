@@ -6,6 +6,10 @@ import RoomPositioning from '../worldstate/RoomPositioning';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from './movement';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import { getUnequippedItemCount } from './inventory';
+import fixedItems from '../../items/fixedItems.json';
+import Item from '../worldstate/Item';
+import { generateRandomItem } from './item';
+
 
 const DIALOG_TEXT_TIME_MS = 5000;
 
@@ -278,6 +282,8 @@ export default class ScriptHelper {
 				}
 				globalState.quests[currentStep.questId].questFinished =
 					currentStep.questState === 'finished';
+				globalState.quests[currentStep.questId].questOngoing =
+					currentStep.questState === 'ongoing';
 				break;
 			}
 			case 'setScriptState': {
@@ -291,6 +297,26 @@ export default class ScriptHelper {
 					id: scriptId,
 					state: currentStep.scriptState
 				};
+				break;
+			}
+			case 'spawnItem': {
+				cleanUpStep = true;
+				let targetX: number;
+				let targetY: number;
+				if (currentStep.atPlayerPosition) {
+					targetX = globalState.playerCharacter.x;
+					targetY = globalState.playerCharacter.y;
+				} else {
+					targetX = (this.currentRoom!.x + currentStep.posX!) * TILE_WIDTH;
+					targetY = (this.currentRoom!.y + currentStep.posY!) * TILE_HEIGHT;
+				}
+				this.scene.dropItem(
+					targetX,
+					targetY,
+					currentStep.fixedId
+						? (fixedItems as unknown as {[name: string]: Item})[currentStep.fixedId]
+						: generateRandomItem(currentStep.itemOptions || {})
+				);
 				break;
 			}
 			// To Do's:

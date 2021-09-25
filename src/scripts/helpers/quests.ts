@@ -1,4 +1,5 @@
 import { ScriptEntry } from '../../../typings/custom';
+import { Source } from '../../items/itemData';
 import globalState from '../worldstate';
 
 export interface Quest {
@@ -8,7 +9,17 @@ export interface Quest {
 		hasItems?: string[];
 		dungeonLevelReached?: number;
 	};
+	goals?: {
+		previousQuests?: string[];
+		hasItems?: string[];
+		dungeonLevelReached?: number;
+	};
 	name: string;
+}
+
+export interface QuestScripts {
+	intro:  ScriptEntry[];
+	end?:  ScriptEntry[];
 }
 
 export const Quests: {[name: string]: Quest} = {
@@ -21,6 +32,9 @@ export const Quests: {[name: string]: Quest} = {
 		name: 'Vanya wants books',
 		preconditions: {
 			previousQuests: ['hildaTalks']
+		},
+		goals: {
+			hasItems: ['book']
 		}
 	}
 };
@@ -57,8 +71,9 @@ export const hasAnyOpenQuests: (questGiverId: string) => boolean = (questGiverId
 	return getOpenQuestIds(questGiverId).length > 0;
 };
 
-const questScripts: {[name: string]: ScriptEntry[]} = {
-	'hildaTalks': [{
+const questScripts: {[name: string]: QuestScripts} = {
+	'hildaTalks': {
+		intro: [{
 			type: 'dialog',
 			portrait: 'player_happy',
 			text: ['Go visit Vanya in her book shop!']
@@ -77,15 +92,48 @@ const questScripts: {[name: string]: ScriptEntry[]} = {
 			questId: 'hildaTalks',
 			questState: 'finished'
 		}
-	],
-	'vanyaWantsBooks': [{
+	]
+	},
+	'vanyaWantsBooks': {
+		intro: [{
 			type: 'dialog',
 			portrait: 'player_happy',
 			text: ['Get me some books, yo!']
-		}
-	]
+		}, {
+			type: 'pauseUntilCondition',
+			roomName: 'bookshop',
+			itemIds: ['book']
+		}, {
+			type: 'takeItem',
+			itemId: 'book',
+			amount: 1
+		}, {
+			type: 'dialog',
+			portrait: 'player_happy',
+			text: ['Thanks for the book, yo!']
+		}, {
+			type: 'spawnItem',
+			atPlayerPosition: true,
+			itemOptions: {
+				sourceTypes: [Source.FORCE],
+				level: 5,
+				sourceWeight: 1,
+				catalystWeight: 0,
+				armorWeight: 0,
+				ringWeight: 0,
+				amuletWeight: 0,
+			}
+		}, {
+			type: 'dialog',
+			portrait: 'player_happy',
+			text: ['Take this Force Source, it\'ll come in handy!']
+		}]
+	}
 };
 
 export const loadQuestScript: (questId: string) => ScriptEntry[] = (questId) => {
-	return questScripts[questId];
+	if (globalState.quests[questId]?.questOngoing) {
+		return questScripts[questId].end || [];
+	}
+	return questScripts[questId].intro;
 };
