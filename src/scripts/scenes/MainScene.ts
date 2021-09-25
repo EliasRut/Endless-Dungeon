@@ -1,6 +1,7 @@
 import 'phaser';
 
 import globalState from '../worldstate/index';
+import { updateStatus } from '../worldstate/Character';
 
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import FpsText from '../drawables/ui/FpsText';
@@ -148,7 +149,9 @@ export default class MainScene extends Phaser.Scene {
 			this.physics.add.collider(this.mainCharacter, door);
 		});
 		Object.values(this.npcMap).forEach((npc) => {
-			this.physics.add.collider(this.mainCharacter, npc);
+			this.physics.add.collider(this.mainCharacter, npc, () => {
+				npc.onCollide(true)
+			});
 		});
 
 		this.fpsText = new FpsText(this);
@@ -332,10 +335,16 @@ export default class MainScene extends Phaser.Scene {
 		Object.entries(this.npcMap).forEach(([key, value]) => {
 				this.physics.add.collider(this.npcMap[id], value);
 		});
-		this.physics.add.collider(this.npcMap[id], this.tileLayer);
-		this.physics.add.collider(this.npcMap[id], this.decorationLayer);
+		this.physics.add.collider(this.npcMap[id], this.tileLayer, () => {
+			npc.onCollide(false);
+		});
+		this.physics.add.collider(this.npcMap[id], this.decorationLayer, () => {
+			npc.onCollide(false);
+		});
 		if (this.mainCharacter) {
-			this.physics.add.collider(this.npcMap[id], this.mainCharacter);
+			this.physics.add.collider(this.npcMap[id], this.mainCharacter, () => {
+				npc.onCollide(true);
+			});
 		}
 		this.npcMap[id].script = options?.script;
 	}
@@ -479,6 +488,7 @@ export default class MainScene extends Phaser.Scene {
 		this.fpsText.update();
 		this.minimap?.update();
 		this.keyboardHelper.updateGamepad();
+		updateStatus(globalTime, globalState.playerCharacter);
 
 		if (this.keyboardHelper.isKKeyPressed()) {
 			globalState.clearState();
@@ -533,6 +543,7 @@ export default class MainScene extends Phaser.Scene {
 			curNpc.update(globalTime);
 		});
 		if (!this.blockUserInteraction) {
+			if(globalState.playerCharacter.stunned === true) return;
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalTime);
 			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
 

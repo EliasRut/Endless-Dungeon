@@ -26,6 +26,9 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		this.id = id;
 		this.lastMovedTimestamp = -Infinity;
 	}
+	public onCollide(withEnemy: boolean) {
+
+	}
 
 	public getDistance(px: number, py: number) {
 		const x = this.x - px;
