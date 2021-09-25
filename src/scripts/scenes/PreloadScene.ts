@@ -193,11 +193,17 @@ export default class PreloadScene extends Phaser.Scene {
 					const directionFrameMultiplier = Math.floor(directionIndex / token.facingRange);
 					attackNames.forEach((attackName) => {
 						const attackData = npcTypeToAttackFileMap[token.name][attackName];
+						const startFrame = directionFrameMultiplier * attackData.framesPerDirection
+							+ (attackData.frameOffset || 0);
 						this.anims.create({
 							key: `${token.name}-${attackName}-${directionName}`,
 							frames: this.anims.generateFrameNumbers(`${token.name}-${attackName}`, {
-								start: directionFrameMultiplier * attackData.framesPerDirection,
-								end: (directionFrameMultiplier + 1) * attackData.framesPerDirection  - 1
+								start: startFrame,
+								end: startFrame + (
+									attackData.animationFrames
+									? attackData.animationFrames
+									: attackData.framesPerDirection)
+									- 1
 							}),
 							frameRate: 16,
 							repeat: 0

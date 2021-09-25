@@ -131,12 +131,43 @@ export const npcTypeToFileMap: {[name: string]:{file: string, facing: FacingRang
 };
 
 export const npcTypeToAttackFileMap: {
-	[name: string]: {[attackName: string]: {file: string, framesPerDirection: number}}
+	[name: string]: {[attackName: string]: {
+		file: string,
+		framesPerDirection: number,
+		frameOffset?: number,
+		animationFrames?: number
+	}}
 } =  {
 	'enemy-zombie': {
 		'slash': {
 			file: 'assets/sprites/enemy-zombie-slash.png',
 			framesPerDirection: 16
+		}
+	},
+	'enemy-vampire': {
+		'jiggle': {
+			file: 'assets/sprites/enemy-vampire-charge.png',
+			framesPerDirection: 16,
+			frameOffset: 0,
+			animationFrames: 8
+		},
+		'fly': {
+			file: 'assets/sprites/enemy-vampire-charge.png',
+			framesPerDirection: 16,
+			frameOffset: 8,
+			animationFrames: 1
+		},
+		'stun': {
+			file: 'assets/sprites/enemy-vampire-charge.png',
+			framesPerDirection: 16,
+			frameOffset: 9,
+			animationFrames: 3
+		},
+		'recover': {
+			file: 'assets/sprites/enemy-vampire-charge.png',
+			framesPerDirection: 16,
+			frameOffset: 12,
+			animationFrames: 4
 		}
 	}
 };
