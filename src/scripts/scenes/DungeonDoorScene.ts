@@ -9,7 +9,7 @@ export default class DungeonDoorScene extends Phaser.Scene {
 	dungeonDoor: DungeonDoor;
 	keyboardHelper: KeyboardHelper;
 	keyLastPressed: number = 0;
-	keyCD: number = 150;
+	keyCD: number = 350;
 
 	constructor() {
 		super({ key: 'DungeonDoorScene' });		

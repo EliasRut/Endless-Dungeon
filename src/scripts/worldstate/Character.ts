@@ -12,6 +12,9 @@ export default class Character {
 	public movementSpeed: number;
 	public slowFactor: number = 1;
 	public attackTime: number;
+	public stunDuration: number = 0;
+	public stunnedAt: number = 0;
+	public stunned: boolean = false;
 
 	public currentFacing: Facings = Facings.SOUTH;
 	public isWalking = false;
@@ -35,5 +38,13 @@ export default class Character {
 		this.health = health;
 		this.damage = damage;
 		this.movementSpeed = movementSpeed;
+	}
+}
+
+export const updateStatus = (globalTime: number, character: Character) => {
+	if (character.stunned) {
+		if (globalTime > character.stunnedAt + character.stunDuration) {
+			character.stunned = false;
+		}		
 	}
 }

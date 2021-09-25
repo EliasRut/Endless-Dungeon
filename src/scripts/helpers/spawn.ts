@@ -6,6 +6,7 @@ import NpcToken from '../drawables/tokens/NpcToken';
 import { NpcOptions } from '../../../typings/custom';
 import RedlingBossToken from '../drawables/tokens/RedlingBoss';
 import LichKingToken from '../drawables/tokens/LichKing';
+import VampireToken from '../drawables/tokens/VampireEnemyToken';
 
 export const spawnNpc = (
 		scene: MainScene,
@@ -25,6 +26,9 @@ export const spawnNpc = (
 		}
 		case 'enemy-zombie': {
 			return new ZombieToken(scene, posX, posY, type, level, id);
+		}
+		case 'enemy-vampire': {
+			return new VampireToken(scene, posX, posY, type, level, id);
 		}
 		case 'redling-boss': {
 			return new RedlingBossToken(scene, posX, posY, type, level, id);

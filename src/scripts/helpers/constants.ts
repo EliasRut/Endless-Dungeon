@@ -127,16 +127,48 @@ export const npcTypeToFileMap: {[name: string]:{file: string, facing: FacingRang
 	'red-link'     : {file: 'assets/sprites/red-link.png',facing: FacingRange.ALL_DIRECTIONS},
 	'naked-guy'    : {file: 'assets/sprites/naked-guy.png',facing: FacingRange.ALL_DIRECTIONS},
 	'enemy-zombie' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW},
+	'enemy-vampire' : {file: 'assets/sprites/enemy-vampire.png',facing: FacingRange.ONLY_NESW},
 	'lich-king' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW}
 };
 
 export const npcTypeToAttackFileMap: {
-	[name: string]: {[attackName: string]: {file: string, framesPerDirection: number}}
+	[name: string]: {[attackName: string]: {
+		file: string,
+		framesPerDirection: number,
+		frameOffset?: number,
+		animationFrames?: number
+	}}
 } =  {
 	'enemy-zombie': {
 		'slash': {
 			file: 'assets/sprites/enemy-zombie-slash.png',
 			framesPerDirection: 16
+		}
+	},
+	'enemy-vampire': {
+		'prepare': {
+			file: 'assets/sprites/enemy-vampire-charge.png',
+			framesPerDirection: 16,
+			frameOffset: 0,
+			animationFrames: 9
+		},
+		'fly': {
+			file: 'assets/sprites/enemy-vampire-charge.png',
+			framesPerDirection: 16,
+			frameOffset: 9,
+			animationFrames: 1
+		},
+		'stun': {
+			file: 'assets/sprites/enemy-vampire-charge.png',
+			framesPerDirection: 16,
+			frameOffset: 10,
+			animationFrames: 6
+		},
+		'recover': {
+			file: 'assets/sprites/enemy-vampire-charge.png',
+			framesPerDirection: 16,
+			frameOffset: 14,
+			animationFrames: 2
 		}
 	}
 };
@@ -166,6 +198,7 @@ export const colorOfMagicToTilesetMap = {
 
 export const enemyBudgetCost = {
 	'enemy-zombie': 1,
+	'enemy-vampire': 1,
 	'redling-boss': 10
 };
 
