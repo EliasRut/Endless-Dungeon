@@ -32,9 +32,15 @@ export default class NpcGenerationScene extends Phaser.Scene {
 		requiredNpcs.add('enemy-zombie');
 		Object.values(globalState.availableRooms).forEach((room) => {
 			room.npcs?.forEach((npc) => {
+				if (!npc.type) {
+					throw new Error(`No npc type found for room ${room.name}.`);
+				}
 				requiredNpcs.add(npc.type);
 			});
 			room.usedNpcTypes?.forEach((npcType) => {
+				if (!npcType) {
+					throw new Error(`No npc type found for room ${room.name}.`);
+				}
 				requiredNpcs.add(npcType);
 			});
 		});
