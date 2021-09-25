@@ -400,13 +400,16 @@ export default class DungeonGenerator {
 			if (room.noRandomEnemies) {
 				return;
 			}
+
+			const startY =this.roomOffsets[index][0] * BLOCK_SIZE;
+			const startX =this.roomOffsets[index][1] * BLOCK_SIZE;
 			const roomWidth = room.layout[0].length;
 			const roomHeight = room.layout.length;
 
 			for (let y = 0; y < roomHeight; y++) {
 				for (let x = 0; x < roomWidth; x++) {
 					if (room.layout[y][x] === 32) {
-						this.potentialEnemyFields.push({x, y});
+						this.potentialEnemyFields.push({x: startX + x, y: y + startY});
 					}
 				}
 			}
@@ -860,7 +863,7 @@ export default class DungeonGenerator {
 							const tileX = blockX * BLOCK_SIZE + x;
 							this.combinedLayout[tileY][tileX] = blockLayout[y][x];
 							if (blockLayout[y][x] === 32) {
-								this.potentialEnemyFields.push({x, y});
+								this.potentialEnemyFields.push({x: tileX, y: tileY});
 							}
 						}
 					}

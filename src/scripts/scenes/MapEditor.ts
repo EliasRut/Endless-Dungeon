@@ -6,7 +6,7 @@ import {
 import PositionText, { POSITION_TEXT_X_OFFSET, POSITION_TEXT_Y_OFFSET } from '../drawables/ui/PositionText';
 import globalState from '../worldstate';
 import firebase from 'firebase';
-import { DatabaseRoom, Room } from '../../../typings/custom';
+import { DatabaseRoom, NpcPositioning, Room } from '../../../typings/custom';
 import { deserializeRoom } from '../helpers/serialization';
 
 const MIN_ZOOM_LEVEL = 0.125;
@@ -71,13 +71,15 @@ export default class MapEditor extends Phaser.Scene {
 	libraryLayer: Phaser.Tilemaps.TilemapLayer;
 	backgroundLibraryLayer: Phaser.Tilemaps.TilemapLayer;
 	npcLibraryLayer: Phaser.GameObjects.Group;
-	npcTokens: Phaser.GameObjects.Image[];
+	npcLibraryTokens: Phaser.GameObjects.Image[];
 
 	highlightingX = 0;
 	highlightingY = 0;
 	mapEditorHighlighting: Phaser.GameObjects.Image;
 
 	selectedLibraryNpcIndex: number = -1;
+	npcTokens: Phaser.GameObjects.Image[];
+	npcs: NpcPositioning[];
 
 	oneKey: Phaser.Input.Keyboard.Key;
 	twoKey: Phaser.Input.Keyboard.Key;
@@ -166,6 +168,10 @@ export default class MapEditor extends Phaser.Scene {
 		this.roomLayout = [];
 		this.roomDecorationLayout = [];
 		this.roomOverlayLayout = [];
+
+		this.npcs = selectedRoom.npcs || [];
+
+		this.npcTokens = [];
 
 		this.applyConfiguration();
 
@@ -323,10 +329,11 @@ export default class MapEditor extends Phaser.Scene {
 
 		this.npcLibraryLayer = new Phaser.GameObjects.Group(this);
 
-		this.npcTokens = [];
+		this.npcs = [];
+		this.npcLibraryTokens = [];
 		npcKeys.forEach((key, index) => {
 			const token = new Phaser.GameObjects.Image(this, 0, 0, key);
-			token.setPosition(index * 40, 0); // + ((40 - token.width) / 2), (token.height / 2));
+			token.setPosition(index * 40, 0);
 			token.setOrigin(0);
 			token.setScrollFactor(0);
 			token.setDepth(100);
@@ -336,7 +343,7 @@ export default class MapEditor extends Phaser.Scene {
 				this.mapEditorHighlighting.setPosition(index * 40, 0);
 			});
 			token.setInteractive();
-			this.npcTokens.push(token);
+			this.npcLibraryTokens.push(token);
 			this.npcLibraryLayer.add(token, true);
 		});
 		this.npcLibraryLayer.setVisible(this.activeLayerDropdownElement.value === 'npcs');
