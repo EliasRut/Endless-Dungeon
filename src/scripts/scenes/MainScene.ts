@@ -478,12 +478,13 @@ export default class MainScene extends Phaser.Scene {
 		globalState.gameTime = globalTime;
 		this.fpsText.update();
 		this.minimap?.update();
+		this.keyboardHelper.updateGamepad();
 
 		if (this.keyboardHelper.isKKeyPressed()) {
 			globalState.clearState();
 			location.reload();
 		}
-		if (this.keyboardHelper.isInventoryPressed()) {
+		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visiblity)) {
 			if (this.wasIPressed=== false){
 				this.icons.backpackIcon.toggleScreen();
 				this.overlayScreens.inventory.interactInventory('pressed', globalTime);

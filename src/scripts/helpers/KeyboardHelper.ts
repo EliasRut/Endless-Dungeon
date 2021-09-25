@@ -36,7 +36,7 @@ export default class KeyboardHelper {
 	isAbility2Pressed: () => boolean;
 	isAbility3Pressed: () => boolean;
 	isAbility4Pressed: () => boolean;
-	isInventoryPressed: () => boolean;
+	isInventoryPressed: (inventoryOpen : boolean) => boolean;
 	isSettingsPressed: () => boolean;
 	isEnterPressed: () => boolean;
 
@@ -50,7 +50,7 @@ export default class KeyboardHelper {
 		this.kKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
 		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
 		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);		
 
 		this.scene = scene;
 		this.isMoveUpPressed = () => {
@@ -84,26 +84,39 @@ export default class KeyboardHelper {
 			const axis = this.gamepad?.axes[0];
 			const axisValue = axis ? axis.getValue() : 0;
 			return !!this.gamepad?.right || axisValue > AXIS_MOVEMENT_THRESHOLD;
+		};		
+		this.isEnterPressed = () => {			
+			if (this.enterKey.isDown) {
+				return true;
+			}
+			try {
+				return !!this.gamepad?.A;
+			} catch (err) {
+				return false;
+			}			
 		};
-		this.isInventoryPressed = () => {
+		this.isInventoryPressed = (inventoryOpen: boolean) => {
 			if (this.inventoryKey.isDown) {
 				return true;
 			}
-			return false;
+			try {
+				if(inventoryOpen) {
+					let eitherPressed = !!this.gamepad?.isButtonDown(9) || !!this.gamepad?.B;
+					return eitherPressed;
+				} else return !!this.gamepad?.isButtonDown(9);
+			} catch (err) {
+				return false;
+			}
 		};
-
 		this.isSettingsPressed = () => {
 			if (this.settingsKey.isDown) {
 				return true;
 			}
-			return false;
-		};
-
-		this.isEnterPressed = () => {
-			if (this.enterKey.isDown) {
-				return true;
+			try {
+				return !!this.gamepad?.isButtonDown(8);
+			} catch (err) {
+				return false;
 			}
-			return false;
 		};
 
 		this.abilityKey1 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
@@ -123,7 +136,7 @@ export default class KeyboardHelper {
 				return true;
 			}
 			try {
-				return !!this.gamepad?.isButtonDown(0);
+				return !!this.gamepad?.A;
 			} catch (err) {
 				return false;
 			}
@@ -138,7 +151,7 @@ export default class KeyboardHelper {
 				return true;
 			}
 			try {
-				return !!this.gamepad?.isButtonDown(2);
+				return !!this.gamepad?.X;
 			} catch (err) {
 				return false;
 			}
@@ -153,7 +166,7 @@ export default class KeyboardHelper {
 				return true;
 			}
 			try {
-				return !!this.gamepad?.isButtonDown(1);
+				return !!this.gamepad?.B;
 			} catch (err) {
 				return false;
 			}
@@ -168,28 +181,7 @@ export default class KeyboardHelper {
 				return true;
 			}
 			try {
-				return !!this.gamepad?.isButtonDown(3);
-			} catch (err) {
-				return false;
-			}
-		};
-		this.isInventoryPressed = () => {
-			if (this.inventoryKey.isDown) {
-				return true;
-			}
-			try {
-				return !!this.gamepad?.isButtonDown(8);
-			} catch (err) {
-				return false;
-			}
-		};
-
-		this.isSettingsPressed = () => {
-			if (this.settingsKey.isDown) {
-				return true;
-			}
-			try {
-				return !!this.gamepad?.isButtonDown(9);
+				return !!this.gamepad?.Y;
 			} catch (err) {
 				return false;
 			}
@@ -200,15 +192,16 @@ export default class KeyboardHelper {
 		if (this.isMoveDownPressed()) return "down";
 		else if (this.isMoveLeftPressed()) return "left";
 		else if (this.isMoveRightPressed()) return "right";
-		else if(this.isMoveUpPressed()) return "up";
-		else if(this.isEnterPressed()) return "enter";
+		else if (this.isMoveUpPressed()) return "up";
+		else if (this.isEnterPressed()) return "enter";		
 		return "nothing";
+	}
+	updateGamepad() {
+		this.gamepad = this.scene.input.gamepad?.getPad(0);
 	}
 	getCharacterFacing(stickDeltaX: number, stickDeltaY: number) {
 		let yFacing = 0;
-		let xFacing = 0;
-
-		this.gamepad = this.scene.input.gamepad?.getPad(0);
+		let xFacing = 0;		
 
 		if (stickDeltaY < -20 || this.isMoveUpPressed()) {
 			yFacing = -1;
