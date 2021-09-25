@@ -1,4 +1,5 @@
 import DungeonLevel from '../worldstate/DungeonLevel';
+import { UiDepths } from './constants';
 import { TILE_HEIGHT, TILE_WIDTH, GID_MULTIPLE } from './generateDungeon';
 import { COLLIDING_TILE_RANGES } from './movement';
 
@@ -36,7 +37,8 @@ export const generateTilemap: (scene: Phaser.Scene, dungeonLevel: DungeonLevel) 
 	[
 		Phaser.Tilemaps.TilemapLayer,
 		Phaser.Tilemaps.TilemapLayer,
-		Phaser.Tilemaps.TilemapLayer
+		Phaser.Tilemaps.TilemapLayer,
+		// Phaser.Tilemaps.TilemapLayer
 	] = (scene, dungeonLevel) => {
 
 	const tileLayer = createLayer(scene, dungeonLevel.layout, dungeonLevel.tilesets, 0);
@@ -65,5 +67,9 @@ export const generateTilemap: (scene: Phaser.Scene, dungeonLevel: DungeonLevel) 
 		});
 	});
 
-	return [tileLayer, decorationTileLayer, overlayTileLayer];
+	// const topTileLayer =
+	// 	createLayer(scene, dungeonLevel.topLayout, dungeonLevel.tilesets, 3);
+	// topTileLayer.setDepth(UiDepths.TOP_TILE_LAYER);
+
+	return [tileLayer, decorationTileLayer, overlayTileLayer];//, topTileLayer];
 };

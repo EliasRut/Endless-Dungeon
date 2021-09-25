@@ -203,6 +203,7 @@ export default class DungeonGenerator {
 	combinedLayout: number[][];
 	decorationLayout: number[][];
 	overlayLayout: number[][];
+	topLayout: number[][];
 	blocksUsed: number[][];
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	dungeonLevel: number;
@@ -291,14 +292,17 @@ export default class DungeonGenerator {
 		this.combinedLayout = [];
 		this.decorationLayout = [];
 		this.overlayLayout = [];
+		this.topLayout = [];
 		for (let y = 0; y < this.dungeonHeight; y++) {
 			this.combinedLayout[y] = [];
 			this.decorationLayout[y] = [];
 			this.overlayLayout[y] = [];
+			this.topLayout[y] = [];
 			for (let x = 0; x < this.dungeonWidth; x++) {
 				this.combinedLayout[y][x] = -1;
 				this.decorationLayout[y][x] = -1;
 				this.overlayLayout[y][x] = -1;
+				this.topLayout[y][x] = 161;
 			}
 		}
 
@@ -451,6 +455,7 @@ export default class DungeonGenerator {
 			layout: this.combinedLayout,
 			decorationLayout: this.decorationLayout,
 			overlayLayout: this.overlayLayout,
+			topLayout: this.topLayout,
 			npcs: this.npcs,
 			connections,
 			doors,
@@ -605,6 +610,7 @@ export default class DungeonGenerator {
 					const actualY = y + roomYBlockOffset * BLOCK_SIZE;
 					const actualX = x + roomXBlockOffset * BLOCK_SIZE;
 					this.combinedLayout[actualY][actualX] = gid + roomLayout[y][x];
+					this.topLayout[actualY][actualX] = roomLayout[y][x] >= 120 ? roomLayout[y][x] : -1;
 				}
 			}
 		}
@@ -862,6 +868,7 @@ export default class DungeonGenerator {
 							const tileY = blockY * BLOCK_SIZE + y;
 							const tileX = blockX * BLOCK_SIZE + x;
 							this.combinedLayout[tileY][tileX] = blockLayout[y][x];
+							this.topLayout[tileY][tileX] = blockLayout[y][x] >= 120 ? blockLayout[y][x] : -1;
 							if (blockLayout[y][x] === 32) {
 								this.potentialEnemyFields.push({x: tileX, y: tileY});
 							}

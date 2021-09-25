@@ -1,4 +1,4 @@
-import { Abilities, AbilityType, } from '../abilities/abilityData';
+import { Abilities, AbilityType, SpreadData, } from '../abilities/abilityData';
 import AbilityEffect from '../drawables/effects/AbilityEffect';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import EnemyToken from '../drawables/tokens/EnemyToken';
@@ -29,11 +29,17 @@ export default class AbilityHelper {
 		const numProjectiles =  (Abilities[type].projectiles || 0);
 		const fireProjectile = (projectileIndex: number) => {
 			// Spread multiple projectiles over an arc on a circle
-			const spread = projectileData?.spread ? projectileData!.spread : [0, 0];
+			const spread: SpreadData = projectileData?.spread ? projectileData!.spread : [0, 0];
 			// The total arc we want to cover
 			const spreadDistance = spread[1] - spread[0];
-			// The current point in the arc we are at
-			const currentSpread = spread[0] + spreadDistance * (projectileIndex / numProjectiles);
+			let currentSpread: number;
+			if (spread[2]) {
+				currentSpread = spread[0] +
+					spread[2](projectileIndex / ((numProjectiles - 1) || 1)) * spreadDistance;
+			} else {
+				currentSpread = spread[0] +
+					spreadDistance * (projectileIndex / ((numProjectiles - 1) || 1));
+			}
 			// We want to combine the arc position with the characters facing to allow cone-like effects
 			const yMultiplier = -Math.cos(currentSpread * Math.PI + facingRotation);
 			const xMultiplier = Math.sin(currentSpread * Math.PI + facingRotation);
@@ -54,16 +60,25 @@ export default class AbilityHelper {
 			effect.setMaxVelocity(projectileData!.velocity);
 			effect.body.velocity.scale(projectileData!.velocity);
 
-			effect.setDrag(projectileData!.drag || 0);
+			effect.setDrag(
+				(projectileData!.drag || 0) * Math.abs(xMultiplier),
+				(projectileData!.drag || 0) * Math.abs(yMultiplier)
+			);
+
+			effect.setDebug(true, true, 0xffff00);
 
 			this.scene.physics.add.collider(effect, this.scene.tileLayer, () => {
-				effect.destroy();
+				if (projectileData!.destroyOnWallContact) {
+					effect.destroy();
+				}
 				if (projectileData?.collisionSound) {
 					this.scene.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
 				}
 			});
 			this.scene.physics.add.collider(effect, this.scene.decorationLayer, () => {
-				effect.destroy();
+				if (projectileData!.destroyOnWallContact) {
+					effect.destroy();
+				}
 				if (projectileData?.collisionSound) {
 					this.scene.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
 				}
@@ -72,12 +87,17 @@ export default class AbilityHelper {
 			const targetTokens = origin.faction === Faction.PLAYER ?
 				Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES) :
 				this.scene.mainCharacter;
-			this.scene.physics.add.collider(effect, targetTokens, (collidingEffect, target) => {
-				collidingEffect.destroy();
-				const enemy = target as CharacterToken;
+			const collidingCallback = (collidingEffect: AbilityEffect, enemy: CharacterToken) => {
+				if (projectileData!.destroyOnEnemyContact) {
+					collidingEffect.destroy();
+				}
+				if (collidingEffect.hitEnemyTokens.includes(enemy)) {
+					return;
+				}
+				effect.hitEnemyTokens.push(enemy);
 				enemy.stateObject.health -= (origin.damage * Abilities[type].damageMultiplier);
 				if (Abilities[type].stun) {
-					stun(globalTime, Abilities[type].stun!, enemy.stateObject)
+					stun(globalTime, Abilities[type].stun!, enemy.stateObject);
 				}
 				if (projectileData?.knockback) {
 					enemy.lastMovedTimestamp = globalTime;
@@ -91,7 +111,12 @@ export default class AbilityHelper {
 				if (projectileData?.collisionSound) {
 					this.scene.sound.play(projectileData.collisionSound!, {volume: projectileData.sfxVolume!});
 				}
-			});
+			};
+			if (!projectileData?.passThroughEnemies) {
+				this.scene.physics.add.collider(effect, targetTokens, collidingCallback as any);
+			} else {
+				this.scene.physics.add.overlap(effect, targetTokens, collidingCallback as any);
+			}
 			this.abilityEffects.push(effect);
 		};
 		// Go through all projectiles the ability should launch

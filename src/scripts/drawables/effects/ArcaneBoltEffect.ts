@@ -7,7 +7,7 @@ import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
 
 const BODY_RADIUS = 6;
-const EXPLOSION_PARTICLE_SPEED = 200;
+const EXPLOSION_PARTICLE_SPEED = 100;
 const EXPLOSION_PARTICLE_COUNT = 10;
 
 const RED_MIN = 0x330000;
@@ -32,13 +32,11 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 		this.tint = 0xff00ff;
 		this.setVisible(false);
 
-		this.seekingSpeed = 3000;
-
 		const particles = scene.add.particles('rock');
 		particles.setDepth(1);
 		this.trailEmitter = particles.createEmitter({
 			alpha: { start: 1, end: 0 },
-			scale: { start: 0.01, end: 0 },
+			scale: { start: 0.01 * this.effectScale, end: 0 },
 			speed: 70,
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 200, max: 400 },
@@ -56,7 +54,7 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 		this.coreEmitter = particles.createEmitter({
 			alpha: { start: 1, end: 0, ease: 'ease-out' },
 			// scale: { start: 0.033, end: 0.2 },
-			scale: 0.033,
+			scale: 0.033 * this.effectScale,
 			angle: { min: 0, max: 360},
 			speed: {min: 0, max: 70},
 			rotate: { min: -180, max: 180 },
@@ -81,9 +79,9 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 				max: 1 * EXPLOSION_PARTICLE_SPEED
 			});
 			this.trailEmitter.setLifespan({min: 200, max: 400});
-			this.trailEmitter.setScale({start: 0.03, end: 0});
-			this.trailEmitter.explode(100, this.body.x, this.body.y);
-			this.coreEmitter.setSpeed({min: 40, max: 200});
+			this.trailEmitter.setScale({start: 0.03 * this.effectScale, end: 0});
+			this.trailEmitter.explode(40, this.body.x, this.body.y);
+			this.coreEmitter.setSpeed({min: 0.4 * EXPLOSION_PARTICLE_SPEED, max: EXPLOSION_PARTICLE_SPEED});
 			this.coreEmitter.setLifespan({min: 200, max: 700});
 			this.coreEmitter.setAlpha({start: 1, end: 0});
 			this.coreEmitter.explode(8, this.body.x, this.body.y);

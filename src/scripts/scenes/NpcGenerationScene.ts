@@ -47,7 +47,7 @@ export default class NpcGenerationScene extends Phaser.Scene {
 				requiredNpcs.add(npcType);
 			});
 		});
-		
+
 		// NPCs
 		requiredNpcs.forEach((npc) => {
 			if (npcTypeToFileMap[npc]) {

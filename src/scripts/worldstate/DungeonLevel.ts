@@ -12,6 +12,7 @@ export default class DungeonLevel {
 	layout: number[][];
 	decorationLayout: number[][];
 	overlayLayout: number[][];
+	topLayout: number[][];
 	npcs: NpcPositioning[];
 	connections: MapConnection[];
 	doors: Door[];

@@ -31,7 +31,7 @@ export default class DynamicLightingHelper {
 	constructor(
 		tileLayer: Phaser.Tilemaps.TilemapLayer,
 		decorationLayer: Phaser.Tilemaps.TilemapLayer,
-		overlayLayer: Phaser.Tilemaps.TilemapLayer
+		overlayLayer: Phaser.Tilemaps.TilemapLayer,
 	) {
 		this.tileLayer = tileLayer;
 		this.decorationLayer = decorationLayer;

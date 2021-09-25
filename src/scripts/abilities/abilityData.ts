@@ -7,10 +7,13 @@ import HealingLightEffect from '../drawables/effects/HealingLightEffect';
 import ArcaneBoltEffect from '../drawables/effects/ArcaneBoltEffect';
 import ConeEffect from '../drawables/effects/ConeEffect';
 
+export type SpreadData = [number, number, ((factor: number) => number)?];
+
 export interface ProjectileData {
-	spread?: [number, number];
+	spread?: SpreadData;
 	velocity: number;
 	drag?: number;
+	effectScale?: number;
 	xOffset: number;
 	yOffset: number;
 	effect: typeof AbilityEffect;
@@ -21,6 +24,9 @@ export interface ProjectileData {
 	knockback?: number;
 	timeToLive?: number;
 	destroyOnEnemyContact: boolean;
+	destroyOnWallContact: boolean;
+	explodeOnDestruction?: boolean;
+	passThroughEnemies?: boolean;
 }
 
 interface AbilityData {
@@ -67,11 +73,13 @@ export const Abilities: {[type: string]: AbilityData} = {
 			effect: FireBallEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
-			destroyOnEnemyContact: true
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			explodeOnDestruction: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
-		cooldownMs: 400,
+		cooldownMs: 250,
 		damageMultiplier: 1,
 		stun: 3000,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
@@ -80,27 +88,30 @@ export const Abilities: {[type: string]: AbilityData} = {
 	[AbilityType.ARCANE_BOLT]: {
 		projectiles: 1,
 		projectileData: {
-			velocity: 600,
+			velocity: 450,
 			xOffset: 0,
 			yOffset: 0,
 			effect: ArcaneBoltEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			knockback: 200,
-			destroyOnEnemyContact: true
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			explodeOnDestruction: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
-		cooldownMs: 400,
+		cooldownMs: 250,
 		damageMultiplier: 0.8,
 		flavorText: `Shooting magic missiles!`,
 		icon: ['icon-abilities', 1]
 	},
 	[AbilityType.HAIL_OF_BOLTS]: {
-		projectiles: 5,
+		projectiles: 13,
 		projectileData: {
-			spread: [-0.06, 0.07],
-			velocity: 600,
+			spread: [-0.07, 0.07, (num) => Math.sin(num * Math.PI * 0.95)],
+			velocity: 350,
+			delay: 50,
 			xOffset: 0,
 			yOffset: 0,
 			effect: ArcaneBoltEffect,
@@ -108,32 +119,38 @@ export const Abilities: {[type: string]: AbilityData} = {
 			sfxVolume: 0.2,
 			targeting: true,
 			knockback: 200,
-			destroyOnEnemyContact: true
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			explodeOnDestruction: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
-		cooldownMs: 1500,
-		damageMultiplier: 0.8,
+		cooldownMs: 300,
+		damageMultiplier: 0.25,
 		flavorText: `Shooting magic missiles!`,
 		icon: ['icon-abilities', 1]
 	},
 	[AbilityType.HAIL_OF_FLAMES]: {
-		projectiles: 5,
+		projectiles: 13,
 		projectileData: {
-			spread: [-0.15, 0.2],
-			velocity: 300,
+			spread: [-0.07, 0.07, (num) => Math.sin(num * Math.PI * 0.95)],
+			delay: 50,
+			velocity: 350,
+			effectScale: 0.8,
 			xOffset: 0,
 			yOffset: 0,
 			effect: FireBallEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			targeting: true,
-			destroyOnEnemyContact: true
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			explodeOnDestruction: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
-		cooldownMs: 1500,
-		damageMultiplier: 0.8,
+		cooldownMs: 3000,
+		damageMultiplier: 0.33,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0]
 	},
@@ -148,7 +165,9 @@ export const Abilities: {[type: string]: AbilityData} = {
 			collisionSound: 'sound-icespike-hit',
 			sfxVolume: 0.2,
 			targeting: true,
-			destroyOnEnemyContact: true
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			explodeOnDestruction: true
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
@@ -166,7 +185,9 @@ export const Abilities: {[type: string]: AbilityData} = {
 			effect: IceSpikeEffect,
 			collisionSound: 'sound-icespike-hit',
 			sfxVolume: 0.2,
-			destroyOnEnemyContact: true
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			explodeOnDestruction: true
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
@@ -184,6 +205,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			xOffset: 20,
 			yOffset: 20,
 			effect: DustNovaEffect,
+			destroyOnWallContact: true,
 			destroyOnEnemyContact: true
 			// collisionSound: 'sound-wind',
 			// sfxVolume: 0.4
@@ -204,6 +226,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			yOffset: 25,
 			effect: RoundHouseKickEffect,
 			delay: 12,
+			destroyOnWallContact: true,
 			destroyOnEnemyContact: true
 			// collisionSound: 'sound-wind',
 			// sfxVolume: 0.4
@@ -221,6 +244,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			xOffset: 0,
 			yOffset: 0,
 			effect: HealingLightEffect,
+			destroyOnWallContact: true,
 			destroyOnEnemyContact: false
 			// collisionSound: 'sound-wind',
 			// sfxVolume: 0.4
@@ -241,6 +265,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			effect: ArcaneBoltEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
+			destroyOnWallContact: true,
 			destroyOnEnemyContact: true
 		},
 		sound: 'sound-fireball',
@@ -251,23 +276,28 @@ export const Abilities: {[type: string]: AbilityData} = {
 		icon: ['icon-abilities', 1]
 	},
 	[AbilityType.FIRE_CONE]: {
-		projectiles: 10,
+		projectiles: 12,
 		projectileData: {
-			spread: [-0.1, 0.1],
-			velocity: 300,
+			spread: [-0.14, 0.14],
+			velocity: 400,
+			drag: 700,
 			xOffset: 0,
 			yOffset: 0,
 			effect: FireBallEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			timeToLive: 500,
+			effectScale: 1.2,
 			targeting: false,
-			destroyOnEnemyContact: false
+			destroyOnWallContact: false,
+			destroyOnEnemyContact: false,
+			explodeOnDestruction: false,
+			passThroughEnemies: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
 		cooldownMs: 1500,
-		damageMultiplier: 0.8,
+		damageMultiplier: 0.2,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0]
 	},

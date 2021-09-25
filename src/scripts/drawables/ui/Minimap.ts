@@ -5,6 +5,7 @@ import {
 	TILE_HEIGHT
 } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
+import { UiDepths } from '../../helpers/constants';
 
 const X_POSITION = 10;
 const Y_POSITION = 200;
@@ -23,6 +24,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 		this.setScrollFactor(0);
 		scene.add.existing(this);
 		this.setOrigin(0);
+		this.setDepth(UiDepths.UI_STICK_LAYER);
 	}
 
 	public update() {

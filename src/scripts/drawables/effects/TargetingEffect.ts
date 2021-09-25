@@ -5,7 +5,7 @@ import AbilityEffect from './AbilityEffect';
 
 export default class TargetingEffect extends AbilityEffect {
 	allowedTargets: PossibleTargets = PossibleTargets.NONE;
-	seekingSpeed: number = 500;
+	seekingSpeed: number = 3000;
 
 	update(time: number) {
 		let nearestEnemy: CharacterToken | undefined;

@@ -150,7 +150,7 @@ export default class MainScene extends Phaser.Scene {
 		});
 		Object.values(this.npcMap).forEach((npc) => {
 			this.physics.add.collider(this.mainCharacter, npc, () => {
-				npc.onCollide(true)
+				npc.onCollide(true);
 			});
 		});
 
@@ -403,7 +403,7 @@ export default class MainScene extends Phaser.Scene {
 		const [
 			tileLayer,
 			decorationLayer,
-			overlayLayer
+			overlayLayer,
 		] = generateTilemap(this, dungeonLevel);
 
 		this.tileLayer = tileLayer;
@@ -413,6 +413,7 @@ export default class MainScene extends Phaser.Scene {
 		this.tileLayer.setDepth(UiDepths.BASE_TILE_LAYER);
 		this.decorationLayer.setDepth(UiDepths.DECORATION_TILE_LAYER);
 		this.overlayLayer.setDepth(UiDepths.OVERLAY_TILE_LAYER);
+		this.overlayLayer.setDepth(UiDepths.TOP_TILE_LAYER);
 
 		npcs.forEach((npc) => {
 			this.addNpc(
