@@ -1,5 +1,7 @@
 import { Facings } from '../../helpers/constants';
 import AbilityEffect from './AbilityEffect';
+import { ProjectileData } from '../../abilities/abilityData';
+
 
 const BODY_RADIUS = 6;
 const BODY_MASS = 10;
@@ -7,8 +9,8 @@ const EFFECT_DESTRUCTION_TIMEOUT_MS = 600;
 
 export default class DustNovaEffect extends AbilityEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings) {
-		super(scene, x, y, 'empty-tile', facing);
+	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings, projectileData: ProjectileData) {
+		super(scene, x, y, 'empty-tile', facing, projectileData);
 		scene.add.existing(this);
 		this.setDepth(1);
 		scene.physics.add.existing(this);

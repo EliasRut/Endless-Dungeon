@@ -1,4 +1,4 @@
-import { Abilities, AbilityType } from '../abilities/abilityData';
+import { Abilities, AbilityType, } from '../abilities/abilityData';
 import AbilityEffect from '../drawables/effects/AbilityEffect';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import EnemyToken from '../drawables/tokens/EnemyToken';
@@ -9,6 +9,7 @@ import Character from '../worldstate/Character';
 import { Faction, PossibleTargets } from './constants';
 import { getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
+
 
 export default class AbilityHelper {
 	scene: MainScene;
@@ -41,7 +42,8 @@ export default class AbilityHelper {
 				origin.x + xMultiplier * projectileData!.xOffset,
 				origin.y + yMultiplier * projectileData!.yOffset,
 				'',
-				origin.currentFacing
+				origin.currentFacing,
+				projectileData
 			);
 			if (projectileData?.targeting) {
 				(effect as TargetingEffect).allowedTargets = origin.faction === Faction.PLAYER ?
