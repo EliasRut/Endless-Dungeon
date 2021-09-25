@@ -20,6 +20,7 @@ export interface ProjectileData {
 	targeting?: boolean;
 	knockback?: number;
 	timeToLive?: number;
+	destroyOnEnemyContact: boolean;
 }
 
 interface AbilityData {
@@ -66,6 +67,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			effect: FireBallEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
+			destroyOnEnemyContact: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
@@ -84,7 +86,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 			effect: ArcaneBoltEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
-			knockback: 200
+			knockback: 200,
+			destroyOnEnemyContact: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
@@ -104,7 +107,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			targeting: true,
-			knockback: 200
+			knockback: 200,
+			destroyOnEnemyContact: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
@@ -123,7 +127,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 			effect: FireBallEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
-			targeting: true
+			targeting: true,
+			destroyOnEnemyContact: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
@@ -142,7 +147,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 			effect: IceSpikeEffect,
 			collisionSound: 'sound-icespike-hit',
 			sfxVolume: 0.2,
-			targeting: true
+			targeting: true,
+			destroyOnEnemyContact: true
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
@@ -159,7 +165,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 			yOffset: 16,
 			effect: IceSpikeEffect,
 			collisionSound: 'sound-icespike-hit',
-			sfxVolume: 0.2
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
@@ -177,6 +184,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			xOffset: 20,
 			yOffset: 20,
 			effect: DustNovaEffect,
+			destroyOnEnemyContact: true
 			// collisionSound: 'sound-wind',
 			// sfxVolume: 0.4
 		},
@@ -196,6 +204,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			yOffset: 25,
 			effect: RoundHouseKickEffect,
 			delay: 12,
+			destroyOnEnemyContact: true
 			// collisionSound: 'sound-wind',
 			// sfxVolume: 0.4
 		},
@@ -212,6 +221,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			xOffset: 0,
 			yOffset: 0,
 			effect: HealingLightEffect,
+			destroyOnEnemyContact: false
 			// collisionSound: 'sound-wind',
 			// sfxVolume: 0.4
 		},
@@ -231,6 +241,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			effect: ArcaneBoltEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
+			destroyOnEnemyContact: true
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
@@ -250,7 +261,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			timeToLive: 500,
-			targeting: false
+			targeting: false,
+			destroyOnEnemyContact: false
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
