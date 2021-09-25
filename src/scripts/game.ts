@@ -29,28 +29,28 @@ const NPC_EDITOR_WIDTH = 320;
 const NPC_EDITOR_HEIGHT = 240;
 
 // This is the configuration for Phaser
-const config: Phaser.Types.Core.GameConfig = {
+export const getGameConfig = (parent: HTMLElement, mode: MODE) => ({
 	type: Phaser.AUTO,
 	backgroundColor: '#020202',
 	scale: {
-		parent: 'phaser-game',
+		parent,
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH,
 		// zoom: Phaser.Scale.ZOOM_4X,
-		width: activeMode === MODE.NPC_EDITOR ? NPC_EDITOR_WIDTH : DEFAULT_WIDTH,
-		height: activeMode === MODE.NPC_EDITOR ? NPC_EDITOR_HEIGHT : DEFAULT_HEIGHT
+		width: mode === MODE.NPC_EDITOR ? NPC_EDITOR_WIDTH : DEFAULT_WIDTH,
+		height: mode === MODE.NPC_EDITOR ? NPC_EDITOR_HEIGHT : DEFAULT_HEIGHT
 	},
 	input: {
 			gamepad: true
 	},
-	scene: activeMode === MODE.GAME ? [
+	scene: mode === MODE.GAME ? [
 		RoomPreloaderScene,
 		NpcGenerationScene,
 		PreloadScene,
 		MainScene,
 		DungeonDoorPreloadScene,
 		DungeonDoorScene
-	] : (activeMode === MODE.MAP_EDITOR ? [
+	] : (mode === MODE.MAP_EDITOR ? [
 		RoomPreloaderScene,
 		NpcGenerationScene,
 		PreloadScene,
@@ -70,9 +70,4 @@ const config: Phaser.Types.Core.GameConfig = {
 		pixelArt: true,
 		roundPixels: false
 	}
-};
-
-// This will create the phaser game object once the window finishes loading.
-window.addEventListener('load', () => {
-	const game = new Phaser.Game(config);
 });
