@@ -6,7 +6,7 @@ import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 
 const MAX_INTERACTION_DISTANCE = 30;
 const MAX_EQUIPPABLE_ITEM_LOCATION = 80;
-const HEAL_PERCENTAGE = 1/2;
+const HEAL_PERCENTAGE = 1/4; // health
 
 export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 	stateObject: Item;

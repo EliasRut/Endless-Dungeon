@@ -1,4 +1,4 @@
-import { Abilities, AbilityType } from '../abilities/abilityData';
+import { Abilities, AbilityType, } from '../abilities/abilityData';
 import AbilityEffect from '../drawables/effects/AbilityEffect';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import EnemyToken from '../drawables/tokens/EnemyToken';
@@ -9,6 +9,7 @@ import Character from '../worldstate/Character';
 import { Faction, PossibleTargets } from './constants';
 import { getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
+
 
 export default class AbilityHelper {
 	scene: MainScene;
@@ -41,7 +42,8 @@ export default class AbilityHelper {
 				origin.x + xMultiplier * projectileData!.xOffset,
 				origin.y + yMultiplier * projectileData!.yOffset,
 				'',
-				origin.currentFacing
+				origin.currentFacing,
+				projectileData
 			);
 			if (projectileData?.targeting) {
 				(effect as TargetingEffect).allowedTargets = origin.faction === Faction.PLAYER ?
@@ -74,6 +76,9 @@ export default class AbilityHelper {
 				collidingEffect.destroy();
 				const enemy = target as CharacterToken;
 				enemy.stateObject.health -= (origin.damage * Abilities[type].damageMultiplier);
+				if (Abilities[type].stun) {
+					stun(globalTime, Abilities[type].stun!, enemy.stateObject)
+				}
 				if (projectileData?.knockback) {
 					enemy.lastMovedTimestamp = globalTime;
 					const angle = Phaser.Math.Angle.Between(
@@ -103,7 +108,6 @@ export default class AbilityHelper {
 			this.scene.sound.play(Abilities[type].sound!, {volume: Abilities[type].sfxVolume!});
 		}
 	}
-
 	update(time: number, castAbilities: AbilityType[]) {
 		castAbilities.forEach((ability) => {
 			this.triggerAbility(globalState.playerCharacter, ability, time);
@@ -116,4 +120,10 @@ export default class AbilityHelper {
 			effect.update(time);
 		});
 	}
+
+}
+export const stun = (time: number, duration: number, character: Character) => {
+	character.stunned = true;
+	character.stunnedAt = time;
+	character.stunDuration = duration;
 }

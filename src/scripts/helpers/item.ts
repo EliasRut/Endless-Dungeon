@@ -127,6 +127,9 @@ export const generateRandomItem = (options: Partial<RandomItemOptions>) => {
 };
 
 export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystItem) => {
+	if (offHand.catalystType===Catalyst.CONE) {
+		return AbilityType.FIRE_CONE;
+		}
 	switch (baseAbility) {
 		case AbilityType.FIREBALL: {
 			return AbilityType.HAIL_OF_FLAMES;

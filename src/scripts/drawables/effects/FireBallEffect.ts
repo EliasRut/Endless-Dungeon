@@ -1,5 +1,7 @@
 import { Facings } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
+import { ProjectileData } from '../../abilities/abilityData';
+
 
 const BODY_RADIUS = 6;
 const EXPLOSION_PARTICLE_SPEED = 100;
@@ -7,8 +9,8 @@ const VISIBILITY_DELAY = 50;
 
 export default class FireBallEffect extends TargetingEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings) {
-		super(scene, x, y, 'empty-tile', facing);
+	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings, projectileData: ProjectileData) {
+		super(scene, x, y, 'empty-tile', facing, projectileData);
 		scene.add.existing(this);
 		this.setDepth(1);
 		scene.physics.add.existing(this);
@@ -27,6 +29,11 @@ export default class FireBallEffect extends TargetingEffect {
 			frequency: 30,
 			maxParticles: 200
 		});
+		if (projectileData?.timeToLive) {
+		    setTimeout(() => {
+		 	this.destroy();
+		 }, projectileData?.timeToLive);
+		}
 	}
 
 	destroy() {

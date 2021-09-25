@@ -215,6 +215,8 @@ export default class DungeonGenerator {
 	dungeonBlocksY: number;
 	enemyBudget: number;
 
+	potentialEnemyFields: {x: number, y: number}[];
+
 	public generateLevel: (
 			id: string,
 			dungeonLevel: number,
@@ -233,10 +235,11 @@ export default class DungeonGenerator {
 
 		this.fillerTilest = colorOfMagicToTilesetMap[levelData.style];
 
+		this.potentialEnemyFields = [];
+
 		while (levelData.numberOfRooms > this.rooms.length) {
 			const roomGen = new RoomGenerator();
 			const genericRoom = roomGen.generateRoom(this.fillerTilest);
-			genericRoom.layout
 			this.rooms.push(genericRoom);
 			globalState.availableRooms[genericRoom.name] = genericRoom;
 		}
@@ -393,30 +396,46 @@ export default class DungeonGenerator {
 			});
 		});
 
-		if (this.enemyBudget > 0) {
-			let lastId = 0;
-			const potentialEnemyFields: {x: number, y: number}[] = [];
-			for (let y = 0; y < this.dungeonWidth; y++) {
-				for (let x = 0; x < this.dungeonHeight; x++) {
-					if (this.combinedLayout[y][x] === 32) {
-						potentialEnemyFields.push({y, x});
+		this.rooms.forEach((room, index) => {
+			if (room.noRandomEnemies) {
+				return;
+			}
+			const roomWidth = room.layout[0].length;
+			const roomHeight = room.layout.length;
+
+			for (let y = 0; y < roomHeight; y++) {
+				for (let x = 0; x < roomWidth; x++) {
+					if (room.layout[y][x] === 32) {
+						this.potentialEnemyFields.push({x, y});
 					}
 				}
 			}
-			while (this.enemyBudget > 0 && potentialEnemyFields.length > 0) {
-				const randomIndex = Math.floor(potentialEnemyFields.length * Math.random());
-				const {x, y} = potentialEnemyFields[randomIndex];
+		});
+
+		if (this.enemyBudget > 0) {
+			let lastId = 0;
+			// const potentialEnemyFields: {x: number, y: number}[] = [];
+			// for (let y = 0; y < this.dungeonWidth; y++) {
+			// 	for (let x = 0; x < this.dungeonHeight; x++) {
+			// 		if (this.combinedLayout[y][x] === 32) {
+			// 			potentialEnemyFields.push({y, x});
+			// 		}
+			// 	}
+			// }
+			while (this.enemyBudget > 0 && this.potentialEnemyFields.length > 0) {
+				const randomIndex = Math.floor(this.potentialEnemyFields.length * Math.random());
+				const {x, y} = this.potentialEnemyFields[randomIndex];
 				this.enemyBudget--;
 				this.npcs.push({
 					facingX: 0,
 					facingY: 0,
-					type: 'enemy-zombie',
+					type: 'enemy-vampire',
 					id: `filler-${lastId++}`,
 					x: x * TILE_WIDTH,
 					y: y * TILE_HEIGHT
 				});
 
-				potentialEnemyFields.splice(randomIndex, 1);
+				this.potentialEnemyFields.splice(randomIndex, 1);
 			}
 		}
 
@@ -840,6 +859,9 @@ export default class DungeonGenerator {
 							const tileY = blockY * BLOCK_SIZE + y;
 							const tileX = blockX * BLOCK_SIZE + x;
 							this.combinedLayout[tileY][tileX] = blockLayout[y][x];
+							if (blockLayout[y][x] === 32) {
+								this.potentialEnemyFields.push({x, y});
+							}
 						}
 					}
 				}
