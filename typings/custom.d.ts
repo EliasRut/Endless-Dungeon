@@ -1,5 +1,6 @@
 import { AbilityType } from "../src/scripts/abilities/abilityData";
 import { ColorsOfMagic } from "../src/scripts/helpers/constants";
+import { RandomItemOptions } from "../src/scripts/helpers/item";
 
 export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
 
@@ -60,7 +61,7 @@ export interface ScriptCondition {
 	conditionType: "hasItem" | "scriptState";
 	itemId?: string;
 	scriptId?: string;
-	scriptState?: "new" | "finished";
+	scriptState?: "new" | "ongoing" | "finished";
 }
 
 export interface ScriptPausedCondition {
@@ -116,6 +117,15 @@ export interface ScriptSpawn {
 	posY: number;
 }
 
+export interface ScriptSpawnItem {
+	type: "spawnItem";
+	fixedId?: string;
+	itemOptions?: Partial<RandomItemOptions>;
+	posX?: number;
+	posY?: number;
+	atPlayerPosition?: boolean;
+}
+
 export interface ScriptOpenDoor {
 	type: "openDoor";
 	doorId: string;
@@ -158,13 +168,13 @@ export interface ScriptSetScriptState {
 export interface ScriptQuestState {
 	type: "setQuestState";
 	questId: string;
-	questState: "new" | "finished";
+	questState: "new" | "ongoing" | "finished";
 }
 
 export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange |
 	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn | ScriptOpenDoor |
 	ScriptCondition | ScriptSetScriptState | ScriptTakeItem | ScriptCast | ScriptPlaceItem |
-	ScriptPausedCondition | ScriptQuestState;
+	ScriptPausedCondition | ScriptQuestState | ScriptSpawnItem;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];

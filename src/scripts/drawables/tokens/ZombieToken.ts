@@ -43,7 +43,9 @@ export default class ZombieToken extends EnemyToken {
 		if (this.stateObject.health <= 0){
 			if (Math.random() < ITEM_DROP_CHANCE) {
 				this.dropRandomItem(this.level);
-			} else if (Math.random() < HEALTH_DROP_CHANCE) this.dropFixedItem('health');
+			} else if (Math.random() < HEALTH_DROP_CHANCE) {
+				this.dropFixedItem('health');
+			}
 			this.destroy();
 			return;
 		}
