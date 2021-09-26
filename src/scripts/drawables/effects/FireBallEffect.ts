@@ -14,7 +14,6 @@ const GREEN_DIFF = 0x000100;
 
 export default class FireBallEffect extends TargetingEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	particleDeathZone: {contains: (x: number, y: number) => boolean};
 	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings, projectileData: ProjectileData) {
 		super(scene, x, y, 'empty-tile', facing, projectileData);
 		scene.add.existing(this);
@@ -23,14 +22,6 @@ export default class FireBallEffect extends TargetingEffect {
 		this.body.setCircle(BODY_RADIUS, 0, 0);
 		this.body.setMass(1);
 
-		const mainScene = scene as MainScene;
-
-		this.particleDeathZone = {
-			contains: (particleX, particleY) => {
-				const tileLayerTile = mainScene.tileLayer.getTileAtWorldXY(particleX, particleY);
-				return !tileLayerTile || isCollidingTile(tileLayerTile.index);
-			}
-		};
 		const particles = scene.add.particles('fire');
 		this.emitter = particles.createEmitter({
 			alpha: { start: 1, end: 0 },

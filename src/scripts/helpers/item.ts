@@ -127,9 +127,31 @@ export const generateRandomItem = (options: Partial<RandomItemOptions>) => {
 };
 
 export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystItem) => {
-	if (offHand.catalystType===Catalyst.CONE) {
-		return AbilityType.FIRE_CONE;
+
+	if (offHand.catalystType === Catalyst.CONE) {
+		switch (baseAbility) {
+			case AbilityType.ARCANE_BOLT: {
+				return AbilityType.ARCANE_CONE;
+			}
+			case AbilityType.ICESPIKE:
+			case AbilityType.FIREBALL:
+			default: {
+				return AbilityType.FIRE_CONE;
+			}
 		}
+	}
+	if (offHand.catalystType === Catalyst.NOVA) {
+		switch (baseAbility) {
+			case AbilityType.ARCANE_BOLT: {
+				return AbilityType.ARCANE_NOVA;
+			}
+			case AbilityType.ICESPIKE:
+			case AbilityType.FIREBALL:
+			default: {
+				return AbilityType.FIRE_NOVA;
+			}
+		}
+	}
 	switch (baseAbility) {
 		case AbilityType.FIREBALL: {
 			return AbilityType.HAIL_OF_FLAMES;
