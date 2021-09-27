@@ -40,7 +40,7 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 			scale: { start: 0.01 * this.effectScale, end: 0 },
 			speed: 70,
 			rotate: { min: -180, max: 180 },
-			lifespan: { min: 500, max: 800 },//{ min: 200, max: 400 },
+			lifespan: { min: 500, max: 800 },// used to be: { min: 200, max: 400 },
 			blendMode: Phaser.BlendModes.ADD,
 			// tint: {min: 0x000000, max: 0xffffff},
 			tint: {onEmit: (particle) => {
@@ -59,7 +59,7 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 			angle: { min: 0, max: 360},
 			speed: {min: 0, max: 70},
 			rotate: { min: -180, max: 180 },
-			lifespan: 800,//300,
+			lifespan: 800,// used to be: 300,
 			blendMode: Phaser.BlendModes.ADD,
 			tint: {onEmit: (particle) => {
 				return RED_MIN + RED_DIFF * 

@@ -7,7 +7,7 @@ import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import { Faction, PossibleTargets } from './constants';
-import { getRotationInRadiansForFacing } from './movement';
+import { getFacing8Dir, getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
 
 
@@ -48,7 +48,7 @@ export default class AbilityHelper {
 				origin.x + xMultiplier * projectileData!.xOffset,
 				origin.y + yMultiplier * projectileData!.yOffset,
 				'',
-				origin.currentFacing,
+				getFacing8Dir(xMultiplier, yMultiplier),
 				projectileData
 			);
 			if (projectileData?.targeting) {

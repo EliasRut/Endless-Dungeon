@@ -27,6 +27,7 @@ export interface ProjectileData {
 	destroyOnWallContact: boolean;
 	explodeOnDestruction?: boolean;
 	passThroughEnemies?: boolean;
+	shape?: 'source' | 'storm' | 'cone' | 'nova';
 }
 
 interface AbilityData {
@@ -56,7 +57,9 @@ export const enum AbilityType {
 	FIRE_CONE = 'fireCone',
 	FIRE_NOVA = 'fireNova',
 	ARCANE_CONE = 'arcaneCone',
-	ARCANE_NOVA = 'arcaneNova'
+	ARCANE_NOVA = 'arcaneNova',
+	ICE_CONE = 'iceCone',
+	ICE_NOVA = 'iceNova',
 }
 
 export const Abilities: {[type: string]: AbilityData} = {
@@ -158,12 +161,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 		icon: ['icon-abilities', 0]
 	},
 	[AbilityType.HAIL_OF_ICE]: {
-		projectiles: 5,
+		projectiles: 13,
 		projectileData: {
-			spread: [-0.15, 0.2],
-			velocity: 400,
-			xOffset: 16,
-			yOffset: 16,
+			spread: [-0.07, 0.07, (num) => Math.sin(num * Math.PI * 0.95)],
+			delay: 50,
+			velocity: 350,
+			effectScale: 0.8,
+			xOffset: 0,
+			yOffset: 0,
 			effect: IceSpikeEffect,
 			collisionSound: 'sound-icespike-hit',
 			sfxVolume: 0.2,
@@ -175,7 +180,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
 		cooldownMs: 1500,
-		damageMultiplier: 0.8,
+		damageMultiplier: 0.25,
 		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`,
 		icon: ['icon-abilities', 1]
 	},
@@ -331,6 +336,61 @@ export const Abilities: {[type: string]: AbilityData} = {
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0]
 	},
+	[AbilityType.ICE_CONE]: {
+		projectiles: 12,
+		projectileData: {
+			spread: [-0.14, 0.14],
+			velocity: 400,
+			drag: 700,
+			xOffset: 0,
+			yOffset: 0,
+			effect: IceSpikeEffect,
+			collisionSound: 'sound-icespike-hit',
+			sfxVolume: 0.2,
+			timeToLive: 500,
+			effectScale: 1.2,
+			targeting: false,
+			destroyOnWallContact: false,
+			destroyOnEnemyContact: false,
+			explodeOnDestruction: false,
+			passThroughEnemies: true,
+			knockback: 100,
+			shape: 'cone'
+		},
+		sound: 'sound-icespike',
+		sfxVolume: 0.10,
+		cooldownMs: 1500,
+		damageMultiplier: 0.15,
+		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
+		icon: ['icon-abilities', 1]
+	},
+	[AbilityType.ICE_NOVA]: {
+		projectiles: 36,
+		projectileData: {
+			spread: [-1, 1],
+			velocity: 300,
+			drag: 700,
+			xOffset: 0,
+			yOffset: 0,
+			effect: IceSpikeEffect,
+			collisionSound: 'sound-icespike-hit',
+			sfxVolume: 0.2,
+			timeToLive: 500,
+			effectScale: 1.2,
+			targeting: false,
+			destroyOnWallContact: false,
+			destroyOnEnemyContact: false,
+			explodeOnDestruction: false,
+			passThroughEnemies: true,
+			shape: 'nova'
+		},
+		sound: 'sound-icespike',
+		sfxVolume: 0.10,
+		cooldownMs: 1500,
+		damageMultiplier: 0.15,
+		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
+		icon: ['icon-abilities', 1]
+	},
 	[AbilityType.FIRE_NOVA]: {
 		projectiles: 36,
 		projectileData: {
@@ -353,7 +413,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
 		cooldownMs: 1500,
-		damageMultiplier: 0.2,
+		damageMultiplier: 0.25,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0]
 	},

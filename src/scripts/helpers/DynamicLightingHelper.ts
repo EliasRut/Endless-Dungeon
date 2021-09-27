@@ -4,7 +4,7 @@ import { GID_MULTIPLE, TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import { isCollidingTile } from './movement';
 
 const sightRadius = 14;
-const lightRadius = 8;
+const lightRadius = 10;
 
 const TEN_SECONDS_IN_FRAMES = 600;
 const LIGHTRAY_PRECISION = 10000;

@@ -133,7 +133,9 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			case AbilityType.ARCANE_BOLT: {
 				return AbilityType.ARCANE_CONE;
 			}
-			case AbilityType.ICESPIKE:
+			case AbilityType.ICESPIKE: {
+				return AbilityType.ICE_CONE;
+			}
 			case AbilityType.FIREBALL:
 			default: {
 				return AbilityType.FIRE_CONE;
@@ -145,7 +147,9 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			case AbilityType.ARCANE_BOLT: {
 				return AbilityType.ARCANE_NOVA;
 			}
-			case AbilityType.ICESPIKE:
+			case AbilityType.ICESPIKE: {
+				return AbilityType.ICE_NOVA;
+			}
 			case AbilityType.FIREBALL:
 			default: {
 				return AbilityType.FIRE_NOVA;
