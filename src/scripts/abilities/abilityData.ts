@@ -14,6 +14,7 @@ export interface ProjectileData {
 	velocity: number;
 	drag?: number;
 	effectScale?: number;
+	spriteScale?: number;
 	xOffset: number;
 	yOffset: number;
 	effect: typeof AbilityEffect;
@@ -131,7 +132,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.10,
-		cooldownMs: 300,
+		cooldownMs: 3000,
 		damageMultiplier: 0.25,
 		flavorText: `Shooting magic missiles!`,
 		icon: ['icon-abilities', 1]
@@ -166,7 +167,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 			spread: [-0.07, 0.07, (num) => Math.sin(num * Math.PI * 0.95)],
 			delay: 50,
 			velocity: 350,
-			effectScale: 0.8,
+			spriteScale: 0.5,
+			effectScale: 0.5,
 			xOffset: 0,
 			yOffset: 0,
 			effect: IceSpikeEffect,
@@ -179,7 +181,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
-		cooldownMs: 1500,
+		cooldownMs: 3000,
 		damageMultiplier: 0.25,
 		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`,
 		icon: ['icon-abilities', 1]
@@ -348,7 +350,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			collisionSound: 'sound-icespike-hit',
 			sfxVolume: 0.2,
 			timeToLive: 500,
-			effectScale: 1.2,
+			spriteScale: 0.5,
 			targeting: false,
 			destroyOnWallContact: false,
 			destroyOnEnemyContact: false,
@@ -376,7 +378,8 @@ export const Abilities: {[type: string]: AbilityData} = {
 			collisionSound: 'sound-icespike-hit',
 			sfxVolume: 0.2,
 			timeToLive: 500,
-			effectScale: 1.2,
+			spriteScale: 0.7,
+			effectScale: 0.7,
 			targeting: false,
 			destroyOnWallContact: false,
 			destroyOnEnemyContact: false,

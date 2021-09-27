@@ -18,16 +18,17 @@ export default class AbilityEffect extends Phaser.Physics.Arcade.Sprite {
 			this.explodeOnDestruction = !!projectileData?.explodeOnDestruction;
 			this.effectScale = projectileData?.effectScale || 1;
 
+			const mainScene = scene as MainScene;
 
-		const mainScene = scene as MainScene;
-
-		this.particleDeathZone = {
-			contains: (particleX, particleY) => {
-				const tileLayerTile = mainScene.tileLayer.getTileAtWorldXY(particleX, particleY);
-				return !tileLayerTile || isCollidingTile(tileLayerTile.index);
-			}
-		};
+			this.particleDeathZone = {
+				contains: (particleX, particleY) => {
+					const tileLayerTile = mainScene.tileLayer.getTileAtWorldXY(particleX, particleY);
+					return !tileLayerTile || isCollidingTile(tileLayerTile.index);
+				}
+			};
 		}
+
+		onCollisionWithEnemy(enemy: Phaser.GameObjects.GameObject) {}
 
 		destroy() {
 			this.destroyed = true;

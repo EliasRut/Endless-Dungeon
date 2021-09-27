@@ -14,11 +14,12 @@ const EFFECT_DESTRUCTION_TIMEOUT_MS = 2000;
 export default class IceSpikeEffect extends TargetingEffect {
 	snowEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	spikeEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
+	wasStuckToEnemy: boolean = false;
 	stuckEnemy?: Phaser.Physics.Arcade.Body;
 	stuckEnemyOffset?: {x: number, y: number};
 	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings, projectileData: ProjectileData) {
 		super(scene, x, y, 'ice', facing, projectileData);
-		this.setScale(SPRITE_SCALE);
+		this.setScale(SPRITE_SCALE * (projectileData.spriteScale || 1));
 		this.setRotation(getRotationInRadiansForFacing(facing));
 		scene.add.existing(this);
 		this.setDepth(1);
@@ -34,7 +35,7 @@ export default class IceSpikeEffect extends TargetingEffect {
 		this.snowEmitter = snowParticles.createEmitter({
 			alpha: { start: 1, end: 0.4 },
 			// scale: { start: 0.3, end: 0.05 },
-			scale: { start: 0.4, end: 0.1 },
+			scale: { start: 0.4 * (projectileData.effectScale || 1), end: 0.1 },
 			// tint: 0x3366ff,//{ start: 0xff945e, end: 0x660000 }, //0x663300
 			speed: {min: 60, max: 100},
 			// accelerationY: -300,
@@ -52,7 +53,7 @@ export default class IceSpikeEffect extends TargetingEffect {
 		iceParticles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		this.spikeEmitter = iceParticles.createEmitter({
 			alpha: { start: 1, end: 0.4 },
-			scale: { start: 0.4, end: 0 },
+			scale: { start: 0.4 * (projectileData.effectScale || 1), end: 0 },
 			speed: {min: 60, max: 100},
 			angle: { min: -180, max: 180 },
 			rotate: { min: -180, max: 180 },
@@ -71,7 +72,8 @@ export default class IceSpikeEffect extends TargetingEffect {
 		}
 	}
 
-	attachToEnemy(enemy: Phaser.GameObjects.GameObject) {
+	onCollisionWithEnemy(enemy: Phaser.GameObjects.GameObject) {
+		this.wasStuckToEnemy = true;
 		this.stuckEnemy = enemy.body as Phaser.Physics.Arcade.Body;
 		this.stuckEnemyOffset = {
 			x: this.stuckEnemy.position.x - this.body.x,
@@ -97,7 +99,7 @@ export default class IceSpikeEffect extends TargetingEffect {
 		this.body.stop();
 		this.body.destroy();
 
-		if (this.explodeOnDestruction) {
+		if (this.explodeOnDestruction || this.stuckEnemy) {
 			setTimeout(() => {
 				this.snowEmitter.stop();
 				super.destroy();
@@ -123,11 +125,17 @@ export default class IceSpikeEffect extends TargetingEffect {
 			this.spikeEmitter.start();
 			this.isStarted = true;
 		}
-		if (this.stuckEnemy) {
-			this.setPosition(
-				this.stuckEnemy.position.x - this.stuckEnemyOffset!.x,
-				this.stuckEnemy.position.y - this.stuckEnemyOffset!.y
-			);
+		if (this.wasStuckToEnemy) {
+			if (this.stuckEnemy) {
+				this.setPosition(
+					this.stuckEnemy.position.x - this.stuckEnemyOffset!.x,
+					this.stuckEnemy.position.y - this.stuckEnemyOffset!.y
+				);
+			} else {
+				this.spikeEmitter.stop();
+				this.snowEmitter.stop();
+				super.destroy();
+			}
 		}
 	}
 }

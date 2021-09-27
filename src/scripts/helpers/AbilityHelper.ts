@@ -88,11 +88,12 @@ export default class AbilityHelper {
 				Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES) :
 				this.scene.mainCharacter;
 			const collidingCallback = (collidingEffect: AbilityEffect, enemy: CharacterToken) => {
-				if (projectileData!.destroyOnEnemyContact) {
-					collidingEffect.destroy();
-				}
 				if (collidingEffect.hitEnemyTokens.includes(enemy)) {
 					return;
+				}
+				collidingEffect.onCollisionWithEnemy(enemy);
+				if (projectileData!.destroyOnEnemyContact) {
+					collidingEffect.destroy();
 				}
 				effect.hitEnemyTokens.push(enemy);
 				enemy.stateObject.health -= (origin.damage * Abilities[type].damageMultiplier);
