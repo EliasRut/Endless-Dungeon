@@ -62,8 +62,11 @@ export default class IceSpikeEffect extends TargetingEffect {
 			blendMode: Phaser.BlendModes.ADD,
 			maxParticles: (projectileData.shape === 'cone' || projectileData.shape === 'nova') ? 20 : 200,
 			x: PARTICLE_START_X_OFFSET * facingVectors.x,
-			y: PARTICLE_START_Y_OFFSET * facingVectors.y
+			y: PARTICLE_START_Y_OFFSET * facingVectors.y,
 		});
+
+		this.snowEmitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
+		this.spikeEmitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
 
 		if (projectileData?.timeToLive) {
 			setTimeout(() => {
