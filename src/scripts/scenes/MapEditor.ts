@@ -8,6 +8,8 @@ import globalState from '../worldstate';
 import firebase from 'firebase';
 import { DatabaseRoom, NpcPositioning, Room } from '../../../typings/custom';
 import { deserializeRoom } from '../helpers/serialization';
+import { spawnNpc } from '../helpers/spawn';
+import { UiDepths } from '../helpers/constants';
 
 const MIN_ZOOM_LEVEL = 0.125;
 
@@ -25,7 +27,8 @@ const ROOM_DEFAULT_HEIGHT = 8;
 const DEPTHS = {
 	baseLayer: 1,
 	decorationLayer: 2,
-	overlayLayer: 3,
+	npcLayer: 3,
+	overlayLayer: 4,
 	libraryBackgroundLayer: 4,
 	libraryTileLayer: 5,
 	libraryHighlighting: 6
@@ -41,7 +44,7 @@ interface MultiLevelLayout {
 
 type LevelHistory = MultiLevelLayout[];
 
-const npcKeys = ['hilda-base', 'vanya-base', 'enemy-zombie'];
+const npcKeys = ['hilda-base', 'vanya-base', 'enemy-zombie', 'enemy-vampire'];
 
 export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
@@ -65,6 +68,9 @@ export default class MapEditor extends Phaser.Scene {
 	roomHeight = 8;
 	selectedId = 32;
 
+	widthInPixels: number;
+	heightInPixels: number;
+
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationTileLayer: Phaser.Tilemaps.TilemapLayer;
 	overlayTileLayer: Phaser.Tilemaps.TilemapLayer;
@@ -77,7 +83,8 @@ export default class MapEditor extends Phaser.Scene {
 	highlightingY = 0;
 	mapEditorHighlighting: Phaser.GameObjects.Image;
 
-	selectedLibraryNpcIndex: number = -1;
+	selectedLibraryNpcIndex: number = 0;
+	selectedNpcTokenIndex: number = -1;
 	npcTokens: Phaser.GameObjects.Image[];
 	npcs: NpcPositioning[];
 
@@ -113,6 +120,15 @@ export default class MapEditor extends Phaser.Scene {
 	exportButtonElement: HTMLButtonElement;
 	activeLayerDropdownElement: HTMLSelectElement;
 
+	// Npc Details Dialog fields
+	npcTypeDropdownElement: HTMLSelectElement;
+	npcIdElement: HTMLInputElement;
+	npcLevelElement: HTMLInputElement;
+	npcXElement: HTMLInputElement;
+	npcYElement: HTMLInputElement;
+	npcSaveButton: HTMLButtonElement;
+	npcDeleteButton: HTMLButtonElement;
+
 	wasTKeyDown: boolean = false;
 	wasUndoDown: boolean = false;
 	wasZoomInDown: boolean = false;
@@ -147,6 +163,17 @@ export default class MapEditor extends Phaser.Scene {
 		this.exportButtonElement = document.getElementById('exportButton') as HTMLButtonElement;
 		this.activeLayerDropdownElement =
 			document.getElementById('activeLayerDropdown') as HTMLSelectElement;
+
+		// Npc Details Dialog fields
+		this.npcTypeDropdownElement = document.getElementById('npcType') as HTMLSelectElement;
+		this.npcIdElement = document.getElementById('npcId') as HTMLInputElement;
+		this.npcLevelElement = document.getElementById('npcLevel') as HTMLInputElement;
+		this.npcXElement = document.getElementById('npcX') as HTMLInputElement;
+		this.npcYElement = document.getElementById('npcY') as HTMLInputElement;
+		this.npcSaveButton = document.getElementById('npcSaveButton') as HTMLButtonElement;
+		this.npcSaveButton.onclick = () => this.saveNpcToken();
+		this.npcDeleteButton = document.getElementById('npcDeleteButton') as HTMLButtonElement;
+		this.npcDeleteButton.onclick = () => this.deleteNpcToken();
 	}
 
 	populateFromDatabase(databaseSelectedRoom: DatabaseRoom) {
@@ -171,6 +198,9 @@ export default class MapEditor extends Phaser.Scene {
 
 		this.npcs = selectedRoom.npcs || [];
 
+		this.npcTokens.forEach((token) => {
+			token.destroy(true);
+		});
 		this.npcTokens = [];
 
 		this.applyConfiguration();
@@ -280,6 +310,20 @@ export default class MapEditor extends Phaser.Scene {
 		goButtonElement.onclick = () => {
 			this.applyConfiguration();
 		};
+
+		// NPC Details Dialog
+		// Prepare NPC Type dropdown
+		while (this.npcTypeDropdownElement.firstChild) {
+			this.npcTypeDropdownElement.remove(0);
+		}
+
+		npcKeys.forEach((npcKey) => {
+			const newOption = document.createElement('option');
+			newOption.value = npcKey;
+			newOption.innerText = npcKey;
+			this.npcTypeDropdownElement.appendChild(newOption);
+		});
+
 		this.applyConfiguration();
 
 		this.oneKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE, false);
@@ -331,16 +375,27 @@ export default class MapEditor extends Phaser.Scene {
 
 		this.npcs = [];
 		this.npcLibraryTokens = [];
+		const cursorToken = new Phaser.GameObjects.Image(this, 0, 0, 'search-icon');
+		cursorToken.setPosition(8, 8);
+		cursorToken.setOrigin(0);
+		cursorToken.setScrollFactor(0);
+		cursorToken.setDepth(100);
+		cursorToken.addListener('pointerdown', () => {
+			this.selectedLibraryNpcIndex = 0;
+			this.mapEditorHighlighting.setPosition(0, 0);
+		});
+		cursorToken.setInteractive();
+		this.npcLibraryTokens.push(cursorToken);
+		this.npcLibraryLayer.add(cursorToken, true);
 		npcKeys.forEach((key, index) => {
 			const token = new Phaser.GameObjects.Image(this, 0, 0, key);
-			token.setPosition(index * 40, 0);
+			token.setPosition((index + 1) * 40, 0);
 			token.setOrigin(0);
 			token.setScrollFactor(0);
 			token.setDepth(100);
 			token.addListener('pointerdown', () => {
-				console.log('Pointer down.');
-				this.selectedLibraryNpcIndex = index;
-				this.mapEditorHighlighting.setPosition(index * 40, 0);
+				this.selectedLibraryNpcIndex = (index + 1);
+				this.mapEditorHighlighting.setPosition((index + 1) * 40, 0);
 			});
 			token.setInteractive();
 			this.npcLibraryTokens.push(token);
@@ -350,6 +405,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.add.existing(this.npcLibraryLayer);
 
 		this.addToHistory(true);
+
 	}
 
 	getTileLayerForName(layerName: string) {
@@ -389,25 +445,153 @@ export default class MapEditor extends Phaser.Scene {
 			this.overlayTileLayer.removeInteractive();
 			this.mapEditorHighlighting.setScale(1);
 			this.npcLibraryLayer.setVisible(false);
+			this.hideNpcDetailsDialog();
 		} else if (activeLayerValue === 'decoration') {
 			this.tileLayer.removeInteractive();
 			this.decorationTileLayer.setInteractive();
 			this.overlayTileLayer.removeInteractive();
 			this.mapEditorHighlighting.setScale(1);
 			this.npcLibraryLayer.setVisible(false);
+			this.hideNpcDetailsDialog();
 		} else if (activeLayerValue === 'overlay') {
 			this.tileLayer.removeInteractive();
 			this.decorationTileLayer.removeInteractive();
 			this.overlayTileLayer.setInteractive();
 			this.mapEditorHighlighting.setScale(1);
 			this.npcLibraryLayer.setVisible(false);
+			this.hideNpcDetailsDialog();
 		} else if (activeLayerValue === 'npcs') {
-			this.tileLayer.removeInteractive();
+			this.tileLayer.setInteractive();
 			this.decorationTileLayer.removeInteractive();
 			this.overlayTileLayer.removeInteractive();
 			this.mapEditorHighlighting.setScale(2.5);
 			this.npcLibraryLayer.setVisible(true);
 		}
+		this.updateNpcTokens();
+	}
+
+	updateNpcTokens() {
+		// Update npc tokens transparency
+		const isNpcLayerActive = this.activeLayerDropdownElement.value === 'npcs';
+		(this.npcTokens || []).forEach((npc, index) => {
+			npc.setAlpha(isNpcLayerActive ? 1 : 0.7);
+			if (isNpcLayerActive) {
+				npc.on('pointerdown', () => {
+					if (this.selectedLibraryNpcIndex !== 0) {
+						return;
+					}
+					const npcData = this.npcs[index];
+					this.showNpcDetailsDialog(npcData);
+					this.npcTokens.forEach((otherToken) => otherToken.tint = 0xffffff);
+					npc.tint = 0xffcccc;
+					this.selectedNpcTokenIndex = index;
+				});
+				npc.setInteractive();
+			} else {
+				npc.removeInteractive();
+				npc.tint = 0xffffff;
+			}
+		});
+	}
+
+	hideNpcDetailsDialog() {
+		const dialog = document.getElementById('npcDetailsDialog')!;
+		dialog.style.display = 'none';
+		this.selectedNpcTokenIndex = -1;
+	}
+
+	showNpcDetailsDialog(npcPosition: NpcPositioning) {
+		const dialog = document.getElementById('npcDetailsDialog')!;
+		dialog.style.display = 'flex';
+
+		this.npcTypeDropdownElement.value = npcPosition.type;
+		this.npcIdElement.value = npcPosition.id;
+		this.npcLevelElement.value = npcPosition.level || '+0';
+		this.npcXElement.value = `${npcPosition.x}`;
+		this.npcYElement.value = `${npcPosition.y}`;
+	}
+
+	deleteNpcToken() {
+		if (this.selectedNpcTokenIndex === -1) {
+			return;
+		}
+
+		this.npcTokens[this.selectedNpcTokenIndex].destroy(true);
+		this.npcTokens.splice(this.selectedNpcTokenIndex, 1);
+		this.npcs.splice(this.selectedNpcTokenIndex, 1);
+		this.hideNpcDetailsDialog();
+		this.drawRoom();
+	}
+
+	saveNpcToken() {
+		if (this.selectedNpcTokenIndex === -1) {
+			return;
+		}
+
+		this.npcTokens[this.selectedNpcTokenIndex].destroy(true);
+
+		const npcPosition: NpcPositioning = {
+			...this.npcs[this.selectedNpcTokenIndex],
+			type: this.npcTypeDropdownElement.value,
+			id: this.npcIdElement.value,
+			level: this.npcLevelElement.value,
+			x: parseInt(this.npcXElement.value, 10),
+			y: parseInt(this.npcYElement.value, 10),
+		};
+
+		const npc = spawnNpc(
+			this as any,
+			npcPosition.type,
+			npcPosition.id,
+			npcPosition.x * TILE_WIDTH - this.widthInPixels / 2,
+			npcPosition.y * TILE_HEIGHT - this.heightInPixels / 2,
+			1
+		);
+		this.add.existing(npc);
+		npc.setAlpha(this.activeLayerDropdownElement.value === 'npcs' ? 1 : 0.7) ;
+		npc.setDepth(DEPTHS.npcLayer);
+		this.npcTokens = [
+			...this.npcTokens.slice(0, this.selectedNpcTokenIndex),
+			npc,
+			...this.npcTokens.slice(this.selectedNpcTokenIndex + 1)
+		];
+		this.npcs = [
+			...this.npcs.slice(0, this.selectedNpcTokenIndex),
+			npcPosition,
+			...this.npcs.slice(this.selectedNpcTokenIndex + 1)
+		];
+
+		this.hideNpcDetailsDialog();
+		this.drawRoom();
+	}
+
+	addNpc(x: number, y: number) {
+		const npcPosition: NpcPositioning = {
+			type: npcKeys[this.selectedLibraryNpcIndex -1],
+			id: `npc-${this.npcs.length}`,
+			level: '+0',
+			x,
+			y,
+		};
+
+		const npc = spawnNpc(
+			this as any,
+			npcPosition.type,
+			npcPosition.id,
+			npcPosition.x * TILE_WIDTH - this.widthInPixels / 2,
+			npcPosition.y * TILE_HEIGHT - this.heightInPixels / 2,
+			1
+		);
+		this.add.existing(npc);
+		npc.setAlpha(1);
+		npc.setDepth(DEPTHS.npcLayer);
+		this.npcTokens.push(npc);
+		this.npcs.push(npcPosition);
+
+		this.selectedNpcTokenIndex = this.npcs.length - 1;
+
+		this.showNpcDetailsDialog(npcPosition);
+		this.drawRoom();
 	}
 
 	applyConfiguration() {
@@ -662,6 +846,8 @@ export default class MapEditor extends Phaser.Scene {
 			tileWidth: TILE_WIDTH,
 			tileHeight: TILE_HEIGHT
 		});
+		this.widthInPixels = map.widthInPixels;
+		this.heightInPixels = map.heightInPixels;
 		const tileSet = map.addTilesetImage(
 			`${this.tileSetName}-image`,
 			this.tileSetName,
@@ -675,7 +861,7 @@ export default class MapEditor extends Phaser.Scene {
 
 		this.tileLayer = map
 			.createLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
-		if (activeLayerValue === 'base') {
+		if (activeLayerValue === 'base' || activeLayerValue === 'npcs') {
 			this.tileLayer.setInteractive();
 		}
 		this.tileLayer.setDepth(DEPTHS.baseLayer);
@@ -687,6 +873,12 @@ export default class MapEditor extends Phaser.Scene {
 			y: number
 		) => void = (tilemapLayer, layoutValues, x, y) => {
 			const [tileX, tileY, clickedTile] = this.getDataFromClick(x, y, tilemapLayer);
+			if (this.activeLayerDropdownElement.value === 'npcs') {
+				if (this.selectedLibraryNpcIndex === 0) {
+					return;
+				}
+				this.addNpc(tileX, tileY);
+			}
 			if (this.shiftKey.isDown) {
 				this.selectionStartPoint = [tileX, tileY];
 				this.selectedTileValues = undefined;
@@ -843,6 +1035,30 @@ export default class MapEditor extends Phaser.Scene {
 
 		this.decorationTileLayer.update();
 		this.overlayTileLayer.update();
+
+		// Draw NPCs
+		(this.npcTokens || []).forEach((token) => {
+			token.destroy(true);
+		});
+		this.npcTokens = [];
+		(this.npcs || []).forEach((npcPosition, index) => {
+			const npc = spawnNpc(
+				this as any,
+				npcPosition.type,
+				npcPosition.id,
+				npcPosition.x * TILE_WIDTH - map.widthInPixels / 2,
+				npcPosition.y * TILE_HEIGHT - map.heightInPixels / 2,
+				1
+			);
+			this.npcTokens.push(npc);
+			this.add.existing(npc);
+			npc.setAlpha(this.activeLayerDropdownElement.value === 'npcs' ? 1 : 0.7) ;
+			npc.setDepth(DEPTHS.npcLayer);
+			if (index === this.selectedNpcTokenIndex) {
+				npc.tint = 0xffcccc;
+			}
+		});
+		this.updateNpcTokens();
 	}
 
 	renderDebugGraphics() {

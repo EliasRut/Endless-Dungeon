@@ -83,6 +83,7 @@ export const MapEditorScreen = () => {
 							<option value='base'>Base Layer</option>
 							<option value='decoration'>Decoration Layer</option>
 							<option value='overlay'>Overlay Layer</option>
+							<option value='npcs'>NPC Placement</option>
 						</Dropdown>
 					</SelectionWrapper>
 					<ExportButtonWrapper>
@@ -91,6 +92,37 @@ export const MapEditorScreen = () => {
 				</MenueWrapper>
 				<GameWrapper ref={phaserRef}></GameWrapper>
 			</PageWrapper>
+			<NpcDetailsDialog id='npcDetailsDialog'>
+				<DialogTitle>NPC Details</DialogTitle>
+				<InputWrapper>
+					<div>Id</div>
+					<Input id='npcId' />
+				</InputWrapper>
+				<InputWrapper>
+					<div>Type</div>
+							<Dropdown
+								id='npcType'
+							><option>Loading...</option></Dropdown>
+				</InputWrapper>
+				<InputWrapper>
+					<div>Level</div>
+					<Input id='npcLevel' />
+				</InputWrapper>
+				<InputWrapper>
+					<div>Tile X Position</div>
+					<Input id='npcX' />
+				</InputWrapper>
+				<InputWrapper>
+					<div>Tile Y Position</div>
+					<Input id='npcY' />
+				</InputWrapper>
+				<ButtonWrapper>
+					<StyledButton id='npcSaveButton'>Save</StyledButton>
+				</ButtonWrapper>
+				<ButtonWrapper style={{marginTop: 24}}>
+					<StyledRedButton id='npcDeleteButton'>Delete</StyledRedButton>
+				</ButtonWrapper>
+			</NpcDetailsDialog>
 			<DownloadAnker id='downloadAnchorElem'></DownloadAnker>
 		</PageContainer>
 	);
@@ -139,10 +171,12 @@ const MenueWrapper = styled.div`
 	font-family: 'munro';
 	font-size: 1.2rem;
 	padding: 24px;
+	padding-top: 0;
 `;
 
 const Dropdown = styled.select`
-	width: 140px;
+	width: 148px;
+	height: 24px;
 	font-family: 'munro';
 	font-size: 1rem;
 `;
@@ -157,6 +191,17 @@ const StyledButton = styled.button`
 	font-size: 1rem;
 	margin: 0 10px;
 	padding: 8px;
+`;
+
+const StyledRedButton = styled(StyledButton)`
+	& {
+		background-color: #cc0000;
+		color: #fff;
+		border: 1px solid #fff;
+	}
+	&:hover {
+		background-color: #dd2222;
+	}
 `;
 
 const SelectionWrapper = styled.div`
@@ -185,4 +230,26 @@ const GameWrapper = styled.div`
 
 const DownloadAnker = styled.a`
 	display: none;
+`;
+
+const NpcDetailsDialog = styled.div`
+	display: none;
+	position: fixed;
+	top: 50%;
+	right: 5%;
+	width: 148px;
+	height: 400px;
+	margin-top: -200px;
+	background-color: #333c;
+	border: 2px solid #cccccc;
+  box-shadow: 4px 4px 4px 4px #0009;
+	flex-direction: column;
+	padding: 24px;
+`;
+
+const DialogTitle = styled.h2`
+	color: #fff;
+	font-family: 'munro';
+	font-size: 1.2rem;
+	margin: 0;
 `;

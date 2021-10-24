@@ -39,6 +39,7 @@ export default class PreloadScene extends Phaser.Scene {
 	preload() {
 		// Empty tile
 		this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
+		this.load.image('search-icon', 'assets/img/search-icon.png');
 
 		// Player
 		this.load.spritesheet('player', 'assets/sprites/main-character.png',

@@ -22,6 +22,7 @@ export interface NpcPositioning extends NpcOptions {
 	y: number;
 	facingX?: number;
 	facingY?: number;
+	level?: string;
 }
 
 export interface MapConnection {
