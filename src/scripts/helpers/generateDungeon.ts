@@ -446,6 +446,38 @@ export default class DungeonGenerator {
 			}
 		}
 
+		// Replace default fields with decorated ones
+		if (levelData.isDungeon) {
+			for (let y = 0; y < this.combinedLayout.length; y++) {
+				for (let x = 0; x < this.combinedLayout[0].length; x++) {
+					const tileId = this.combinedLayout[y][x];
+					if (tileId === 0) {
+						continue;
+					}
+					const baseTileId = tileId % 1000;
+					const tileSetBase = Math.floor(tileId / 1000) * 1000;
+					if (baseTileId === 32) {
+						const rnd = Math.random();
+						if (rnd > 0.995) {
+							this.combinedLayout[y][x] = tileSetBase + 72;
+						} else if (rnd > 0.98) {
+							this.combinedLayout[y][x] = tileSetBase + 33;
+						}
+					} else if (baseTileId === 2) {
+						const rnd = Math.random();
+						if (rnd > 0.9) {
+							this.combinedLayout[y][x] = tileSetBase + 13;
+						}
+					} else if (baseTileId === 42) {
+						const rnd = Math.random();
+						if (rnd > 0.9) {
+							this.combinedLayout[y][x] = tileSetBase + 53;
+						}
+					}
+				}
+			}
+		}
+
 		return {
 			id,
 			startPositionX: cameraOffsetX,
@@ -462,7 +494,7 @@ export default class DungeonGenerator {
 			items,
 			enemyLevel: dungeonLevel,
 			name: levelData.title,
-			dynamicLighting: levelData.title.startsWith('dungeonLevel')
+			dynamicLighting: levelData.isDungeon
 		};
 	}
 

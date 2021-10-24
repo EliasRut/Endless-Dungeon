@@ -249,7 +249,8 @@ export default class PreloadScene extends Phaser.Scene {
 					height: levelData.height,
 					enemyBudget: levelData.enemyBudget || 0,
 					numberOfRooms: levelData.numberOfRooms || 0,
-					style: levelData.style || ColorsOfMagic.DEATH
+					style: levelData.style || ColorsOfMagic.DEATH,
+					isDungeon: true
 				}
 			);
 
@@ -274,7 +275,8 @@ export default class PreloadScene extends Phaser.Scene {
 					height: Math.ceil(roomData.layout.length / BLOCK_SIZE) + 2,
 					enemyBudget: 0,
 					numberOfRooms: 1,
-					style: roomData.colorOfMagic || ColorsOfMagic.DEATH
+					style: roomData.colorOfMagic || ColorsOfMagic.DEATH,
+					isDungeon: false
 				}
 			);
 

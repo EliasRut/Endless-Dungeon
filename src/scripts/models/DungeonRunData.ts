@@ -10,6 +10,7 @@ export interface DungeonLevelData {
 	height: number;
 	numberOfRooms: number;
 	enemyBudget: number;
+	isDungeon: boolean;
 }
 
 export interface DungeonRunData {

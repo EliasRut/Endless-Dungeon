@@ -62,6 +62,7 @@ export const generateDungeonRun: (runes: RuneAssignment) => DungeonRunData = (ru
 				...dungeonLevel.rooms,
 				...(secondaryContentRoomAssignment[level] || [])
 			],
+			isDungeon: true
 	}));
 
 	return {
