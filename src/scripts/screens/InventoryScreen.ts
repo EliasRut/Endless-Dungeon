@@ -3,7 +3,7 @@ import {
 	BAG_BOXES_X,
 	BAG_BOXES_Y,
 	EquipmentSlot,
-	UiDepths
+	UiDepths,
 } from '../helpers/constants';
 import { AbilityType, Abilities } from '../abilities/abilityData';
 import OverlayScreen from './OverlayScreen';
@@ -15,7 +15,7 @@ import {
 	unequipItem,
 	equipItem,
 	placeItemInNextFreeBagSlot,
-	removeItemFromBagById
+	removeItemFromBagById,
 } from '../helpers/inventory';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import { isEquippable } from '../helpers/inventory';
@@ -57,7 +57,7 @@ const EQUIPMENT_SLOT_COORDINATES = {
 	[EquipmentSlot.CHESTPIECE]: [INVENTORY_START_X + 0, INVENTORY_START_Y - 70],
 	[EquipmentSlot.NECKLACE]: [INVENTORY_START_X + 0, INVENTORY_START_Y - 107],
 	[EquipmentSlot.RIGHT_RING]: [INVENTORY_START_X + 42.5, INVENTORY_START_Y - 45.5],
-	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X - 41, INVENTORY_START_Y - 45.5]
+	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X - 41, INVENTORY_START_Y - 45.5],
 };
 
 const COORDINATES_TO_SLOT: { [id: string]: EquipmentSlot } = {
@@ -66,7 +66,7 @@ const COORDINATES_TO_SLOT: { [id: string]: EquipmentSlot } = {
 	'1_-1': EquipmentSlot.CHESTPIECE,
 	'1_-2': EquipmentSlot.NECKLACE,
 	'2_-1': EquipmentSlot.RIGHT_RING,
-	'0_-1': EquipmentSlot.LEFT_RING
+	'0_-1': EquipmentSlot.LEFT_RING,
 };
 
 const EQUIPMENT_SLOT_TO_ABILITY_KEY = {
@@ -93,12 +93,22 @@ export default class InventoryScreen extends OverlayScreen {
 		// tslint:disable: no-magic-numbers
 		super(scene, INVENTORY_BORDER_X, INVENTORY_BORDER_Y, 175, 280);
 		this.scene = scene as MainScene;
-		const inventoryField = new Phaser.GameObjects.Image(scene, INVENTORY_START_X, INVENTORY_START_Y, 'inventory-borders');
+		const inventoryField = new Phaser.GameObjects.Image(
+			scene,
+			INVENTORY_START_X,
+			INVENTORY_START_Y,
+			'inventory-borders'
+		);
 		inventoryField.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		inventoryField.setScrollFactor(0);
 		this.add(inventoryField, true);
 		// tslint:enable
-		this.inventorySelection = new Phaser.GameObjects.Image(scene, BAG_START_X, BAG_START_Y, "inventory-selection");
+		this.inventorySelection = new Phaser.GameObjects.Image(
+			scene,
+			BAG_START_X,
+			BAG_START_Y,
+			'inventory-selection'
+		);
 		this.inventorySelection.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.inventorySelection.setScrollFactor(0);
 		this.add(this.inventorySelection, true);
@@ -162,19 +172,19 @@ export default class InventoryScreen extends OverlayScreen {
 		}
 	}
 
-	//select next item in bag. Handles cd for key press
+	// select next item in bag. Handles cd for key press
 	interactInventory(direction: string, globalTime: number) {
-		if (direction == "nothing") return;
+		if (direction === 'nothing') return;
 		if (globalTime - this.keyLastPressed > this.keyCD) this.keyLastPressed = globalTime;
 		else return;
-		if (direction == "enter") {
-			if (this.focusedItem != undefined) this.handleInvetoryItemInteraction(this.focusedItem);
+		if (direction === 'enter') {
+			if (this.focusedItem !== undefined) this.handleInvetoryItemInteraction(this.focusedItem);
 			else return;
 		}
 
-		let item = this.getNextBagItem(direction);
-		if (item == this.focusedItem) return;
-		if (item != undefined) this.handleInvetoryItemInteraction(item);
+		const item = this.getNextBagItem(direction);
+		if (item === this.focusedItem) return;
+		if (item !== undefined) this.handleInvetoryItemInteraction(item);
 		else {
 			this.focusedItem = undefined;
 			this.scene.overlayScreens.itemScreen.update(undefined);
@@ -182,19 +192,21 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 
 	getNextBagItem(direction: string) {
-		let x = this.currentXY[0];
-		let y = this.currentXY[1];
-		if (direction == "up") {
-			this.currentXY[1] -= 1
-			if (y == 0) {
+		const x = this.currentXY[0];
+		const y = this.currentXY[1];
+		if (direction === 'up') {
+			this.currentXY[1] -= 1;
+			if (y === 0) {
 				this.currentXY[0] = Math.floor(this.currentXY[0] / 3);
 			}
+		} else if (direction === 'down') {
+			this.currentXY[1] += 1;
+		} else if (direction === 'left') {
+			this.currentXY[0] -= 1;
+		} else if (direction === 'right') {
+			this.currentXY[0] += 1;
 		}
-		else if (direction == "down") { this.currentXY[1] += 1 }
-		else if (direction == "left") { this.currentXY[0] -= 1 }
-		else if (direction == "right") { this.currentXY[0] += 1 }
-		if (this.checkXBoundary()
-			|| this.currentXY[1] > BAG_BOXES_Y - 1 || 0 - 2 > this.currentXY[1]) {
+		if (this.checkXBoundary() || this.currentXY[1] > BAG_BOXES_Y - 1 || 0 - 2 > this.currentXY[1]) {
 			this.currentXY[0] = x;
 			this.currentXY[1] = y;
 			return this.focusedItem;
@@ -206,29 +218,25 @@ export default class InventoryScreen extends OverlayScreen {
 	// hard coded for inventory highlighting, special cases when 0 > y
 	checkXBoundary() {
 		if (this.currentXY[1] >= 0) {
-			if (this.currentXY[0] > BAG_BOXES_X - 1 || 0 > this.currentXY[0])
-				return true;
-		}
-		else if (this.currentXY[1] >= -2) {
-			if (this.currentXY[0] > 2 || 0 > this.currentXY[0])
-				return true;
+			if (this.currentXY[0] > BAG_BOXES_X - 1 || 0 > this.currentXY[0]) return true;
+		} else if (this.currentXY[1] >= -2) {
+			if (this.currentXY[0] > 2 || 0 > this.currentXY[0]) return true;
 		}
 		return false;
 	}
-	
+
 	getItemAtXY(x: number, y: number) {
 		let item = undefined;
 		if (y >= 0) {
 			const uneqippedItemList = getUnequippedItemsWithPositions();
 			uneqippedItemList.forEach((itemPosition) => {
-				if (itemPosition.x == x
-					&& itemPosition.y == y) {
+				if (itemPosition.x === x && itemPosition.y === y) {
 					item = itemPosition.item;
 				}
 			});
 		} else {
 			const equippedItems = getEquippedItems();
-			let coordinates = `${x}_${y}`;
+			const coordinates = `${x}_${y}`;
 			item = equippedItems[COORDINATES_TO_SLOT[coordinates]];
 		}
 		return item;
@@ -239,19 +247,19 @@ export default class InventoryScreen extends OverlayScreen {
 		const uneqippedItemList = getUnequippedItemsWithPositions();
 		uneqippedItemList.forEach((itemPosition) => {
 			if (item == itemPosition.item) {
-				result = [itemPosition.x, itemPosition.y]
+				result = [itemPosition.x, itemPosition.y];
 			}
 		});
 		return result;
 	}
 
 	// move highlighted field
-	moveSelection(x: number, y: number) {		
+	moveSelection(x: number, y: number) {
 		if (y >= 0) {
-			this.inventorySelection.setX(BAG_START_X + (BOX_SIZE * x));
-			this.inventorySelection.setY(BAG_START_Y + (BOX_SIZE * y));
+			this.inventorySelection.setX(BAG_START_X + BOX_SIZE * x);
+			this.inventorySelection.setY(BAG_START_Y + BOX_SIZE * y);
 		} else {
-			let coordinates = `${x}_${y}`;
+			const coordinates = `${x}_${y}`;
 			this.inventorySelection.setX(EQUIPMENT_SLOT_COORDINATES[COORDINATES_TO_SLOT[coordinates]][0]);
 			this.inventorySelection.setY(EQUIPMENT_SLOT_COORDINATES[COORDINATES_TO_SLOT[coordinates]][1]);
 		}
@@ -260,56 +268,55 @@ export default class InventoryScreen extends OverlayScreen {
 	// updates all abilities and icons at once.
 	updateAbilities(constructor: boolean) {
 		const equippedItems = getEquippedItems();
-		Object.keys(equippedItems)
-			.forEach((key) => {
-				const slotKey = key as EquipmentSlot;
-				if (slotKey === EquipmentSlot.CHESTPIECE) return;
-				// TODO: NECKLACE
-				if (slotKey === EquipmentSlot.NECKLACE) return;
+		Object.keys(equippedItems).forEach((key) => {
+			const slotKey = key as EquipmentSlot;
+			if (slotKey === EquipmentSlot.CHESTPIECE) return;
+			// TODO: NECKLACE
+			if (slotKey === EquipmentSlot.NECKLACE) return;
 
-				// Remove ability if no item is equipped in slot
-				if (equippedItems[slotKey] === undefined) {
-					if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
-					if (slotKey === EquipmentSlot.MAIN_HAND) {
-						updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
-						const abilityIcon = this.createAbilityIcon();
-						this.handleIconOptions(constructor, abilityIcon, AbilityType.FIREBALL);
-						this.abilityIconMap[EquipmentSlot.MAIN_HAND] = abilityIcon;
-					}
-					else {
-						updateAbility(
-							this.scene,
-							globalState.playerCharacter,
-							EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
-							AbilityType.NOTHING
-						);
-					}
-					return;
-				}
-				let ability: AbilityType;
-				if (slotKey === EquipmentSlot.OFF_HAND) {
-					const catalystItem = equippedItems[slotKey]!.data as CatalystItem;
-
-					const baseAbility = equippedItems.mainhand ?
-						(equippedItems.mainhand.data as AbilityLinkedItem).ability :
-						AbilityType.FIREBALL;
-					ability = getCatalystAbility(baseAbility, catalystItem);
-				} else {
-					const abilityLinkedItem = equippedItems[slotKey]!.data as AbilityLinkedItem;
-					ability = abilityLinkedItem.ability;
-				}
-
-				const abilityIcon = this.createAbilityIcon(slotKey, ability);
+			// Remove ability if no item is equipped in slot
+			if (equippedItems[slotKey] === undefined) {
 				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
-				this.abilityIconMap[slotKey] = abilityIcon;
+				if (slotKey === EquipmentSlot.MAIN_HAND) {
+					updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
+					const abilityIcon = this.createAbilityIcon();
+					this.handleIconOptions(constructor, abilityIcon, AbilityType.FIREBALL);
+					this.abilityIconMap[EquipmentSlot.MAIN_HAND] = abilityIcon;
+				} else {
+					updateAbility(
+						this.scene,
+						globalState.playerCharacter,
+						EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
+						AbilityType.NOTHING
+					);
+				}
+				return;
+			}
+			let ability: AbilityType;
+			if (slotKey === EquipmentSlot.OFF_HAND) {
+				const catalystItem = equippedItems[slotKey]!.data as CatalystItem;
 
-				updateAbility(
-					this.scene,
-					globalState.playerCharacter,
-					EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
-					ability);
-				this.handleIconOptions(constructor, abilityIcon, ability);
-			});
+				const baseAbility = equippedItems.mainhand
+					? (equippedItems.mainhand.data as AbilityLinkedItem).ability
+					: AbilityType.FIREBALL;
+				ability = getCatalystAbility(baseAbility, catalystItem);
+			} else {
+				const abilityLinkedItem = equippedItems[slotKey]!.data as AbilityLinkedItem;
+				ability = abilityLinkedItem.ability;
+			}
+
+			const abilityIcon = this.createAbilityIcon(slotKey, ability);
+			if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
+			this.abilityIconMap[slotKey] = abilityIcon;
+
+			updateAbility(
+				this.scene,
+				globalState.playerCharacter,
+				EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
+				ability
+			);
+			this.handleIconOptions(constructor, abilityIcon, ability);
+		});
 	}
 
 	createAbilityIcon(
@@ -321,7 +328,9 @@ export default class InventoryScreen extends OverlayScreen {
 			this.scene,
 			iconX,
 			iconY,
-			Abilities[ability].icon![0], Abilities[ability].icon![1]);
+			Abilities[ability].icon![0],
+			Abilities[ability].icon![1]
+		);
 		abilityIcon.displayWidth = ABILITY_ICON_SIZE;
 		abilityIcon.displayHeight = ABILITY_ICON_SIZE;
 		abilityIcon.setDepth(UiDepths.UI_BACKGROUND_LAYER);
@@ -345,10 +354,7 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 	addToInventory(item: Item) {
 		const [x, y] = placeItemInNextFreeBagSlot(item);
-		if (x >= 0) this.createItemToken(
-			item,
-			BAG_START_X + x * BOX_SIZE,
-			BAG_START_Y + y * BOX_SIZE);
+		if (x >= 0) this.createItemToken(item, BAG_START_X + x * BOX_SIZE, BAG_START_Y + y * BOX_SIZE);
 		else return false;
 		return true;
 	}

@@ -1,8 +1,6 @@
 import { UiDepths } from '../helpers/constants';
-import MainScene from '../scenes/MainScene';
 
 export default class OverlayScreen extends Phaser.GameObjects.Group {
-
 	visiblity: boolean;
 
 	constructor(scene: Phaser.Scene, startX: number, startY: number, width: number, height: number) {
@@ -23,31 +21,76 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 		const yStretchFactor = (screenHeight - 2 * tileSize) / tileSize;
 
 		// tslint:disable: no-magic-numbers
-		const topLeftCorner =
-			new Phaser.GameObjects.Image(scene, leftBorderX, topBorderY, 'screen-background', 0);
-		const topRightCorner =
-			new Phaser.GameObjects.Image(scene, rightBorderX, topBorderY, 'screen-background', 2);
-		const bottomLeftCorner =
-			new Phaser.GameObjects.Image(scene, leftBorderX, bottomBorderY, 'screen-background', 6);
-		const bottomRightCorner =
-			new Phaser.GameObjects.Image(scene, rightBorderX, bottomBorderY, 'screen-background', 8);
+		const topLeftCorner = new Phaser.GameObjects.Image(
+			scene,
+			leftBorderX,
+			topBorderY,
+			'screen-background',
+			0
+		);
+		const topRightCorner = new Phaser.GameObjects.Image(
+			scene,
+			rightBorderX,
+			topBorderY,
+			'screen-background',
+			2
+		);
+		const bottomLeftCorner = new Phaser.GameObjects.Image(
+			scene,
+			leftBorderX,
+			bottomBorderY,
+			'screen-background',
+			6
+		);
+		const bottomRightCorner = new Phaser.GameObjects.Image(
+			scene,
+			rightBorderX,
+			bottomBorderY,
+			'screen-background',
+			8
+		);
 
-		const topBorder =
-			new Phaser.GameObjects.Image(scene, middlePieceX, topBorderY, 'screen-background', 1);
+		const topBorder = new Phaser.GameObjects.Image(
+			scene,
+			middlePieceX,
+			topBorderY,
+			'screen-background',
+			1
+		);
 		topBorder.scaleX = xStretchFactor;
-		const bottomBorder =
-			new Phaser.GameObjects.Image(scene, middlePieceX, bottomBorderY, 'screen-background', 7);
+		const bottomBorder = new Phaser.GameObjects.Image(
+			scene,
+			middlePieceX,
+			bottomBorderY,
+			'screen-background',
+			7
+		);
 		bottomBorder.scaleX = xStretchFactor;
 
-		const leftBorder =
-			new Phaser.GameObjects.Image(scene, leftBorderX, middlePieceY, 'screen-background', 3);
+		const leftBorder = new Phaser.GameObjects.Image(
+			scene,
+			leftBorderX,
+			middlePieceY,
+			'screen-background',
+			3
+		);
 		leftBorder.scaleY = yStretchFactor;
-		const rightBorder =
-			new Phaser.GameObjects.Image(scene, rightBorderX, middlePieceY, 'screen-background', 5);
+		const rightBorder = new Phaser.GameObjects.Image(
+			scene,
+			rightBorderX,
+			middlePieceY,
+			'screen-background',
+			5
+		);
 		rightBorder.scaleY = yStretchFactor;
 
-		const centerPiece =
-			new Phaser.GameObjects.Image(scene, middlePieceX, middlePieceY, 'screen-background', 4);
+		const centerPiece = new Phaser.GameObjects.Image(
+			scene,
+			middlePieceX,
+			middlePieceY,
+			'screen-background',
+			4
+		);
 		centerPiece.scaleX = xStretchFactor;
 		centerPiece.scaleY = yStretchFactor;
 		// tslint:enable
@@ -70,9 +113,10 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 		this.addMultiple(pieces, true);
 	}
 
-
 	toggleVisibility() {
 		this.toggleVisible();
 		this.visiblity = !this.visiblity;
 	}
+
+	update() {}
 }

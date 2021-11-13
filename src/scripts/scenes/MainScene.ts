@@ -37,6 +37,9 @@ import { Catalyst, Source } from '../../items/itemData';
 import Minimap from '../drawables/ui/Minimap';
 import { AbilityType } from '../abilities/abilityData';
 import LevelName from '../drawables/ui/LevelName';
+import QuestsIcon from '../drawables/ui/QuestsIcon';
+import QuestLogScreen from '../screens/QuestLogScreen';
+import QuestDetailsScreen from '../screens/QuestDetailsScreen';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -75,6 +78,8 @@ export default class MainScene extends Phaser.Scene {
 		statScreen: StatScreen;
 		dialogScreen: DialogScreen;
 		settingsScreen: SettingsScreen;
+		questLogScreen: QuestLogScreen;
+		questDetailsScreen: QuestDetailsScreen;
 		itemScreen: ItemScreen;
 	};
 	alive: number;
@@ -89,10 +94,12 @@ export default class MainScene extends Phaser.Scene {
 	icons: {
 		backpackIcon: BackpackIcon;
 		settingsIcon: SettingsIcon;
+		questsIcon: QuestsIcon;
 	};
 
 	wasIPressed: boolean = false;
 	wasEscPressed: boolean = false;
+	wasJPressed: boolean = false;
 
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
@@ -160,6 +167,7 @@ export default class MainScene extends Phaser.Scene {
 		this.icons = {
 			backpackIcon: new BackpackIcon(this),
 			settingsIcon: new SettingsIcon(this),
+			questsIcon: new QuestsIcon(this),
 		};
 		if (globalState.currentLevel.startsWith('dungeonLevel')) {
 			this.levelName = new LevelName(this);
@@ -231,10 +239,13 @@ export default class MainScene extends Phaser.Scene {
 			inventory: new InventoryScreen(this),
 			dialogScreen: new DialogScreen(this),
 			settingsScreen: new SettingsScreen(this),
+			questLogScreen: new QuestLogScreen(this),
+			questDetailsScreen: new QuestDetailsScreen(this),
 		};
 
 		this.icons.backpackIcon.setScreens();
 		this.icons.settingsIcon.setScreens();
+		this.icons.questsIcon.setScreens();
 
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
@@ -502,6 +513,14 @@ export default class MainScene extends Phaser.Scene {
 			this.wasEscPressed = true;
 		} else {
 			this.wasEscPressed = false;
+		}
+		if (this.keyboardHelper.isQuestsPressed()) {
+			if (this.wasJPressed === false) {
+				this.icons.questsIcon.toggleScreen();
+			}
+			this.wasJPressed = true;
+		} else {
+			this.wasJPressed = false;
 		}
 
 		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
