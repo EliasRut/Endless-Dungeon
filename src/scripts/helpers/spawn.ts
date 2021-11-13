@@ -9,15 +9,15 @@ import LichKingToken from '../drawables/tokens/LichKing';
 import VampireToken from '../drawables/tokens/VampireEnemyToken';
 
 export const spawnNpc = (
-		scene: MainScene,
-		type: string,
-		id: string,
-		posX: number,
-		posY: number,
-		level: number,
-		options?: NpcOptions
-	) => {
-	switch(type) {
+	scene: MainScene,
+	type: string,
+	id: string,
+	posX: number,
+	posY: number,
+	level: number,
+	options?: NpcOptions
+) => {
+	switch (type) {
 		case 'red-link': {
 			return new MeleeEnemyToken(scene, posX, posY, 'enemy-zombie', id);
 		}

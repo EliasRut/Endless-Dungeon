@@ -2,7 +2,7 @@ import { Facings, UiDepths } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
 import MainScene from '../../scenes/MainScene';
-import { isCollidingTile } from '../../helpers/movement';
+import { getRotationInRadiansForFacing, isCollidingTile } from '../../helpers/movement';
 
 const BODY_RADIUS = 6;
 const EXPLOSION_PARTICLE_SPEED = 100;
@@ -12,7 +12,7 @@ const RED_MIN = 0xcc0000;
 const RED_DIFF = 0x010000;
 const GREEN_DIFF = 0x000100;
 
-export default class FireBallEffect extends TargetingEffect {
+export default class NecroticBoltEffect extends TargetingEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	constructor(
 		scene: Phaser.Scene,
@@ -22,8 +22,9 @@ export default class FireBallEffect extends TargetingEffect {
 		facing: Facings,
 		projectileData: ProjectileData
 	) {
-		super(scene, x, y, 'empty-tile', facing, projectileData);
+		super(scene, x, y, 'skull', facing, projectileData);
 		scene.add.existing(this);
+		this.setRotation(getRotationInRadiansForFacing(facing));
 		this.setDepth(1);
 		scene.physics.add.existing(this);
 		this.body.setCircle(BODY_RADIUS, 0, 0);
@@ -33,22 +34,13 @@ export default class FireBallEffect extends TargetingEffect {
 		this.emitter = particles.createEmitter({
 			alpha: { start: 1, end: 0 },
 			scale: { start: 0.2 * this.effectScale, end: 0.05 },
-			speed: 20,
+			speed: 10,
 			rotate: { min: -180, max: 180 },
-			lifespan: { min: 200, max: 400 },
-			// blendMode: Phaser.BlendModes.ADD,
-			tint: {
-				onEmit: (particle) => {
-					return (
-						RED_MIN +
-						RED_DIFF * Math.floor(Math.random() * 51) +
-						GREEN_DIFF * 228 +
-						Math.floor(Math.random() * 24) +
-						Math.floor(128 + Math.random() * 127)
-					); // + 128;
-				},
-			},
-			frequency: 20,
+			lifespan: { min: 500, max: 1000 },
+			blendMode: Phaser.BlendModes.ADD,
+			tint: 0x062f19,
+			//tint: 0x471c86,
+			frequency: 15,
 			maxParticles: 100,
 		});
 

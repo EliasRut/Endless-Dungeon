@@ -4,11 +4,17 @@ import { ProjectileData } from '../../abilities/abilityData';
 
 const BODY_RADIUS = 6;
 const BODY_MASS = 10;
-//const EFFECT_DESTRUCTION_TIMEOUT_MS = 1200;
 
 export default class ConeEffect extends AbilityEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings, projectileData: ProjectileData) {
+	constructor(
+		scene: Phaser.Scene,
+		x: number,
+		y: number,
+		spriteName: string,
+		facing: Facings,
+		projectileData: ProjectileData
+	) {
 		super(scene, x, y, 'empty-tile', facing, projectileData);
 		scene.add.existing(this);
 		this.setDepth(1);
@@ -29,10 +35,10 @@ export default class ConeEffect extends AbilityEffect {
 		this.emitter.startFollow(this.body.gameObject);
 		this.emitter.start();
 
-		 if (projectileData?.timeToLive) {
-		    setTimeout(() => {
-		 	this.destroy();
-		 }, projectileData?.timeToLive);
+		if (projectileData?.timeToLive) {
+			setTimeout(() => {
+				this.destroy();
+			}, projectileData?.timeToLive);
 		}
 	}
 

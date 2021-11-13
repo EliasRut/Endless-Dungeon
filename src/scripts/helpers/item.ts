@@ -133,6 +133,9 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			case AbilityType.ARCANE_BOLT: {
 				return AbilityType.ARCANE_CONE;
 			}
+			case AbilityType.NECROTIC_BOLT: {
+				return AbilityType.NECROTIC_CONE;
+			}
 			case AbilityType.ICESPIKE: {
 				return AbilityType.ICE_CONE;
 			}
@@ -146,6 +149,9 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 		switch (baseAbility) {
 			case AbilityType.ARCANE_BOLT: {
 				return AbilityType.ARCANE_NOVA;
+			}
+			case AbilityType.NECROTIC_BOLT: {
+				return AbilityType.NECROTIC_NOVA;
 			}
 			case AbilityType.ICESPIKE: {
 				return AbilityType.ICE_NOVA;
