@@ -1,5 +1,5 @@
 import { facingToSpriteNameMap, KNOCKBACK_TIME } from '../../helpers/constants';
-import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
+import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
@@ -20,6 +20,7 @@ const ATTACK_DURATION = 3000;
 const WALL_COLLISION_STUN = 2000;
 const PLAYER_STUN = 500;
 const COLLISION_STUN = 1000;
+const LAUNCH_SPEED = 100;
 export default class VampireToken extends EnemyToken {
 	attacking: boolean;
 	chargeTime: number = CHARGE_TIME;
@@ -75,8 +76,10 @@ export default class VampireToken extends EnemyToken {
 		if (!this.attacking) {
 			const tx = this.target.x;
 			const ty = this.target.y;
+			const px = globalState.playerCharacter.x;
+			const py = globalState.playerCharacter.y;
 			if (this.aggro) {
-				if(this.attackRange < this.getDistance(tx, ty)){
+				if(px !== tx || py !== ty || this.attackRange < this.getDistance(tx, ty)){
 				const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
 				const xSpeed = (tx - this.x) / totalDistance * this.stateObject.movementSpeed;
 				const ySpeed = (ty - this.y) / totalDistance * this.stateObject.movementSpeed;
@@ -145,15 +148,15 @@ export default class VampireToken extends EnemyToken {
 			this.launched = true;
 			const tx = this.target.x;
 			const ty = this.target.y;
-			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
-			const xSpeed = (tx - this.x) / totalDistance * this.stateObject.movementSpeed;
-			const ySpeed = (ty - this.y) / totalDistance * this.stateObject.movementSpeed;
+			const speeds = getXYfromTotalSpeed(this.y - ty, this.x - tx);
+			const xSpeed = speeds[0] * LAUNCH_SPEED;
+			const ySpeed = speeds[1] * LAUNCH_SPEED;
+
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const attackAnimationName = `enemy-vampire-fly-${facingToSpriteNameMap[newFacing]}`;
 			this.play({ key: attackAnimationName, repeat: -1 });
-
-			this.launchX = (xSpeed * 3);
-			this.launchY = (ySpeed * 3);
+			this.launchX = (xSpeed);
+			this.launchY = (ySpeed);
 		}
 	}
 

@@ -8,9 +8,9 @@ import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 import { generateRandomItem } from '../../helpers/item';
 import Item from '../../worldstate/Item';
 
-const BODY_RADIUS = 12;
-const BODY_X_OFFSET = 10;
-const BODY_Y_OFFSET = 12;
+const BODY_RADIUS = 8;
+const BODY_X_OFFSET = 12;
+const BODY_Y_OFFSET = 16;
 
 const ENEMY_DAMAGE = 5;
 const ENEMY_HEALTH = 4;

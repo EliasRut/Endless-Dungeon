@@ -6,9 +6,9 @@ import CharacterToken from './CharacterToken';
 import { getNextQuestId, hasAnyOpenQuests, loadQuestScript } from '../../helpers/quests';
 import MainScene from '../../scenes/MainScene';
 
-const BODY_RADIUS = 10;
-const BODY_X_OFFSET = 10;
-const BODY_Y_OFFSET = 12;
+const BODY_RADIUS = 8;
+const BODY_X_OFFSET = 12;
+const BODY_Y_OFFSET = 16;
 
 const NPC_DAMAGE = 10;
 const NPC_HEALTH = 10;
