@@ -8,9 +8,9 @@ import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 import { generateRandomItem } from '../../helpers/item';
 import Item from '../../worldstate/Item';
 
-const BODY_RADIUS = 12;
-const BODY_X_OFFSET = 10;
-const BODY_Y_OFFSET = 12;
+const BODY_RADIUS = 8;
+const BODY_X_OFFSET = 12;
+const BODY_Y_OFFSET = 16;
 
 const ENEMY_DAMAGE = 5;
 const ENEMY_HEALTH = 4;
@@ -36,6 +36,7 @@ export default abstract class EnemyToken extends CharacterToken {
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.stateObject = new Enemy(tokenName, ENEMY_DAMAGE, ENEMY_HEALTH, ENEMY_SPEED);
+		globalState.enemies[id] = this.stateObject;
 		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 		this.tokenName = tokenName;
 		this.target = new Phaser.Geom.Point(0, 0);
@@ -46,7 +47,7 @@ export default abstract class EnemyToken extends CharacterToken {
 		// Instead of ray tracing we're using the players line of sight calculation, which tints the
 		// tile the enemy stands on.
 		const tile = this.getOccupiedTile();
-		return tile && tile.tint !== VISITED_TILE_TINT && tile.tint > 0;
+		return tile && tile.tint > VISITED_TILE_TINT;
 	}
 
 	dropRandomItem(level: number = 1) {
@@ -60,7 +61,7 @@ export default abstract class EnemyToken extends CharacterToken {
 
 	dropFixedItem(id: string) {
 		if (this.scene === undefined) {
-			//???
+			// ???
 			return;
 		}
 		this.scene.addFixedItem(id, this.x, this.y);
@@ -94,14 +95,13 @@ export default abstract class EnemyToken extends CharacterToken {
 			} else {
 				this.tint = tile.tint;
 			}
-			this.setVisible(tile.tint !== VISITED_TILE_TINT);
+			this.setVisible(tile.tint > VISITED_TILE_TINT);
 		}
 
 		// set aggro boolean, use a linger time for aggro
 		if (this.lastUpdate <= time) {
 			const player = globalState.playerCharacter;
-			const distance = this.getDistance(player.x, player.y);
-			if (distance < this.stateObject.vision && this.checkLoS()) {
+			if (this.checkLoS() && this.getDistance(player.x, player.y) < this.stateObject.vision) {
 				this.aggro = true;
 				this.lastUpdate = time;
 				this.target.x = player.x;

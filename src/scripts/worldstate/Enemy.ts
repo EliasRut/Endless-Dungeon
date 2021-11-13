@@ -2,7 +2,7 @@ import { Facings, Faction } from '../helpers/constants';
 import Character from './Character';
 // This class handles the players character and all mechanical events associated with it.
 export default class Enemy extends Character {
-	public vision = 250;
+	public vision = 224;
 	public attackTime = 2000;
 	public exactTargetXFactor = 0;
 	public exactTargetYFactor = 0;

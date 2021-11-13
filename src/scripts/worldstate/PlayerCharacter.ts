@@ -8,6 +8,7 @@ export default class PlayerCharacter extends Character {
 	public x = 0;
 	public y = 0;
 
+
 	public abilityCastTime = [
 		-Infinity,
 		-Infinity,

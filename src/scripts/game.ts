@@ -62,7 +62,7 @@ export const getGameConfig = (parent: HTMLElement, mode: MODE) => ({
 	physics: {
 		default: 'arcade',
 		arcade: {
-			debug: false,
+			debug: true,
 		}
 	},
 	render: {
