@@ -23,6 +23,7 @@ export class WorldState {
 	public playerCharacter: PlayerCharacter;
 	public transitionStack: {[id: string]: RoomCoordinates} = {};
 	public npcs: {[id: string]: Character} = {};
+	public enemies: {[id: string]: Character} = {};
 	public doors: {[id: string]: Door} = {};
 	public scripts: ScriptState = {};
 	public quests: {[id: string]: QuestState} = {};
@@ -34,6 +35,27 @@ export class WorldState {
 	public inventory: Inventory;
 	public itemList: Item[];
 
+
+
+
+	public static readonly PLAYERCHARACTER: string = 'playerCharacter';
+	public static readonly GAMETIME: string = 'gameTime';
+	public static readonly NPCS: string = 'npcs';
+	public static readonly ENEMIES: string = 'enemies';
+	public static readonly DOORS: string = 'doors';
+	public static readonly SCRIPTS: string = 'scripts';
+	public static readonly QUESTS: string = 'quests';
+	public static readonly DUNGEON: string = 'dungeon';
+	public static readonly TRANSITIONSTACK: string = 'transitionStack';
+	public static readonly AVAILABLEROOMS: string = 'availableRooms';
+	public static readonly AVAILABLETILESETS: string = 'availableTilesets';
+	public static readonly CURRENTLEVEL: string = 'currentLevel';
+	public static readonly ROOMASSIGNMENT: string = 'roomAssignment';
+	public static readonly INVENTORY: string = 'inventory';
+	public static readonly SAVEGAMENAME: string = 'saveGameName';
+
+
+
 	constructor() {
 		this.playerCharacter = new PlayerCharacter();
 		this.dungeon = new Dungeon();
@@ -41,21 +63,24 @@ export class WorldState {
 		this.itemList = [];
 	}
 
+
+
 	storeState() {
-		localStorage.setItem('playerCharacter', JSON.stringify(this.playerCharacter));
-		localStorage.setItem('gameTime', `${this.gameTime}`);
-		localStorage.setItem('npcs', JSON.stringify(this.npcs));
-		localStorage.setItem('doors', JSON.stringify(this.doors));
-		localStorage.setItem('scripts', JSON.stringify(this.scripts));
-		localStorage.setItem('quests', JSON.stringify(this.quests));
-		localStorage.setItem('dungeon', JSON.stringify(this.dungeon));
-		localStorage.setItem('transitionStack', JSON.stringify(this.transitionStack));
-		localStorage.setItem('availableRooms', JSON.stringify(this.availableRooms));
-		localStorage.setItem('availableTilesets', JSON.stringify(this.availableTilesets));
-		localStorage.setItem('currentLevel', JSON.stringify(this.currentLevel));
-		localStorage.setItem('roomAssignment', JSON.stringify(this.roomAssignment));
-		localStorage.setItem('inventory', JSON.stringify(this.inventory));
-		localStorage.setItem('saveGameName', 'test-save');
+		localStorage.setItem(WorldState.PLAYERCHARACTER, JSON.stringify(this.playerCharacter));
+		localStorage.setItem(WorldState.GAMETIME, `${this.gameTime}`);
+		localStorage.setItem(WorldState.NPCS, JSON.stringify(this.npcs));
+		localStorage.setItem(WorldState.ENEMIES, JSON.stringify(this.enemies));
+		localStorage.setItem(WorldState.DOORS, JSON.stringify(this.doors));
+		localStorage.setItem(WorldState.SCRIPTS, JSON.stringify(this.scripts));
+		localStorage.setItem(WorldState.QUESTS, JSON.stringify(this.quests));
+		localStorage.setItem(WorldState.DUNGEON, JSON.stringify(this.dungeon));
+		localStorage.setItem(WorldState.TRANSITIONSTACK, JSON.stringify(this.transitionStack));
+		localStorage.setItem(WorldState.AVAILABLEROOMS, JSON.stringify(this.availableRooms));
+		localStorage.setItem(WorldState.AVAILABLETILESETS, JSON.stringify(this.availableTilesets));
+		localStorage.setItem(WorldState.CURRENTLEVEL, JSON.stringify(this.currentLevel));
+		localStorage.setItem(WorldState.ROOMASSIGNMENT, JSON.stringify(this.roomAssignment));
+		localStorage.setItem(WorldState.INVENTORY, JSON.stringify(this.inventory));
+		localStorage.setItem(WorldState.SAVEGAMENAME, 'test-save');
 	}
 
 	loadState() {
@@ -63,21 +88,24 @@ export class WorldState {
 		// localStorage.clear();
 		const saveGameName = localStorage.getItem('saveGameName');
 		if (!saveGameName) {
+			console.log("no savegamename set")
 			return;
 		}
-		this.gameTime = parseInt(localStorage.getItem('gameTime') || '0', 10);
-		this.playerCharacter = JSON.parse(localStorage.getItem('playerCharacter') || '{}');
-		this.npcs = JSON.parse(localStorage.getItem('npcs') || '{}');
-		this.doors = JSON.parse(localStorage.getItem('doors') || '{}');
-		this.scripts = JSON.parse(localStorage.getItem('scripts') || '{}');
-		this.quests = JSON.parse(localStorage.getItem('quests') || '{}');
-		this.dungeon = JSON.parse(localStorage.getItem('dungeon') || '{}');
-		this.transitionStack = JSON.parse(localStorage.getItem('transitionStack') || '{}');
-		this.availableRooms = JSON.parse(localStorage.getItem('availableRooms') || '{}');
-		this.availableTilesets = JSON.parse(localStorage.getItem('availableTilesets') || '{}');
-		this.currentLevel = JSON.parse(localStorage.getItem('currentLevel') || '{}');
-		this.roomAssignment = JSON.parse(localStorage.getItem('roomAssignment') || '{}');
-		this.inventory = JSON.parse(localStorage.getItem('inventory') || '{}');
+		this.gameTime = parseInt(localStorage.getItem(WorldState.GAMETIME) || '0', 10);
+		this.playerCharacter = JSON.parse(localStorage.getItem(WorldState.PLAYERCHARACTER) || '{}');
+		this.npcs = JSON.parse(localStorage.getItem(WorldState.NPCS) || '{}');
+		this.enemies = JSON.parse(localStorage.getItem(WorldState.ENEMIES) || '{}');
+		this.doors = JSON.parse(localStorage.getItem(WorldState.DOORS) || '{}');
+		this.scripts = JSON.parse(localStorage.getItem(WorldState.SCRIPTS) || '{}');
+		this.quests = JSON.parse(localStorage.getItem(WorldState.QUESTS) || '{}');
+		this.dungeon = JSON.parse(localStorage.getItem(WorldState.DUNGEON) || '{}');
+		this.transitionStack = JSON.parse(localStorage.getItem(WorldState.TRANSITIONSTACK) || '{}');
+		this.availableRooms = JSON.parse(localStorage.getItem(WorldState.AVAILABLEROOMS) || '{}');
+		this.availableTilesets = JSON.parse(localStorage.getItem(WorldState.AVAILABLETILESETS) || '{}');
+		console.log("setting current level to"+localStorage.getItem(WorldState.CURRENTLEVEL))
+		this.currentLevel = JSON.parse(localStorage.getItem(WorldState.CURRENTLEVEL) || '{}');
+		this.roomAssignment = JSON.parse(localStorage.getItem(WorldState.ROOMASSIGNMENT) || '{}');
+		this.inventory = JSON.parse(localStorage.getItem(WorldState.INVENTORY) || '{}');
 		// Reset cast times.
 		this.playerCharacter.abilityCastTime = [
 			-Infinity,

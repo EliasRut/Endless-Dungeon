@@ -3,7 +3,7 @@ import { isJSON } from 'validator';
 import { UiDepths } from '../helpers/constants';
 import MainScene from '../scenes/MainScene';
 import RoomPreloaderScene from '../scenes/RoomPreloaderScene';
-import globalState from '../worldstate';
+import globalState, { WorldState } from '../worldstate';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
 import OverlayScreen from './OverlayScreen';
 import * as data from '../../assets/newgame.json';
@@ -42,10 +42,17 @@ export default class SettingsScreen extends OverlayScreen {
 
 
 		const fileInput: HTMLInputElement = document.createElement('input');
-		const sc: Phaser.Scene = this.scene;
+		// const sc: Phaser.Scene = this.scene;
 		fileInput.type = 'file';
 		fileInput.setAttribute('style','display:none');
-		fileInput.addEventListener('change', () => {this.load(this.loadJSONFile(fileInput));}, false);
+		
+		fileInput.addEventListener('change', () => {
+			const json = this.loadJSONFile(fileInput); 
+			console.log(json);
+			json.then (( value ) => {
+			this.load(value);
+			});
+		}, false);
 		document.body.appendChild(fileInput);
 
 
@@ -85,20 +92,21 @@ export default class SettingsScreen extends OverlayScreen {
 
 	save() {
 		let jsonData: string = '{';
-		jsonData += '"playerCharacter": '      + JSON.stringify(globalState.playerCharacter) +',\n';
-		jsonData += '"gameTime": '             + `${globalState.gameTime}` + ',\n';
-		jsonData += '"npcs": '                 + JSON.stringify(globalState.npcs) +',\n';
-		jsonData += '"doors": '                + JSON.stringify(globalState.doors) +',\n';
-		jsonData += '"scripts": '              + JSON.stringify(globalState.scripts) +',\n';
-		jsonData += '"quests": '               + JSON.stringify(globalState.quests) +',\n';
-		jsonData += '"dungeon": '              + JSON.stringify(globalState.dungeon) +',\n';
-		jsonData += '"transitionStack": '      + JSON.stringify(globalState.transitionStack) +',\n';
-		jsonData += '"availableRooms": '       + JSON.stringify(globalState.availableRooms) +',\n';
-		jsonData += '"availableTilesets": '    + JSON.stringify(globalState.availableTilesets) +',\n';
-		jsonData += '"currentLevel": '         + JSON.stringify(globalState.currentLevel) +',\n';
-		jsonData += '"roomAssignment": '       + JSON.stringify(globalState.roomAssignment) +',\n';
-		jsonData += '"inventory": '            + JSON.stringify(globalState.inventory) +',\n';
-		jsonData += '"saveGameName": '			+ '"test-save"';
+		jsonData += '"'+WorldState.PLAYERCHARACTER+'": '      + JSON.stringify(globalState.playerCharacter) +',\n';
+		jsonData += '"'+WorldState.GAMETIME+'": '             + `${globalState.gameTime}` + ',\n';
+		jsonData += '"'+WorldState.NPCS+'": '                 + JSON.stringify(globalState.npcs) +',\n';
+		jsonData += '"'+WorldState.ENEMIES+'": '              + JSON.stringify(globalState.enemies) +',\n';
+		jsonData += '"'+WorldState.DOORS+'": '                + JSON.stringify(globalState.doors) +',\n';
+		jsonData += '"'+WorldState.SCRIPTS+'": '              + JSON.stringify(globalState.scripts) +',\n';
+		jsonData += '"'+WorldState.QUESTS+'": '               + JSON.stringify(globalState.quests) +',\n';
+		jsonData += '"'+WorldState.DUNGEON+'": '              + JSON.stringify(globalState.dungeon) +',\n';
+		jsonData += '"'+WorldState.TRANSITIONSTACK+'": '      + JSON.stringify(globalState.transitionStack) +',\n';
+		jsonData += '"'+WorldState.AVAILABLEROOMS+'": '       + JSON.stringify(globalState.availableRooms) +',\n';
+		jsonData += '"'+WorldState.AVAILABLETILESETS+'": '    + JSON.stringify(globalState.availableTilesets) +',\n';
+		jsonData += '"'+WorldState.CURRENTLEVEL+'": '         + JSON.stringify(globalState.currentLevel) +',\n';
+		jsonData += '"'+WorldState.ROOMASSIGNMENT+'": '       + JSON.stringify(globalState.roomAssignment) +',\n';
+		jsonData += '"'+WorldState.INVENTORY+'": '            + JSON.stringify(globalState.inventory) +',\n';
+		jsonData += '"'+WorldState.SAVEGAMENAME+'": '			+ '"test-save+"';
 		jsonData += '}';
 
 		console.log(this.scene.scene);
@@ -109,8 +117,8 @@ export default class SettingsScreen extends OverlayScreen {
 	async loadJSONFile(element: HTMLInputElement): Promise<any> {
 		let savegame: File;
 		let savegameJSON: any;
-		if(element.files === null) {
-			return;
+		if(!element.files) {
+			return new Promise<any>((reject) => {reject("element.files is undefined")});
 		}
 
 		savegame = element.files[0];
@@ -121,31 +129,34 @@ export default class SettingsScreen extends OverlayScreen {
 		if(isJSON(saveStr)) {
 			savegameJSON = JSON.parse(saveStr);
 			// console.log(saveStr);
-			return savegameJSON;
+			// console.log(savegameJSON)
+			return new Promise<any>((resolve) => {resolve(savegameJSON)});
 		}
 
 		console.log(element.files[0].name+' is not a json file.');
 		console.log(saveStr);
-		return null;
+		return new Promise<any>((reject) => {reject("File is not a json file.")});
 	}
 
 	async load(savegame: any): Promise<any> {
 
+
 		/* tslint:disable: max-line-length */
-		if (savegame.playerCharacter) 	localStorage.setItem('playerCharacter', JSON.stringify(savegame.playerCharacter));
-		if (savegame.gameTime) 			localStorage.setItem('gameTime', `${savegame.gameTime}`);
-		if (savegame.npcs) 				localStorage.setItem('npcs', JSON.stringify(savegame.npcs));
-		if (savegame.doors) 			localStorage.setItem('doors', JSON.stringify(savegame.doors));
-		if (savegame.scripts)			localStorage.setItem('scripts', JSON.stringify(savegame.scripts));
-		if (savegame.quests) 			localStorage.setItem('quests', JSON.stringify(savegame.quests));
-		if (savegame.dungeon)			localStorage.setItem('dungeon', JSON.stringify(savegame.dungeon));
-		if (savegame.transitionStack) 	localStorage.setItem('transitionStack', JSON.stringify(savegame.transitionStack));
-		if (savegame.availableRooms) 	localStorage.setItem('availableRooms', JSON.stringify(savegame.availableRooms));
-		if (savegame.availableTilesets)	localStorage.setItem('availableTilesets', JSON.stringify(savegame.availableTilesets));
-		if (savegame.currentLevel)		localStorage.setItem('currentLevel', JSON.stringify(savegame.currentLevel));
-		if (savegame.roomAssignment)	localStorage.setItem('roomAssignment', JSON.stringify(savegame.roomAssignment));
-		if (savegame.inventory)			localStorage.setItem('inventory', JSON.stringify(savegame.inventory));
-		if (savegame.saveGameName)		localStorage.setItem('saveGameName',JSON.stringify(savegame.saveGameName));
+		if (savegame.playerCharacter) 	localStorage.setItem(WorldState.PLAYERCHARACTER, JSON.stringify(savegame.playerCharacter));
+		if (savegame.gameTime) 			localStorage.setItem(WorldState.GAMETIME, `${savegame.gameTime}`);
+		if (savegame.npcs) 				localStorage.setItem(WorldState.NPCS, JSON.stringify(savegame.npcs));
+		if (savegame.enemies) 			localStorage.setItem(WorldState.ENEMIES, JSON.stringify(savegame.enemies));
+		if (savegame.doors) 			localStorage.setItem(WorldState.DOORS, JSON.stringify(savegame.doors));
+		if (savegame.scripts)			localStorage.setItem(WorldState.SCRIPTS, JSON.stringify(savegame.scripts));
+		if (savegame.quests) 			localStorage.setItem(WorldState.QUESTS, JSON.stringify(savegame.quests));
+		if (savegame.dungeon)			localStorage.setItem(WorldState.DUNGEON, JSON.stringify(savegame.dungeon));
+		if (savegame.transitionStack) 	localStorage.setItem(WorldState.TRANSITIONSTACK, JSON.stringify(savegame.transitionStack));
+		if (savegame.availableRooms) 	localStorage.setItem(WorldState.AVAILABLEROOMS, JSON.stringify(savegame.availableRooms));
+		if (savegame.availableTilesets)	localStorage.setItem(WorldState.AVAILABLETILESETS, JSON.stringify(savegame.availableTilesets));
+		if (savegame.currentLevel)		localStorage.setItem(WorldState.CURRENTLEVEL, JSON.stringify(savegame.currentLevel));
+		if (savegame.roomAssignment)	localStorage.setItem(WorldState.ROOMASSIGNMENT, JSON.stringify(savegame.roomAssignment));
+		if (savegame.inventory)			localStorage.setItem(WorldState.INVENTORY, JSON.stringify(savegame.inventory));
+		if (savegame.saveGameName)		localStorage.setItem(WorldState.SAVEGAMENAME,JSON.stringify(savegame.saveGameName));
 		/* tslint:enable: max-line-length */
 
 		// globalState.loadState();

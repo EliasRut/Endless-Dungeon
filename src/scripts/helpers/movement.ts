@@ -138,3 +138,11 @@ export const isCollidingTile = (tileNumber: number) => {
 			lower <= normedNumber && normedNumber <= upper );
 	return !!firstColliding;
 };
+
+export const getXYfromTotalSpeed = (y: number, x: number) => {
+	const tanPhi = y / x;
+	const phi = Math.atan(tanPhi);
+	const xSpeed = Math.cos(phi) * Math.sign(-1 * x);
+	const ySpeed = Math.sin(phi) * Math.sign(-1 * x);
+	return [xSpeed, ySpeed];
+}
