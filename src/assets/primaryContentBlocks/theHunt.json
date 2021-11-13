@@ -1,0 +1,35 @@
+{
+	"title": "The Hunt",
+	"lowerBoundOfSecondaryContentBlocks": 1,
+	"upperBoundOfSecondaryContentBlocks": 1,
+	"dungeonLevels": [
+		{
+			"title": "Plantling Cave - Level 1",
+			"style": "wild",
+			"rooms": ["COM-wild-key"],
+			"width": 16,
+			"height": 16,
+			"numberOfRooms": 6,
+			"enemyBudget": 25
+		},
+		{
+			"title": "Plantling Cave - Level 2",
+			"style": "wild",
+			"rooms": ["COM-wild-combat-1"],
+			"width": 12,
+			"height": 12,
+			"numberOfRooms": 4,
+			"enemyBudget": 25
+		},
+		{
+			"title": "Plantling Cave - Level 3",
+			"style": "wild",
+			"rooms": ["COM-wild-druid-room"],
+			"width": 12,
+			"height": 12,
+			"numberOfRooms": 3,
+			"enemyBudget": 15
+		}
+	],
+	"themes": ["wild"]
+}
