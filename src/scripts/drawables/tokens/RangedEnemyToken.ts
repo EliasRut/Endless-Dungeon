@@ -8,15 +8,14 @@ import EnemyToken from './EnemyToken';
 const ATTACK_RANGE = 100;
 
 export default class RangedEnemyToken extends EnemyToken {
-
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
 		super(scene, x, y, tokenName, id);
 
 		this.attackRange = ATTACK_RANGE; // how close the enemy comes.
 	}
 
-	public update(time: number,) {
-		super.update(time);
+	public update(time: number, delta: number) {
+		super.update(time, delta);
 
 		const player = globalState.playerCharacter;
 
@@ -40,16 +39,11 @@ export default class RangedEnemyToken extends EnemyToken {
 		const ySpeed = yFactor * this.stateObject.movementSpeed;
 		const newFacing = getFacing8Dir(xSpeed, ySpeed);
 
-		if(this.aggro) {
-			if (this.attackedAt + this.stateObject.attackTime < time
-				&& this.attackRange < distance) {
-
+		if (this.aggro) {
+			if (this.attackedAt + this.stateObject.attackTime < time && this.attackRange < distance) {
 				this.setVelocityX(xSpeed);
 				this.setVelocityY(ySpeed);
-				const animation = updateMovingState(
-					this.stateObject,
-					true,
-					newFacing);
+				const animation = updateMovingState(this.stateObject, true, newFacing);
 
 				if (animation) {
 					this.play(animation);
@@ -60,7 +54,8 @@ export default class RangedEnemyToken extends EnemyToken {
 				const animation = updateMovingState(
 					this.stateObject,
 					false,
-					this.stateObject.currentFacing);
+					this.stateObject.currentFacing
+				);
 
 				if (animation) {
 					this.play(animation);
@@ -68,7 +63,7 @@ export default class RangedEnemyToken extends EnemyToken {
 				this.stateObject.currentFacing = newFacing;
 			}
 
-			if(distance <= this.attackRange && this.checkLoS()) {
+			if (distance <= this.attackRange && this.checkLoS()) {
 				this.attack(time);
 			}
 
@@ -82,10 +77,7 @@ export default class RangedEnemyToken extends EnemyToken {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.attackedAt = time;
-			this.scene.abilityHelper.triggerAbility(
-				this.stateObject,
-				AbilityType.HAIL_OF_FLAMES,
-				time);
+			this.scene.abilityHelper.triggerAbility(this.stateObject, AbilityType.HAIL_OF_FLAMES, time);
 		}
 	}
 }

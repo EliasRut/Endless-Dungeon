@@ -102,6 +102,10 @@ export default class AbilityHelper {
 				if (Abilities[type].stun) {
 					stun(globalTime, Abilities[type].stun!, enemy.stateObject);
 				}
+				if (Abilities[type].necroticStacks) {
+					enemy.lastNecroticEffectTimestamp = globalTime;
+					enemy.necroticEffectStacks += Abilities[type].necroticStacks!;
+				}
 				if (projectileData?.knockback) {
 					enemy.lastMovedTimestamp = globalTime;
 					const angle = Phaser.Math.Angle.Between(effect.x, effect.y, enemy.x, enemy.y);

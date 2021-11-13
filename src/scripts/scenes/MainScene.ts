@@ -475,7 +475,7 @@ export default class MainScene extends Phaser.Scene {
 		// tslint:enable: no-magic-numbers
 	}
 
-	update(globalTime: number, _delta: number) {
+	update(globalTime: number, delta: number) {
 		globalState.gameTime = globalTime;
 		this.fpsText.update();
 		this.minimap?.update();
@@ -591,7 +591,7 @@ export default class MainScene extends Phaser.Scene {
 
 		// Updated npcs
 		Object.values(this.npcMap).forEach((curNpc) => {
-			curNpc.update(globalTime);
+			curNpc.update(globalTime, delta);
 		});
 
 		// TODO: remove items that are picked up

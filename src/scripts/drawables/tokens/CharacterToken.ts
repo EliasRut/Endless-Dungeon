@@ -10,6 +10,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	faction: Faction;
 	isBeingMoved?: boolean;
 	lastMovedTimestamp: number;
+	lastNecroticEffectTimestamp: number;
+	necroticEffectStacks: number;
 
 	constructor(
 			scene: Phaser.Scene,
@@ -25,6 +27,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		this.type = type;
 		this.id = id;
 		this.lastMovedTimestamp = -Infinity;
+		this.lastNecroticEffectTimestamp = -Infinity;
+		this.necroticEffectStacks = 0;
 	}
 
 	public onCollide(withEnemy: boolean) {}

@@ -39,8 +39,8 @@ export default class ZombieToken extends EnemyToken {
 		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
 	}
 
-	public update(time: number) {
-		super.update(time);
+	public update(time: number, delta: number) {
+		super.update(time, delta);
 
 		this.stateObject.movementSpeed = Math.max(
 			MIN_MOVEMENT_SPEED,

@@ -8,9 +8,15 @@ import EnemyToken from './EnemyToken';
 const ATTACK_RANGE = 80;
 
 export default class RedlingBossToken extends EnemyToken {
-
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
+	constructor(
+		scene: MainScene,
+		x: number,
+		y: number,
+		tokenName: string,
+		level: number,
+		id: string
+	) {
 		super(scene, x, y, tokenName, id);
 
 		this.setScale(2);
@@ -33,14 +39,14 @@ export default class RedlingBossToken extends EnemyToken {
 			blendMode: Phaser.BlendModes.ADD,
 			frequency: 30,
 			maxParticles: 200,
-			follow: this
+			follow: this,
 		});
 		this.emitter.startFollow(this.body.gameObject);
 		this.emitter.start();
 	}
 
-	public update(time: number,) {
-		super.update(time);
+	public update(time: number, delta: number) {
+		super.update(time, delta);
 
 		// check death
 		if (this.stateObject.health <= 0) {
@@ -53,9 +59,11 @@ export default class RedlingBossToken extends EnemyToken {
 			return;
 		}
 
-		const timeSinceAttack = Math.max(1,
-			Math.min(this.stateObject.attackTime, time - this.attackedAt));
-		this.emitter.setFrequency(30 + (this.stateObject.attackTime / timeSinceAttack))
+		const timeSinceAttack = Math.max(
+			1,
+			Math.min(this.stateObject.attackTime, time - this.attackedAt)
+		);
+		this.emitter.setFrequency(30 + this.stateObject.attackTime / timeSinceAttack);
 
 		const tx = this.target.x;
 		const ty = this.target.y;
@@ -70,16 +78,11 @@ export default class RedlingBossToken extends EnemyToken {
 		const ySpeed = yFactor * this.stateObject.movementSpeed;
 		const newFacing = getFacing8Dir(xSpeed, ySpeed);
 
-		if(this.aggro) {
-			if (this.attackedAt + this.stateObject.attackTime < time
-				&& this.attackRange < distance) {
-
+		if (this.aggro) {
+			if (this.attackedAt + this.stateObject.attackTime < time && this.attackRange < distance) {
 				this.setVelocityX(xSpeed);
 				this.setVelocityY(ySpeed);
-				const animation = updateMovingState(
-					this.stateObject,
-					true,
-					newFacing);
+				const animation = updateMovingState(this.stateObject, true, newFacing);
 
 				if (animation) {
 					this.play(animation);
@@ -90,7 +93,8 @@ export default class RedlingBossToken extends EnemyToken {
 				const animation = updateMovingState(
 					this.stateObject,
 					false,
-					this.stateObject.currentFacing);
+					this.stateObject.currentFacing
+				);
 
 				if (animation) {
 					this.play(animation);
@@ -98,7 +102,7 @@ export default class RedlingBossToken extends EnemyToken {
 				this.stateObject.currentFacing = newFacing;
 			}
 
-			if(distance <= this.attackRange && this.checkLoS()) {
+			if (distance <= this.attackRange && this.checkLoS()) {
 				this.attack(time);
 			}
 
@@ -112,10 +116,7 @@ export default class RedlingBossToken extends EnemyToken {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.attackedAt = time;
-			this.scene.abilityHelper.triggerAbility(
-				this.stateObject,
-				AbilityType.HAIL_OF_FLAMES,
-				time);
+			this.scene.abilityHelper.triggerAbility(this.stateObject, AbilityType.HAIL_OF_FLAMES, time);
 		}
 	}
 }
