@@ -58,7 +58,7 @@ export default abstract class EnemyToken extends CharacterToken {
 
 	dropFixedItem(id: string) {
 		if (this.scene === undefined) {
-			//???
+			// ???
 			return;
 		}
 		this.scene.addFixedItem(id, this.x, this.y);

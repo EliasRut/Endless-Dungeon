@@ -80,6 +80,7 @@ export const MapEditorScreen = () => {
 							<option value="decoration">Decoration Layer</option>
 							<option value="overlay">Overlay Layer</option>
 							<option value="npcs">NPC Placement</option>
+							<option value="items">Item Placement</option>
 						</Dropdown>
 					</SelectionWrapper>
 					<ExportButtonWrapper>
@@ -120,10 +121,10 @@ export const MapEditorScreen = () => {
 				</ButtonWrapper>
 			</NpcDetailsDialog>
 			<ItemDetailsDialog id="itemDetailsDialog">
-				<DialogTitle>NPC Details</DialogTitle>
+				<DialogTitle>Item Details</DialogTitle>
 				<InputWrapper>
 					<div>Type</div>
-					<Dropdown id="itemType">
+					<Dropdown id="itemId">
 						<option>Loading...</option>
 					</Dropdown>
 				</InputWrapper>

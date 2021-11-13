@@ -31,10 +31,11 @@ const DEPTHS = {
 	baseLayer: 1,
 	decorationLayer: 2,
 	npcLayer: 3,
-	overlayLayer: 4,
-	libraryBackgroundLayer: 4,
-	libraryTileLayer: 5,
-	libraryHighlighting: 6,
+	itemLayer: 4,
+	overlayLayer: 5,
+	libraryBackgroundLayer: 6,
+	libraryTileLayer: 7,
+	libraryHighlighting: 8,
 };
 
 type MapLayout = number[][];
@@ -94,7 +95,7 @@ export default class MapEditor extends Phaser.Scene {
 	selectedItemTokenIndex: number = -1;
 	npcTokens: Phaser.GameObjects.Image[];
 	npcs: NpcPositioning[];
-	itemTokens: Phaser.GameObjects.Image[];
+	itemTokens: Phaser.GameObjects.Sprite[];
 	items: ItemsPositioning[];
 
 	oneKey: Phaser.Input.Keyboard.Key;
@@ -139,8 +140,7 @@ export default class MapEditor extends Phaser.Scene {
 	npcDeleteButton: HTMLButtonElement;
 
 	// Item Details Dialog fields
-	itemTypeDropdownElement: HTMLSelectElement;
-	itemIdElement: HTMLInputElement;
+	itemIdElement: HTMLSelectElement;
 	itemXElement: HTMLInputElement;
 	itemYElement: HTMLInputElement;
 	itemSaveButton: HTMLButtonElement;
@@ -197,8 +197,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.npcDeleteButton.onclick = () => this.deleteNpcToken();
 
 		// Item Details Dialog fields
-		this.itemTypeDropdownElement = document.getElementById('itemType') as HTMLSelectElement;
-		this.itemIdElement = document.getElementById('itemId') as HTMLInputElement;
+		this.itemIdElement = document.getElementById('itemId') as HTMLSelectElement;
 		this.itemXElement = document.getElementById('itemX') as HTMLInputElement;
 		this.itemYElement = document.getElementById('itemY') as HTMLInputElement;
 		this.itemSaveButton = document.getElementById('itemSaveButton') as HTMLButtonElement;
@@ -228,11 +227,17 @@ export default class MapEditor extends Phaser.Scene {
 		this.roomOverlayLayout = [];
 
 		this.npcs = selectedRoom.npcs || [];
+		this.items = selectedRoom.items || [];
 
 		this.npcTokens.forEach((token) => {
 			token.destroy(true);
 		});
 		this.npcTokens = [];
+
+		this.itemTokens.forEach((token) => {
+			token.destroy(true);
+		});
+		this.itemTokens = [];
 
 		this.applyConfiguration();
 
@@ -357,6 +362,19 @@ export default class MapEditor extends Phaser.Scene {
 			this.npcTypeDropdownElement.appendChild(newOption);
 		});
 
+		// Items Details Dialog
+		// Prepare NPC Type dropdown
+		while (this.itemIdElement.firstChild) {
+			this.itemIdElement.remove(0);
+		}
+
+		Object.values(fixedItems).forEach((item) => {
+			const newOption = document.createElement('option');
+			newOption.value = item.id;
+			newOption.innerText = item.id;
+			this.itemIdElement.appendChild(newOption);
+		});
+
 		this.applyConfiguration();
 
 		this.oneKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE, false);
@@ -388,15 +406,6 @@ export default class MapEditor extends Phaser.Scene {
 		};
 
 		this.cameras.main.setZoom(this.zoomFactor);
-		// this.cameras.main.centerOn(0, 0);
-
-		// if (this.zoomIn.isDown) {
-		// 	const cam = this.cameras.main;
-
-		// 	cam.pan(500, 500, 2000, 'Power2');
-		// 	cam.zoomTo(4, 3000);
-		// }
-
 		this.exportButtonElement.onclick = () => {
 			const data = this.getExportData();
 
@@ -411,18 +420,18 @@ export default class MapEditor extends Phaser.Scene {
 
 		this.npcs = [];
 		this.npcLibraryTokens = [];
-		const cursorToken = new Phaser.GameObjects.Image(this, 0, 0, 'search-icon');
-		cursorToken.setPosition(8, 8);
-		cursorToken.setOrigin(0);
-		cursorToken.setScrollFactor(0);
-		cursorToken.setDepth(100);
-		cursorToken.addListener('pointerdown', () => {
+		const npcCursorToken = new Phaser.GameObjects.Image(this, 0, 0, 'search-icon');
+		npcCursorToken.setPosition(8, 8);
+		npcCursorToken.setOrigin(0);
+		npcCursorToken.setScrollFactor(0);
+		npcCursorToken.setDepth(100);
+		npcCursorToken.addListener('pointerdown', () => {
 			this.selectedLibraryNpcIndex = 0;
 			this.mapEditorHighlighting.setPosition(0, 0);
 		});
-		cursorToken.setInteractive();
-		this.npcLibraryTokens.push(cursorToken);
-		this.npcLibraryLayer.add(cursorToken, true);
+		npcCursorToken.setInteractive();
+		this.npcLibraryTokens.push(npcCursorToken);
+		this.npcLibraryLayer.add(npcCursorToken, true);
 		npcKeys.forEach((key, index) => {
 			const token = new Phaser.GameObjects.Image(this, 0, 0, key);
 			token.setPosition((index + 1) * 40, 0);
@@ -439,6 +448,45 @@ export default class MapEditor extends Phaser.Scene {
 		});
 		this.npcLibraryLayer.setVisible(this.activeLayerDropdownElement.value === 'npcs');
 		this.add.existing(this.npcLibraryLayer);
+
+		this.itemLibraryLayer = new Phaser.GameObjects.Group(this);
+
+		this.items = [];
+		this.itemLibraryTokens = [];
+		const itemCursorToken = new Phaser.GameObjects.Sprite(this, 0, 0, 'search-icon', 0);
+		itemCursorToken.setPosition(8, 8);
+		itemCursorToken.setOrigin(0);
+		itemCursorToken.setScrollFactor(0);
+		itemCursorToken.setDepth(100);
+		itemCursorToken.addListener('pointerdown', () => {
+			this.selectedLibraryItemIndex = 0;
+			this.mapEditorHighlighting.setPosition(0, 0);
+		});
+		itemCursorToken.setInteractive();
+		this.itemLibraryTokens.push(itemCursorToken);
+		this.itemLibraryLayer.add(itemCursorToken, true);
+		Object.values(fixedItems).forEach((item, index) => {
+			const token = new Phaser.GameObjects.Sprite(
+				this,
+				0,
+				0,
+				'test-items-spritesheet',
+				item.iconFrame
+			);
+			token.setPosition((index + 1) * 40 + 12, 10);
+			token.setOrigin(0);
+			token.setScrollFactor(0);
+			token.setDepth(100);
+			token.addListener('pointerdown', () => {
+				this.selectedLibraryItemIndex = index + 1;
+				this.mapEditorHighlighting.setPosition((index + 1) * 40, 0);
+			});
+			token.setInteractive();
+			this.itemLibraryTokens.push(token);
+			this.itemLibraryLayer.add(token, true);
+		});
+		this.itemLibraryLayer.setVisible(this.activeLayerDropdownElement.value === 'npcs');
+		this.add.existing(this.itemLibraryLayer);
 
 		this.addToHistory(true);
 	}
@@ -486,6 +534,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.overlayTileLayer.removeInteractive();
 			this.mapEditorHighlighting.setScale(1);
 			this.npcLibraryLayer.setVisible(false);
+			this.itemLibraryLayer.setVisible(false);
 			this.hideNpcDetailsDialog();
 			this.hideItemDetailsDialog();
 		} else if (activeLayerValue === 'decoration') {
@@ -494,6 +543,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.overlayTileLayer.removeInteractive();
 			this.mapEditorHighlighting.setScale(1);
 			this.npcLibraryLayer.setVisible(false);
+			this.itemLibraryLayer.setVisible(false);
 			this.hideNpcDetailsDialog();
 			this.hideItemDetailsDialog();
 		} else if (activeLayerValue === 'overlay') {
@@ -502,6 +552,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.overlayTileLayer.setInteractive();
 			this.mapEditorHighlighting.setScale(1);
 			this.npcLibraryLayer.setVisible(false);
+			this.itemLibraryLayer.setVisible(false);
 			this.hideNpcDetailsDialog();
 			this.hideItemDetailsDialog();
 		} else if (activeLayerValue === 'npcs') {
@@ -509,9 +560,18 @@ export default class MapEditor extends Phaser.Scene {
 			this.decorationTileLayer.removeInteractive();
 			this.overlayTileLayer.removeInteractive();
 			this.mapEditorHighlighting.setScale(2.5);
+			this.itemLibraryLayer.setVisible(false);
 			this.npcLibraryLayer.setVisible(true);
+		} else if (activeLayerValue === 'items') {
+			this.tileLayer.setInteractive();
+			this.decorationTileLayer.removeInteractive();
+			this.overlayTileLayer.removeInteractive();
+			this.mapEditorHighlighting.setScale(2.5);
+			this.npcLibraryLayer.setVisible(false);
+			this.itemLibraryLayer.setVisible(true);
 		}
 		this.updateNpcTokens();
+		this.updateItemTokens();
 	}
 
 	updateNpcTokens() {
@@ -645,14 +705,14 @@ export default class MapEditor extends Phaser.Scene {
 			item.setAlpha(isItemLayerActive ? 1 : 0.7);
 			if (isItemLayerActive) {
 				item.on('pointerdown', () => {
-					if (this.selectedLibraryNpcIndex !== 0) {
+					if (this.selectedLibraryItemIndex !== 0) {
 						return;
 					}
 					const itemData = this.items[index];
 					this.showItemDetailsDialog(itemData);
 					this.itemTokens.forEach((otherToken) => (otherToken.tint = 0xffffff));
 					item.tint = 0xffcccc;
-					this.selectedNpcTokenIndex = index;
+					this.selectedItemTokenIndex = index;
 				});
 				item.setInteractive();
 			} else {
@@ -708,8 +768,13 @@ export default class MapEditor extends Phaser.Scene {
 		const item = {
 			...(fixedItems as { [id: string]: Partial<Item> })[id],
 		} as Item;
-		const itemToken = new WorldItemToken(this as any, x, y, item);
-		itemToken.setAlpha(this.activeLayerDropdownElement.value === 'npcs' ? 1 : 0.7);
+		const itemToken = new WorldItemToken(
+			this as any,
+			x * TILE_WIDTH - this.widthInPixels / 2,
+			y * TILE_HEIGHT - this.heightInPixels / 2,
+			item
+		);
+		itemToken.setAlpha(this.activeLayerDropdownElement.value === 'items' ? 1 : 0.7);
 		itemToken.setDepth(DEPTHS.npcLayer);
 		this.itemTokens = [
 			...this.itemTokens.slice(0, this.selectedItemTokenIndex),
@@ -737,7 +802,12 @@ export default class MapEditor extends Phaser.Scene {
 		const item = {
 			...(fixedItems as { [id: string]: Partial<Item> })[id],
 		} as Item;
-		const itemToken = new WorldItemToken(this as any, x, y, item);
+		const itemToken = new WorldItemToken(
+			this as any,
+			x * TILE_WIDTH - this.widthInPixels / 2,
+			y * TILE_HEIGHT - this.heightInPixels / 2,
+			item
+		);
 		this.add.existing(itemToken);
 		itemToken.setAlpha(1);
 		itemToken.setDepth(DEPTHS.npcLayer);
@@ -1011,7 +1081,11 @@ export default class MapEditor extends Phaser.Scene {
 		const activeLayerValue = this.activeLayerDropdownElement.value;
 
 		this.tileLayer = map.createLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
-		if (activeLayerValue === 'base' || activeLayerValue === 'npcs') {
+		if (
+			activeLayerValue === 'base' ||
+			activeLayerValue === 'npcs' ||
+			activeLayerValue === 'items'
+		) {
 			this.tileLayer.setInteractive();
 		}
 		this.tileLayer.setDepth(DEPTHS.baseLayer);
@@ -1028,6 +1102,12 @@ export default class MapEditor extends Phaser.Scene {
 					return;
 				}
 				this.addNpc(tileX, tileY);
+			}
+			if (this.activeLayerDropdownElement.value === 'items') {
+				if (this.selectedLibraryItemIndex === 0) {
+					return;
+				}
+				this.addItem(tileX, tileY);
 			}
 			if (this.shiftKey.isDown) {
 				this.selectionStartPoint = [tileX, tileY];
@@ -1228,6 +1308,34 @@ export default class MapEditor extends Phaser.Scene {
 			}
 		});
 		this.updateNpcTokens();
+
+		// Draw items
+		(this.itemTokens || []).forEach((token) => {
+			token.destroy(true);
+		});
+		this.itemTokens = [];
+		(this.items || []).forEach((itemPosition, index) => {
+			const { x, y, id } = itemPosition;
+
+			const item = {
+				...(fixedItems as { [id: string]: Partial<Item> })[id],
+			} as Item;
+			const itemToken = new WorldItemToken(
+				this as any,
+				x * TILE_WIDTH - this.widthInPixels / 2,
+				y * TILE_HEIGHT - this.heightInPixels / 2,
+				item
+			);
+
+			this.itemTokens.push(itemToken);
+			this.add.existing(itemToken);
+			itemToken.setAlpha(this.activeLayerDropdownElement.value === 'items' ? 1 : 0.7);
+			itemToken.setDepth(DEPTHS.itemLayer);
+			if (index === this.selectedItemTokenIndex) {
+				itemToken.tint = 0xffcccc;
+			}
+		});
+		this.updateItemTokens();
 	}
 
 	renderDebugGraphics() {
@@ -1397,11 +1505,11 @@ export default class MapEditor extends Phaser.Scene {
 		const decorationTilesetValue = this.tilesetDecorationDropdownElement.value;
 		const overlayTilesetValue = this.tilesetOverlayDropdownElement.value;
 
-		return {
-			npcs: [],
-			items: [],
+		const data = {
 			scripts: [],
 			...this.fileData,
+			npcs: this.npcs,
+			items: this.items,
 			openings: JSON.stringify(this.fileData.openings || []),
 			name: roomNameValue,
 			tileset: tilesetValue,
@@ -1411,6 +1519,7 @@ export default class MapEditor extends Phaser.Scene {
 			decorations: JSON.stringify(this.roomDecorationLayout),
 			overlays: JSON.stringify(this.roomOverlayLayout),
 		};
+		return data;
 	}
 
 	autoSave() {
