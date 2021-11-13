@@ -63,6 +63,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('snow', 'assets/img/snowflake.png');
 		this.load.image('rock', 'assets/img/rock.png');
 		this.load.image('wind', 'assets/img/wind-gust.png');
+		this.load.image('skull', 'assets/img/necrotic-skull.png');
 
 		// Other elements
 		this.load.image('quest', 'assets/img/quest.png');
