@@ -4,7 +4,7 @@
 		"max-line-length": {
 			"options": [100]
 		},
-		"indent": [true, "tabs"],
+		"indent": false,
 		"new-parens": true,
 		"no-arg": true,
 		"no-bitwise": true,
@@ -20,7 +20,6 @@
 		"no-var-keyword": true,
 		"triple-equals": true,
 		"prefer-const": true,
-		"semicolon": [true, "always"],
 		"no-empty": false
 	},
 	"jsRules": {
