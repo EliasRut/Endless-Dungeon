@@ -36,7 +36,7 @@ export const SourceData = {
 		iconFrame: 26,
 	} as AbilityLinkedItem,
 	[Source.NECROTIC]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.NECROTIC_BOLT,
 		name: 'Necrotic Source',
 		description: 'Use the power of decay to make your enemies fall apart bit by bit. Yuk!',
 		iconFrame: 25,

@@ -6,6 +6,7 @@ import RoundHouseKickEffect from '../drawables/effects/RoundHouseKickEffect';
 import HealingLightEffect from '../drawables/effects/HealingLightEffect';
 import ArcaneBoltEffect from '../drawables/effects/ArcaneBoltEffect';
 import ConeEffect from '../drawables/effects/ConeEffect';
+import NecroticBoltEffect from '../drawables/effects/NecroticBoltEffect';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -61,15 +62,16 @@ export const enum AbilityType {
 	ARCANE_NOVA = 'arcaneNova',
 	ICE_CONE = 'iceCone',
 	ICE_NOVA = 'iceNova',
+	NECROTIC_BOLT = 'nectoricBolt',
 }
 
-export const Abilities: {[type: string]: AbilityData} = {
+export const Abilities: { [type: string]: AbilityData } = {
 	[AbilityType.NOTHING]: {
 		projectiles: 0,
 		cooldownMs: 0,
 		damageMultiplier: 0,
 		flavorText: ``,
-		icon: ['icon-abilities', 2]
+		icon: ['icon-abilities', 2],
 	},
 	[AbilityType.FIREBALL]: {
 		projectiles: 1,
@@ -82,15 +84,15 @@ export const Abilities: {[type: string]: AbilityData} = {
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			explodeOnDestruction: true
+			explodeOnDestruction: true,
 		},
 		sound: 'sound-fireball',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 250,
 		damageMultiplier: 1,
 		stun: 3000,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
-		icon: ['icon-abilities', 0]
+		icon: ['icon-abilities', 0],
 	},
 	[AbilityType.ARCANE_BOLT]: {
 		projectiles: 1,
@@ -104,14 +106,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 			knockback: 120,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			explodeOnDestruction: true
+			explodeOnDestruction: true,
 		},
 		sound: 'sound-fireball',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 250,
 		damageMultiplier: 0.8,
 		flavorText: `Shooting magic missiles!`,
-		icon: ['icon-abilities', 1]
+		icon: ['icon-abilities', 1],
 	},
 	[AbilityType.HAIL_OF_BOLTS]: {
 		projectiles: 13,
@@ -128,14 +130,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 			knockback: 200,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			explodeOnDestruction: true
+			explodeOnDestruction: true,
 		},
 		sound: 'sound-fireball',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 3000,
 		damageMultiplier: 0.25,
 		flavorText: `Shooting magic missiles!`,
-		icon: ['icon-abilities', 1]
+		icon: ['icon-abilities', 1],
 	},
 	[AbilityType.HAIL_OF_FLAMES]: {
 		projectiles: 13,
@@ -152,14 +154,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 			targeting: true,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			explodeOnDestruction: true
+			explodeOnDestruction: true,
 		},
 		sound: 'sound-fireball',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 3000,
 		damageMultiplier: 0.33,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
-		icon: ['icon-abilities', 0]
+		icon: ['icon-abilities', 0],
 	},
 	[AbilityType.HAIL_OF_ICE]: {
 		projectiles: 13,
@@ -177,14 +179,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 			targeting: true,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			explodeOnDestruction: true
+			explodeOnDestruction: true,
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
 		cooldownMs: 3000,
 		damageMultiplier: 0.25,
 		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`,
-		icon: ['icon-abilities', 1]
+		icon: ['icon-abilities', 1],
 	},
 	[AbilityType.ICESPIKE]: {
 		projectiles: 1,
@@ -197,14 +199,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			explodeOnDestruction: true
+			explodeOnDestruction: true,
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
 		cooldownMs: 400,
 		damageMultiplier: 0.8,
 		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`,
-		icon: ['icon-abilities', 1]
+		icon: ['icon-abilities', 1],
 	},
 	[AbilityType.DUSTNOVA]: {
 		projectiles: 32,
@@ -216,7 +218,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			yOffset: 20,
 			effect: DustNovaEffect,
 			destroyOnWallContact: true,
-			destroyOnEnemyContact: true
+			destroyOnEnemyContact: true,
 			// collisionSound: 'sound-wind',
 			// sfxVolume: 0.4
 		},
@@ -237,7 +239,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			effect: RoundHouseKickEffect,
 			delay: 12,
 			destroyOnWallContact: true,
-			destroyOnEnemyContact: true
+			destroyOnEnemyContact: true,
 			// collisionSound: 'sound-wind',
 			// sfxVolume: 0.4
 		},
@@ -255,7 +257,7 @@ export const Abilities: {[type: string]: AbilityData} = {
 			yOffset: 0,
 			effect: HealingLightEffect,
 			destroyOnWallContact: true,
-			destroyOnEnemyContact: false
+			destroyOnEnemyContact: false,
 			// collisionSound: 'sound-wind',
 			// sfxVolume: 0.4
 		},
@@ -276,14 +278,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			destroyOnWallContact: true,
-			destroyOnEnemyContact: true
+			destroyOnEnemyContact: true,
 		},
 		sound: 'sound-fireball',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 400,
 		damageMultiplier: 0.2,
 		flavorText: `A blade of arcane power.`,
-		icon: ['icon-abilities', 1]
+		icon: ['icon-abilities', 1],
 	},
 	[AbilityType.FIRE_CONE]: {
 		projectiles: 12,
@@ -302,14 +304,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 			destroyOnWallContact: false,
 			destroyOnEnemyContact: false,
 			explodeOnDestruction: false,
-			passThroughEnemies: true
+			passThroughEnemies: true,
 		},
 		sound: 'sound-fireball',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 1500,
 		damageMultiplier: 0.2,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
-		icon: ['icon-abilities', 0]
+		icon: ['icon-abilities', 0],
 	},
 	[AbilityType.ARCANE_CONE]: {
 		projectiles: 12,
@@ -332,11 +334,11 @@ export const Abilities: {[type: string]: AbilityData} = {
 			knockback: 100,
 		},
 		sound: 'sound-fireball',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 1500,
 		damageMultiplier: 0.15,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
-		icon: ['icon-abilities', 0]
+		icon: ['icon-abilities', 0],
 	},
 	[AbilityType.ICE_CONE]: {
 		projectiles: 12,
@@ -357,14 +359,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 			explodeOnDestruction: false,
 			passThroughEnemies: true,
 			knockback: 100,
-			shape: 'cone'
+			shape: 'cone',
 		},
 		sound: 'sound-icespike',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 1500,
 		damageMultiplier: 0.15,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
-		icon: ['icon-abilities', 1]
+		icon: ['icon-abilities', 1],
 	},
 	[AbilityType.ICE_NOVA]: {
 		projectiles: 36,
@@ -385,14 +387,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 			destroyOnEnemyContact: false,
 			explodeOnDestruction: false,
 			passThroughEnemies: true,
-			shape: 'nova'
+			shape: 'nova',
 		},
 		sound: 'sound-icespike',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 1500,
 		damageMultiplier: 0.15,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
-		icon: ['icon-abilities', 1]
+		icon: ['icon-abilities', 1],
 	},
 	[AbilityType.FIRE_NOVA]: {
 		projectiles: 36,
@@ -411,14 +413,14 @@ export const Abilities: {[type: string]: AbilityData} = {
 			destroyOnWallContact: false,
 			destroyOnEnemyContact: false,
 			explodeOnDestruction: false,
-			passThroughEnemies: true
+			passThroughEnemies: true,
 		},
 		sound: 'sound-fireball',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 1500,
 		damageMultiplier: 0.25,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
-		icon: ['icon-abilities', 0]
+		icon: ['icon-abilities', 0],
 	},
 	[AbilityType.ARCANE_NOVA]: {
 		projectiles: 36,
@@ -441,10 +443,31 @@ export const Abilities: {[type: string]: AbilityData} = {
 			knockback: 100,
 		},
 		sound: 'sound-fireball',
-		sfxVolume: 0.10,
+		sfxVolume: 0.1,
 		cooldownMs: 1500,
 		damageMultiplier: 0.15,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
-		icon: ['icon-abilities', 0]
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.NECROTIC_BOLT]: {
+		projectiles: 1,
+		projectileData: {
+			velocity: 300,
+			xOffset: 0,
+			yOffset: 0,
+			effect: NecroticBoltEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			explodeOnDestruction: true,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.1,
+		cooldownMs: 250,
+		damageMultiplier: 1,
+		stun: 3000,
+		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
+		icon: ['icon-abilities', 0],
 	},
 };

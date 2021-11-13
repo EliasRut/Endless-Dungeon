@@ -1,5 +1,9 @@
 import { Facings, UiDepths } from '../../helpers/constants';
-import { getFacing8Dir, getRotationInRadiansForFacing, getVelocitiesForFacing } from '../../helpers/movement';
+import {
+	getFacing8Dir,
+	getRotationInRadiansForFacing,
+	getVelocitiesForFacing,
+} from '../../helpers/movement';
 import { ProjectileData } from '../../abilities/abilityData';
 import TargetingEffect from './TargetingEffect';
 
@@ -16,8 +20,15 @@ export default class IceSpikeEffect extends TargetingEffect {
 	spikeEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	wasStuckToEnemy: boolean = false;
 	stuckEnemy?: Phaser.Physics.Arcade.Body;
-	stuckEnemyOffset?: {x: number, y: number};
-	constructor(scene: Phaser.Scene, x: number, y: number, spriteName: string, facing: Facings, projectileData: ProjectileData) {
+	stuckEnemyOffset?: { x: number; y: number };
+	constructor(
+		scene: Phaser.Scene,
+		x: number,
+		y: number,
+		spriteName: string,
+		facing: Facings,
+		projectileData: ProjectileData
+	) {
 		super(scene, x, y, 'ice', facing, projectileData);
 		this.setScale(SPRITE_SCALE * (projectileData.spriteScale || 1));
 		this.setRotation(getRotationInRadiansForFacing(facing));
@@ -37,16 +48,16 @@ export default class IceSpikeEffect extends TargetingEffect {
 			// scale: { start: 0.3, end: 0.05 },
 			scale: { start: 0.4 * (projectileData.effectScale || 1), end: 0.1 },
 			// tint: 0x3366ff,//{ start: 0xff945e, end: 0x660000 }, //0x663300
-			speed: {min: 60, max: 100},
+			speed: { min: 60, max: 100 },
 			// accelerationY: -300,
 			angle: { min: -180, max: 180 },
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 400, max: 600 },
 			frequency: 10,
 			// blendMode: Phaser.BlendModes.ADD,
-			maxParticles: (projectileData.shape === 'cone' || projectileData.shape === 'nova') ? 20 : 200,
+			maxParticles: projectileData.shape === 'cone' || projectileData.shape === 'nova' ? 20 : 200,
 			x: PARTICLE_START_X_OFFSET * facingVectors.x,
-			y: PARTICLE_START_Y_OFFSET * facingVectors.y
+			y: PARTICLE_START_Y_OFFSET * facingVectors.y,
 		});
 
 		const iceParticles = scene.add.particles('ice');
@@ -54,13 +65,13 @@ export default class IceSpikeEffect extends TargetingEffect {
 		this.spikeEmitter = iceParticles.createEmitter({
 			alpha: { start: 1, end: 0.4 },
 			scale: { start: 0.4 * (projectileData.effectScale || 1), end: 0 },
-			speed: {min: 60, max: 100},
+			speed: { min: 60, max: 100 },
 			angle: { min: -180, max: 180 },
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 400, max: 600 },
 			frequency: 1,
 			blendMode: Phaser.BlendModes.ADD,
-			maxParticles: (projectileData.shape === 'cone' || projectileData.shape === 'nova') ? 20 : 200,
+			maxParticles: projectileData.shape === 'cone' || projectileData.shape === 'nova' ? 20 : 200,
 			x: PARTICLE_START_X_OFFSET * facingVectors.x,
 			y: PARTICLE_START_Y_OFFSET * facingVectors.y,
 		});
@@ -80,24 +91,24 @@ export default class IceSpikeEffect extends TargetingEffect {
 		this.stuckEnemy = enemy.body as Phaser.Physics.Arcade.Body;
 		this.stuckEnemyOffset = {
 			x: this.stuckEnemy.position.x - this.body.x,
-			y: this.stuckEnemy.position.y - this.body.y
+			y: this.stuckEnemy.position.y - this.body.y,
 		};
 	}
 
 	// tslint:disable: no-magic-numbers
 	destroy() {
-		this.snowEmitter.setEmitterAngle({min: -180, max: 180});
-		this.snowEmitter.setSpeed({min:10, max: 40});
+		this.snowEmitter.setEmitterAngle({ min: -180, max: 180 });
+		this.snowEmitter.setSpeed({ min: 10, max: 40 });
 		this.snowEmitter.explode(100, this.body.x, this.body.y);
 		setTimeout(() => {
-			this.snowEmitter.setSpeed({min: 15, max: 40});
+			this.snowEmitter.setSpeed({ min: 15, max: 40 });
 			this.snowEmitter.setFrequency(80);
 			this.snowEmitter.setLifespan(700);
 			this.spikeEmitter.start();
 		}, 0);
 		this.spikeEmitter.stopFollow();
-		this.spikeEmitter.setEmitterAngle({min: -180, max: 180});
-		this.spikeEmitter.setSpeed({min:10, max: 40});
+		this.spikeEmitter.setEmitterAngle({ min: -180, max: 180 });
+		this.spikeEmitter.setSpeed({ min: 10, max: 40 });
 		this.spikeEmitter.explode(10, this.body.x, this.body.y);
 		this.body.stop();
 		this.body.destroy();
@@ -118,8 +129,9 @@ export default class IceSpikeEffect extends TargetingEffect {
 		super.update(time);
 
 		if (this.body.velocity.x || this.body.velocity.y) {
-			this.setRotation(getRotationInRadiansForFacing(getFacing8Dir(
-				this.body.velocity.x, this.body.velocity.y)));
+			this.setRotation(
+				getRotationInRadiansForFacing(getFacing8Dir(this.body.velocity.x, this.body.velocity.y))
+			);
 		}
 		if (time - this.castTime > VISIBILITY_DELAY && !this.isStarted) {
 			this.snowEmitter.startFollow(this.body.gameObject);

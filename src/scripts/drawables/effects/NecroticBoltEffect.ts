@@ -12,7 +12,7 @@ const RED_MIN = 0xcc0000;
 const RED_DIFF = 0x010000;
 const GREEN_DIFF = 0x000100;
 
-export default class FireBallEffect extends TargetingEffect {
+export default class NecroticBoltEffect extends TargetingEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	constructor(
 		scene: Phaser.Scene,
@@ -36,18 +36,8 @@ export default class FireBallEffect extends TargetingEffect {
 			speed: 20,
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 200, max: 400 },
-			// blendMode: Phaser.BlendModes.ADD,
-			tint: {
-				onEmit: (particle) => {
-					return (
-						RED_MIN +
-						RED_DIFF * Math.floor(Math.random() * 51) +
-						GREEN_DIFF * 228 +
-						Math.floor(Math.random() * 24) +
-						Math.floor(128 + Math.random() * 127)
-					); // + 128;
-				},
-			},
+			blendMode: Phaser.BlendModes.ADD,
+			tint: 0x00ff00,
 			frequency: 20,
 			maxParticles: 100,
 		});
