@@ -88,8 +88,7 @@ export default abstract class EnemyToken extends CharacterToken {
 		// set aggro boolean, use a linger time for aggro
 		if (this.lastUpdate <= time) {
 			const player = globalState.playerCharacter;
-			const distance = this.getDistance(player.x, player.y);
-			if (distance < this.stateObject.vision && this.checkLoS()) {
+			if (this.checkLoS() && this.getDistance(player.x, player.y) < this.stateObject.vision) {
 				this.aggro = true;
 				this.lastUpdate = time;
 				this.target.x = player.x;
