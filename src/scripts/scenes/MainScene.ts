@@ -91,8 +91,8 @@ export default class MainScene extends Phaser.Scene {
 		settingsIcon: SettingsIcon;
 	};
 
-	wasIPressed: boolean=false;
-	wasEscPressed: boolean=false;
+	wasIPressed: boolean = false;
+	wasEscPressed: boolean = false;
 
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
@@ -112,8 +112,9 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	// If nothing is found, we default to desktop
-	isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-		.test(navigator?.userAgent || '');
+	isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+		navigator?.userAgent || ''
+	);
 
 	create() {
 		this.input.addPointer(2);
@@ -140,7 +141,8 @@ export default class MainScene extends Phaser.Scene {
 		this.mainCharacter = new PlayerCharacterToken(
 			this,
 			globalState.playerCharacter.x || startX,
-			globalState.playerCharacter.y || startY);
+			globalState.playerCharacter.y || startY
+		);
 		this.mainCharacter.setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.cameras.main.startFollow(this.mainCharacter, false);
 		this.physics.add.collider(this.mainCharacter, this.tileLayer);
@@ -157,7 +159,7 @@ export default class MainScene extends Phaser.Scene {
 		this.fpsText = new FpsText(this);
 		this.icons = {
 			backpackIcon: new BackpackIcon(this),
-			settingsIcon: new SettingsIcon(this)
+			settingsIcon: new SettingsIcon(this),
 		};
 		if (globalState.currentLevel.startsWith('dungeonLevel')) {
 			this.levelName = new LevelName(this);
@@ -182,10 +184,7 @@ export default class MainScene extends Phaser.Scene {
 			this.mobilePadStick.setScrollFactor(0);
 			this.mobilePadStick.setDepth(UiDepths.UI_STICK_LAYER);
 
-			const hitArea = new Phaser.Geom.Circle(
-				70,
-				70,
-				70);
+			const hitArea = new Phaser.Geom.Circle(70, 70, 70);
 			this.mobilePadBackgorund.setInteractive(hitArea, Phaser.Geom.Circle.Contains);
 			this.mobilePadBackgorund.on('pointerup', (event: any) => {
 				this.mobilePadStick!.x = this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET;
@@ -200,16 +199,12 @@ export default class MainScene extends Phaser.Scene {
 
 				this.mobilePadStick!.x = Math.min(
 					this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET + 60,
-					Math.max(
-						this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET - 60,
-						event.position.x
-					));
+					Math.max(this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET - 60, event.position.x)
+				);
 				this.mobilePadStick!.y = Math.min(
 					this.cameras.main.height / 2 + 60,
-					Math.max(
-						this.cameras.main.height / 2 - 60,
-						event.position.y
-					));
+					Math.max(this.cameras.main.height / 2 - 60, event.position.y)
+				);
 			});
 			this.mobilePadBackgorund.on('pointerover', (_: any, event: any) => {
 				if (!event.isDown) {
@@ -220,16 +215,12 @@ export default class MainScene extends Phaser.Scene {
 
 				this.mobilePadStick!.x = Math.min(
 					this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET + 60,
-					Math.max(
-						this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET - 60,
-						event.position.x
-					));
+					Math.max(this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET - 60, event.position.x)
+				);
 				this.mobilePadStick!.y = Math.min(
 					this.cameras.main.height / 2 + 60,
-					Math.max(
-						this.cameras.main.height / 2 - 60,
-						event.position.y
-					));
+					Math.max(this.cameras.main.height / 2 - 60, event.position.y)
+				);
 			});
 			this.add.existing(this.mobilePadStick);
 		}
@@ -239,7 +230,7 @@ export default class MainScene extends Phaser.Scene {
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
 			dialogScreen: new DialogScreen(this),
-			settingsScreen: new SettingsScreen(this)
+			settingsScreen: new SettingsScreen(this),
 		};
 
 		this.icons.backpackIcon.setScreens();
@@ -253,7 +244,7 @@ export default class MainScene extends Phaser.Scene {
 		if (globalState.currentLevel === 'town') {
 			this.sound.play('score-town', { volume: 0.05, loop: true });
 		} else {
-			this.sound.play('score-dungeon', {volume: 0.08, loop: true});
+			this.sound.play('score-dungeon', { volume: 0.08, loop: true });
 		}
 
 		if (globalState.inventory.unequippedItemList.length === 0) {
@@ -264,76 +255,87 @@ export default class MainScene extends Phaser.Scene {
 				ringWeight: 0,
 				amuletWeight: 0,
 			};
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				sourceWeight: 1,
-				sourceTypes: [Source.FIRE]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				sourceWeight: 1,
-				sourceTypes: [Source.ICE]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				sourceWeight: 1,
-				sourceTypes: [Source.FORCE]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				sourceWeight: 1,
-				sourceTypes: [Source.NECROTIC]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				catalystWeight: 1,
-				catalystTypes: [Catalyst.NOVA]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				catalystWeight: 1,
-				catalystTypes: [Catalyst.CONE]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				catalystWeight: 1,
-				catalystTypes: [Catalyst.STORM]
-			}));
-			this.overlayScreens.inventory.addToInventory(generateRandomItem({
-				...zeroWeights,
-				catalystWeight: 1,
-				catalystTypes: [Catalyst.SUMMON]
-			}));
+			this.overlayScreens.inventory.addToInventory(
+				generateRandomItem({
+					...zeroWeights,
+					sourceWeight: 1,
+					sourceTypes: [Source.FIRE],
+				})
+			);
+			this.overlayScreens.inventory.addToInventory(
+				generateRandomItem({
+					...zeroWeights,
+					sourceWeight: 1,
+					sourceTypes: [Source.ICE],
+				})
+			);
+			this.overlayScreens.inventory.addToInventory(
+				generateRandomItem({
+					...zeroWeights,
+					sourceWeight: 1,
+					sourceTypes: [Source.FORCE],
+				})
+			);
+			this.overlayScreens.inventory.addToInventory(
+				generateRandomItem({
+					...zeroWeights,
+					sourceWeight: 1,
+					sourceTypes: [Source.NECROTIC],
+				})
+			);
+			this.overlayScreens.inventory.addToInventory(
+				generateRandomItem({
+					...zeroWeights,
+					catalystWeight: 1,
+					catalystTypes: [Catalyst.NOVA],
+				})
+			);
+			this.overlayScreens.inventory.addToInventory(
+				generateRandomItem({
+					...zeroWeights,
+					catalystWeight: 1,
+					catalystTypes: [Catalyst.CONE],
+				})
+			);
+			this.overlayScreens.inventory.addToInventory(
+				generateRandomItem({
+					...zeroWeights,
+					catalystWeight: 1,
+					catalystTypes: [Catalyst.STORM],
+				})
+			);
+			this.overlayScreens.inventory.addToInventory(
+				generateRandomItem({
+					...zeroWeights,
+					catalystWeight: 1,
+					catalystTypes: [Catalyst.SUMMON],
+				})
+			);
 		}
 	}
 
 	addNpc(
-			id: string,
-			type: string,
-			x: number,
-			y: number,
-			level: number,
-			facingX: number,
-			facingY: number,
-			options?: NpcOptions
-		) {
+		id: string,
+		type: string,
+		x: number,
+		y: number,
+		level: number,
+		facingX: number,
+		facingY: number,
+		options?: NpcOptions
+	) {
 		const npc = spawnNpc(this, type, id, x, y, level, options);
 		this.npcMap[id] = npc;
 		if (globalState.npcs[id]) {
 			const facing = getFacing8Dir(facingX, facingY);
-			const animation = updateMovingState(
-				globalState.npcs[id],
-				false,
-				facing,
-				true
-			);
+			const animation = updateMovingState(globalState.npcs[id], false, facing, true);
 			if (animation) {
 				npc.play(animation);
 			}
 		}
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		Object.entries(this.npcMap).forEach(([key, value]) => {
-				this.physics.add.collider(this.npcMap[id], value);
+			this.physics.add.collider(this.npcMap[id], value);
 		});
 		this.physics.add.collider(this.npcMap[id], this.tileLayer, () => {
 			npc.onCollide(false);
@@ -356,7 +358,7 @@ export default class MainScene extends Phaser.Scene {
 				type,
 				x,
 				y,
-				open
+				open,
 			};
 		}
 		this.doorMap[id] = new DoorToken(this, x, y, type, id);
@@ -373,7 +375,7 @@ export default class MainScene extends Phaser.Scene {
 			x, // - DEBUG__ITEM_OFFSET_X,
 			y, // - DEBUG__ITEM_OFFSET_Y,
 			{
-				...(fixedItems as { [id: string]: Partial<Item> })[id]
+				...(fixedItems as { [id: string]: Partial<Item> })[id],
 			} as Item
 		);
 	}
@@ -392,19 +394,9 @@ export default class MainScene extends Phaser.Scene {
 			throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
 		}
 
-		const {
-			startPositionX,
-			startPositionY,
-			npcs,
-			doors,
-			items
-		} = dungeonLevel;
+		const { startPositionX, startPositionY, npcs, doors, items } = dungeonLevel;
 
-		const [
-			tileLayer,
-			decorationLayer,
-			overlayLayer,
-		] = generateTilemap(this, dungeonLevel);
+		const [tileLayer, decorationLayer, overlayLayer] = generateTilemap(this, dungeonLevel);
 
 		this.tileLayer = tileLayer;
 		this.decorationLayer = decorationLayer;
@@ -427,8 +419,9 @@ export default class MainScene extends Phaser.Scene {
 				{
 					script: npc.script,
 					questGiverId: npc.questGiverId,
-					traderId: npc.traderId
-				});
+					traderId: npc.traderId,
+				}
+			);
 		});
 		// this.addNpc(
 		// 	"lichking",
@@ -460,17 +453,15 @@ export default class MainScene extends Phaser.Scene {
 		let usedStartPositionY = startPositionY;
 		if (transitionCoordinates) {
 			const targetRoom = globalState.dungeon.levels[globalState.currentLevel]?.rooms.find(
-				(room) => room.roomName === transitionCoordinates.targetRoom);
+				(room) => room.roomName === transitionCoordinates.targetRoom
+			);
 			if (targetRoom) {
 				usedStartPositionX = (targetRoom.x + transitionCoordinates.targetX) * TILE_WIDTH;
 				usedStartPositionY = (targetRoom.y + transitionCoordinates.targetY) * TILE_HEIGHT;
 			}
 		}
 
-		return [
-			usedStartPositionX,
-			usedStartPositionY
-		];
+		return [usedStartPositionX, usedStartPositionY];
 	}
 
 	renderDebugGraphics() {
@@ -479,7 +470,7 @@ export default class MainScene extends Phaser.Scene {
 		this.tileLayer.renderDebug(debugGraphics, {
 			tileColor: null, // Color of non-colliding tiles
 			collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255),
-			faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+			faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Color of colliding face edges
 		});
 		// tslint:enable: no-magic-numbers
 	}
@@ -496,23 +487,21 @@ export default class MainScene extends Phaser.Scene {
 			location.reload();
 		}
 		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visiblity)) {
-			if (this.wasIPressed=== false){
+			if (this.wasIPressed === false) {
 				this.icons.backpackIcon.toggleScreen();
 				this.overlayScreens.inventory.interactInventory('pressed', globalTime);
 			}
-			this.wasIPressed=true;
-
+			this.wasIPressed = true;
 		} else {
-			this.wasIPressed=false;
+			this.wasIPressed = false;
 		}
 		if (this.keyboardHelper.isSettingsPressed()) {
-			if (this.wasEscPressed=== false){
+			if (this.wasEscPressed === false) {
 				this.icons.settingsIcon.toggleScreen();
 			}
-			this.wasEscPressed=true;
-
+			this.wasEscPressed = true;
 		} else {
-			this.wasEscPressed=false;
+			this.wasEscPressed = false;
 		}
 
 		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
@@ -533,45 +522,40 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayScreens.statScreen.update();
 
 		if (this.isPaused) {
-			if(this.icons.backpackIcon.screens[0].visiblity)
-			this.overlayScreens.inventory.interactInventory(
-				this.keyboardHelper.getInventoryKeyPress(),
-				globalTime);
+			if (this.icons.backpackIcon.screens[0].visiblity)
+				this.overlayScreens.inventory.interactInventory(
+					this.keyboardHelper.getInventoryKeyPress(),
+					globalTime
+				);
 			return;
 		}
 
-		Object.values(this.npcMap).forEach((curNpc) => {
-			curNpc.update(globalTime);
-		});
 		if (!this.blockUserInteraction) {
-			if(globalState.playerCharacter.stunned === true) return;
+			if (globalState.playerCharacter.stunned === true) return;
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalTime);
 			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
 
 			const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
-				this.mobilePadStick ? (this.mobilePadStick.x - this.mobilePadBackgorund!.x) : 0,
-				this.mobilePadStick ? (this.mobilePadStick.y - this.mobilePadBackgorund!.y) : 0
+				this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackgorund!.x : 0,
+				this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackgorund!.y : 0
 			);
 			const newFacing = getFacing8Dir(xFacing, yFacing);
 
-			const hasMoved = isCasting ? false : (xFacing !== 0 || yFacing !== 0);
-			const playerAnimation = updateMovingState(
-				globalState.playerCharacter,
-				hasMoved,
-				newFacing);
-			const isWalking = this.mobilePadStick ?
-				(Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40
-					&& Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40) :
-				false;
+			const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
+			const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
+			const isWalking = this.mobilePadStick
+				? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
+				  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
+				: false;
 			if (playerAnimation) {
 				this.mainCharacter.play({
 					key: playerAnimation,
-					frameRate: globalState.playerCharacter.movementSpeed / (isWalking ? 20 : 10)
+					frameRate: globalState.playerCharacter.movementSpeed / (isWalking ? 20 : 10),
 				});
 			}
 			if (hasMoved) {
 				const shouldPlayLeftStepSfx =
-					!this.lastStepLeft || (globalTime - this.lastStepLeft) > STEP_SOUND_TIME;
+					!this.lastStepLeft || globalTime - this.lastStepLeft > STEP_SOUND_TIME;
 
 				if (shouldPlayLeftStepSfx) {
 					this.sound.play('sound-step-grass-l', { volume: 0.25 });
@@ -589,7 +573,6 @@ export default class MainScene extends Phaser.Scene {
 
 			this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
 			this.mainCharacter.body.velocity.normalize().scale(speed);
-
 		}
 		globalState.playerCharacter.x = Math.round(this.mainCharacter.x);
 		globalState.playerCharacter.y = Math.round(this.mainCharacter.y);
@@ -606,6 +589,11 @@ export default class MainScene extends Phaser.Scene {
 			this.dynamicLightingHelper.updateDynamicLighting();
 		}
 
+		// Updated npcs
+		Object.values(this.npcMap).forEach((curNpc) => {
+			curNpc.update(globalTime);
+		});
+
 		// TODO: remove items that are picked up
 		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);
 		this.worldItems.forEach((item) => {
@@ -621,10 +609,10 @@ export default class MainScene extends Phaser.Scene {
 		const playerX = globalState.playerCharacter.x;
 		const playerY = globalState.playerCharacter.y;
 		connections.forEach((connection) => {
-
-			if (Math.hypot(
-				connection.x - playerX,
-				connection.y - playerY) < CONNECTION_POINT_THRESHOLD_DISTANCE) {
+			if (
+				Math.hypot(connection.x - playerX, connection.y - playerY) <
+				CONNECTION_POINT_THRESHOLD_DISTANCE
+			) {
 				globalState.playerCharacter.x = 0;
 				globalState.playerCharacter.y = 0;
 				if (connection.targetMap) {
@@ -632,7 +620,7 @@ export default class MainScene extends Phaser.Scene {
 						globalState.transitionStack[connection.targetMap] = {
 							targetRoom: connection.targetRoom,
 							targetX: connection.targetX || 0,
-							targetY: connection.targetY || 0
+							targetY: connection.targetY || 0,
 						};
 					}
 					globalState.currentLevel = connection.targetMap;
@@ -642,6 +630,29 @@ export default class MainScene extends Phaser.Scene {
 				}
 			}
 		});
+
+		// Set parts of the overlay layer transparent if the character is behind it
+		this.overlayLayer.forEachTile((tile) => (tile.alpha = 1));
+		const overlayTile = this.overlayLayer.getTileAtWorldXY(playerX, playerY);
+		if (overlayTile) {
+			const overlayTiles = [
+				overlayTile,
+				this.overlayLayer.getTileAtWorldXY(playerX - 16, playerY - 16),
+				this.overlayLayer.getTileAtWorldXY(playerX, playerY - 16),
+				this.overlayLayer.getTileAtWorldXY(playerX + 16, playerY - 16),
+				this.overlayLayer.getTileAtWorldXY(playerX - 16, playerY),
+				this.overlayLayer.getTileAtWorldXY(playerX + 16, playerY),
+				this.overlayLayer.getTileAtWorldXY(playerX - 16, playerY + 16),
+				this.overlayLayer.getTileAtWorldXY(playerX, playerY + 16),
+				this.overlayLayer.getTileAtWorldXY(playerX + 16, playerY + 16),
+			];
+
+			for (const currentTile of overlayTiles) {
+				if (currentTile) {
+					currentTile.alpha = 0.4;
+				}
+			}
+		}
 
 		// tslint:disable-next-line: no-magic-numbers
 		if (Date.now() - this.lastSave > 10 * 1000) {

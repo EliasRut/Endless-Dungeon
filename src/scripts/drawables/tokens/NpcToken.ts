@@ -20,14 +20,14 @@ export default class NpcToken extends CharacterToken {
 	openQuestSymbol?: Phaser.GameObjects.Image;
 
 	constructor(
-			scene: Phaser.Scene,
-			x: number,
-			y: number,
-			type: string,
-			id: string,
-			options?: NpcOptions
-		) {
-		super(scene, x, y, 'empty-tile', type, id);
+		scene: Phaser.Scene,
+		x: number,
+		y: number,
+		type: string,
+		id: string,
+		options?: NpcOptions
+	) {
+		super(scene, x, y, type, type, id);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 
@@ -36,11 +36,7 @@ export default class NpcToken extends CharacterToken {
 		this.questGiverId = options?.questGiverId;
 		this.traderId = options?.traderId;
 
-		globalState.npcs[id] = new Character(
-			type,
-			NPC_DAMAGE,
-			NPC_HEALTH,
-			NPC_SPEED);
+		globalState.npcs[id] = new Character(type, NPC_DAMAGE, NPC_HEALTH, NPC_SPEED);
 
 		this.play(`${type}-idle-s`);
 		this.faction = Faction.NPCS;
@@ -69,7 +65,7 @@ export default class NpcToken extends CharacterToken {
 						globalState.quests[nextQuestId] = {
 							questFinished: false,
 							questGiverId: this.questGiverId,
-							states: {}
+							states: {},
 						};
 						mainScene.scriptHelper.loadScript(loadQuestScript(nextQuestId));
 					}

@@ -33,11 +33,7 @@ export default abstract class EnemyToken extends CharacterToken {
 		super(scene, x, y, tokenName, tokenName, id);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
-		this.stateObject = new Enemy(
-			tokenName,
-			ENEMY_DAMAGE,
-			ENEMY_HEALTH,
-			ENEMY_SPEED);
+		this.stateObject = new Enemy(tokenName, ENEMY_DAMAGE, ENEMY_HEALTH, ENEMY_SPEED);
 		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 		this.tokenName = tokenName;
 		this.target = new Phaser.Geom.Point(0, 0);
@@ -48,16 +44,16 @@ export default abstract class EnemyToken extends CharacterToken {
 		// Instead of ray tracing we're using the players line of sight calculation, which tints the
 		// tile the enemy stands on.
 		const tile = this.getOccupiedTile();
-		return tile && tile.tint !== VISITED_TILE_TINT && tile.tint > 0;
+		return tile && tile.tint > VISITED_TILE_TINT;
 	}
 
 	dropRandomItem(level: number = 1) {
-		if(this.scene === undefined) {
+		if (this.scene === undefined) {
 			// TODO find out when this happens
 			return;
 		}
 
-		this.scene.dropItem(this.x, this.y, generateRandomItem({level}));
+		this.scene.dropItem(this.x, this.y, generateRandomItem({ level }));
 	}
 
 	dropFixedItem(id: string) {
@@ -82,21 +78,19 @@ export default abstract class EnemyToken extends CharacterToken {
 		const tile = this.getOccupiedTile();
 		if (tile) {
 			this.tint = tile.tint;
-			this.setVisible(tile.tint !== VISITED_TILE_TINT);
+			const isVisible = tile.tint > VISITED_TILE_TINT;
+			this.setVisible(isVisible);
 		}
 
 		// set aggro boolean, use a linger time for aggro
 		if (this.lastUpdate <= time) {
 			const player = globalState.playerCharacter;
-			const distance = this.getDistance(player.x, player.y);
-			if (distance < this.stateObject.vision && this.checkLoS()) {
+			if (this.checkLoS() && this.getDistance(player.x, player.y) < this.stateObject.vision) {
 				this.aggro = true;
 				this.lastUpdate = time;
 				this.target.x = player.x;
 				this.target.y = player.y;
-			}
-			else if(this.aggro
-				&& this.lastUpdate + this.aggroLinger < time){
+			} else if (this.aggro && this.lastUpdate + this.aggroLinger < time) {
 				this.aggro = false;
 			}
 		}
@@ -105,7 +99,7 @@ export default abstract class EnemyToken extends CharacterToken {
 	// destroy the enemy
 	destroy() {
 		if (this.scene?.npcMap) {
-			delete (this.scene.npcMap[this.id]);
+			delete this.scene.npcMap[this.id];
 		}
 
 		super.destroy();
