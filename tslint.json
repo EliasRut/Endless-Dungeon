@@ -20,7 +20,8 @@
 		"no-var-keyword": true,
 		"triple-equals": true,
 		"prefer-const": true,
-		"semicolon": [true, "always"]
+		"semicolon": [true, "always"],
+		"no-empty": false
 	},
 	"jsRules": {
 		"max-line-length": {
