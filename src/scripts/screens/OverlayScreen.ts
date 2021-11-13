@@ -117,4 +117,6 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 		this.toggleVisible();
 		this.visiblity = !this.visiblity;
 	}
+
+	update() {}
 }

@@ -99,6 +99,7 @@ export default class MainScene extends Phaser.Scene {
 
 	wasIPressed: boolean = false;
 	wasEscPressed: boolean = false;
+	wasJPressed: boolean = false;
 
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
@@ -513,13 +514,13 @@ export default class MainScene extends Phaser.Scene {
 		} else {
 			this.wasEscPressed = false;
 		}
-		if (this.keyboardHelper.isSettingsPressed()) {
-			if (this.wasEscPressed === false) {
+		if (this.keyboardHelper.isQuestsPressed()) {
+			if (this.wasJPressed === false) {
 				this.icons.questsIcon.toggleScreen();
 			}
-			this.wasEscPressed = true;
+			this.wasJPressed = true;
 		} else {
-			this.wasEscPressed = false;
+			this.wasJPressed = false;
 		}
 
 		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
