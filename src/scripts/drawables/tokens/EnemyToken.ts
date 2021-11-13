@@ -34,6 +34,7 @@ export default abstract class EnemyToken extends CharacterToken {
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.stateObject = new Enemy(tokenName, ENEMY_DAMAGE, ENEMY_HEALTH, ENEMY_SPEED);
+		globalState.enemies[id] = this.stateObject;
 		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 		this.tokenName = tokenName;
 		this.target = new Phaser.Geom.Point(0, 0);
