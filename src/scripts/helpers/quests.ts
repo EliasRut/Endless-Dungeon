@@ -50,6 +50,7 @@ export const Quests: { [name: string]: Quest } = {
 		description: 'Rescue Erwin from the zombies',
 		preconditions: {
 			hasItems: ['Wild Rune'],
+			dungeonLevelReached: 1,
 		},
 	},
 	theHunt: {
@@ -60,6 +61,7 @@ export const Quests: { [name: string]: Quest } = {
 		preconditions: {
 			previousQuests: ['theRescue'],
 			hasItems: ['Wild Rune', 'Death Rune'],
+			dungeonLevelReached: 1,
 		},
 	},
 };
