@@ -4,11 +4,16 @@ import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import firebase from 'firebase';
 import '../App.css';
 
 const showGame = true;
 
-export const NPCEditorScreen = () => {
+export interface NPCEditorScreenProps {
+	user: firebase.User;
+}
+
+export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
 	const phaserRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -20,95 +25,93 @@ export const NPCEditorScreen = () => {
 	return (
 		<PageContainer>
 			<NavigationWrapper>
-				<StyledLink to='/mapEditor'>Map Editor</StyledLink>
-				<StyledLink to='/npcEditor'>NPC Editor</StyledLink>
-				<StyledLink to='/game'>Game</StyledLink>
+				<StyledLink to="/mapEditor">Map Editor</StyledLink>
+				<StyledLink to="/npcEditor">NPC Editor</StyledLink>
+				<StyledLink to="/game">Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>
-				<MenueWrapper id='npcEditorMenu'>
+				<MenueWrapper id="npcEditorMenu">
 					<div>
 						<div>Load NPC:</div>
-						<Dropdown
-							id='npcDropdown'
-						>
+						<Dropdown id="npcDropdown">
 							<option>Loading...</option>
 						</Dropdown>
 						<ButtonWrapper>
-							<StyledButton id='loadNpcButton'>Load</StyledButton>
+							<StyledButton id="loadNpcButton">Load</StyledButton>
 						</ButtonWrapper>
 					</div>
 					<SelectionWrapper>
 						<InputWrapper>
 							<div>NPC Id</div>
-							<Input id='npcId' />
+							<Input id="npcId" />
 						</InputWrapper>
 						<InputWrapper>
 							<div>NPC Name</div>
-							<Input id='npcName' width={4} />
+							<Input id="npcName" width={4} />
 						</InputWrapper>
 						<InputWrapper>
 							<div>Body template</div>
-							<Dropdown id='bodyDropdown'>
-								<option value='body-1'>body-1</option>
+							<Dropdown id="bodyDropdown">
+								<option value="body-1">body-1</option>
 							</Dropdown>
 						</InputWrapper>
 						<InputWrapper>
 							<div>Hair template</div>
-							<Dropdown id='hairDropdown'>
-								<option value='hair-1'>hair-1</option>
-								<option value='hair-2'>hair-2</option>
+							<Dropdown id="hairDropdown">
+								<option value="hair-1">hair-1</option>
+								<option value="hair-2">hair-2</option>
 							</Dropdown>
 						</InputWrapper>
 						<InputWrapper>
 							<div>Shirt dropdown</div>
-							<Dropdown id='shirtDropdown'>
-								<option value='shirt-1'>shirt-1</option>
+							<Dropdown id="shirtDropdown">
+								<option value="shirt-1">shirt-1</option>
 							</Dropdown>
 						</InputWrapper>
 						<InputWrapper>
 							<div>Pants dropdown</div>
-							<Dropdown id='pantsDropdown'>
-								<option value='pants-1'>pants-1</option>
+							<Dropdown id="pantsDropdown">
+								<option value="pants-1">pants-1</option>
 							</Dropdown>
 						</InputWrapper>
 					</SelectionWrapper>
 					<ExportButtonWrapper>
-						<StyledButton id='exportButton'>Export</StyledButton>
+						<StyledButton id="exportButton">Export</StyledButton>
 					</ExportButtonWrapper>
 				</MenueWrapper>
 				<GameWrapper ref={phaserRef}></GameWrapper>
 				<ColorManagerWrapper>
 					<ColorSelectionWrapper>
 						<div>Body color</div>
-						<Input type='color' id='bodyColor' />
+						<Input type="color" id="bodyColor" />
 					</ColorSelectionWrapper>
 					<ColorSelectionWrapper>
 						<div>Eye color</div>
-						<Input type='color' id='eyeColor' />
+						<Input type="color" id="eyeColor" />
 					</ColorSelectionWrapper>
 					<ColorSelectionWrapper>
 						<div>Hair template</div>
-						<Input type='color' id='hairColor' />
+						<Input type="color" id="hairColor" />
 					</ColorSelectionWrapper>
 					<ColorSelectionWrapper>
 						<div>Shirt Color 1</div>
-						<Input type='color' id='shirtColor1' />
+						<Input type="color" id="shirtColor1" />
 					</ColorSelectionWrapper>
 					<ColorSelectionWrapper>
 						<div>Shirt Color 2</div>
-						<Input type='color' id='shirtColor2' />
+						<Input type="color" id="shirtColor2" />
 					</ColorSelectionWrapper>
 					<ColorSelectionWrapper>
 						<div>Pants Color</div>
-						<Input type='color' id='pantsColor' />
+						<Input type="color" id="pantsColor" />
 					</ColorSelectionWrapper>
 					<ColorSelectionWrapper>
 						<div>Shoes Color</div>
-						<Input type='color' id='shoesColor' />
+						<Input type="color" id="shoesColor" />
 					</ColorSelectionWrapper>
 				</ColorManagerWrapper>
 			</PageWrapper>
-			<DownloadAnker id='downloadAnchorElem'></DownloadAnker>
+			<DownloadAnker id="downloadAnchorElem"></DownloadAnker>
 		</PageContainer>
 	);
 };

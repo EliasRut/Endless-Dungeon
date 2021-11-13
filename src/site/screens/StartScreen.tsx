@@ -3,18 +3,26 @@ import React from 'react';
 import CenteredContainer from '../components/CenteredContainer';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import firebase from 'firebase';
 
-export const StartScreen = () => {
+export interface StartScreenProps {
+	auth: () => void;
+	user: firebase.User | null;
+}
+
+export const StartScreen = ({ auth, user }: StartScreenProps) => {
 	return (
 		<CenteredContainer>
-			<SiteHeader>Project <br/> Endless Dungeon</SiteHeader>
+			<SiteHeader>
+				Project <br /> Endless Dungeon
+			</SiteHeader>
 			<ButtonContainer>
-				<StyledButton
-					to='/game'
-				>Game</StyledButton>
-				<StyledButton
-					to='/mapEditor'
-				>Tools</StyledButton>
+				<StyledLinkButton to="/game">Game</StyledLinkButton>
+				{user ? (
+					<StyledLinkButton to="/mapEditor">Tools</StyledLinkButton>
+				) : (
+					<StyledButton onClick={auth}>Login</StyledButton>
+				)}
 			</ButtonContainer>
 		</CenteredContainer>
 	);
@@ -34,7 +42,21 @@ export const ButtonContainer = styled.div`
 	align-items: center;
 `;
 
-const StyledButton = styled(Link)`
+const StyledButton = styled.button`
+	font-family: 'munro';
+	font-size: 3rem;
+	padding: 6px 24px;
+	cursor: pointer;
+	text-decoration: none;
+	color: white;
+	border-style: solid;
+	border-radius: 0.5rem;
+	border-color: white;
+	box-shadow: 2px 2px 8px #c3c3c3;
+	background-color: #000;
+`;
+
+const StyledLinkButton = styled(Link)`
 	font-family: 'munro';
 	font-size: 3rem;
 	padding: 6px 24px;

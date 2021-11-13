@@ -4,11 +4,16 @@ import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import firebase from 'firebase';
 import '../App.css';
+
+export interface MapEditorScreenProps {
+	user: firebase.User;
+}
 
 const showGame = true;
 
-export const MapEditorScreen = () => {
+export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 	const phaserRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
