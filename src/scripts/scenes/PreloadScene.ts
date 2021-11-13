@@ -8,7 +8,7 @@ import {
 	ColorsOfMagic,
 	activeMode,
 	MODE,
-	NUM_COLORS_OF_MAGIC
+	NUM_COLORS_OF_MAGIC,
 } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
@@ -23,16 +23,20 @@ export default class PreloadScene extends Phaser.Scene {
 		super({ key: 'PreloadScene' });
 	}
 
-	neededAnimations = [{name: 'player',facingRange: FacingRange.ALL_DIRECTIONS}];
+	neededAnimations = [{ name: 'player', facingRange: FacingRange.ALL_DIRECTIONS }];
 
 	init() {
-		const text = new Phaser.GameObjects.Text(this,
+		const text = new Phaser.GameObjects.Text(
+			this,
 			this.cameras.main.centerX,
-			this.cameras.main.centerY, 'Loading ...', {
+			this.cameras.main.centerY,
+			'Loading ...',
+			{
 				fontFamily: 'munro',
 				color: 'white',
-				fontSize: '26px'
-			});
+				fontSize: '26px',
+			}
+		);
 		this.add.existing(text);
 	}
 
@@ -42,12 +46,16 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('search-icon', 'assets/img/search-icon.png');
 
 		// Player
-		this.load.spritesheet('player', 'assets/sprites/main-character.png',
-			{ frameWidth: 40, frameHeight: 40 });
+		this.load.spritesheet('player', 'assets/sprites/main-character.png', {
+			frameWidth: 40,
+			frameHeight: 40,
+		});
 
 		// Overlay screens
-		this.load.spritesheet('screen-background', 'assets/img/screen-background.png',
-			{ frameWidth: 64, frameHeight: 64 });
+		this.load.spritesheet('screen-background', 'assets/img/screen-background.png', {
+			frameWidth: 64,
+			frameHeight: 64,
+		});
 
 		// Ability effects
 		this.load.image('fire', 'assets/img/muzzleflash3.png');
@@ -63,7 +71,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('pad-background', 'assets/img/pad-background.png');
 		this.load.image('pad-stick', 'assets/img/pad-stick.png');
 		this.load.image('icon-backpack', 'assets/img/backpack-icon.png');
-		this.load.image('icon-settings', 'assets/img/settings-icon.png',);
+		this.load.image('icon-settings', 'assets/img/settings-icon.png');
 		this.load.image('icon-hero', 'assets/img/hero-icon.png');
 		this.load.image('icon-healthbar-background', 'assets/img/gui-healthbar.png');
 		this.load.image('ability-background-desktop', 'assets/img/ability-icon-background-desktop.png');
@@ -72,20 +80,28 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('icon-healthbar', 'assets/img/gui-life.png');
 		this.load.image('inventory-borders', 'assets/img/inventory-borders-tall.png');
 		this.load.image('inventory-selection', 'assets/img/inventory-selection.png');
-		this.load.spritesheet('icon-abilities', 'assets/img/abilities-sheet.png',
-			{ frameWidth: 20, frameHeight: 20 });
+		this.load.spritesheet('icon-abilities', 'assets/img/abilities-sheet.png', {
+			frameWidth: 20,
+			frameHeight: 20,
+		});
 
 		// Essences
-		this.load.spritesheet('items-essence', 'assets/sprites/items-essence.png',
-			{ frameWidth: 16, frameHeight: 16 });
+		this.load.spritesheet('items-essence', 'assets/sprites/items-essence.png', {
+			frameWidth: 16,
+			frameHeight: 16,
+		});
 
 		// Items
-		this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png',
-			{ frameWidth: 16, frameHeight: 16 });
+		this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png', {
+			frameWidth: 16,
+			frameHeight: 16,
+		});
 
 		// Doors
-		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png',
-			{ frameWidth: 48, frameHeight: 32 });
+		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png', {
+			frameWidth: 48,
+			frameHeight: 32,
+		});
 
 		// Dungeon Door
 		this.load.image('dungeon-door', 'assets/img/dungeon-door.png');
@@ -114,7 +130,10 @@ export default class PreloadScene extends Phaser.Scene {
 			if (!globalState.availableTilesets.includes(room.tileset)) {
 				globalState.availableTilesets.push(room.tileset);
 			}
-			if (room.decorationTileset && !globalState.availableTilesets.includes(room.decorationTileset)) {
+			if (
+				room.decorationTileset &&
+				!globalState.availableTilesets.includes(room.decorationTileset)
+			) {
 				globalState.availableTilesets.push(room.decorationTileset);
 			}
 			if (room.overlayTileset && !globalState.availableTilesets.includes(room.overlayTileset)) {
@@ -145,18 +164,19 @@ export default class PreloadScene extends Phaser.Scene {
 		requiredNpcs.forEach((npc) => {
 			this.neededAnimations.push({
 				name: npc,
-				facingRange: npcTypeToFileMap[npc]?.facing || FacingRange.ONLY_NESW
+				facingRange: npcTypeToFileMap[npc]?.facing || FacingRange.ONLY_NESW,
 			});
 		});
 	}
 
 	create() {
-		if (activeMode === MODE.MAP_EDITOR) {
-			this.scene.start('MapEditor');
-			return;
-		}
 		if (activeMode === MODE.NPC_EDITOR) {
 			this.scene.start('NpcEditor');
+			return;
+		}
+
+		if (activeMode === MODE.MAP_EDITOR) {
+			this.scene.start('MapEditor');
 			return;
 		}
 
@@ -177,38 +197,40 @@ export default class PreloadScene extends Phaser.Scene {
 						key: `${token.name}-idle-${directionName}`,
 						frames: this.anims.generateFrameNumbers(token.name, {
 							start: idleFrameOffset / token.facingRange,
-							end: idleFrameOffset / token.facingRange /* Currently only 1 drawn */
+							end: idleFrameOffset / token.facingRange /* Currently only 1 drawn */,
 						}),
 						frameRate: 5,
-						repeat: -1
+						repeat: -1,
 					});
 					this.anims.create({
 						key: `${token.name}-walk-${directionName}`,
 						frames: this.anims.generateFrameNumbers(token.name, {
 							start: walkFrameOffset / token.facingRange,
-							end: walkFrameOffset / token.facingRange + numWalkFrames - 1
+							end: walkFrameOffset / token.facingRange + numWalkFrames - 1,
 						}),
 						frameRate: 12,
-						repeat: -1
+						repeat: -1,
 					});
 					const attackNames = Object.keys(npcTypeToAttackFileMap[token.name] || {});
 					const directionFrameMultiplier = Math.floor(directionIndex / token.facingRange);
 					attackNames.forEach((attackName) => {
 						const attackData = npcTypeToAttackFileMap[token.name][attackName];
-						const startFrame = directionFrameMultiplier * attackData.framesPerDirection
-							+ (attackData.frameOffset || 0);
+						const startFrame =
+							directionFrameMultiplier * attackData.framesPerDirection +
+							(attackData.frameOffset || 0);
 						this.anims.create({
 							key: `${token.name}-${attackName}-${directionName}`,
 							frames: this.anims.generateFrameNumbers(`${token.name}-${attackName}`, {
 								start: startFrame,
-								end: startFrame + (
-									attackData.animationFrames
-									? attackData.animationFrames
-									: attackData.framesPerDirection)
-									- 1
+								end:
+									startFrame +
+									(attackData.animationFrames
+										? attackData.animationFrames
+										: attackData.framesPerDirection) -
+									1,
 							}),
 							frameRate: 16,
-							repeat: 0
+							repeat: 0,
 						});
 					});
 				}
@@ -221,22 +243,26 @@ export default class PreloadScene extends Phaser.Scene {
 				key: `essence-${name}`,
 				frames: this.anims.generateFrameNumbers('items-essence', {
 					start: index * NUM_COLORS_OF_MAGIC,
-					end: (index + 1) * NUM_COLORS_OF_MAGIC - 1
+					end: (index + 1) * NUM_COLORS_OF_MAGIC - 1,
 				}),
 				frameRate: 12,
-				repeat: -1
+				repeat: -1,
 			});
 		});
 
 		// Construct dungeon for this map
-		if (!globalState.dungeon.levels[globalState.currentLevel] &&
-			globalState.currentLevel.startsWith('dungeonLevel')) {
+		if (
+			!globalState.dungeon.levels[globalState.currentLevel] &&
+			globalState.currentLevel.startsWith('dungeonLevel')
+		) {
 			// Town is 0, "dungeonLevelx"s are their last character (that's a bit hacky)
 			// everything else is -1
-			const numericLevel = globalState.currentLevel === 'town' ? 0 :
-				globalState.currentLevel.startsWith('dungeonLevel') ?
-					parseInt(globalState.currentLevel.substr(-1), 10) :
-					-1;
+			const numericLevel =
+				globalState.currentLevel === 'town'
+					? 0
+					: globalState.currentLevel.startsWith('dungeonLevel')
+					? parseInt(globalState.currentLevel.substr(-1), 10)
+					: -1;
 
 			const levelData = globalState.roomAssignment[globalState.currentLevel];
 			const dungeonLevel = new DungeonGenerator().generateLevel(
@@ -250,14 +276,12 @@ export default class PreloadScene extends Phaser.Scene {
 					enemyBudget: levelData.enemyBudget || 0,
 					numberOfRooms: levelData.numberOfRooms || 0,
 					style: levelData.style || ColorsOfMagic.DEATH,
-					isDungeon: true
+					isDungeon: true,
 				}
 			);
 
 			globalState.dungeon.levels[globalState.currentLevel] = dungeonLevel;
-
 		} else if (!globalState.dungeon.levels[globalState.currentLevel]) {
-
 			// Town is 0, "dungeonLevelx"s are their last character (that's a bit hacky)
 			// everything else is -1
 			const numericLevel = globalState.currentLevel.startsWith('town') ? 0 : -1;
@@ -276,7 +300,7 @@ export default class PreloadScene extends Phaser.Scene {
 					enemyBudget: 0,
 					numberOfRooms: 1,
 					style: roomData.colorOfMagic || ColorsOfMagic.DEATH,
-					isDungeon: false
+					isDungeon: false,
 				}
 			);
 

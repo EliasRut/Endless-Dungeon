@@ -1,15 +1,18 @@
 import 'phaser';
-import {
-	TILE_WIDTH,
-	TILE_HEIGHT
-} from '../helpers/generateDungeon';
-import PositionText, { POSITION_TEXT_X_OFFSET, POSITION_TEXT_Y_OFFSET } from '../drawables/ui/PositionText';
+import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
+import PositionText, {
+	POSITION_TEXT_X_OFFSET,
+	POSITION_TEXT_Y_OFFSET,
+} from '../drawables/ui/PositionText';
 import globalState from '../worldstate';
 import firebase from 'firebase';
-import { DatabaseRoom, NpcPositioning, Room } from '../../../typings/custom';
+import { DatabaseRoom, ItemsPositioning, NpcPositioning, Room } from '../../../typings/custom';
 import { deserializeRoom } from '../helpers/serialization';
 import { spawnNpc } from '../helpers/spawn';
 import { UiDepths } from '../helpers/constants';
+import fixedItems from '../../items/fixedItems.json';
+import WorldItemToken from '../drawables/tokens/WorldItemToken';
+import Item from '../worldstate/Item';
 
 const MIN_ZOOM_LEVEL = 0.125;
 
@@ -31,7 +34,7 @@ const DEPTHS = {
 	overlayLayer: 4,
 	libraryBackgroundLayer: 4,
 	libraryTileLayer: 5,
-	libraryHighlighting: 6
+	libraryHighlighting: 6,
 };
 
 type MapLayout = number[][];
@@ -78,6 +81,8 @@ export default class MapEditor extends Phaser.Scene {
 	backgroundLibraryLayer: Phaser.Tilemaps.TilemapLayer;
 	npcLibraryLayer: Phaser.GameObjects.Group;
 	npcLibraryTokens: Phaser.GameObjects.Image[];
+	itemLibraryLayer: Phaser.GameObjects.Group;
+	itemLibraryTokens: Phaser.GameObjects.Image[];
 
 	highlightingX = 0;
 	highlightingY = 0;
@@ -85,8 +90,12 @@ export default class MapEditor extends Phaser.Scene {
 
 	selectedLibraryNpcIndex: number = 0;
 	selectedNpcTokenIndex: number = -1;
+	selectedLibraryItemIndex: number = 0;
+	selectedItemTokenIndex: number = -1;
 	npcTokens: Phaser.GameObjects.Image[];
 	npcs: NpcPositioning[];
+	itemTokens: Phaser.GameObjects.Image[];
+	items: ItemsPositioning[];
 
 	oneKey: Phaser.Input.Keyboard.Key;
 	twoKey: Phaser.Input.Keyboard.Key;
@@ -129,6 +138,14 @@ export default class MapEditor extends Phaser.Scene {
 	npcSaveButton: HTMLButtonElement;
 	npcDeleteButton: HTMLButtonElement;
 
+	// Item Details Dialog fields
+	itemTypeDropdownElement: HTMLSelectElement;
+	itemIdElement: HTMLInputElement;
+	itemXElement: HTMLInputElement;
+	itemYElement: HTMLInputElement;
+	itemSaveButton: HTMLButtonElement;
+	itemDeleteButton: HTMLButtonElement;
+
 	wasTKeyDown: boolean = false;
 	wasUndoDown: boolean = false;
 	wasZoomInDown: boolean = false;
@@ -150,19 +167,23 @@ export default class MapEditor extends Phaser.Scene {
 		this.mapEditorMenuElement = document.getElementById('mapEditorMenu') as HTMLDivElement;
 		this.roomsDropdownElement = document.getElementById('roomDropdown') as HTMLSelectElement;
 		this.tilesetDropdownElement = document.getElementById('tilesetDropdown') as HTMLSelectElement;
-		this.tilesetDecorationDropdownElement =
-			document.getElementById('tilesetDecorationDropdown') as HTMLSelectElement;
-		this.tilesetOverlayDropdownElement =
-			document.getElementById('tilesetOverlayDropdown') as HTMLSelectElement;
+		this.tilesetDecorationDropdownElement = document.getElementById(
+			'tilesetDecorationDropdown'
+		) as HTMLSelectElement;
+		this.tilesetOverlayDropdownElement = document.getElementById(
+			'tilesetOverlayDropdown'
+		) as HTMLSelectElement;
 		this.loadButtonElement = document.getElementById('loadRoomButton') as HTMLButtonElement;
-		this.loadFromAutosaveButtonElement =
-			document.getElementById('loadFromAutosaveRoomButton') as HTMLButtonElement;
+		this.loadFromAutosaveButtonElement = document.getElementById(
+			'loadFromAutosaveRoomButton'
+		) as HTMLButtonElement;
 		this.roomNameElement = document.getElementById('roomName') as HTMLInputElement;
 		this.roomHeightElement = document.getElementById('roomHeight') as HTMLInputElement;
 		this.roomWidthElement = document.getElementById('roomWidth') as HTMLInputElement;
 		this.exportButtonElement = document.getElementById('exportButton') as HTMLButtonElement;
-		this.activeLayerDropdownElement =
-			document.getElementById('activeLayerDropdown') as HTMLSelectElement;
+		this.activeLayerDropdownElement = document.getElementById(
+			'activeLayerDropdown'
+		) as HTMLSelectElement;
 
 		// Npc Details Dialog fields
 		this.npcTypeDropdownElement = document.getElementById('npcType') as HTMLSelectElement;
@@ -174,6 +195,16 @@ export default class MapEditor extends Phaser.Scene {
 		this.npcSaveButton.onclick = () => this.saveNpcToken();
 		this.npcDeleteButton = document.getElementById('npcDeleteButton') as HTMLButtonElement;
 		this.npcDeleteButton.onclick = () => this.deleteNpcToken();
+
+		// Item Details Dialog fields
+		this.itemTypeDropdownElement = document.getElementById('itemType') as HTMLSelectElement;
+		this.itemIdElement = document.getElementById('itemId') as HTMLInputElement;
+		this.itemXElement = document.getElementById('itemX') as HTMLInputElement;
+		this.itemYElement = document.getElementById('itemY') as HTMLInputElement;
+		this.itemSaveButton = document.getElementById('itemSaveButton') as HTMLButtonElement;
+		this.itemSaveButton.onclick = () => this.saveItemToken();
+		this.itemDeleteButton = document.getElementById('itemDeleteButton') as HTMLButtonElement;
+		this.itemDeleteButton.onclick = () => this.deleteItemToken();
 	}
 
 	populateFromDatabase(databaseSelectedRoom: DatabaseRoom) {
@@ -182,12 +213,12 @@ export default class MapEditor extends Phaser.Scene {
 		this.roomNameElement.value = selectedRoom.name;
 
 		this.tilesetDropdownElement.value = selectedRoom.tileset;
-		this.tilesetDecorationDropdownElement.value = selectedRoom.decorationTileset ?
-			selectedRoom.decorationTileset :
-			this.tilesetDecorationDropdownElement.options[0].value;
-		this.tilesetOverlayDropdownElement.value = selectedRoom.overlayTileset ?
-			selectedRoom.overlayTileset :
-			this.tilesetOverlayDropdownElement.options[0].value;
+		this.tilesetDecorationDropdownElement.value = selectedRoom.decorationTileset
+			? selectedRoom.decorationTileset
+			: this.tilesetDecorationDropdownElement.options[0].value;
+		this.tilesetOverlayDropdownElement.value = selectedRoom.overlayTileset
+			? selectedRoom.overlayTileset
+			: this.tilesetOverlayDropdownElement.options[0].value;
 
 		this.roomHeightElement.value = `${selectedRoom.layout.length}`;
 		this.roomWidthElement.value = `${selectedRoom.layout[0].length}`;
@@ -208,12 +239,10 @@ export default class MapEditor extends Phaser.Scene {
 		for (let y = 0; y < selectedRoom.layout.length; y++) {
 			for (let x = 0; x < selectedRoom.layout[y].length; x++) {
 				this.roomLayout[y][x] = selectedRoom.layout[y][x];
-				this.roomDecorationLayout[y][x] = selectedRoom.decorations ?
-					selectedRoom.decorations[y][x] :
-					0;
-				this.roomOverlayLayout[y][x] = selectedRoom.overlays ?
-					selectedRoom.overlays[y][x] :
-					0;
+				this.roomDecorationLayout[y][x] = selectedRoom.decorations
+					? selectedRoom.decorations[y][x]
+					: 0;
+				this.roomOverlayLayout[y][x] = selectedRoom.overlays ? selectedRoom.overlays[y][x] : 0;
 
 				const tile = this.tileLayer.getTileAt(x, y);
 				if (tile) {
@@ -242,7 +271,11 @@ export default class MapEditor extends Phaser.Scene {
 		this.mapEditorMenuElement.style.display = 'flex';
 
 		this.mapEditorHighlighting = new Phaser.GameObjects.Image(
-			this, 0, 0, 'map-editor-highlighting');
+			this,
+			0,
+			0,
+			'map-editor-highlighting'
+		);
 		this.mapEditorHighlighting.setDepth(DEPTHS.libraryHighlighting);
 		this.mapEditorHighlighting.setScrollFactor(0, 0);
 		this.mapEditorHighlighting.setOrigin(0);
@@ -337,7 +370,10 @@ export default class MapEditor extends Phaser.Scene {
 		this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R, false);
 		this.ctrlKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL, false);
 		this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT, false);
-		this.zoomOut = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.NUMPAD_SUBTRACT, false);
+		this.zoomOut = this.input.keyboard.addKey(
+			Phaser.Input.Keyboard.KeyCodes.NUMPAD_SUBTRACT,
+			false
+		);
 		this.zoomIn = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.NUMPAD_ADD, false);
 
 		this.loadFromAutosaveButtonElement.onclick = async () => {
@@ -394,7 +430,7 @@ export default class MapEditor extends Phaser.Scene {
 			token.setScrollFactor(0);
 			token.setDepth(100);
 			token.addListener('pointerdown', () => {
-				this.selectedLibraryNpcIndex = (index + 1);
+				this.selectedLibraryNpcIndex = index + 1;
 				this.mapEditorHighlighting.setPosition((index + 1) * 40, 0);
 			});
 			token.setInteractive();
@@ -405,14 +441,16 @@ export default class MapEditor extends Phaser.Scene {
 		this.add.existing(this.npcLibraryLayer);
 
 		this.addToHistory(true);
-
 	}
 
 	getTileLayerForName(layerName: string) {
 		switch (layerName) {
-			case 'decoration': return this.decorationTileLayer;
-			case 'overlay': return this.overlayTileLayer;
-			default: return this.tileLayer;
+			case 'decoration':
+				return this.decorationTileLayer;
+			case 'overlay':
+				return this.overlayTileLayer;
+			default:
+				return this.tileLayer;
 		}
 	}
 
@@ -422,9 +460,12 @@ export default class MapEditor extends Phaser.Scene {
 
 	getLayerValuesForName(layerName: string) {
 		switch (layerName) {
-			case 'decoration': return this.roomDecorationLayout;
-			case 'overlay': return this.roomOverlayLayout;
-			default: return this.roomLayout;
+			case 'decoration':
+				return this.roomDecorationLayout;
+			case 'overlay':
+				return this.roomOverlayLayout;
+			default:
+				return this.roomLayout;
 		}
 	}
 
@@ -482,7 +523,7 @@ export default class MapEditor extends Phaser.Scene {
 					}
 					const npcData = this.npcs[index];
 					this.showNpcDetailsDialog(npcData);
-					this.npcTokens.forEach((otherToken) => otherToken.tint = 0xffffff);
+					this.npcTokens.forEach((otherToken) => (otherToken.tint = 0xffffff));
 					npc.tint = 0xffcccc;
 					this.selectedNpcTokenIndex = index;
 				});
@@ -548,17 +589,17 @@ export default class MapEditor extends Phaser.Scene {
 			1
 		);
 		this.add.existing(npc);
-		npc.setAlpha(this.activeLayerDropdownElement.value === 'npcs' ? 1 : 0.7) ;
+		npc.setAlpha(this.activeLayerDropdownElement.value === 'npcs' ? 1 : 0.7);
 		npc.setDepth(DEPTHS.npcLayer);
 		this.npcTokens = [
 			...this.npcTokens.slice(0, this.selectedNpcTokenIndex),
 			npc,
-			...this.npcTokens.slice(this.selectedNpcTokenIndex + 1)
+			...this.npcTokens.slice(this.selectedNpcTokenIndex + 1),
 		];
 		this.npcs = [
 			...this.npcs.slice(0, this.selectedNpcTokenIndex),
 			npcPosition,
-			...this.npcs.slice(this.selectedNpcTokenIndex + 1)
+			...this.npcs.slice(this.selectedNpcTokenIndex + 1),
 		];
 
 		this.hideNpcDetailsDialog();
@@ -567,7 +608,7 @@ export default class MapEditor extends Phaser.Scene {
 
 	addNpc(x: number, y: number) {
 		const npcPosition: NpcPositioning = {
-			type: npcKeys[this.selectedLibraryNpcIndex -1],
+			type: npcKeys[this.selectedLibraryNpcIndex - 1],
 			id: `npc-${this.npcs.length}`,
 			level: '+0',
 			x,
@@ -594,6 +635,118 @@ export default class MapEditor extends Phaser.Scene {
 		this.drawRoom();
 	}
 
+	updateItemTokens() {
+		// Update items tokens transparency
+		const isItemLayerActive = this.activeLayerDropdownElement.value === 'items';
+		(this.itemTokens || []).forEach((item, index) => {
+			item.setAlpha(isItemLayerActive ? 1 : 0.7);
+			if (isItemLayerActive) {
+				item.on('pointerdown', () => {
+					if (this.selectedLibraryNpcIndex !== 0) {
+						return;
+					}
+					const itemData = this.items[index];
+					this.showItemDetailsDialog(itemData);
+					this.itemTokens.forEach((otherToken) => (otherToken.tint = 0xffffff));
+					item.tint = 0xffcccc;
+					this.selectedNpcTokenIndex = index;
+				});
+				item.setInteractive();
+			} else {
+				item.removeInteractive();
+				item.tint = 0xffffff;
+			}
+		});
+	}
+
+	hideItemDetailsDialog() {
+		const dialog = document.getElementById('itemDetailsDialog')!;
+		dialog.style.display = 'none';
+		this.selectedItemTokenIndex = -1;
+	}
+
+	showItemDetailsDialog(itemPosition: ItemsPositioning) {
+		const dialog = document.getElementById('itemDetailsDialog')!;
+		dialog.style.display = 'flex';
+
+		this.itemIdElement.value = itemPosition.id;
+		this.itemXElement.value = `${itemPosition.x}`;
+		this.itemYElement.value = `${itemPosition.y}`;
+	}
+
+	deleteItemToken() {
+		if (this.selectedItemTokenIndex === -1) {
+			return;
+		}
+
+		this.itemTokens[this.selectedItemTokenIndex].destroy(true);
+		this.itemTokens.splice(this.selectedItemTokenIndex, 1);
+		this.items.splice(this.selectedItemTokenIndex, 1);
+		this.hideItemDetailsDialog();
+		this.drawRoom();
+	}
+
+	saveItemToken() {
+		if (this.selectedItemTokenIndex === -1) {
+			return;
+		}
+
+		this.itemTokens[this.selectedItemTokenIndex].destroy(true);
+
+		const itemPosition: ItemsPositioning = {
+			...this.items[this.selectedItemTokenIndex],
+			id: this.itemIdElement.value,
+			x: parseInt(this.itemXElement.value, 10),
+			y: parseInt(this.itemYElement.value, 10),
+		};
+
+		const { x, y, id } = itemPosition;
+
+		const item = {
+			...(fixedItems as { [id: string]: Partial<Item> })[id],
+		} as Item;
+		const itemToken = new WorldItemToken(this as any, x, y, item);
+		itemToken.setAlpha(this.activeLayerDropdownElement.value === 'npcs' ? 1 : 0.7);
+		itemToken.setDepth(DEPTHS.npcLayer);
+		this.itemTokens = [
+			...this.itemTokens.slice(0, this.selectedItemTokenIndex),
+			itemToken,
+			...this.itemTokens.slice(this.selectedItemTokenIndex + 1),
+		];
+		this.items = [
+			...this.items.slice(0, this.selectedItemTokenIndex),
+			itemPosition,
+			...this.items.slice(this.selectedItemTokenIndex + 1),
+		];
+
+		this.hideItemDetailsDialog();
+		this.drawRoom();
+	}
+
+	addItem(x: number, y: number) {
+		const itemPosition: ItemsPositioning = {
+			id: Object.values(fixedItems)[this.selectedLibraryItemIndex - 1].id,
+			x,
+			y,
+		};
+
+		const { id } = itemPosition;
+		const item = {
+			...(fixedItems as { [id: string]: Partial<Item> })[id],
+		} as Item;
+		const itemToken = new WorldItemToken(this as any, x, y, item);
+		this.add.existing(itemToken);
+		itemToken.setAlpha(1);
+		itemToken.setDepth(DEPTHS.npcLayer);
+		this.itemTokens.push(itemToken);
+		this.items.push(itemPosition);
+
+		this.selectedItemTokenIndex = this.items.length - 1;
+
+		this.showItemDetailsDialog(itemPosition);
+		this.drawRoom();
+	}
+
 	applyConfiguration() {
 		const roomNameValue = this.roomNameElement.value;
 		this.roomName = roomNameValue;
@@ -616,15 +769,15 @@ export default class MapEditor extends Phaser.Scene {
 			newRoomDecorationLayout[y] = [];
 			newRoomOverlayLayout[y] = [];
 			for (let x = 0; x < roomWidth; x++) {
-				newRoomLayout[y][x] = this.roomLayout[y] ?
-					(this.roomLayout[y][x] || DEFAULT_TILE) :
-					DEFAULT_TILE;
-				newRoomDecorationLayout[y][x] = this.roomDecorationLayout[y] ?
-					(this.roomDecorationLayout[y][x] || DEFAULT_DECORATION_TILE) :
-					DEFAULT_DECORATION_TILE;
-				newRoomOverlayLayout[y][x] = this.roomOverlayLayout[y] ?
-					(this.roomOverlayLayout[y][x] || DEFAULT_OVERLAY_TILE) :
-					DEFAULT_OVERLAY_TILE;
+				newRoomLayout[y][x] = this.roomLayout[y]
+					? this.roomLayout[y][x] || DEFAULT_TILE
+					: DEFAULT_TILE;
+				newRoomDecorationLayout[y][x] = this.roomDecorationLayout[y]
+					? this.roomDecorationLayout[y][x] || DEFAULT_DECORATION_TILE
+					: DEFAULT_DECORATION_TILE;
+				newRoomOverlayLayout[y][x] = this.roomOverlayLayout[y]
+					? this.roomOverlayLayout[y][x] || DEFAULT_OVERLAY_TILE
+					: DEFAULT_OVERLAY_TILE;
 			}
 		}
 		this.roomLayout = newRoomLayout;
@@ -699,13 +852,13 @@ export default class MapEditor extends Phaser.Scene {
 		);
 		this.libraryLayer = map.createLayer(0, tileSet, 0, 0).setInteractive();
 		this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
-		this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
+		this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number }) => {
 			this.selectedTileValues = undefined;
 			this.libraryLayer.forEachTile((tile) => {
 				tile.clearAlpha();
 			});
-			const clickX = pointer.downX;// - this.libraryLayer.x;
-			const clickY = pointer.downY;// - this.libraryLayer.y;
+			const clickX = pointer.downX; // - this.libraryLayer.x;
+			const clickY = pointer.downY; // - this.libraryLayer.y;
 			const tileX = Math.floor(clickX / TILE_WIDTH);
 			const tileY = Math.floor(clickY / TILE_HEIGHT);
 			const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
@@ -715,7 +868,7 @@ export default class MapEditor extends Phaser.Scene {
 				this.highlightingY = clickedTile.y * TILE_HEIGHT;
 				const zoomedWidth = this.cameras.main.width * (1 / this.zoomFactor);
 				const zoomedHeight = this.cameras.main.height * (1 / this.zoomFactor);
-				const zoomedZeroX = 	(this.cameras.main.width - zoomedWidth) / 2;
+				const zoomedZeroX = (this.cameras.main.width - zoomedWidth) / 2;
 				const zoomedZeroY = (this.cameras.main.height - zoomedHeight) / 2;
 				this.mapEditorHighlighting.x = zoomedZeroX + this.highlightingX * (1 / this.zoomFactor);
 				this.mapEditorHighlighting.y = zoomedZeroY + this.highlightingY * (1 / this.zoomFactor);
@@ -736,28 +889,25 @@ export default class MapEditor extends Phaser.Scene {
 			1,
 			2
 		);
-		this.backgroundLibraryLayer =
-			backgroundMap.createLayer(0, backgroundTileSet, 0, 0).setInteractive();
+		this.backgroundLibraryLayer = backgroundMap
+			.createLayer(0, backgroundTileSet, 0, 0)
+			.setInteractive();
 		this.backgroundLibraryLayer.setDepth(DEPTHS.libraryBackgroundLayer);
 		this.backgroundLibraryLayer.setScrollFactor(0, 0);
 	}
 
-	getDataFromClick (
-			posX: number,
-			posY: number,
-			tileLayer: Phaser.Tilemaps.TilemapLayer
-		) {
+	getDataFromClick(posX: number, posY: number, tileLayer: Phaser.Tilemaps.TilemapLayer) {
 		const clickX =
 			posX - this.cameras.main.centerX + (this.cameraPositionX - tileLayer.x) * this.zoomFactor;
 		const clickY =
 			posY - this.cameras.main.centerY + (this.cameraPositionY - tileLayer.y) * this.zoomFactor;
 		const tileX = Math.floor(clickX / (TILE_WIDTH * this.zoomFactor));
 		const tileY = Math.floor(clickY / (TILE_HEIGHT * this.zoomFactor));
-		return [
-			tileX,
-			tileY,
-			tileLayer.getTileAt(tileX, tileY)
-		] as [number, number, Phaser.Tilemaps.Tile];
+		return [tileX, tileY, tileLayer.getTileAt(tileX, tileY)] as [
+			number,
+			number,
+			Phaser.Tilemaps.Tile
+		];
 	}
 
 	addToHistory(autosave: boolean) {
@@ -790,9 +940,9 @@ export default class MapEditor extends Phaser.Scene {
 		const maxY = Math.max(this.selectionStartPoint[1], this.selectionEndPoint[1]);
 
 		const selectionValues: Partial<MultiLevelLayout> = {};
-		const activeLayers: (keyof MultiLevelLayout)[] = wasCtrlPressed ?
-			['base', 'decoration', 'overlay'] :
-			[this.activeLayerDropdownElement.value as keyof MultiLevelLayout];
+		const activeLayers: (keyof MultiLevelLayout)[] = wasCtrlPressed
+			? ['base', 'decoration', 'overlay']
+			: [this.activeLayerDropdownElement.value as keyof MultiLevelLayout];
 		for (const layer of activeLayers) {
 			selectionValues[layer] = [];
 			for (let y = minY; y <= maxY; y++) {
@@ -813,17 +963,15 @@ export default class MapEditor extends Phaser.Scene {
 		if (!this.selectedTileValues) {
 			return;
 		}
-		const layers = Object.keys(this.selectedTileValues).reduce(
-			(obj, tileLayerName) => {
-				obj[tileLayerName] = this.getLayerValuesForName(tileLayerName);
-				return obj;
-			}, {} as {[name: string]: MapLayout});
+		const layers = Object.keys(this.selectedTileValues).reduce((obj, tileLayerName) => {
+			obj[tileLayerName] = this.getLayerValuesForName(tileLayerName);
+			return obj;
+		}, {} as { [name: string]: MapLayout });
 		Object.entries(layers).forEach(([layerName, layerValues]) => {
 			const layerKey = layerName as keyof MultiLevelLayout;
 			for (let y = 0; y < this.selectedTileValues![layerKey]!.length; y++) {
 				for (let x = 0; x < this.selectedTileValues![layerKey]![y].length; x++) {
-						layerValues[tileY + y][tileX + x] =
-							this.selectedTileValues![layerKey]![y][x];
+					layerValues[tileY + y][tileX + x] = this.selectedTileValues![layerKey]![y][x];
 				}
 			}
 		});
@@ -844,7 +992,7 @@ export default class MapEditor extends Phaser.Scene {
 		const map = this.make.tilemap({
 			data: this.roomLayout,
 			tileWidth: TILE_WIDTH,
-			tileHeight: TILE_HEIGHT
+			tileHeight: TILE_HEIGHT,
 		});
 		this.widthInPixels = map.widthInPixels;
 		this.heightInPixels = map.heightInPixels;
@@ -859,8 +1007,7 @@ export default class MapEditor extends Phaser.Scene {
 
 		const activeLayerValue = this.activeLayerDropdownElement.value;
 
-		this.tileLayer = map
-			.createLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
+		this.tileLayer = map.createLayer(0, tileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
 		if (activeLayerValue === 'base' || activeLayerValue === 'npcs') {
 			this.tileLayer.setInteractive();
 		}
@@ -922,30 +1069,27 @@ export default class MapEditor extends Phaser.Scene {
 			}
 		};
 
-		const onPointerUp: (
-			tilemapLayer: Phaser.Tilemaps.TilemapLayer,
-			x: number,
-			y: number
-		) => void = (tilemapLayer, x, y) => {
-			this.isPointerDown = false;
-			if (this.shiftKey.isDown) {
-				const [tileX, tileY] = this.getDataFromClick(x, y, tilemapLayer);
-				this.selectionEndPoint = [tileX, tileY];
-				this.endSelection(this.ctrlKey.isDown);
-			}
-		};
+		const onPointerUp: (tilemapLayer: Phaser.Tilemaps.TilemapLayer, x: number, y: number) => void =
+			(tilemapLayer, x, y) => {
+				this.isPointerDown = false;
+				if (this.shiftKey.isDown) {
+					const [tileX, tileY] = this.getDataFromClick(x, y, tilemapLayer);
+					this.selectionEndPoint = [tileX, tileY];
+					this.endSelection(this.ctrlKey.isDown);
+				}
+			};
 
 		const onPointerOut: () => void = () => {
 			this.isPointerDown = false;
 		};
 
-		this.tileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
+		this.tileLayer.on('pointerdown', (pointer: { downX: number; downY: number }) => {
 			onPointerDown(this.tileLayer, this.roomLayout, pointer.downX, pointer.downY);
 		});
-		this.tileLayer.on('pointermove', (pointer: {position: {x: number; y: number;}}) => {
+		this.tileLayer.on('pointermove', (pointer: { position: { x: number; y: number } }) => {
 			onPointerMove(this.tileLayer, this.roomLayout, pointer.position.x, pointer.position.y);
 		});
-		this.tileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
+		this.tileLayer.on('pointerup', (pointer: { upX: number; upY: number }) => {
 			onPointerUp(this.tileLayer, pointer.upX, pointer.upY);
 		});
 		this.tileLayer.on('pointerout', () => {
@@ -955,7 +1099,7 @@ export default class MapEditor extends Phaser.Scene {
 		const decorationMap = this.make.tilemap({
 			data: this.roomDecorationLayout,
 			tileWidth: TILE_WIDTH,
-			tileHeight: TILE_HEIGHT
+			tileHeight: TILE_HEIGHT,
 		});
 		const decorationTileSet = decorationMap.addTilesetImage(
 			`${this.decorationTileSetName}-image`,
@@ -965,21 +1109,36 @@ export default class MapEditor extends Phaser.Scene {
 			1,
 			2
 		);
-		this.decorationTileLayer = decorationMap
-			.createLayer(0, decorationTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
+		this.decorationTileLayer = decorationMap.createLayer(
+			0,
+			decorationTileSet,
+			-map.widthInPixels / 2,
+			-map.heightInPixels / 2
+		);
 		if (activeLayerValue === 'decoration') {
-				this.decorationTileLayer.setInteractive();
+			this.decorationTileLayer.setInteractive();
 		}
 		this.decorationTileLayer.setDepth(DEPTHS.decorationLayer);
-		this.decorationTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
-			onPointerDown(this.decorationTileLayer, this.roomDecorationLayout,
-				pointer.downX, pointer.downY);
+		this.decorationTileLayer.on('pointerdown', (pointer: { downX: number; downY: number }) => {
+			onPointerDown(
+				this.decorationTileLayer,
+				this.roomDecorationLayout,
+				pointer.downX,
+				pointer.downY
+			);
 		});
-		this.decorationTileLayer.on('pointermove', (pointer: {position: {x: number; y: number;}}) => {
-			onPointerMove(this.decorationTileLayer, this.roomDecorationLayout,
-				pointer.position.x, pointer.position.y);
-		});
-		this.decorationTileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
+		this.decorationTileLayer.on(
+			'pointermove',
+			(pointer: { position: { x: number; y: number } }) => {
+				onPointerMove(
+					this.decorationTileLayer,
+					this.roomDecorationLayout,
+					pointer.position.x,
+					pointer.position.y
+				);
+			}
+		);
+		this.decorationTileLayer.on('pointerup', (pointer: { upX: number; upY: number }) => {
 			onPointerUp(this.decorationTileLayer, pointer.upX, pointer.upY);
 		});
 		this.decorationTileLayer.on('pointerout', () => {
@@ -989,7 +1148,7 @@ export default class MapEditor extends Phaser.Scene {
 		const overlayMap = this.make.tilemap({
 			data: this.roomOverlayLayout,
 			tileWidth: TILE_WIDTH,
-			tileHeight: TILE_HEIGHT
+			tileHeight: TILE_HEIGHT,
 		});
 		const overlayTileSet = overlayMap.addTilesetImage(
 			`${this.overlayTileSetName}-image`,
@@ -999,21 +1158,28 @@ export default class MapEditor extends Phaser.Scene {
 			1,
 			2
 		);
-		this.overlayTileLayer = overlayMap
-			.createLayer(0, overlayTileSet, -map.widthInPixels / 2, -map.heightInPixels / 2);
+		this.overlayTileLayer = overlayMap.createLayer(
+			0,
+			overlayTileSet,
+			-map.widthInPixels / 2,
+			-map.heightInPixels / 2
+		);
 		if (activeLayerValue === 'overlay') {
 			this.overlayTileLayer.setInteractive();
 		}
 		this.overlayTileLayer.setDepth(DEPTHS.overlayLayer);
-		this.overlayTileLayer.on('pointerdown', (pointer: { downX: number; downY: number; }) => {
-			onPointerDown(this.overlayTileLayer, this.roomOverlayLayout,
-				pointer.downX, pointer.downY);
+		this.overlayTileLayer.on('pointerdown', (pointer: { downX: number; downY: number }) => {
+			onPointerDown(this.overlayTileLayer, this.roomOverlayLayout, pointer.downX, pointer.downY);
 		});
-		this.overlayTileLayer.on('pointermove', (pointer: {position: {x: number; y: number;}}) => {
-			onPointerMove(this.overlayTileLayer, this.roomOverlayLayout,
-				pointer.position.x, pointer.position.y);
+		this.overlayTileLayer.on('pointermove', (pointer: { position: { x: number; y: number } }) => {
+			onPointerMove(
+				this.overlayTileLayer,
+				this.roomOverlayLayout,
+				pointer.position.x,
+				pointer.position.y
+			);
 		});
-		this.overlayTileLayer.on('pointerup', (pointer: { upX: number; upY: number; }) => {
+		this.overlayTileLayer.on('pointerup', (pointer: { upX: number; upY: number }) => {
 			onPointerUp(this.overlayTileLayer, pointer.upX, pointer.upY);
 		});
 		this.overlayTileLayer.on('pointerout', () => {
@@ -1052,7 +1218,7 @@ export default class MapEditor extends Phaser.Scene {
 			);
 			this.npcTokens.push(npc);
 			this.add.existing(npc);
-			npc.setAlpha(this.activeLayerDropdownElement.value === 'npcs' ? 1 : 0.7) ;
+			npc.setAlpha(this.activeLayerDropdownElement.value === 'npcs' ? 1 : 0.7);
 			npc.setDepth(DEPTHS.npcLayer);
 			if (index === this.selectedNpcTokenIndex) {
 				npc.tint = 0xffcccc;
@@ -1067,7 +1233,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.tileLayer.renderDebug(debugGraphics, {
 			tileColor: null, // Color of non-colliding tiles
 			collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255),
-			faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+			faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Color of colliding face edges
 		});
 		// tslint:enable
 	}
@@ -1096,9 +1262,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.cameraPositionX = this.cameraPositionX - CAMERA_MOVEMENT_PER_FRAME;
 		}
 		if (this.oneKey.isDown || this.twoKey.isDown || this.threeKey.isDown) {
-			const newLayer = this.oneKey.isDown ? 'base' : (
-				this.twoKey.isDown ? 'decoration' : 'overlay'
-			);
+			const newLayer = this.oneKey.isDown ? 'base' : this.twoKey.isDown ? 'decoration' : 'overlay';
 			const activeLayerValue = this.activeLayerDropdownElement.value;
 			if (activeLayerValue !== newLayer) {
 				this.activeLayerDropdownElement.value = newLayer;
@@ -1140,15 +1304,17 @@ export default class MapEditor extends Phaser.Scene {
 			this.mapEditorHighlighting.setScale(1 / this.zoomFactor);
 			const newWidth = this.cameras.main.width * (1 / this.zoomFactor);
 			const newHeight = this.cameras.main.height * (1 / this.zoomFactor);
-			const newX = 	(this.cameras.main.width - newWidth) / 2;
+			const newX = (this.cameras.main.width - newWidth) / 2;
 			const newY = (this.cameras.main.height - newHeight) / 2;
 			this.libraryLayer.setPosition(newX, newY);
 			this.backgroundLibraryLayer.setPosition(newX, newY);
 			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
 			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
 			this.positionText.setScale(1 / this.zoomFactor);
-			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET * (1 / this.zoomFactor),
-				this.cameras.main.height - (POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor)) - newY);
+			this.positionText.setPosition(
+				newX + POSITION_TEXT_X_OFFSET * (1 / this.zoomFactor),
+				this.cameras.main.height - POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor) - newY
+			);
 		}
 		this.wasZoomInDown = this.zoomIn.isDown;
 
@@ -1161,27 +1327,32 @@ export default class MapEditor extends Phaser.Scene {
 			this.mapEditorHighlighting.setScale(1 / this.zoomFactor);
 			const newWidth = this.cameras.main.width * (1 / this.zoomFactor);
 			const newHeight = this.cameras.main.height * (1 / this.zoomFactor);
-			const newX = 	(this.cameras.main.width - newWidth) / 2;
+			const newX = (this.cameras.main.width - newWidth) / 2;
 			const newY = (this.cameras.main.height - newHeight) / 2;
 			this.libraryLayer.setPosition(newX, newY);
 			this.backgroundLibraryLayer.setPosition(newX, newY);
 			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
 			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
 			this.positionText.setScale(1 / this.zoomFactor);
-			this.positionText.setPosition(newX + POSITION_TEXT_X_OFFSET * (1 / this.zoomFactor),
-				this.cameras.main.height - (POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor)) - newY);
+			this.positionText.setPosition(
+				newX + POSITION_TEXT_X_OFFSET * (1 / this.zoomFactor),
+				this.cameras.main.height - POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor) - newY
+			);
 		}
 		this.wasZoomOutDown = this.zoomOut.isDown;
 
 		// tslint:disable no-magic-numbers
-		this.tileLayer.forEachTile((tile) => tile.tint = 0xffffff);
-		this.decorationTileLayer.forEachTile((tile) => tile.tint = 0xffffff);
-		this.overlayTileLayer.forEachTile((tile) => tile.tint = 0xffffff);
+		this.tileLayer.forEachTile((tile) => (tile.tint = 0xffffff));
+		this.decorationTileLayer.forEachTile((tile) => (tile.tint = 0xffffff));
+		this.overlayTileLayer.forEachTile((tile) => (tile.tint = 0xffffff));
 
 		if (this.shiftKey.isDown) {
 			const position = this.input.mousePointer.position;
-			const [_tileX, _tileY, hoveredTile] =
-				this.getDataFromClick(position.x, position.y, this.tileLayer);
+			const [_tileX, _tileY, hoveredTile] = this.getDataFromClick(
+				position.x,
+				position.y,
+				this.tileLayer
+			);
 			if (hoveredTile) {
 				hoveredTile.tint = this.ctrlKey.isDown ? 0x9999ff : 0xff9999;
 			}

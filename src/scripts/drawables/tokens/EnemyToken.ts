@@ -33,11 +33,7 @@ export default abstract class EnemyToken extends CharacterToken {
 		super(scene, x, y, tokenName, tokenName, id);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
-		this.stateObject = new Enemy(
-			tokenName,
-			ENEMY_DAMAGE,
-			ENEMY_HEALTH,
-			ENEMY_SPEED);
+		this.stateObject = new Enemy(tokenName, ENEMY_DAMAGE, ENEMY_HEALTH, ENEMY_SPEED);
 		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 		this.tokenName = tokenName;
 		this.target = new Phaser.Geom.Point(0, 0);
@@ -47,17 +43,22 @@ export default abstract class EnemyToken extends CharacterToken {
 	public checkLoS() {
 		// Instead of ray tracing we're using the players line of sight calculation, which tints the
 		// tile the enemy stands on.
-		const tile = this.getOccupiedTile();
-		return tile && tile.tint !== VISITED_TILE_TINT && tile.tint > 0;
+
+		if (this.body) {
+			const x = Math.round(this.body.x / TILE_WIDTH);
+			const y = Math.round(this.body.y / TILE_HEIGHT);
+			return this.scene.dynamicLightingHelper?.visibleTiles[x][y];
+		}
+		return false;
 	}
 
 	dropRandomItem(level: number = 1) {
-		if(this.scene === undefined) {
+		if (this.scene === undefined) {
 			// TODO find out when this happens
 			return;
 		}
 
-		this.scene.dropItem(this.x, this.y, generateRandomItem({level}));
+		this.scene.dropItem(this.x, this.y, generateRandomItem({ level }));
 	}
 
 	dropFixedItem(id: string) {
@@ -94,9 +95,7 @@ export default abstract class EnemyToken extends CharacterToken {
 				this.lastUpdate = time;
 				this.target.x = player.x;
 				this.target.y = player.y;
-			}
-			else if(this.aggro
-				&& this.lastUpdate + this.aggroLinger < time){
+			} else if (this.aggro && this.lastUpdate + this.aggroLinger < time) {
 				this.aggro = false;
 			}
 		}
@@ -105,7 +104,7 @@ export default abstract class EnemyToken extends CharacterToken {
 	// destroy the enemy
 	destroy() {
 		if (this.scene?.npcMap) {
-			delete (this.scene.npcMap[this.id]);
+			delete this.scene.npcMap[this.id];
 		}
 
 		super.destroy();
