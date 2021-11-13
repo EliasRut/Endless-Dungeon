@@ -1,9 +1,14 @@
 import { NpcScript } from '../../../../typings/custom';
-import { Faction } from '../../helpers/constants';
+import { Faction, VISITED_TILE_TINT } from '../../helpers/constants';
+import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
+import MainScene from '../../scenes/MainScene';
 import Character from '../../worldstate/Character';
+
+const GREEN_DIFF = 0x003300;
 
 export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	stateObject: Character;
+	scene: MainScene;
 	id: string;
 	type: string;
 	script?: NpcScript;
@@ -13,14 +18,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	lastNecroticEffectTimestamp: number;
 	necroticEffectStacks: number;
 
-	constructor(
-			scene: Phaser.Scene,
-			x: number,
-			y: number,
-			tileName: string,
-			type: string,
-			id: string
-		) {
+	constructor(scene: MainScene, x: number, y: number, tileName: string, type: string, id: string) {
 		super(scene, x, y, tileName);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
@@ -37,5 +35,35 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		const x = this.x - px;
 		const y = this.y - py;
 		return Math.hypot(x, y);
+	}
+
+	protected getOccupiedTile() {
+		if (this.body) {
+			const x = Math.round(this.body.x / TILE_WIDTH);
+			const y = Math.round(this.body.y / TILE_HEIGHT);
+			return this.scene.tileLayer.getTileAt(x, y);
+		}
+		return null;
+	}
+
+	protected receiveDotDamage(deltaTime: number) {}
+
+	// update from main Scene
+	public update(time: number, deltaTime: number) {
+		const tile = this.getOccupiedTile();
+		if (tile) {
+			// let the necrotic Effekt disapear after 2 sec
+			if (this.lastNecroticEffectTimestamp <= time - 2000) {
+				this.necroticEffectStacks = 0;
+			}
+			if (this.necroticEffectStacks > 0) {
+				// Color the token green
+				this.tint = Math.min(0x00ff00, 0x006600 + GREEN_DIFF * this.necroticEffectStacks);
+				this.receiveDotDamage(deltaTime);
+			} else {
+				this.tint = tile.tint;
+			}
+			this.setVisible(tile.tint > VISITED_TILE_TINT);
+		}
 	}
 }

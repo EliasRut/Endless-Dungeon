@@ -21,7 +21,6 @@ const GREEN_DIFF = 0x003300;
 export default abstract class EnemyToken extends CharacterToken {
 	fireballEffect: FireBallEffect | undefined;
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	scene: MainScene;
 	tokenName: string;
 	attackRange: number;
 	attackedAt: number = -Infinity;
@@ -67,7 +66,7 @@ export default abstract class EnemyToken extends CharacterToken {
 		this.scene.addFixedItem(id, this.x, this.y);
 	}
 
-	private getOccupiedTile() {
+	protected getOccupiedTile() {
 		if (this.body) {
 			const x = Math.round(this.body.x / TILE_WIDTH);
 			const y = Math.round(this.body.y / TILE_HEIGHT);
@@ -76,26 +75,16 @@ export default abstract class EnemyToken extends CharacterToken {
 		return null;
 	}
 
+	protected receiveDotDamage(deltaTime: number) {
+		// dot = damage over time, deltatime is in ms so we have to devide it by 1000
+		const dot =
+			(globalState.playerCharacter.damage * this.necroticEffectStacks * deltaTime) / 1000 / 4;
+		this.stateObject.health = this.stateObject.health - dot;
+	}
+
 	// update from main Scene
-	public update(time: number, deltatime: number) {
-		const tile = this.getOccupiedTile();
-		if (tile) {
-			// let the necrotic Effekt disapear after 2 sec
-			if (this.lastNecroticEffectTimestamp <= time - 2000) {
-				this.necroticEffectStacks = 0;
-			}
-			if (this.necroticEffectStacks > 0) {
-				// colored the Enemy into green
-				this.tint = Math.min(0x00ff00, 0x006600 + GREEN_DIFF * this.necroticEffectStacks);
-				// dot = damage over time, deltatime is in ms so we have to devide it by 1000
-				const dot =
-					(globalState.playerCharacter.damage * this.necroticEffectStacks * deltatime) / 1000 / 4;
-				this.stateObject.health = this.stateObject.health - dot;
-			} else {
-				this.tint = tile.tint;
-			}
-			this.setVisible(tile.tint > VISITED_TILE_TINT);
-		}
+	public update(time: number, deltaTime: number) {
+		super.update(time, deltaTime);
 
 		// set aggro boolean, use a linger time for aggro
 		if (this.lastUpdate <= time) {

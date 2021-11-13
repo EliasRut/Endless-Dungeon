@@ -48,10 +48,6 @@ export const Quests: { [name: string]: Quest } = {
 		questGiverName: 'Agnes',
 		name: 'The Rescue',
 		description: 'Rescue Erwin from the zombies',
-		preconditions: {
-			hasItems: ['Wild Rune'],
-			dungeonLevelReached: 1,
-		},
 	},
 	theHunt: {
 		questGiverId: 'agnes',

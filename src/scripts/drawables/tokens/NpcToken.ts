@@ -20,7 +20,7 @@ export default class NpcToken extends CharacterToken {
 	openQuestSymbol?: Phaser.GameObjects.Image;
 
 	constructor(
-		scene: Phaser.Scene,
+		scene: MainScene,
 		x: number,
 		y: number,
 		type: string,
@@ -42,7 +42,8 @@ export default class NpcToken extends CharacterToken {
 		this.faction = Faction.NPCS;
 	}
 
-	update(globalTime: number) {
+	update(globalTime: number, deltaTime: number) {
+		super.update(globalTime, deltaTime);
 		if (this.questGiverId && hasAnyOpenQuests(this.questGiverId)) {
 			const yOffset = Math.abs(500 - (globalTime % 1000)) / 125;
 			if (!this.openQuestSymbol) {

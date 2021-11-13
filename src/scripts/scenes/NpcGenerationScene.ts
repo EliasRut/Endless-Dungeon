@@ -33,6 +33,7 @@ export default class NpcGenerationScene extends Phaser.Scene {
 		requiredNpcs.add('enemy-vampire');
 		requiredNpcs.add('vanya-base');
 		requiredNpcs.add('agnes');
+		requiredNpcs.add('erwin');
 		requiredNpcs.add('hilda-base');
 		Object.values(globalState.availableRooms).forEach((room) => {
 			room.npcs?.forEach((npc) => {
