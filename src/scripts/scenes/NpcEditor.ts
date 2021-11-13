@@ -15,7 +15,7 @@ import {
 	ColorPallete,
 	generatePalleteLookup,
 	PalleteLookup,
-	generateColorConversionTable
+	generateColorConversionTable,
 } from '../helpers/colors';
 import firebase from 'firebase';
 import { NpcData } from '../../../typings/custom';
@@ -151,7 +151,7 @@ export default class NpcEditor extends Phaser.Scene {
 			this.bodyDropdownElement.value! as any,
 			this.hairDropdownElement.value! as any,
 			this.shirtDropdownElement.value! as any,
-			this.pantsDropdownElement.value! as any,
+			this.pantsDropdownElement.value! as any
 		);
 	}
 
@@ -245,26 +245,10 @@ export default class NpcEditor extends Phaser.Scene {
 
 		this.loadNpcList();
 
-		this.bodyLayer = this.add.image(
-			LAYER_X_OFFSET,
-			LAYER_Y_OFFSET,
-			'body-1'
-		);
-		this.pantsLayer = this.add.image(
-			LAYER_X_OFFSET,
-			LAYER_Y_OFFSET,
-			'pants-1'
-		);
-		this.shirtLayer = this.add.image(
-			LAYER_X_OFFSET,
-			LAYER_Y_OFFSET,
-			'shirt-1'
-		);
-		this.hairLayer = this.add.image(
-			LAYER_X_OFFSET,
-			LAYER_Y_OFFSET,
-			'hair-1'
-		);
+		this.bodyLayer = this.add.image(LAYER_X_OFFSET, LAYER_Y_OFFSET, 'body-1');
+		this.pantsLayer = this.add.image(LAYER_X_OFFSET, LAYER_Y_OFFSET, 'pants-1');
+		this.shirtLayer = this.add.image(LAYER_X_OFFSET, LAYER_Y_OFFSET, 'shirt-1');
+		this.hairLayer = this.add.image(LAYER_X_OFFSET, LAYER_Y_OFFSET, 'hair-1');
 
 		this.updateImage();
 	}
@@ -282,22 +266,18 @@ export default class NpcEditor extends Phaser.Scene {
 			shirtColor1: this.shirtColor1InputElement.value.substr(1),
 			shirtColor2: this.shirtColor2InputElement.value.substr(1),
 			pantsColor: this.pantsColorInputElement.value.substr(1),
-			shoesColor: this.shoesColorInputElement.value.substr(1)
+			shoesColor: this.shoesColorInputElement.value.substr(1),
 		};
 
 		this.palleteLookup = generateColorConversionTable(this.palleteLookup, colorConfig);
 
-		generateColorReplacedTextures(
-			this.textures,
-			this.palleteLookup,
-			{
-				...colorConfig,
-				bodyTemplate: this.bodyDropdownElement.value!,
-				hairTemplate: this.hairDropdownElement.value!,
-				shirtTemplate: this.shirtDropdownElement.value!,
-				pantsTemplate: this.pantsDropdownElement.value!
-			}
-		);
+		generateColorReplacedTextures(this.textures, this.palleteLookup, {
+			...colorConfig,
+			bodyTemplate: this.bodyDropdownElement.value!,
+			hairTemplate: this.hairDropdownElement.value!,
+			shirtTemplate: this.shirtDropdownElement.value!,
+			pantsTemplate: this.pantsDropdownElement.value!,
+		});
 
 		this.bodyLayer.setTexture('body-temp');
 		this.hairLayer.setTexture('hair-temp');

@@ -16,9 +16,10 @@ export default class KeyboardHelper {
 	abilityKey4: Phaser.Input.Keyboard.Key;
 	inventoryKey: Phaser.Input.Keyboard.Key;
 	settingsKey: Phaser.Input.Keyboard.Key;
+	questsKey: Phaser.Input.Keyboard.Key;
 	enterKey: Phaser.Input.Keyboard.Key;
 
-	abilityKeyPressed: {[key: number]: boolean} = {
+	abilityKeyPressed: { [key: number]: boolean } = {
 		[AbilityKey.ONE]: false,
 		[AbilityKey.TWO]: false,
 		[AbilityKey.THREE]: false,
@@ -36,21 +37,23 @@ export default class KeyboardHelper {
 	isAbility2Pressed: () => boolean;
 	isAbility3Pressed: () => boolean;
 	isAbility4Pressed: () => boolean;
-	isInventoryPressed: (inventoryOpen : boolean) => boolean;
+	isInventoryPressed: (inventoryOpen: boolean) => boolean;
 	isSettingsPressed: () => boolean;
+	isQuestsPressed: () => boolean;
 	isEnterPressed: () => boolean;
 
 	scene: Phaser.Scene;
 
-	constructor (scene: Phaser.Scene) {
+	constructor(scene: Phaser.Scene) {
 		this.upKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
 		this.downKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
 		this.leftKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
 		this.rightKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 		this.kKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
 		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
-		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);		
+		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
+		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
 		this.scene = scene;
 		this.isMoveUpPressed = () => {
@@ -84,8 +87,8 @@ export default class KeyboardHelper {
 			const axis = this.gamepad?.axes[0];
 			const axisValue = axis ? axis.getValue() : 0;
 			return !!this.gamepad?.right || axisValue > AXIS_MOVEMENT_THRESHOLD;
-		};		
-		this.isEnterPressed = () => {			
+		};
+		this.isEnterPressed = () => {
 			if (this.enterKey.isDown) {
 				return true;
 			}
@@ -93,15 +96,15 @@ export default class KeyboardHelper {
 				return !!this.gamepad?.A;
 			} catch (err) {
 				return false;
-			}			
+			}
 		};
 		this.isInventoryPressed = (inventoryOpen: boolean) => {
 			if (this.inventoryKey.isDown) {
 				return true;
 			}
 			try {
-				if(inventoryOpen) {
-					let eitherPressed = !!this.gamepad?.isButtonDown(9) || !!this.gamepad?.B;
+				if (inventoryOpen) {
+					const eitherPressed = !!this.gamepad?.isButtonDown(9) || !!this.gamepad?.B;
 					return eitherPressed;
 				} else return !!this.gamepad?.isButtonDown(9);
 			} catch (err) {
@@ -118,6 +121,16 @@ export default class KeyboardHelper {
 				return false;
 			}
 		};
+		this.isQuestsPressed = () => {
+			if (this.questsKey.isDown) {
+				return true;
+			}
+			try {
+				return !!this.gamepad?.isButtonDown(10);
+			} catch (err) {
+				return false;
+			}
+		};
 
 		this.abilityKey1 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 		this.abilityKey2 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
@@ -125,6 +138,7 @@ export default class KeyboardHelper {
 		this.abilityKey4 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
 		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
 		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
 		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
 		this.isAbility1Pressed = () => {
@@ -189,19 +203,19 @@ export default class KeyboardHelper {
 	}
 
 	getInventoryKeyPress() {
-		if (this.isMoveDownPressed()) return "down";
-		else if (this.isMoveLeftPressed()) return "left";
-		else if (this.isMoveRightPressed()) return "right";
-		else if (this.isMoveUpPressed()) return "up";
-		else if (this.isEnterPressed()) return "enter";		
-		return "nothing";
+		if (this.isMoveDownPressed()) return 'down';
+		else if (this.isMoveLeftPressed()) return 'left';
+		else if (this.isMoveRightPressed()) return 'right';
+		else if (this.isMoveUpPressed()) return 'up';
+		else if (this.isEnterPressed()) return 'enter';
+		return 'nothing';
 	}
 	updateGamepad() {
 		this.gamepad = this.scene.input.gamepad?.getPad(0);
 	}
 	getCharacterFacing(stickDeltaX: number, stickDeltaY: number) {
 		let yFacing = 0;
-		let xFacing = 0;		
+		let xFacing = 0;
 
 		if (stickDeltaY < -20 || this.isMoveUpPressed()) {
 			yFacing = -1;
@@ -227,10 +241,14 @@ export default class KeyboardHelper {
 
 	getRelevantEvalFunctionForEnum(abilityKey: AbilityKey) {
 		switch (abilityKey) {
-			case AbilityKey.ONE: return this.isAbility1Pressed;
-			case AbilityKey.TWO: return this.isAbility2Pressed;
-			case AbilityKey.THREE: return this.isAbility3Pressed;
-			case AbilityKey.FOUR: return this.isAbility4Pressed;
+			case AbilityKey.ONE:
+				return this.isAbility1Pressed;
+			case AbilityKey.TWO:
+				return this.isAbility2Pressed;
+			case AbilityKey.THREE:
+				return this.isAbility3Pressed;
+			case AbilityKey.FOUR:
+				return this.isAbility4Pressed;
 			default:
 				throw new Error(`No Ability Key mapping for key ${abilityKey}.`);
 		}
@@ -262,9 +280,9 @@ export default class KeyboardHelper {
 			globalState.playerCharacter.abilityCastTime[AbilityKey.ONE],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.TWO],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.THREE],
-			globalState.playerCharacter.abilityCastTime[AbilityKey.FOUR]
+			globalState.playerCharacter.abilityCastTime[AbilityKey.FOUR],
 		].reduce((max, value) => Math.max(max, value), 0);
-		
+
 		return gameTime - lastCast;
 	}
 

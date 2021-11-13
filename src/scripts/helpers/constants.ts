@@ -6,19 +6,10 @@ export const enum Facings {
 	NORTH,
 	NORTH_WEST,
 	WEST,
-	SOUTH_WEST
+	SOUTH_WEST,
 }
 
-export const spriteDirectionList = [
-	's',
-	'se',
-	'e',
-	'ne',
-	'n',
-	'nw',
-	'w',
-	'sw'
-];
+export const spriteDirectionList = ['s', 'se', 'e', 'ne', 'n', 'nw', 'w', 'sw'];
 
 export const facingToSpriteNameMap = {
 	[Facings.SOUTH]: 's',
@@ -37,7 +28,7 @@ export const ANIMATION_WALK = 'walk';
 export const enum Faction {
 	PLAYER,
 	NPCS,
-	ENEMIES
+	ENEMIES,
 }
 
 export const enum AbilityKey {
@@ -50,7 +41,7 @@ export const enum AbilityKey {
 
 export const enum UiDepths {
 	BASE_TILE_LAYER = 0,
-	DECORATION_TILE_LAYER= 1,
+	DECORATION_TILE_LAYER = 1,
 
 	TOKEN_BACKGROUND_LAYER = 2,
 	TOKEN_MAIN_LAYER = 3,
@@ -64,7 +55,7 @@ export const enum UiDepths {
 	UI_MAIN_LAYER = 9,
 	UI_FOREGROUND_LAYER = 10,
 
-	UI_STICK_LAYER = 11
+	UI_STICK_LAYER = 11,
 }
 
 export const TARGETABLE_TILE_TINT = 0x888888;
@@ -81,7 +72,7 @@ export const enum EquipmentSlot {
 	CHESTPIECE = 'chestpiece',
 	NECKLACE = 'necklace',
 	RIGHT_RING = 'rightRing',
-	LEFT_RING = 'leftRing'
+	LEFT_RING = 'leftRing',
 }
 
 export const enum ColorsOfMagic {
@@ -92,7 +83,7 @@ export const enum ColorsOfMagic {
 	DEATH = 'death',
 	PASSION = 'passion',
 	WILD = 'wild',
-	ROYAL = 'royal'
+	ROYAL = 'royal',
 }
 
 export const ColorsArray = [
@@ -121,69 +112,78 @@ export const BAG_BOXES_Y = 4;
 
 export const enum FacingRange {
 	ALL_DIRECTIONS = 1,
-	ONLY_NESW = 2
+	ONLY_NESW = 2,
 }
 
-export const npcTypeToFileMap: {[name: string]:{file: string, facing: FacingRange}} =  {
-	'red-ball'     : {file: 'assets/sprites/red-ball.png',facing: FacingRange.ALL_DIRECTIONS},
-	'redling-boss' : {file: 'assets/sprites/red-ball.png',facing: FacingRange.ALL_DIRECTIONS},
-	'red-link'     : {file: 'assets/sprites/red-link.png',facing: FacingRange.ALL_DIRECTIONS},
-	'naked-guy'    : {file: 'assets/sprites/naked-guy.png',facing: FacingRange.ALL_DIRECTIONS},
-	'enemy-zombie' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW},
-	'enemy-vampire' : {file: 'assets/sprites/enemy-vampire.png',facing: FacingRange.ONLY_NESW},
-	'lich-king' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW}
+export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingRange } } = {
+	'red-ball': { file: 'assets/sprites/red-ball.png', facing: FacingRange.ALL_DIRECTIONS },
+	'redling-boss': { file: 'assets/sprites/red-ball.png', facing: FacingRange.ALL_DIRECTIONS },
+	'red-link': { file: 'assets/sprites/red-link.png', facing: FacingRange.ALL_DIRECTIONS },
+	'naked-guy': { file: 'assets/sprites/naked-guy.png', facing: FacingRange.ALL_DIRECTIONS },
+	'enemy-zombie': { file: 'assets/sprites/enemy-zombie.png', facing: FacingRange.ONLY_NESW },
+	'enemy-vampire': { file: 'assets/sprites/enemy-vampire.png', facing: FacingRange.ONLY_NESW },
+	'lich-king': { file: 'assets/sprites/enemy-zombie.png', facing: FacingRange.ONLY_NESW },
 };
 
 export const npcTypeToAttackFileMap: {
-	[name: string]: {[attackName: string]: {
-		file: string,
-		framesPerDirection: number,
-		frameOffset?: number,
-		animationFrames?: number
-	}}
-} =  {
+	[name: string]: {
+		[attackName: string]: {
+			file: string;
+			framesPerDirection: number;
+			frameOffset?: number;
+			animationFrames?: number;
+		};
+	};
+} = {
 	'enemy-zombie': {
-		'slash': {
+		slash: {
 			file: 'assets/sprites/enemy-zombie-slash.png',
-			framesPerDirection: 16
-		}
+			framesPerDirection: 16,
+		},
 	},
 	'enemy-vampire': {
-		'prepare': {
+		prepare: {
 			file: 'assets/sprites/enemy-vampire-charge.png',
 			framesPerDirection: 16,
 			frameOffset: 0,
-			animationFrames: 9
+			animationFrames: 9,
 		},
-		'fly': {
+		fly: {
 			file: 'assets/sprites/enemy-vampire-charge.png',
 			framesPerDirection: 16,
 			frameOffset: 9,
-			animationFrames: 1
+			animationFrames: 1,
 		},
-		'stun': {
+		stun: {
 			file: 'assets/sprites/enemy-vampire-charge.png',
 			framesPerDirection: 16,
 			frameOffset: 10,
-			animationFrames: 6
+			animationFrames: 6,
 		},
-		'recover': {
+		recover: {
 			file: 'assets/sprites/enemy-vampire-charge.png',
 			framesPerDirection: 16,
 			frameOffset: 14,
-			animationFrames: 2
-		}
-	}
+			animationFrames: 2,
+		},
+	},
 };
 
 export const essenceNames = [
-	'wild', 'royal', 'metal', 'passion', 'flux', 'death', 'change', 'blood'
+	'wild',
+	'royal',
+	'metal',
+	'passion',
+	'flux',
+	'death',
+	'change',
+	'blood',
 ];
 
 export const enum PossibleTargets {
 	NONE = 0,
 	PLAYER = 1,
-	ENEMIES = 2
+	ENEMIES = 2,
 }
 
 export const KNOCKBACK_TIME = 250;
@@ -202,13 +202,13 @@ export const colorOfMagicToTilesetMap = {
 export const enemyBudgetCost = {
 	'enemy-zombie': 1,
 	'enemy-vampire': 1,
-	'redling-boss': 10
+	'redling-boss': 10,
 };
 
 export const enum MODE {
 	GAME = 'game',
 	MAP_EDITOR = 'mapEditor',
-	NPC_EDITOR = 'npcEditor'
+	NPC_EDITOR = 'npcEditor',
 }
 
 export let activeMode = MODE.GAME;

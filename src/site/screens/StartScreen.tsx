@@ -7,14 +7,12 @@ import { Link } from 'react-router-dom';
 export const StartScreen = () => {
 	return (
 		<CenteredContainer>
-			<SiteHeader>Project <br/> Endless Dungeon</SiteHeader>
+			<SiteHeader>
+				Project <br /> Endless Dungeon
+			</SiteHeader>
 			<ButtonContainer>
-				<StyledButton
-					to='/game'
-				>Game</StyledButton>
-				<StyledButton
-					to='/mapEditor'
-				>Tools</StyledButton>
+				<StyledButton to="/game">Game</StyledButton>
+				<StyledButton to="/mapEditor">Tools</StyledButton>
 			</ButtonContainer>
 		</CenteredContainer>
 	);

@@ -37,6 +37,8 @@ import { Catalyst, Source } from '../../items/itemData';
 import Minimap from '../drawables/ui/Minimap';
 import { AbilityType } from '../abilities/abilityData';
 import LevelName from '../drawables/ui/LevelName';
+import QuestsIcon from '../drawables/ui/QuestsIcon';
+import QuestsScreen from '../screens/QuestsScreen';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -75,6 +77,7 @@ export default class MainScene extends Phaser.Scene {
 		statScreen: StatScreen;
 		dialogScreen: DialogScreen;
 		settingsScreen: SettingsScreen;
+		questsScreen: QuestsScreen;
 		itemScreen: ItemScreen;
 	};
 	alive: number;
@@ -89,6 +92,7 @@ export default class MainScene extends Phaser.Scene {
 	icons: {
 		backpackIcon: BackpackIcon;
 		settingsIcon: SettingsIcon;
+		questsIcon: QuestsIcon;
 	};
 
 	wasIPressed: boolean = false;
@@ -160,6 +164,7 @@ export default class MainScene extends Phaser.Scene {
 		this.icons = {
 			backpackIcon: new BackpackIcon(this),
 			settingsIcon: new SettingsIcon(this),
+			questsIcon: new QuestsIcon(this),
 		};
 		if (globalState.currentLevel.startsWith('dungeonLevel')) {
 			this.levelName = new LevelName(this);
@@ -231,10 +236,12 @@ export default class MainScene extends Phaser.Scene {
 			inventory: new InventoryScreen(this),
 			dialogScreen: new DialogScreen(this),
 			settingsScreen: new SettingsScreen(this),
+			questsScreen: new QuestsScreen(this),
 		};
 
 		this.icons.backpackIcon.setScreens();
 		this.icons.settingsIcon.setScreens();
+		this.icons.questsIcon.setScreens();
 
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.abilityHelper = new AbilityHelper(this);
@@ -498,6 +505,14 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isSettingsPressed()) {
 			if (this.wasEscPressed === false) {
 				this.icons.settingsIcon.toggleScreen();
+			}
+			this.wasEscPressed = true;
+		} else {
+			this.wasEscPressed = false;
+		}
+		if (this.keyboardHelper.isSettingsPressed()) {
+			if (this.wasEscPressed === false) {
+				this.icons.questsIcon.toggleScreen();
 			}
 			this.wasEscPressed = true;
 		} else {

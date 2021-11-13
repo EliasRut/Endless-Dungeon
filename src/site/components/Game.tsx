@@ -16,10 +16,5 @@ export const Game = () => {
 		const game = new Phaser.Game(config);
 	}, [showGame]);
 
-	return (
-		<div
-			className='game__container'
-			ref={phaserRef}
-		/>
-	);
+	return <div className="game__container" ref={phaserRef} />;
 };
