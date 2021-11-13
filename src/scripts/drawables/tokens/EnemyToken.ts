@@ -90,7 +90,6 @@ export default abstract class EnemyToken extends CharacterToken {
 				// dot = damage over time, deltatime is in ms so we have to devide it by 1000
 				const dot =
 					(globalState.playerCharacter.damage * this.necroticEffectStacks * deltatime) / 1000 / 4;
-				console.log(dot);
 				this.stateObject.health = this.stateObject.health - dot;
 			} else {
 				this.tint = tile.tint;

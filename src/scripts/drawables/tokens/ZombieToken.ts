@@ -143,7 +143,6 @@ export default class ZombieToken extends EnemyToken {
 
 		if (distance < this.attackRange) {
 			player.health -= this.stateObject.damage;
-			console.log(`player health=${player.health}`);
 		}
 	}
 }

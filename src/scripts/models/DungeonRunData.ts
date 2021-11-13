@@ -11,6 +11,7 @@ export interface DungeonLevelData {
 	numberOfRooms: number;
 	enemyBudget: number;
 	isDungeon: boolean;
+	specialStartRoom?: boolean;
 }
 
 export interface DungeonRunData {

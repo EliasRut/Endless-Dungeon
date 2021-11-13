@@ -13,7 +13,7 @@ import {
 	Catalyst,
 	ChestPiece,
 	Ring,
-	Amulet
+	Amulet,
 } from '../../items/itemData';
 import { AbilityType } from '../abilities/abilityData';
 
@@ -44,13 +44,13 @@ const randomItemDefaultOptionss: RandomItemOptions = {
 	catalystWeight: 1,
 	armorWeight: 1,
 	ringWeight: 1,
-	amuletWeight: 1
+	amuletWeight: 1,
 };
 
 export const generateRandomItem = (options: Partial<RandomItemOptions>) => {
 	const combinedOptions = {
 		...randomItemDefaultOptionss,
-		...options
+		...options,
 	};
 	const {
 		level,
@@ -70,7 +70,7 @@ export const generateRandomItem = (options: Partial<RandomItemOptions>) => {
 	let itemType: string;
 	let data: ItemData | AbilityLinkedItem;
 	const totalWeight = sourceWeight + catalystWeight + armorWeight + ringWeight + amuletWeight;
-	if (rnd < (sourceWeight / totalWeight)) {
+	if (rnd < sourceWeight / totalWeight) {
 		itemType = EquippableItemType.SOURCE;
 		if (sourceTypes && sourceTypes.length > 0) {
 			const randomIndex = Math.floor(Math.random() * sourceTypes.length);
@@ -127,7 +127,6 @@ export const generateRandomItem = (options: Partial<RandomItemOptions>) => {
 };
 
 export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystItem) => {
-
 	if (offHand.catalystType === Catalyst.CONE) {
 		switch (baseAbility) {
 			case AbilityType.ARCANE_BOLT: {
@@ -163,15 +162,18 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 		}
 	}
 	switch (baseAbility) {
-		case AbilityType.FIREBALL: {
-			return AbilityType.HAIL_OF_FLAMES;
-		}
 		case AbilityType.ICESPIKE: {
 			return AbilityType.HAIL_OF_ICE;
 		}
 		case AbilityType.ARCANE_BOLT: {
 			return AbilityType.HAIL_OF_BOLTS;
 		}
+		case AbilityType.NECROTIC_BOLT: {
+			return AbilityType.HAIL_OF_DEATH;
+		}
+		case AbilityType.FIREBALL:
+		default: {
+			return AbilityType.HAIL_OF_FLAMES;
+		}
 	}
-	return AbilityType.NOTHING;
-}
+};

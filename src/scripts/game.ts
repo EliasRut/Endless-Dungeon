@@ -16,7 +16,7 @@ const firebaseConfig = {
 	projectId: 'project-endless-dungeon',
 	storageBucket: 'project-endless-dungeon.appspot.com',
 	messagingSenderId: '300065738789',
-	appId: '1:300065738789:web:e0a00f15878d7679226fcc'
+	appId: '1:300065738789:web:e0a00f15878d7679226fcc',
 };
 
 // Initialize Firebase
@@ -38,36 +38,34 @@ export const getGameConfig = (parent: HTMLElement, mode: MODE) => ({
 		autoCenter: Phaser.Scale.CENTER_BOTH,
 		// zoom: Phaser.Scale.ZOOM_4X,
 		width: mode === MODE.NPC_EDITOR ? NPC_EDITOR_WIDTH : DEFAULT_WIDTH,
-		height: mode === MODE.NPC_EDITOR ? NPC_EDITOR_HEIGHT : DEFAULT_HEIGHT
+		height: mode === MODE.NPC_EDITOR ? NPC_EDITOR_HEIGHT : DEFAULT_HEIGHT,
 	},
 	input: {
-			gamepad: true
+		gamepad: true,
 	},
-	scene: mode === MODE.GAME ? [
-		RoomPreloaderScene,
-		NpcGenerationScene,
-		PreloadScene,
-		MainScene,
-		DungeonDoorPreloadScene,
-		DungeonDoorScene
-	] : (mode === MODE.MAP_EDITOR ? [
-		RoomPreloaderScene,
-		NpcGenerationScene,
-		PreloadScene,
-		MapEditor
-	] : [
-		NpcEditor
-	]),
+	scene:
+		mode === MODE.GAME
+			? [
+					RoomPreloaderScene,
+					NpcGenerationScene,
+					PreloadScene,
+					MainScene,
+					DungeonDoorPreloadScene,
+					DungeonDoorScene,
+			  ]
+			: mode === MODE.MAP_EDITOR
+			? [RoomPreloaderScene, NpcGenerationScene, PreloadScene, MapEditor]
+			: [NpcEditor],
 	// We are using Phasers arcade physics library
 	physics: {
 		default: 'arcade',
 		arcade: {
-			debug: true,
-		}
+			debug: false,
+		},
 	},
 	render: {
 		antialias: false,
 		pixelArt: true,
-		roundPixels: false
-	}
+		roundPixels: false,
+	},
 });

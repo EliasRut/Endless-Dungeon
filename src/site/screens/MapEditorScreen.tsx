@@ -32,7 +32,10 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 			<PageWrapper>
 				<MenueWrapper id="mapEditorMenu">
 					<div>
-						<div>Load Room:</div>
+						<ButtonWrapper>
+							<StyledButton id="createNewButton">Create New</StyledButton>
+						</ButtonWrapper>
+						<LoadRoomHeader>Load Room:</LoadRoomHeader>
 						<Dropdown id="roomDropdown">
 							<option>Loading...</option>
 						</Dropdown>
@@ -44,52 +47,22 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 						</ButtonWrapper>
 					</div>
 					<SelectionWrapper>
-						<InputWrapper>
-							<div>Room Name</div>
-							<Input id="roomName" />
-						</InputWrapper>
-						<InputWrapper>
-							<div>Room Width</div>
-							<Input id="roomWidth" width={4} />
-						</InputWrapper>
-						<InputWrapper>
-							<div>Room Height</div>
-							<Input id="roomHeight" width={4} />
-						</InputWrapper>
-						<InputWrapper>
-							<div>Base TileSet</div>
-							<Dropdown id="tilesetDropdown">
-								<option>Loading...</option>
-							</Dropdown>
-						</InputWrapper>
-						<InputWrapper>
-							<div>Decoration TileSet</div>
-							<Dropdown id="tilesetDecorationDropdown">
-								<option>Loading...</option>
-							</Dropdown>
-						</InputWrapper>
-						<InputWrapper>
-							<div>Overlay TileSet</div>
-							<Dropdown id="tilesetOverlayDropdown">
-								<option>Loading...</option>
-							</Dropdown>
-						</InputWrapper>
 						<ButtonWrapper>
-							<StyledButton id="goButton">Go</StyledButton>
+							<StyledButton id="showDetailsButton">Show Details</StyledButton>
 						</ButtonWrapper>
 					</SelectionWrapper>
 					<SelectionWrapper>
 						<div>Selected Layer</div>
 						<Dropdown id="activeLayerDropdown">
-							<option value="base">Base Layer</option>
-							<option value="decoration">Decoration Layer</option>
-							<option value="overlay">Overlay Layer</option>
-							<option value="npcs">NPC Placement</option>
-							<option value="items">Item Placement</option>
+							<option value="base">1 - Base Layer</option>
+							<option value="decoration">2 - Decoration Layer</option>
+							<option value="overlay">3 - Overlay Layer</option>
+							<option value="npcs">4 - NPC Placement</option>
+							<option value="items">5 - Item Placement</option>
 						</Dropdown>
 					</SelectionWrapper>
 					<ExportButtonWrapper>
-						<StyledButton id="exportButton">Export</StyledButton>
+						<StyledButton id="exportButton">Save</StyledButton>
 					</ExportButtonWrapper>
 				</MenueWrapper>
 				<GameWrapper ref={phaserRef}></GameWrapper>
@@ -148,6 +121,51 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 					<StyledRedButton id="itemDeleteButton">Delete</StyledRedButton>
 				</ButtonWrapper>
 			</ItemDetailsDialog>
+			<MapDetailsDialog id="mapDetailsDialog">
+				<DialogTitle>Map Details</DialogTitle>
+				<TwoColumnLayout>
+					<Column>
+						<InputWrapper>
+							<div>Room Name</div>
+							<Input id="roomName" />
+						</InputWrapper>
+						<InputWrapper>
+							<div>Room Width</div>
+							<Input id="roomWidth" width={4} />
+						</InputWrapper>
+						<InputWrapper>
+							<div>Room Height</div>
+							<Input id="roomHeight" width={4} />
+						</InputWrapper>
+						<ButtonWrapper>
+							<StyledButton id="detailsCancelButton">Cancel</StyledButton>
+						</ButtonWrapper>
+					</Column>
+					<Column>
+						<InputWrapper>
+							<div>Base TileSet</div>
+							<Dropdown id="tilesetDropdown">
+								<option>Loading...</option>
+							</Dropdown>
+						</InputWrapper>
+						<InputWrapper>
+							<div>Decoration TileSet</div>
+							<Dropdown id="tilesetDecorationDropdown">
+								<option>Loading...</option>
+							</Dropdown>
+						</InputWrapper>
+						<InputWrapper>
+							<div>Overlay TileSet</div>
+							<Dropdown id="tilesetOverlayDropdown">
+								<option>Loading...</option>
+							</Dropdown>
+						</InputWrapper>
+						<ButtonWrapper>
+							<StyledButton id="detailsSaveButton">Create</StyledButton>
+						</ButtonWrapper>
+					</Column>
+				</TwoColumnLayout>
+			</MapDetailsDialog>
 			<DownloadAnker id="downloadAnchorElem"></DownloadAnker>
 		</PageContainer>
 	);
@@ -158,6 +176,10 @@ const PageContainer = styled.div`
 	width: 100%;
 	display: flex;
 	flex-direction: column;
+`;
+
+const LoadRoomHeader = styled.div`
+	margin-top: 16px;
 `;
 
 const StyledLink = styled(Link)`
@@ -211,10 +233,9 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled.button`
-	width: 120px;
+	width: 148px;
 	font-family: 'munro';
 	font-size: 1rem;
-	margin: 0 10px;
 	padding: 8px;
 `;
 
@@ -272,6 +293,22 @@ const NpcDetailsDialog = styled.div`
 	padding: 24px;
 `;
 
+const MapDetailsDialog = styled.div`
+	display: none;
+	position: fixed;
+	top: 50%;
+	right: 50%;
+	width: 360px;
+	height: 240px;
+	margin-top: -120px;
+	margin-left: -180px;
+	background-color: #333c;
+	border: 2px solid #cccccc;
+	box-shadow: 4px 4px 4px 4px #0009;
+	flex-direction: column;
+	padding: 24px;
+`;
+
 const ItemDetailsDialog = styled.div`
 	display: none;
 	position: fixed;
@@ -292,4 +329,14 @@ const DialogTitle = styled.h2`
 	font-family: 'munro';
 	font-size: 1.2rem;
 	margin: 0;
+`;
+
+const TwoColumnLayout = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+`;
+const Column = styled.div`
+	display: flex;
+	flex-direction: column;
 `;

@@ -48,7 +48,7 @@ interface MultiLevelLayout {
 
 type LevelHistory = MultiLevelLayout[];
 
-const npcKeys = ['hilda-base', 'vanya-base', 'enemy-zombie', 'enemy-vampire'];
+const npcKeys = ['hilda-base', 'vanya-base', 'agnes', 'enemy-zombie', 'enemy-vampire'];
 
 export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
@@ -101,6 +101,8 @@ export default class MapEditor extends Phaser.Scene {
 	oneKey: Phaser.Input.Keyboard.Key;
 	twoKey: Phaser.Input.Keyboard.Key;
 	threeKey: Phaser.Input.Keyboard.Key;
+	fourKey: Phaser.Input.Keyboard.Key;
+	fiveKey: Phaser.Input.Keyboard.Key;
 	wKey: Phaser.Input.Keyboard.Key;
 	aKey: Phaser.Input.Keyboard.Key;
 	sKey: Phaser.Input.Keyboard.Key;
@@ -117,6 +119,7 @@ export default class MapEditor extends Phaser.Scene {
 
 	positionText: PositionText;
 
+	// Details Dialog elements
 	mapEditorMenuElement: HTMLDivElement;
 	roomsDropdownElement: HTMLSelectElement;
 	tilesetDropdownElement: HTMLSelectElement;
@@ -127,8 +130,14 @@ export default class MapEditor extends Phaser.Scene {
 	roomNameElement: HTMLInputElement;
 	roomHeightElement: HTMLInputElement;
 	roomWidthElement: HTMLInputElement;
+	detailsSaveButtonElement: HTMLButtonElement;
+
+	// Main UI elements
 	exportButtonElement: HTMLButtonElement;
 	activeLayerDropdownElement: HTMLSelectElement;
+	showDetailsButtonElement: HTMLButtonElement;
+	createNewButtonElement: HTMLButtonElement;
+	detailsCancelButtonElement: HTMLButtonElement;
 
 	// Npc Details Dialog fields
 	npcTypeDropdownElement: HTMLSelectElement;
@@ -184,6 +193,20 @@ export default class MapEditor extends Phaser.Scene {
 		this.activeLayerDropdownElement = document.getElementById(
 			'activeLayerDropdown'
 		) as HTMLSelectElement;
+		this.showDetailsButtonElement = document.getElementById(
+			'showDetailsButton'
+		) as HTMLButtonElement;
+		this.createNewButtonElement = document.getElementById('createNewButton') as HTMLButtonElement;
+		this.detailsSaveButtonElement = document.getElementById(
+			'detailsSaveButton'
+		) as HTMLButtonElement;
+		this.detailsCancelButtonElement = document.getElementById(
+			'detailsCancelButton'
+		) as HTMLButtonElement;
+
+		this.createNewButtonElement.onclick = () => this.showMapDetailsDialog(true);
+		this.showDetailsButtonElement.onclick = () => this.showMapDetailsDialog(false);
+		this.detailsCancelButtonElement.onclick = () => this.hideMapDetailsDialog();
 
 		// Npc Details Dialog fields
 		this.npcTypeDropdownElement = document.getElementById('npcType') as HTMLSelectElement;
@@ -344,9 +367,9 @@ export default class MapEditor extends Phaser.Scene {
 			this.populateFromDatabase(databaseSelectedRoom);
 		};
 
-		const goButtonElement = document.getElementById('goButton') as HTMLButtonElement;
-		goButtonElement.onclick = () => {
+		this.detailsSaveButtonElement.onclick = () => {
 			this.applyConfiguration();
+			this.hideMapDetailsDialog();
 		};
 
 		// NPC Details Dialog
@@ -380,6 +403,8 @@ export default class MapEditor extends Phaser.Scene {
 		this.oneKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE, false);
 		this.twoKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO, false);
 		this.threeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE, false);
+		this.fourKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR, false);
+		this.fiveKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FIVE, false);
 		this.wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, false);
 		this.aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A, false);
 		this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, false);
@@ -489,6 +514,23 @@ export default class MapEditor extends Phaser.Scene {
 		this.add.existing(this.itemLibraryLayer);
 
 		this.addToHistory(true);
+	}
+
+	showMapDetailsDialog(wasNewClicked: boolean) {
+		const dialog = document.getElementById('mapDetailsDialog')!;
+		dialog.style.display = 'flex';
+
+		this.detailsSaveButtonElement.innerText = wasNewClicked ? 'Create' : 'Update';
+		if (wasNewClicked) {
+			this.roomNameElement.value = '';
+		} else {
+			this.roomNameElement.value = this.fileData.name || '';
+		}
+	}
+
+	hideMapDetailsDialog() {
+		const dialog = document.getElementById('mapDetailsDialog')!;
+		dialog.style.display = 'none';
 	}
 
 	getTileLayerForName(layerName: string) {
@@ -1372,8 +1414,20 @@ export default class MapEditor extends Phaser.Scene {
 		if (this.aKey.isDown) {
 			this.cameraPositionX = this.cameraPositionX - CAMERA_MOVEMENT_PER_FRAME;
 		}
-		if (this.oneKey.isDown || this.twoKey.isDown || this.threeKey.isDown) {
-			const newLayer = this.oneKey.isDown ? 'base' : this.twoKey.isDown ? 'decoration' : 'overlay';
+		if (
+			this.oneKey.isDown ||
+			this.twoKey.isDown ||
+			this.threeKey.isDown ||
+			this.fourKey.isDown ||
+			this.fiveKey.isDown
+		) {
+			let newLayer = 'base';
+			if (this.oneKey.isDown) newLayer = 'base';
+			else if (this.twoKey.isDown) newLayer = 'decoration';
+			else if (this.threeKey.isDown) newLayer = 'overlay';
+			else if (this.fourKey.isDown) newLayer = 'npcs';
+			else if (this.fiveKey.isDown) newLayer = 'items';
+
 			const activeLayerValue = this.activeLayerDropdownElement.value;
 			if (activeLayerValue !== newLayer) {
 				this.activeLayerDropdownElement.value = newLayer;
