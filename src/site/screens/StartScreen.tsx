@@ -20,14 +20,14 @@ export const StartScreen = () => {
 	);
 };
 
-const SiteHeader = styled.h1`
+export const SiteHeader = styled.h1`
 	font-size: 8rem;
 	letter-spacing: 4px;
 	text-align: center;
 	text-shadow: 4px 4px 4px #c3c3c3;
 `;
 
-const ButtonContainer = styled.div`
+export const ButtonContainer = styled.div`
 	display: flex;
 	flex-direction: row;
 	justify-content: space-evenly;
