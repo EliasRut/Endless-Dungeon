@@ -43,13 +43,8 @@ export default abstract class EnemyToken extends CharacterToken {
 	public checkLoS() {
 		// Instead of ray tracing we're using the players line of sight calculation, which tints the
 		// tile the enemy stands on.
-
-		if (this.body) {
-			const x = Math.round(this.body.x / TILE_WIDTH);
-			const y = Math.round(this.body.y / TILE_HEIGHT);
-			return this.scene.dynamicLightingHelper?.visibleTiles[x][y];
-		}
-		return false;
+		const tile = this.getOccupiedTile();
+		return tile && tile.tint > VISITED_TILE_TINT;
 	}
 
 	dropRandomItem(level: number = 1) {
@@ -83,7 +78,8 @@ export default abstract class EnemyToken extends CharacterToken {
 		const tile = this.getOccupiedTile();
 		if (tile) {
 			this.tint = tile.tint;
-			this.setVisible(tile.tint !== VISITED_TILE_TINT);
+			const isVisible = tile.tint > VISITED_TILE_TINT;
+			this.setVisible(isVisible);
 		}
 
 		// set aggro boolean, use a linger time for aggro

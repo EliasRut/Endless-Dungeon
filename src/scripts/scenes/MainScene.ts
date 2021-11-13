@@ -530,9 +530,6 @@ export default class MainScene extends Phaser.Scene {
 			return;
 		}
 
-		Object.values(this.npcMap).forEach((curNpc) => {
-			curNpc.update(globalTime);
-		});
 		if (!this.blockUserInteraction) {
 			if (globalState.playerCharacter.stunned === true) return;
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalTime);
@@ -591,6 +588,11 @@ export default class MainScene extends Phaser.Scene {
 		if (this.useDynamicLighting && this.dynamicLightingHelper) {
 			this.dynamicLightingHelper.updateDynamicLighting();
 		}
+
+		// Updated npcs
+		Object.values(this.npcMap).forEach((curNpc) => {
+			curNpc.update(globalTime);
+		});
 
 		// TODO: remove items that are picked up
 		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);

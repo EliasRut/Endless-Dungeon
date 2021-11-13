@@ -10,13 +10,11 @@ const TEN_SECONDS_IN_FRAMES = 600;
 const LIGHTRAY_PRECISION = 10000;
 
 const lightPassingTileIds = [
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
-	41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
-	84, 85, 86, 90, 91, 92
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52,
+	53, 54, 84, 85, 86, 90, 91, 92,
 ];
 
 export default class DynamicLightingHelper {
-
 	lightingLevels: number[][] = [];
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
@@ -31,7 +29,7 @@ export default class DynamicLightingHelper {
 	constructor(
 		tileLayer: Phaser.Tilemaps.TilemapLayer,
 		decorationLayer: Phaser.Tilemaps.TilemapLayer,
-		overlayLayer: Phaser.Tilemaps.TilemapLayer,
+		overlayLayer: Phaser.Tilemaps.TilemapLayer
 	) {
 		this.tileLayer = tileLayer;
 		this.decorationLayer = decorationLayer;
@@ -44,15 +42,15 @@ export default class DynamicLightingHelper {
 	}
 
 	prepareDynamicLighting() {
-		const {width, height} = this.getCurrentLevel();
+		const { width, height } = this.getCurrentLevel();
 		const dungeonWidth = width * TILE_WIDTH;
 		const dungeonHeight = height * TILE_HEIGHT;
-		this.tileLayer.forEachTile((tile) => tile.tint = 0x000000);
-		this.decorationLayer.forEachTile((tile) => tile.tint = 0x000000);
-		this.overlayLayer.forEachTile((tile) => tile.tint = 0x000000);
+		this.tileLayer.forEachTile((tile) => (tile.tint = 0x000000));
+		this.decorationLayer.forEachTile((tile) => (tile.tint = 0x000000));
+		this.overlayLayer.forEachTile((tile) => (tile.tint = 0x000000));
 		for (let x = 0; x < dungeonWidth; x++) {
-				this.isBlockingTile[x] = [];
-				this.visitedTiles[x] = [];
+			this.isBlockingTile[x] = [];
+			this.visitedTiles[x] = [];
 			for (let y = 0; y < dungeonHeight; y++) {
 				this.visitedTiles[x][y] = 0;
 				const tile = this.tileLayer.getTileAt(x, y);
@@ -62,9 +60,8 @@ export default class DynamicLightingHelper {
 					const tileIdNormalized = tile.index % GID_MULTIPLE;
 					// tslint:disable: no-magic-numbers
 					this.isBlockingTile[x][y] =
-						isCollidingTile(tile.index) &&
-							!lightPassingTileIds.includes(tileIdNormalized);
-						// tileIdNormalized < 15 || (tileIdNormalized >= 45 && tileIdNormalized < 60);
+						isCollidingTile(tile.index) && !lightPassingTileIds.includes(tileIdNormalized);
+					// tileIdNormalized < 15 || (tileIdNormalized >= 45 && tileIdNormalized < 60);
 					// tslint:enable: no-magic-numbers
 				}
 			}
@@ -84,8 +81,7 @@ export default class DynamicLightingHelper {
 				// tslint:disable: no-magic-numbers
 				const d = Math.min(255 - 1, Math.round(distanceNormalized * 300));
 				// This will give us a hex value of 0xdddddd, so a greyscale lighting factor
-				this.lightingLevels[x][y] =
-					0x010000 * d + 0x000100 * d + 0x000001 * d + 0x010101;
+				this.lightingLevels[x][y] = 0x010000 * d + 0x000100 * d + 0x000001 * d + 0x010101;
 				// tslint:enable: no-magic-numbers
 			}
 		}
@@ -103,7 +99,7 @@ export default class DynamicLightingHelper {
 	reducedLightingArray: number[][] = [];
 
 	updateDynamicLighting() {
-		const {width, height} = this.getCurrentLevel();
+		const { width, height } = this.getCurrentLevel();
 		const dungeonWidth = width * TILE_WIDTH;
 		const dungeonHeight = height * TILE_HEIGHT;
 		// Take time for benchmarking
@@ -161,8 +157,8 @@ export default class DynamicLightingHelper {
 					this.visitedTiles[tileX][tileY] = Math.max(
 						VISITED_TILE_TINT *
 							((this.visibleTiles[x + sightRadius][y + sightRadius] &&
-								(Math.hypot(distanceX, distanceY) <= (lightRadius * TILE_HEIGHT))
-							) as unknown as number),
+								Math.hypot(distanceX, distanceY) <=
+									lightRadius * TILE_HEIGHT) as unknown as number),
 						this.visitedTiles[tileX][tileY]
 					);
 					//
@@ -171,10 +167,11 @@ export default class DynamicLightingHelper {
 					// VISITED_TILE_TINT if it has been visited before,
 					// black otherwise
 					const tint = Math.max(
-						this.visibleTiles[x + sightRadius][y + sightRadius] as unknown as number *
+						(this.visibleTiles[x + sightRadius][y + sightRadius] as unknown as number) *
 							this.lightingLevels[distanceX][distanceY],
 						this.visitedTiles[tileX][tileY] +
-							(this.visibleTiles[x + sightRadius][y + sightRadius] as unknown as number));
+							(this.visibleTiles[x + sightRadius][y + sightRadius] as unknown as number)
+					);
 					if (tile) {
 						tile.tint = tint;
 					}
@@ -190,8 +187,9 @@ export default class DynamicLightingHelper {
 
 		this.dynamicLightingTimes.push(window.performance.now() - beforeDynamicLighting);
 		if (this.dynamicLightingTimes.length >= TEN_SECONDS_IN_FRAMES) {
-			const avg = this.dynamicLightingTimes.reduce((sum, value) => sum + value)
-				/ this.dynamicLightingTimes.length;
+			const avg =
+				this.dynamicLightingTimes.reduce((sum, value) => sum + value) /
+				this.dynamicLightingTimes.length;
 			// tslint:disable-next-line: no-console
 			console.log(`Dynamic lighting took on avg ${avg} ms`);
 			this.dynamicLightingTimes = [];
@@ -222,10 +220,10 @@ export default class DynamicLightingHelper {
 		for (let i = 1; i <= steps; i++) {
 			xDelta += vectorXAbs;
 			yDelta += vectorYAbs;
-			x += (xDelta >= xThreshold) as unknown as number * xStepDiff;
-			y += (yDelta >= yThreshold) as unknown as number * yStepDiff;
-			xDelta -= (xDelta >= xThreshold) as unknown as number * xThreshold;
-			yDelta -= (yDelta >= yThreshold) as unknown as number * yThreshold;
+			x += ((xDelta >= xThreshold) as unknown as number) * xStepDiff;
+			y += ((yDelta >= yThreshold) as unknown as number) * yStepDiff;
+			xDelta -= ((xDelta >= xThreshold) as unknown as number) * xThreshold;
+			yDelta -= ((yDelta >= yThreshold) as unknown as number) * yThreshold;
 
 			this.visibleTiles[x + sightRadius][y + sightRadius] = true;
 			if (this.isBlockingTile[x + originX][y + originY]) {
@@ -233,5 +231,5 @@ export default class DynamicLightingHelper {
 				break;
 			}
 		}
-	}
+	};
 }

@@ -487,6 +487,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.mapEditorHighlighting.setScale(1);
 			this.npcLibraryLayer.setVisible(false);
 			this.hideNpcDetailsDialog();
+			this.hideItemDetailsDialog();
 		} else if (activeLayerValue === 'decoration') {
 			this.tileLayer.removeInteractive();
 			this.decorationTileLayer.setInteractive();
@@ -494,6 +495,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.mapEditorHighlighting.setScale(1);
 			this.npcLibraryLayer.setVisible(false);
 			this.hideNpcDetailsDialog();
+			this.hideItemDetailsDialog();
 		} else if (activeLayerValue === 'overlay') {
 			this.tileLayer.removeInteractive();
 			this.decorationTileLayer.removeInteractive();
@@ -501,6 +503,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.mapEditorHighlighting.setScale(1);
 			this.npcLibraryLayer.setVisible(false);
 			this.hideNpcDetailsDialog();
+			this.hideItemDetailsDialog();
 		} else if (activeLayerValue === 'npcs') {
 			this.tileLayer.setInteractive();
 			this.decorationTileLayer.removeInteractive();
