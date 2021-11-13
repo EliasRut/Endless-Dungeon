@@ -38,7 +38,8 @@ import Minimap from '../drawables/ui/Minimap';
 import { AbilityType } from '../abilities/abilityData';
 import LevelName from '../drawables/ui/LevelName';
 import QuestsIcon from '../drawables/ui/QuestsIcon';
-import QuestsScreen from '../screens/QuestsScreen';
+import QuestLogScreen from '../screens/QuestLogScreen';
+import QuestDetailsScreen from '../screens/QuestDetailsScreen';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -77,7 +78,8 @@ export default class MainScene extends Phaser.Scene {
 		statScreen: StatScreen;
 		dialogScreen: DialogScreen;
 		settingsScreen: SettingsScreen;
-		questsScreen: QuestsScreen;
+		questLogScreen: QuestLogScreen;
+		questDetailsScreen: QuestDetailsScreen;
 		itemScreen: ItemScreen;
 	};
 	alive: number;
@@ -236,7 +238,8 @@ export default class MainScene extends Phaser.Scene {
 			inventory: new InventoryScreen(this),
 			dialogScreen: new DialogScreen(this),
 			settingsScreen: new SettingsScreen(this),
-			questsScreen: new QuestsScreen(this),
+			questLogScreen: new QuestLogScreen(this),
+			questDetailsScreen: new QuestDetailsScreen(this),
 		};
 
 		this.icons.backpackIcon.setScreens();

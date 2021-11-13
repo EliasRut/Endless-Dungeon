@@ -14,7 +14,7 @@ const quests: [boolean, string][] = [
 	[false, 'The Hunt'],
 ];
 
-export default class QuestsScreen extends OverlayScreen {
+export default class QuestLogScreen extends OverlayScreen {
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
 		super(scene, QUEST_SCREEN_X, QUEST_SCREEN_Y, SCREEN_WIDTH, 280);

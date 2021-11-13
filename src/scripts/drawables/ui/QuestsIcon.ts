@@ -9,7 +9,7 @@ export default class QuestsIcon extends MenuIcon {
 
 	setScreens() {
 		if (!this.screens) {
-			this.screens = [this.scene.overlayScreens.questsScreen];
+			this.screens = [this.scene.overlayScreens.questLogScreen];
 		}
 	}
 }
