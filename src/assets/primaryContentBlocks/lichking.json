@@ -1,43 +1,35 @@
 {
-    "title": "Legends of the Lich King",
-    "lowerBoundOfSecondaryContentBlocks": 1,
-    "upperBoundOfSecondaryContentBlocks": 1,
-    "dungeonLevels": [
-        {
-            "title": "Royal crypta - Level 1",
-            "style": "death",
-            "rooms": [
-                "COM-death-key"
-            ],
-            "width": 16,
-            "height": 16,
-            "numberOfRooms": 6,
-            "enemyBudget": 25
-        },
-        {
-            "title": "Royal crypta - Level 2",
-            "style": "death",
-            "rooms": [
-                "COM-death-combat-1"
-            ],
-            "width": 12,
-            "height": 12,
-            "numberOfRooms": 4,
-            "enemyBudget": 25
-        },
-        {
-            "title": "Royal crypta - Level 3",
-            "style": "death",
-            "rooms": [
-                "COM-death-throne-room"
-            ],
-            "width": 12,
-            "height": 12,
-            "numberOfRooms": 3,
-            "enemyBudget": 15
-        }
-    ],
-    "themes": [
-        "death"
-    ]
+	"title": "Legends of the Lich King",
+	"lowerBoundOfSecondaryContentBlocks": 1,
+	"upperBoundOfSecondaryContentBlocks": 1,
+	"dungeonLevels": [
+		{
+			"title": "Royal crypta - Level 1",
+			"style": "death",
+			"rooms": ["COM-death-key"],
+			"width": 16,
+			"height": 16,
+			"numberOfRooms": 6,
+			"enemyBudget": 25
+		},
+		{
+			"title": "Royal crypta - Level 2",
+			"style": "death",
+			"rooms": ["COM-death-combat-1"],
+			"width": 12,
+			"height": 12,
+			"numberOfRooms": 4,
+			"enemyBudget": 25
+		},
+		{
+			"title": "Royal crypta - Level 3",
+			"style": "death",
+			"rooms": ["COM-death-throne-room"],
+			"width": 12,
+			"height": 12,
+			"numberOfRooms": 3,
+			"enemyBudget": 15
+		}
+	],
+	"themes": ["death"]
 }

@@ -1,0 +1,17 @@
+{
+	"title": "The Rescue",
+	"lowerBoundOfSecondaryContentBlocks": 0,
+	"upperBoundOfSecondaryContentBlocks": 0,
+	"dungeonLevels": [
+		{
+			"title": "Zombie Tomb - Level 1",
+			"style": "death",
+			"rooms": ["chapter-1-start-room"],
+			"width": 8,
+			"height": 8,
+			"numberOfRooms": 2,
+			"enemyBudget": 0
+		}
+	],
+	"themes": ["death"]
+}
