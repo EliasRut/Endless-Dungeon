@@ -42,6 +42,7 @@ interface AbilityData {
 	icon?: [string, number];
 	damageMultiplier: number;
 	stun?: number;
+	necroticStacks?: number;
 }
 
 export const enum AbilityType {
@@ -494,7 +495,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sfxVolume: 0.1,
 		cooldownMs: 250,
 		damageMultiplier: 1,
-		stun: 3000,
+		necroticStacks: 1,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
 	},
@@ -520,6 +521,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sound: 'sound-icespike',
 		sfxVolume: 0.1,
 		cooldownMs: 1500,
+		necroticStacks: 1,
 		damageMultiplier: 0.25,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],

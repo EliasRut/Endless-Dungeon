@@ -20,7 +20,14 @@ export default class ZombieToken extends EnemyToken {
 	attackExecuted: boolean;
 	startingHealth: number;
 
-	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
+	constructor(
+		scene: MainScene,
+		x: number,
+		y: number,
+		tokenName: string,
+		level: number,
+		id: string
+	) {
 		super(scene, x, y, tokenName, id);
 		// cool effects!
 		this.level = level - 1;
@@ -32,14 +39,16 @@ export default class ZombieToken extends EnemyToken {
 		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
 	}
 
-	public update(time: number) {
-		super.update(time);
-		
-		this.stateObject.movementSpeed = Math.max(MIN_MOVEMENT_SPEED,
-		REGULAR_MOVEMENT_SPEED * this.stateObject.health / this.startingHealth);
+	public update(time: number, delta: number) {
+		super.update(time, delta);
+
+		this.stateObject.movementSpeed = Math.max(
+			MIN_MOVEMENT_SPEED,
+			(REGULAR_MOVEMENT_SPEED * this.stateObject.health) / this.startingHealth
+		);
 
 		// check death
-		if (this.stateObject.health <= 0){
+		if (this.stateObject.health <= 0) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
 				this.dropRandomItem(this.level);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
@@ -59,9 +68,11 @@ export default class ZombieToken extends EnemyToken {
 		const ty = this.target.y;
 		const distance = this.getDistance(tx, ty);
 
-		if (this.attackedAt > 0
-				&& !this.attackExecuted
-				&& (this.attackedAt + ATTACK_DAMAGE_DELAY) < time) {
+		if (
+			this.attackedAt > 0 &&
+			!this.attackExecuted &&
+			this.attackedAt + ATTACK_DAMAGE_DELAY < time
+		) {
 			this.attackExecuted = true;
 			this.maybeDealDamage();
 			return;
@@ -72,34 +83,30 @@ export default class ZombieToken extends EnemyToken {
 		// follows you only if you're close enough, then runs straight at you,
 		// stop when close enough (proximity)
 
-		if (this.aggro
-			&& this.attackedAt + this.stateObject.attackTime < time
-			&& this.attackRange < distance) {
+		if (
+			this.aggro &&
+			this.attackedAt + this.stateObject.attackTime < time &&
+			this.attackRange < distance
+		) {
 			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
-			const xSpeed = (tx - this.x) / totalDistance * this.stateObject.movementSpeed;
-			const ySpeed = (ty - this.y) / totalDistance * this.stateObject.movementSpeed;
+			const xSpeed = ((tx - this.x) / totalDistance) * this.stateObject.movementSpeed;
+			const ySpeed = ((ty - this.y) / totalDistance) * this.stateObject.movementSpeed;
 			this.setVelocityX(xSpeed);
 			this.setVelocityY(ySpeed);
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const animation = updateMovingState(
-				this.stateObject,
-				true,
-				newFacing);
+			const animation = updateMovingState(this.stateObject, true, newFacing);
 			if (animation) {
 				this.play(animation);
 			}
 		} else {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
-			const animation = updateMovingState(
-				this.stateObject,
-				false,
-				this.stateObject.currentFacing);
+			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
 			if (animation) {
 				this.play(animation);
 			}
 		}
-		if(distance <= this.attackRange) {
+		if (distance <= this.attackRange) {
 			this.attack(time);
 		}
 		this.stateObject.x = this.body.x;
@@ -110,12 +117,12 @@ export default class ZombieToken extends EnemyToken {
 		super.destroy();
 	}
 
-	attack(time: number) {		
+	attack(time: number) {
 		if (this.attackedAt + this.stateObject.attackTime < time) {
 			const tx = this.target.x;
 			const ty = this.target.y;
-			const xSpeed = (tx - this.x);
-			const ySpeed = (ty - this.y);
+			const xSpeed = tx - this.x;
+			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 
 			const attackAnimationName = `enemy-zombie-slash-${facingToSpriteNameMap[newFacing]}`;

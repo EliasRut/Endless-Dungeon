@@ -12,13 +12,19 @@ const CAST_DURATION = 2500;
 const SPAWN_SEARCH_RADIUS = 250;
 
 export default class LichtKingToken extends EnemyToken {
-
 	summonCD = 20000;
 	summonedAt = -Infinity;
 	casting = 0;
 	addsCounter: number = 0;
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
+	constructor(
+		scene: MainScene,
+		x: number,
+		y: number,
+		tokenName: string,
+		level: number,
+		id: string
+	) {
 		super(scene, x, y, tokenName, id);
 
 		this.setScale(2);
@@ -41,14 +47,14 @@ export default class LichtKingToken extends EnemyToken {
 			blendMode: Phaser.BlendModes.ADD,
 			frequency: 30,
 			maxParticles: 200,
-			follow: this
+			follow: this,
 		});
 		this.emitter.startFollow(this.body.gameObject);
 		this.emitter.start();
 	}
 
-	public update(time: number,) {
-		super.update(time);
+	public update(time: number, delta: number) {
+		super.update(time, delta);
 
 		// check death
 		if (this.stateObject.health <= 0) {
@@ -66,9 +72,11 @@ export default class LichtKingToken extends EnemyToken {
 			return;
 		}
 
-		const timeSinceAttack = Math.max(1,
-			Math.min(this.stateObject.attackTime, time - this.attackedAt));
-		this.emitter.setFrequency(30 + (this.stateObject.attackTime / timeSinceAttack))
+		const timeSinceAttack = Math.max(
+			1,
+			Math.min(this.stateObject.attackTime, time - this.attackedAt)
+		);
+		this.emitter.setFrequency(30 + this.stateObject.attackTime / timeSinceAttack);
 
 		const tx = this.target.x;
 		const ty = this.target.y;
@@ -83,16 +91,11 @@ export default class LichtKingToken extends EnemyToken {
 		const ySpeed = yFactor * this.stateObject.movementSpeed;
 		const newFacing = getFacing8Dir(xSpeed, ySpeed);
 
-		if(this.aggro) {
-			if (this.attackedAt + this.stateObject.attackTime < time
-				&& this.attackRange < distance) {
-
+		if (this.aggro) {
+			if (this.attackedAt + this.stateObject.attackTime < time && this.attackRange < distance) {
 				this.setVelocityX(xSpeed);
 				this.setVelocityY(ySpeed);
-				const animation = updateMovingState(
-					this.stateObject,
-					true,
-					newFacing);
+				const animation = updateMovingState(this.stateObject, true, newFacing);
 
 				if (animation) {
 					this.play(animation);
@@ -103,7 +106,8 @@ export default class LichtKingToken extends EnemyToken {
 				const animation = updateMovingState(
 					this.stateObject,
 					false,
-					this.stateObject.currentFacing);
+					this.stateObject.currentFacing
+				);
 
 				if (animation) {
 					this.play(animation);
@@ -111,7 +115,7 @@ export default class LichtKingToken extends EnemyToken {
 				this.stateObject.currentFacing = newFacing;
 			}
 
-			if(distance <= this.attackRange && this.checkLoS()) {
+			if (distance <= this.attackRange && this.checkLoS()) {
 				this.attack(time);
 			}
 
@@ -123,23 +127,19 @@ export default class LichtKingToken extends EnemyToken {
 	attack(time: number) {
 		if (this.summonedAt + this.summonCD < time) {
 			this.summon(time);
-		}
-		else if (this.attackedAt + this.stateObject.attackTime < time) {
+		} else if (this.attackedAt + this.stateObject.attackTime < time) {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.attackedAt = time;
-			this.scene.abilityHelper.triggerAbility(
-				this.stateObject,
-				AbilityType.ARCANE_BLADE,
-				time);
+			this.scene.abilityHelper.triggerAbility(this.stateObject, AbilityType.ARCANE_BLADE, time);
 		}
-	}	
+	}
 	summon(time: number) {
-		if(this.casting === 0) {
+		if (this.casting === 0) {
 			this.casting = SUMMON_SPEED;
 			this.summonedAt = time;
 		}
-		if(this.casting >= CAST_DURATION) {
+		if (this.casting >= CAST_DURATION) {
 			this.casting = 0;
 			return;
 		}
@@ -153,7 +153,8 @@ export default class LichtKingToken extends EnemyToken {
 					xy[1],
 					1,
 					0,
-					0);
+					0
+				);
 				this.addsCounter++;
 				this.casting += SUMMON_SPEED;
 			} else {
@@ -165,7 +166,8 @@ export default class LichtKingToken extends EnemyToken {
 					xy[1],
 					1,
 					0,
-					0);
+					0
+				);
 				this.addsCounter++;
 				this.casting += SUMMON_SPEED;
 			}

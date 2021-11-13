@@ -21,7 +21,14 @@ export default class VampireToken extends EnemyToken {
 	startingHealth: number;
 	launched: boolean = false;
 
-	constructor(scene: MainScene, x: number, y: number, tokenName: string, level: number, id: string) {
+	constructor(
+		scene: MainScene,
+		x: number,
+		y: number,
+		tokenName: string,
+		level: number,
+		id: string
+	) {
 		super(scene, x, y, tokenName, id);
 		// cool effects!
 		this.level = level - 1;
@@ -34,11 +41,13 @@ export default class VampireToken extends EnemyToken {
 		this.stateObject.attackTime = 1500;
 	}
 
-	public update(time: number) {
-		super.update(time);
+	public update(time: number, delta: number) {
+		super.update(time, delta);
 
-		this.stateObject.movementSpeed = Math.max(MIN_MOVEMENT_SPEED,
-			REGULAR_MOVEMENT_SPEED * this.stateObject.health / this.startingHealth);
+		this.stateObject.movementSpeed = Math.max(
+			MIN_MOVEMENT_SPEED,
+			(REGULAR_MOVEMENT_SPEED * this.stateObject.health) / this.startingHealth
+		);
 
 		// check death
 		if (this.stateObject.health <= 0) {
@@ -67,15 +76,12 @@ export default class VampireToken extends EnemyToken {
 			const distance = this.getDistance(tx, ty);
 			if (this.aggro && this.attackRange < distance) {
 				const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
-				const xSpeed = (tx - this.x) / totalDistance * this.stateObject.movementSpeed;
-				const ySpeed = (ty - this.y) / totalDistance * this.stateObject.movementSpeed;
+				const xSpeed = ((tx - this.x) / totalDistance) * this.stateObject.movementSpeed;
+				const ySpeed = ((ty - this.y) / totalDistance) * this.stateObject.movementSpeed;
 				this.setVelocityX(xSpeed);
 				this.setVelocityY(ySpeed);
 				const newFacing = getFacing4Dir(xSpeed, ySpeed);
-				const animation = updateMovingState(
-					this.stateObject,
-					true,
-					newFacing);
+				const animation = updateMovingState(this.stateObject, true, newFacing);
 				if (animation) {
 					this.play(animation);
 				}
@@ -85,7 +91,8 @@ export default class VampireToken extends EnemyToken {
 				const animation = updateMovingState(
 					this.stateObject,
 					false,
-					this.stateObject.currentFacing);
+					this.stateObject.currentFacing
+				);
 				if (animation) {
 					this.play(animation);
 				}
@@ -110,30 +117,29 @@ export default class VampireToken extends EnemyToken {
 	}
 
 	attack(time: number) {
-		if (this.attackedAt + this.stateObject.attackTime < time) {			
+		if (this.attackedAt + this.stateObject.attackTime < time) {
 			this.attackedAt = time;
 			this.attacking = true;
 			const tx = this.target.x;
 			const ty = this.target.y;
-			const xSpeed = (tx - this.x);
-			const ySpeed = (ty - this.y);
+			const xSpeed = tx - this.x;
+			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const attackAnimationName = `enemy-vampire-prepare-${facingToSpriteNameMap[newFacing]}`;
 			this.play(attackAnimationName);
 
 			this.setVelocityX(0);
 			this.setVelocityY(0);
-
-		} else if (this.attackedAt + this.preAttackTime < time && !this.launched) {			
+		} else if (this.attackedAt + this.preAttackTime < time && !this.launched) {
 			this.launched = true;
 			const tx = this.target.x;
 			const ty = this.target.y;
 			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
-			const xSpeed = (tx - this.x) / totalDistance * this.stateObject.movementSpeed;
-			const ySpeed = (ty - this.y) / totalDistance * this.stateObject.movementSpeed;
+			const xSpeed = ((tx - this.x) / totalDistance) * this.stateObject.movementSpeed;
+			const ySpeed = ((ty - this.y) / totalDistance) * this.stateObject.movementSpeed;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const attackAnimationName = `enemy-vampire-fly-${facingToSpriteNameMap[newFacing]}`;
-			this.play(attackAnimationName);		
+			this.play(attackAnimationName);
 
 			this.setVelocityX(xSpeed * 3);
 			this.setVelocityY(ySpeed * 3);
@@ -145,8 +151,8 @@ export default class VampireToken extends EnemyToken {
 			stun(globalState.gameTime, 1000, this.stateObject);
 			const tx = this.target.x;
 			const ty = this.target.y;
-			const xSpeed = (tx - this.x);
-			const ySpeed = (ty - this.y);
+			const xSpeed = tx - this.x;
+			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const attackAnimationName = `enemy-vampire-stun-${facingToSpriteNameMap[newFacing]}`;
 			this.play(attackAnimationName);

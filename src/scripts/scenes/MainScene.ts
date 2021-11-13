@@ -475,7 +475,7 @@ export default class MainScene extends Phaser.Scene {
 		// tslint:enable: no-magic-numbers
 	}
 
-	update(globalTime: number, _delta: number) {
+	update(globalTime: number, delta: number) {
 		globalState.gameTime = globalTime;
 		this.fpsText.update();
 		this.minimap?.update();
@@ -531,7 +531,7 @@ export default class MainScene extends Phaser.Scene {
 		}
 
 		Object.values(this.npcMap).forEach((curNpc) => {
-			curNpc.update(globalTime);
+			curNpc.update(globalTime, delta);
 		});
 		if (!this.blockUserInteraction) {
 			if (globalState.playerCharacter.stunned === true) return;
