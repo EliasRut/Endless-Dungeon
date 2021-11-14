@@ -21,22 +21,19 @@ export class WorldState {
 	public loadGame: boolean = true;
 	public gameTime: number;
 	public playerCharacter: PlayerCharacter;
-	public transitionStack: {[id: string]: RoomCoordinates} = {};
-	public npcs: {[id: string]: Character} = {};
-	public enemies: {[id: string]: Character} = {};
-	public doors: {[id: string]: Door} = {};
+	public transitionStack: { [id: string]: RoomCoordinates } = {};
+	public npcs: { [id: string]: Character } = {};
+	public enemies: { [id: string]: Character } = {};
+	public doors: { [id: string]: Door } = {};
 	public scripts: ScriptState = {};
-	public quests: {[id: string]: QuestState} = {};
+	public quests: { [id: string]: QuestState } = {};
 	public dungeon: Dungeon;
-	public availableRooms: {[name: string]: Room} = {};
+	public availableRooms: { [name: string]: Room } = {};
 	public availableTilesets: string[] = [];
 	public currentLevel: string = 'town_new';
-	public roomAssignment: {[name: string]: RoomAssignment} = {};
+	public roomAssignment: { [name: string]: RoomAssignment } = {};
 	public inventory: Inventory;
 	public itemList: Item[];
-
-
-
 
 	public static readonly PLAYERCHARACTER: string = 'playerCharacter';
 	public static readonly GAMETIME: string = 'gameTime';
@@ -54,16 +51,12 @@ export class WorldState {
 	public static readonly INVENTORY: string = 'inventory';
 	public static readonly SAVEGAMENAME: string = 'saveGameName';
 
-
-
 	constructor() {
 		this.playerCharacter = new PlayerCharacter();
 		this.dungeon = new Dungeon();
 		this.inventory = new Inventory();
 		this.itemList = [];
 	}
-
-
 
 	storeState() {
 		localStorage.setItem(WorldState.PLAYERCHARACTER, JSON.stringify(this.playerCharacter));
@@ -88,7 +81,7 @@ export class WorldState {
 		// localStorage.clear();
 		const saveGameName = localStorage.getItem('saveGameName');
 		if (!saveGameName) {
-			console.log("no savegamename set")
+			console.log('no savegamename set');
 			return;
 		}
 		this.gameTime = parseInt(localStorage.getItem(WorldState.GAMETIME) || '0', 10);
@@ -102,17 +95,12 @@ export class WorldState {
 		this.transitionStack = JSON.parse(localStorage.getItem(WorldState.TRANSITIONSTACK) || '{}');
 		this.availableRooms = JSON.parse(localStorage.getItem(WorldState.AVAILABLEROOMS) || '{}');
 		this.availableTilesets = JSON.parse(localStorage.getItem(WorldState.AVAILABLETILESETS) || '{}');
-		console.log("setting current level to"+localStorage.getItem(WorldState.CURRENTLEVEL))
+		console.log('setting current level to' + localStorage.getItem(WorldState.CURRENTLEVEL));
 		this.currentLevel = JSON.parse(localStorage.getItem(WorldState.CURRENTLEVEL) || '{}');
 		this.roomAssignment = JSON.parse(localStorage.getItem(WorldState.ROOMASSIGNMENT) || '{}');
 		this.inventory = JSON.parse(localStorage.getItem(WorldState.INVENTORY) || '{}');
 		// Reset cast times.
-		this.playerCharacter.abilityCastTime = [
-			-Infinity,
-			-Infinity,
-			-Infinity,
-			-Infinity
-		];
+		this.playerCharacter.abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity];
 	}
 
 	clearState() {

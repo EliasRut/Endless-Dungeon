@@ -2,13 +2,35 @@ import { DungeonLevelData, DungeonRunData } from '../models/DungeonRunData';
 import { SecondaryContentBlock } from '../models/SecondaryContentBlock';
 import { RuneAssignment } from './constants';
 import ContentDataLibrary from './ContentDataLibrary';
+import globalState from '../worldstate/index';
 
 const CHANCE_FOR_MATCHING_SECONDARY_CONTENT = 0.5;
 
 export const generateDungeonRun: (runes: RuneAssignment) => DungeonRunData = (runes) => {
-	const matchingPrimaryContents = ContentDataLibrary.primaryContent.filter((primaryContent) =>
-		primaryContent.themes.includes(runes.primaryContent)
-	);
+	const matchingPrimaryContents = ContentDataLibrary.primaryContent.filter((primaryContent) => {
+		if (!primaryContent.themes.includes(runes.primaryContent)) {
+			return false;
+		}
+		const requiredQuests = primaryContent.requiredQuests || [];
+		const unmetPrecondition = requiredQuests.find(([questId, requiredStatus]) => {
+			const quest = globalState.quests[questId];
+			switch (requiredStatus) {
+				case 'open': {
+					return !!quest;
+				}
+				case 'started': {
+					return !quest || quest.questFinished;
+				}
+				case 'not-finished': {
+					return quest && quest.questFinished;
+				}
+				case 'finished': {
+					return !quest || !quest.questFinished;
+				}
+			}
+		});
+		return !unmetPrecondition;
+	});
 	const randomIndex = Math.floor(Math.random() * matchingPrimaryContents.length);
 	const selectedPrimaryContent = matchingPrimaryContents[randomIndex];
 	// tslint:disable-next-line: no-console

@@ -25,6 +25,7 @@ export default class DungeonDoorScene extends Phaser.Scene {
 	enterDungeon(runeAssignment: RuneAssignment) {
 		console.log('entering dungeon');
 		const dungeonRun = generateDungeonRun(runeAssignment);
+		globalState.dungeon.levels = {};
 
 		dungeonRun.levels.forEach((levelData, level) => {
 			const rooms = [];

@@ -13,7 +13,7 @@ import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
-import { essenceNames, NUM_ITEM_ICONS, UiDepths } from '../helpers/constants';
+import { essenceNames, Faction, NUM_ITEM_ICONS, UiDepths } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
@@ -354,7 +354,7 @@ export default class MainScene extends Phaser.Scene {
 		this.physics.add.collider(this.npcMap[id], this.decorationLayer, () => {
 			npc.onCollide(false);
 		});
-		if (this.mainCharacter) {
+		if (this.mainCharacter && npc.faction === Faction.ENEMIES) {
 			this.physics.add.collider(this.npcMap[id], this.mainCharacter, () => {
 				npc.onCollide(true);
 			});

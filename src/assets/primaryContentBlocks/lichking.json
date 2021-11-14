@@ -2,6 +2,7 @@
 	"title": "Legends of the Lich King",
 	"lowerBoundOfSecondaryContentBlocks": 1,
 	"upperBoundOfSecondaryContentBlocks": 1,
+	"requiredQuests": [["vanyaWantsBooks", "started"]],
 	"dungeonLevels": [
 		{
 			"title": "Royal crypta - Level 1",

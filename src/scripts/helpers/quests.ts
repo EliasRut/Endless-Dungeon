@@ -25,11 +25,20 @@ export interface QuestScripts {
 }
 
 export const Quests: { [name: string]: Quest } = {
+	theRescue: {
+		questGiverId: 'agnes',
+		questGiverName: 'Agnes',
+		name: 'The Rescue',
+		description: 'Rescue Erwin from the zombies',
+	},
 	hildaTalks: {
 		questGiverId: 'hilda',
 		questGiverName: 'Hilda',
 		name: 'Hilda needs Help',
 		description: 'Help Hila, immediately',
+		preconditions: {
+			previousQuests: ['theRescue'],
+		},
 	},
 	vanyaWantsBooks: {
 		questGiverId: 'vanya',
@@ -42,12 +51,6 @@ export const Quests: { [name: string]: Quest } = {
 		goals: {
 			hasItems: ['book'],
 		},
-	},
-	theRescue: {
-		questGiverId: 'agnes',
-		questGiverName: 'Agnes',
-		name: 'The Rescue',
-		description: 'Rescue Erwin from the zombies',
 	},
 	theHunt: {
 		questGiverId: 'agnes',
@@ -161,6 +164,34 @@ const questScripts: { [name: string]: QuestScripts } = {
 				type: 'dialog',
 				portrait: 'player_happy',
 				text: ["Take this Force Source, it'll come in handy!"],
+			},
+		],
+	},
+	theRescue: {
+		intro: [
+			{
+				type: 'dialog',
+				portrait: 'player_happy',
+				text: ['Young wizard, what a relief. I need your help!'],
+			},
+			{
+				type: 'pauseUntilCondition',
+				scriptIds: ['chapter-1-zombie-room_onClear'],
+				scriptStates: ['finished'],
+			},
+			{
+				type: 'sceneChange',
+				target: 'tavern_new',
+			},
+			{
+				type: 'dialog',
+				portrait: 'player_happy',
+				text: ["Finally, we're back together!"],
+			},
+			{
+				type: 'setQuestState',
+				questId: 'theRescue',
+				questState: 'finished',
 			},
 		],
 	},

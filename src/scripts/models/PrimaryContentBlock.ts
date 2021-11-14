@@ -20,4 +20,5 @@ export interface PrimaryContentBlock {
 	themes: ColorsOfMagic[];
 	lowerBoundOfSecondaryContentBlocks: number;
 	upperBoundOfSecondaryContentBlocks: number;
+	requiredQuests: [string, 'open' | 'started' | 'not-finished' | 'finished'][];
 }

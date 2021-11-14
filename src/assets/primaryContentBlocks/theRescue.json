@@ -2,6 +2,7 @@
 	"title": "The Rescue",
 	"lowerBoundOfSecondaryContentBlocks": 0,
 	"upperBoundOfSecondaryContentBlocks": 0,
+	"requiredQuests": [["theRescue", "not-finished"]],
 	"dungeonLevels": [
 		{
 			"specialStartRoom": true,
