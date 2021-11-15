@@ -176,7 +176,7 @@ const questScripts: { [name: string]: QuestScripts } = {
 			},
 			{
 				type: 'pauseUntilCondition',
-				scriptIds: ['chapter-1-zombie-room_onClear'],
+				scriptIds: ['.*_chapter-1-zombie-room_onClear'],
 				scriptStates: ['finished'],
 			},
 			{

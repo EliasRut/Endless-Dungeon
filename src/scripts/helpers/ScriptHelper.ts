@@ -22,7 +22,13 @@ export default class ScriptHelper {
 	}
 
 	getScriptState(name: string) {
-		return globalState.scripts.states && globalState.scripts.states[name];
+		const stateIds = Object.keys(globalState.scripts.states || []);
+		const nameRegExp = new RegExp(name);
+		const stateId = stateIds.find((id) => nameRegExp.test(id));
+		if (stateId) {
+			return globalState.scripts.states && globalState.scripts.states[stateId];
+		}
+		return undefined;
 	}
 
 	findRoomForToken(token: CharacterToken) {
@@ -44,20 +50,20 @@ export default class ScriptHelper {
 		if (!currentStep) {
 			globalState.scripts.runningScript = undefined;
 			globalState.scripts.scriptStep = undefined;
-			if (globalState.scripts.runningScriptId) {
-				if (!globalState.scripts.states) {
-					globalState.scripts.states = {};
-				}
-				if (!globalState.scripts.states[globalState.scripts.runningScriptId]) {
-					globalState.scripts.states[globalState.scripts.runningScriptId] = {
-						id: globalState.scripts.runningScriptId,
-						state: 'finished',
-					};
-				} else {
-					globalState.scripts.states[globalState.scripts.runningScriptId].state = 'finished';
-				}
-				globalState.scripts.runningScriptId = undefined;
-			}
+			// if (globalState.scripts.runningScriptId) {
+			// 	if (!globalState.scripts.states) {
+			// 		globalState.scripts.states = {};
+			// 	}
+			// 	if (!globalState.scripts.states[globalState.scripts.runningScriptId]) {
+			// 		globalState.scripts.states[globalState.scripts.runningScriptId] = {
+			// 			id: globalState.scripts.runningScriptId,
+			// 			state: 'finished',
+			// 		};
+			// 	} else {
+			// 		globalState.scripts.states[globalState.scripts.runningScriptId].state = 'finished';
+			// 	}
+			// 	globalState.scripts.runningScriptId = undefined;
+			// }
 			return;
 		}
 		switch (currentStep.type) {
@@ -475,9 +481,8 @@ export default class ScriptHelper {
 	}
 
 	isScriptFinished(scriptName: string) {
-		return (
-			globalState.scripts.states && globalState.scripts.states[scriptName]?.state === 'finished'
-		);
+		const state = this.getScriptState(scriptName);
+		return state && state.state === 'finished';
 	}
 
 	hasEnemiesInRoom(roomName: string) {
@@ -499,32 +504,32 @@ export default class ScriptHelper {
 				if (
 					lastRoomName &&
 					globalState.availableRooms[lastRoomName].scripts.onExit &&
-					!this.isScriptFinished(`${lastRoomName}_onExit`)
+					!this.isScriptFinished(`${globalState.currentLevel}_${lastRoomName}_onExit`)
 				) {
 					globalState.scripts.runningScript =
 						globalState.availableRooms[lastRoomName].scripts.onExit;
 					globalState.scripts.scriptStep = 0;
-					globalState.scripts.runningScriptId = `${lastRoomName}_onExit`;
+					globalState.scripts.runningScriptId = `${globalState.currentLevel}_${lastRoomName}_onExit`;
 				} else if (
 					currentRooomName &&
 					globalState.availableRooms[currentRooomName].scripts.onEntry &&
-					!this.isScriptFinished(`${currentRooomName}_onEntry`)
+					!this.isScriptFinished(`${globalState.currentLevel}_${currentRooomName}_onEntry`)
 				) {
 					globalState.scripts.runningScript =
 						globalState.availableRooms[currentRooomName].scripts.onEntry;
 					globalState.scripts.scriptStep = 0;
-					globalState.scripts.runningScriptId = `${currentRooomName}_onEntry`;
+					globalState.scripts.runningScriptId = `${globalState.currentLevel}_${currentRooomName}_onEntry`;
 				}
 			} else if (
 				currentRooomName &&
 				globalState.availableRooms[currentRooomName].scripts.onClear &&
 				!this.hasEnemiesInRoom(currentRooomName) &&
-				!this.isScriptFinished(`${currentRooomName}_onClear`)
+				!this.isScriptFinished(`${globalState.currentLevel}_${currentRooomName}_onClear`)
 			) {
 				globalState.scripts.runningScript =
 					globalState.availableRooms[currentRooomName].scripts.onClear;
 				globalState.scripts.scriptStep = 0;
-				globalState.scripts.runningScriptId = `${currentRooomName}_onClear`;
+				globalState.scripts.runningScriptId = `${globalState.currentLevel}_${currentRooomName}_onClear`;
 			}
 		}
 		if (globalState.scripts.runningScript) {

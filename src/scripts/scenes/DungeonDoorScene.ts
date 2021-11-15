@@ -4,6 +4,7 @@ import globalState from '../worldstate/index';
 import { RuneAssignment } from '../helpers/constants';
 import { generateDungeonRun } from '../helpers/generateDungeonRun';
 import KeyboardHelper from '../helpers/KeyboardHelper';
+import { SingleScriptState } from '../worldstate/ScriptState';
 
 export default class DungeonDoorScene extends Phaser.Scene {
 	dungeonDoor: DungeonDoor;
@@ -23,9 +24,20 @@ export default class DungeonDoorScene extends Phaser.Scene {
 	}
 
 	enterDungeon(runeAssignment: RuneAssignment) {
+		// tslint:disable-next-line: no-console
 		console.log('entering dungeon');
 		const dungeonRun = generateDungeonRun(runeAssignment);
 		globalState.dungeon.levels = {};
+		globalState.doors = {};
+		const newScriptState: { [id: string]: SingleScriptState } = {};
+		Object.entries(globalState.scripts.states || {}).forEach(([scriptId, scriptState]) => {
+			if (!scriptId.startsWith('dungeonLevel')) {
+				newScriptState[scriptId] = scriptState;
+			}
+		});
+		globalState.scripts.states = newScriptState;
+		globalState.playerCharacter.x = 0;
+		globalState.playerCharacter.y = 0;
 
 		dungeonRun.levels.forEach((levelData, level) => {
 			const rooms = [];

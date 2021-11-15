@@ -81,6 +81,7 @@ export class WorldState {
 		// localStorage.clear();
 		const saveGameName = localStorage.getItem('saveGameName');
 		if (!saveGameName) {
+			// tslint:disable-next-line: no-console
 			console.log('no savegamename set');
 			return;
 		}
@@ -95,6 +96,7 @@ export class WorldState {
 		this.transitionStack = JSON.parse(localStorage.getItem(WorldState.TRANSITIONSTACK) || '{}');
 		this.availableRooms = JSON.parse(localStorage.getItem(WorldState.AVAILABLEROOMS) || '{}');
 		this.availableTilesets = JSON.parse(localStorage.getItem(WorldState.AVAILABLETILESETS) || '{}');
+		// tslint:disable-next-line: no-console
 		console.log('setting current level to' + localStorage.getItem(WorldState.CURRENTLEVEL));
 		this.currentLevel = JSON.parse(localStorage.getItem(WorldState.CURRENTLEVEL) || '{}');
 		this.roomAssignment = JSON.parse(localStorage.getItem(WorldState.ROOMASSIGNMENT) || '{}');
