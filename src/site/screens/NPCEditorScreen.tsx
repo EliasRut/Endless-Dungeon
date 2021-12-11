@@ -27,6 +27,7 @@ export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
 			<NavigationWrapper>
 				<StyledLink to="/mapEditor">Map Editor</StyledLink>
 				<StyledLink to="/npcEditor">NPC Editor</StyledLink>
+				<StyledLink to="/scriptEditor">Script Editor</StyledLink>
 				<StyledLink to="/game">Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>
