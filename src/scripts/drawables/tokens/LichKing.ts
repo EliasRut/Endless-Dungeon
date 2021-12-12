@@ -131,7 +131,12 @@ export default class LichtKingToken extends EnemyToken {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.attackedAt = time;
-			this.scene.abilityHelper.triggerAbility(this.stateObject, AbilityType.ARCANE_BLADE, time);
+			this.scene.abilityHelper.triggerAbility(
+				this.stateObject,
+				this.stateObject,
+				AbilityType.ARCANE_BLADE,
+				time
+			);
 		}
 	}
 	summon(time: number) {
