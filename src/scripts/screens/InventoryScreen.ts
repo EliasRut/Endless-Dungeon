@@ -1,7 +1,6 @@
 import { AbilityKey, BAG_BOXES_X, EquipmentSlot, UiDepths } from '../helpers/constants';
 import { AbilityType, Abilities } from '../abilities/abilityData';
 import OverlayScreen from './OverlayScreen';
-import Item from '../worldstate/Item';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import globalState from '../worldstate';
 import MainScene from '../scenes/MainScene';
@@ -125,14 +124,7 @@ export default class InventoryScreen extends OverlayScreen {
 
 		this.equipmentSelectionWheel = new EquipmentSelectionWheel(scene);
 		this.equipmentSelectionWheel.toggleVisibility();
-		// const equippedItems = getEquippedItems();
-		// Object.keys(equippedItems)
-		// 	.filter((slotKey) => !!equippedItems[slotKey as EquipmentSlot])
-		// 	.forEach((key) => {
-		// 		const slotKey = key as EquipmentSlot;
-		// 		const item = equippedItems[slotKey]! as string;
-		// 		const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotKey];
-		// 	});
+
 		this.updateAbilities(true);
 
 		this.currentXY = [0, 0];
@@ -142,7 +134,7 @@ export default class InventoryScreen extends OverlayScreen {
 		const itemName = getItemKeyForEquipmentSlot(slotName);
 		const itemData = itemName ? getItemDataForName(itemName) : undefined;
 		const itemToken = new InventoryItemToken(this.scene, x, y, itemData?.iconFrame || -1);
-		// this.equipmentSlotTokenMap[itemname] = itemToken;
+
 		itemToken.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		itemToken.setScrollFactor(0);
 		itemToken.setInteractive();
@@ -154,31 +146,27 @@ export default class InventoryScreen extends OverlayScreen {
 		return itemToken;
 	}
 
+	showEquipmentSelectionWheel() {
+		if (!this.focusedSlot) {
+			return;
+		}
+		const [centerX, centerY] = EQUIPMENT_SLOT_COORDINATES[this.focusedSlot];
+		this.equipmentSelectionWheel.toggleVisibility();
+		this.equipmentSelectionWheel.update(
+			centerX,
+			centerY,
+			this.focusedSlot,
+			getEquipmentDataRecordForEquipmentSlot(this.focusedSlot)
+		);
+	}
+
 	handleEquipmentSlotInteraction(slotName: EquipmentSlot) {
 		if (this.focusedSlot === slotName) {
 			if (this.equipmentSelectionWheel.visiblity) {
 				this.equipmentSelectionWheel.toggleVisibility();
 			} else {
-				const [centerX, centerY] = EQUIPMENT_SLOT_COORDINATES[slotName];
-				this.equipmentSelectionWheel.toggleVisibility();
-				this.equipmentSelectionWheel.update(
-					centerX,
-					centerY,
-					slotName,
-					getEquipmentDataRecordForEquipmentSlot(slotName)
-				);
+				this.showEquipmentSelectionWheel();
 			}
-			// console.log('Showing selection dialog.');
-			// if (isEquippable(item)) {
-			// 	const equippableItem = item as EquippableItem;
-			// 	if (isEquipped(equippableItem)) {
-			// 		unequipItem(equippableItem);
-			// 	} else {
-			// 		equipItem(equippableItem);
-			// 	}
-			// 	this.update();
-			// 	this.updateAbilities(false);
-			// }
 		} else {
 			this.focusedSlot = slotName;
 			const [itemData, equipmentData] = getFullDataForEquipmentSlot(slotName);
@@ -194,10 +182,12 @@ export default class InventoryScreen extends OverlayScreen {
 		if (direction === 'nothing') return;
 		if (globalTime - this.keyLastPressed > this.keyCD) this.keyLastPressed = globalTime;
 		else return;
-		if (direction === 'enter') {
-			console.log('Showing selection dialog.');
-			// if (this.focusedItem !== undefined) this.handleInvetoryItemInteraction(this.focusedItem);
-			// else return;
+		if (direction === 'enter' && this.focusedSlot) {
+			if (this.equipmentSelectionWheel.visiblity) {
+				this.equipmentSelectionWheel.toggleVisibility();
+			} else {
+				this.showEquipmentSelectionWheel();
+			}
 			return;
 		}
 
@@ -219,40 +209,6 @@ export default class InventoryScreen extends OverlayScreen {
 
 		this.inventorySelection.setX(selectionPos[0]);
 		this.inventorySelection.setY(selectionPos[1]);
-		// this.moveSelection(this.currentXY[0], this.currentXY[1]);
-		// const item = this.getNextBagItem(direction);
-		// if (item === this.focusedItem) return;
-		// if (item !== undefined) this.handleInvetoryItemInteraction(item);
-		// else {
-		// 	this.focusedItem = undefined;
-		// 	this.scene.overlayScreens.itemScreen.update(undefined);
-		// }
-	}
-
-	getNextBagItem(direction: string) {
-		// 	const x = this.currentXY[0];
-		// 	const y = this.currentXY[1];
-		// 	if (direction === 'up') {
-		// 		this.currentXY[1] -= 1;
-		// 		if (y === 0) {
-		// 			this.currentXY[0] = Math.floor(this.currentXY[0] / 3);
-		// 		}
-		// 	} else if (direction === 'down') {
-		// 		this.currentXY[1] += 1;
-		// 	} else if (direction === 'left') {
-		// 		this.currentXY[0] -= 1;
-		// 	} else if (direction === 'right') {
-		// 		this.currentXY[0] += 1;
-		// 	}
-		// 	this.moveSelection(this.currentXY[0], this.currentXY[1]);
-		// }
-		// 	if (this.checkXBoundary() || this.currentXY[1] > BAG_BOXES_Y - 1 || 0 - 2 > this.currentXY[1]) {
-		// 		this.currentXY[0] = x;
-		// 		this.currentXY[1] = y;
-		// 		return this.focusedItem;
-		// 	}
-		// 	this.moveSelection(this.currentXY[0], this.currentXY[1]);
-		// 	return this.getItemAtXY(this.currentXY[0], this.currentXY[1]);
 	}
 
 	// hard coded for inventory highlighting, special cases when 0 > y
@@ -264,34 +220,6 @@ export default class InventoryScreen extends OverlayScreen {
 		}
 		return false;
 	}
-
-	// getItemAtXY(x: number, y: number) {
-	// 	let item = undefined;
-	// 	if (y >= 0) {
-	// 		const uneqippedItemList = getUnequippedItemsWithPositions();
-	// 		uneqippedItemList.forEach((itemPosition) => {
-	// 			if (itemPosition.x === x && itemPosition.y === y) {
-	// 				item = itemPosition.item;
-	// 			}
-	// 		});
-	// 	} else {
-	// 		const equippedItems = getEquippedItems();
-	// 		const coordinates = `${x}_${y}`;
-	// 		item = equippedItems[COORDINATES_TO_SLOT[coordinates]];
-	// 	}
-	// 	return item;
-	// }
-
-	// getXYofItem(item: Item) {
-	// 	let result = undefined;
-	// 	const uneqippedItemList = getUnequippedItemsWithPositions();
-	// 	uneqippedItemList.forEach((itemPosition) => {
-	// 		if (item == itemPosition.item) {
-	// 			result = [itemPosition.x, itemPosition.y];
-	// 		}
-	// 	});
-	// 	return result;
-	// }
 
 	// updates all abilities and icons at once.
 	updateAbilities(constructor: boolean) {
@@ -307,9 +235,9 @@ export default class InventoryScreen extends OverlayScreen {
 				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 				if (slotKey === EquipmentSlot.SOURCE) {
 					updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
-					const abilityIcon = this.createAbilityIcon();
-					this.handleIconOptions(constructor, abilityIcon, AbilityType.FIREBALL);
-					this.abilityIconMap[EquipmentSlot.SOURCE] = abilityIcon;
+					const newAbilityIcon = this.createAbilityIcon();
+					this.handleIconOptions(constructor, newAbilityIcon, AbilityType.FIREBALL);
+					this.abilityIconMap[EquipmentSlot.SOURCE] = newAbilityIcon;
 				} else {
 					updateAbility(
 						this.scene,
@@ -387,19 +315,6 @@ export default class InventoryScreen extends OverlayScreen {
 		});
 	}
 
-	addToInventory(item: Item) {
-		// const [x, y] = placeItemInNextFreeBagSlot(item);
-		// if (x >= 0) this.createItemToken(item, BAG_START_X + x * BOX_SIZE, BAG_START_Y + y * BOX_SIZE);
-		// else return false;
-		// return true;
-	}
-
-	// We currently ignore amount.
-	removeFromInventory(itemId: string, amount: number) {
-		// removeItemFromBagById(itemId);
-		// this.equipmentSlotTokenMap[itemId].destroy(true);
-	}
-
 	update() {
 		Object.entries(EQUIPMENT_SLOT_COORDINATES).forEach(([slotName, [x, y]]) => {
 			this.equipmentSlotTokenMap[slotName as EquipmentSlot]?.destroy(true);
@@ -415,23 +330,5 @@ export default class InventoryScreen extends OverlayScreen {
 			? getFullDataForEquipmentSlot(this.focusedSlot)
 			: [undefined, undefined];
 		this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
-		// Object.keys(equippedItems)
-		// 	.filter((slotKey) => !!equippedItems[slotKey as EquipmentSlot])
-		// 	.forEach((key) => {
-		// 		const slotKey = key as EquipmentSlot;
-		// 		const item = equippedItems[slotKey]!;
-		// 		const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotKey];
-		// 		this.itemTokenMap[item.id].x = x;
-		// 		this.itemTokenMap[item.id].y = y;
-		// 	});
-
-		// const uneqippedItemList = getUnequippedItemsWithPositions();
-		// uneqippedItemList.forEach((itemPosition) => {
-		// 	const x = BAG_START_X + itemPosition.x * BOX_SIZE;
-		// 	const y = BAG_START_Y + itemPosition.y * BOX_SIZE;
-		// 	const item = itemPosition.item;
-		// 	this.itemTokenMap[item.id].x = x;
-		// 	this.itemTokenMap[item.id].y = y;
-		// });
 	}
 }

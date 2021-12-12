@@ -244,10 +244,12 @@ export default class ScriptHelper {
 			}
 			case 'takeItem': {
 				cleanUpStep = true;
-				this.scene.overlayScreens.inventory.removeFromInventory(
-					currentStep.itemId,
-					currentStep.amount
-				);
+				if (globalState.inventory.bag[currentStep.itemId as UneqippableItem]) {
+					globalState.inventory.bag[currentStep.itemId as UneqippableItem]! -= currentStep.amount;
+					if (globalState.inventory.bag[currentStep.itemId as UneqippableItem]! < 0) {
+						delete globalState.inventory.bag[currentStep.itemId as UneqippableItem];
+					}
+				}
 				break;
 			}
 			case 'placeItem': {
@@ -508,7 +510,8 @@ export default class ScriptHelper {
 					globalState.scripts.runningScript =
 						globalState.availableRooms[lastRoomName].scripts.onExit;
 					globalState.scripts.scriptStep = 0;
-					globalState.scripts.runningScriptId = `${globalState.currentLevel}_${lastRoomName}_onExit`;
+					const scriptId = `${globalState.currentLevel}_${lastRoomName}_onExit`;
+					globalState.scripts.runningScriptId = scriptId;
 				} else if (
 					currentRooomName &&
 					globalState.availableRooms[currentRooomName].scripts.onEntry &&
@@ -517,7 +520,8 @@ export default class ScriptHelper {
 					globalState.scripts.runningScript =
 						globalState.availableRooms[currentRooomName].scripts.onEntry;
 					globalState.scripts.scriptStep = 0;
-					globalState.scripts.runningScriptId = `${globalState.currentLevel}_${currentRooomName}_onEntry`;
+					const scriptId = `${globalState.currentLevel}_${currentRooomName}_onEntry`;
+					globalState.scripts.runningScriptId = scriptId;
 				}
 			} else if (
 				currentRooomName &&
@@ -528,7 +532,8 @@ export default class ScriptHelper {
 				globalState.scripts.runningScript =
 					globalState.availableRooms[currentRooomName].scripts.onClear;
 				globalState.scripts.scriptStep = 0;
-				globalState.scripts.runningScriptId = `${globalState.currentLevel}_${currentRooomName}_onClear`;
+				const scriptId = `${globalState.currentLevel}_${currentRooomName}_onClear`;
+				globalState.scripts.runningScriptId = scriptId;
 			}
 		}
 		if (globalState.scripts.runningScript) {
