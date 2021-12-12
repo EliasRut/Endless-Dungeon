@@ -125,9 +125,9 @@ export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingR
 	'lich-king': { file: 'assets/sprites/enemy-zombie.png', facing: FacingRange.ONLY_NESW },
 };
 
-export const npcTypeToAttackFileMap: {
+export const characterToSubAnimationFileMap: {
 	[name: string]: {
-		[attackName: string]: {
+		[subAnimation: string]: {
 			file: string;
 			framesPerDirection: number;
 			frameOffset?: number;
