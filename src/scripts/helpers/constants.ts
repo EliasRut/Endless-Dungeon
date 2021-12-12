@@ -54,8 +54,9 @@ export const enum UiDepths {
 	UI_BACKGROUND_LAYER = 8,
 	UI_MAIN_LAYER = 9,
 	UI_FOREGROUND_LAYER = 10,
+	UI_ABOVE_FOREGROUND_LAYER = 11,
 
-	UI_STICK_LAYER = 11,
+	UI_STICK_LAYER = 12,
 }
 
 export const TARGETABLE_TILE_TINT = 0x888888;
@@ -167,7 +168,7 @@ export const characterToSubAnimationFileMap: {
 			animationFrames: 2,
 		},
 	},
-	'player': {
+	player: {
 		damage: {
 			file: 'assets/sprites/main-character-damagestun.png',
 			framesPerDirection: 12,

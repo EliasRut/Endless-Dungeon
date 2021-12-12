@@ -1,28 +1,36 @@
-import Item from '../../worldstate/Item';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import { UiDepths } from '../../helpers/constants';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
+import { ItemData, EquipmentKey, UneqippableItem } from '../../../items/itemData';
+import { isEquippable, getEquipmentDataForItemKey } from '../../helpers/inventory';
 
 const MAX_INTERACTION_DISTANCE = 30;
-const MAX_EQUIPPABLE_ITEM_LOCATION = 80;
 const HEAL_PERCENTAGE = 1 / 4; // health
 
 export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
-	stateObject: Item;
 	isDestroyed: boolean = false;
+	itemKey: string;
+	level: number;
 	tileX: number;
 	tileY: number;
 	tile?: Phaser.Tilemaps.Tile;
 
-	constructor(scene: MainScene, x: number, y: number, item: Item) {
+	constructor(
+		scene: MainScene,
+		x: number,
+		y: number,
+		itemKey: string,
+		item: ItemData,
+		level: number
+	) {
 		super(scene, x, y, 'test-items-spritesheet', item.iconFrame);
 		const tileX = Math.round(x / TILE_WIDTH);
 		const tileY = Math.round(y / TILE_HEIGHT);
+		this.itemKey = itemKey;
+		this.level = level;
 		this.tile = (this.scene as MainScene).tileLayer.getTileAt(tileX, tileY);
 		this.tileY = Math.round(y / TILE_HEIGHT);
 		this.tileX = Math.round(x / TILE_WIDTH);
-		this.stateObject = item;
 		scene.add.existing(this);
 	}
 
@@ -32,19 +40,28 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		const distance = Math.hypot(this.x - px, this.y - py);
 		// if you run over item, put into inventory
 		if (distance < MAX_INTERACTION_DISTANCE) {
-			if (this.stateObject.type === 'health') {
+			if (this.itemKey === 'health') {
 				const heal = Math.round(globalState.playerCharacter.maxHealth / HEAL_PERCENTAGE);
 				globalState.playerCharacter.health =
 					globalState.playerCharacter.health + heal > globalState.playerCharacter.maxHealth
 						? globalState.playerCharacter.maxHealth
 						: globalState.playerCharacter.health + heal;
-				this.isDestroyed = true;
-				this.destroy(true);
+			} else {
+				if (isEquippable(this.itemKey)) {
+					const equipmentData = getEquipmentDataForItemKey(this.itemKey as EquipmentKey);
+					if (this.level > equipmentData.level) {
+						equipmentData.level = this.level;
+					}
+					scene.overlayScreens.inventory.update();
+				} else {
+					const unequippableItemKey = this.itemKey as UneqippableItem;
+					globalState.inventory.bag[unequippableItemKey] =
+						(globalState.inventory.bag[unequippableItemKey] || 0) + 1;
+				}
 			}
-			// else if (scene.overlayScreens.inventory.addToInventory(this.stateObject)) {
-			// 	this.isDestroyed = true;
-			// 	this.destroy(true);
-			// }
+
+			this.isDestroyed = true;
+			this.destroy(true);
 		}
 		if (scene?.dynamicLightingHelper && this.tile) {
 			this.tint = this.tile?.tint;

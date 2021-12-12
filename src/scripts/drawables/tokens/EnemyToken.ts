@@ -55,7 +55,8 @@ export default abstract class EnemyToken extends CharacterToken {
 			return;
 		}
 
-		this.scene.dropItem(this.x, this.y, generateRandomItem({ level }));
+		const itemData = generateRandomItem({ level });
+		this.scene.dropItem(this.x, this.y, itemData.itemKey, itemData.level);
 	}
 
 	dropFixedItem(id: string) {

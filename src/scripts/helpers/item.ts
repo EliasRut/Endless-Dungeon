@@ -1,9 +1,6 @@
-import EquippableItem from '../worldstate/EquippableItem';
 import {
 	EquippableItemType,
 	SourceData,
-	ItemData,
-	AbilityLinkedItem,
 	CatalystData,
 	ChestPieceData,
 	RingData,
@@ -14,15 +11,15 @@ import {
 	ChestPiece,
 	Ring,
 	Amulet,
+	EquipmentKey,
 } from '../../items/itemData';
 import { AbilityType } from '../abilities/abilityData';
+import { getItemDataForName } from '../../items/itemData';
 
-const MAX_HEALTH = 20;
-const BASE_DAMAGE = 0;
-const MAX_ADDITIONAL_DAMAGE = 1;
-const MAX_MOVEMENT_SPEED = 35;
-const BASE_MAIN_STAT = 1;
-const MAX_ADDITIONAL_MAIN_STAT = 1;
+export interface EquippableDroppedItemData {
+	level: number;
+	itemKey: EquippableItemType;
+}
 
 export interface RandomItemOptions {
 	level: number;
@@ -68,62 +65,55 @@ export const generateRandomItem = (options: Partial<RandomItemOptions>) => {
 
 	const rnd = Math.random();
 	let itemType: string;
-	let data: ItemData | AbilityLinkedItem;
+	let itemKey: EquipmentKey;
 	const totalWeight = sourceWeight + catalystWeight + armorWeight + ringWeight + amuletWeight;
 	if (rnd < sourceWeight / totalWeight) {
 		itemType = EquippableItemType.SOURCE;
 		if (sourceTypes && sourceTypes.length > 0) {
 			const randomIndex = Math.floor(Math.random() * sourceTypes.length);
-			data = SourceData[sourceTypes[randomIndex]];
+			itemKey = sourceTypes[randomIndex];
 		} else {
 			const randomIndex = Math.floor(Math.random() * Object.keys(SourceData).length);
-			data = Object.values(SourceData)[randomIndex];
+			itemKey = Object.keys(SourceData)[randomIndex] as Source;
 		}
 	} else if (rnd < (sourceWeight + catalystWeight) / totalWeight) {
 		itemType = EquippableItemType.CATALYST;
 		if (catalystTypes && catalystTypes.length > 0) {
 			const randomIndex = Math.floor(Math.random() * catalystTypes.length);
-			data = CatalystData[catalystTypes[randomIndex]];
+			itemKey = catalystTypes[randomIndex];
 		} else {
 			const randomIndex = Math.floor(Math.random() * Object.keys(CatalystData).length);
-			data = Object.values(CatalystData)[randomIndex];
+			itemKey = Object.keys(CatalystData)[randomIndex] as Catalyst;
 		}
 	} else if (rnd < (sourceWeight + catalystWeight + armorWeight) / totalWeight) {
 		itemType = EquippableItemType.CHESTPIECE;
 		if (chestPieceTypes && chestPieceTypes.length > 0) {
 			const randomIndex = Math.floor(Math.random() * chestPieceTypes.length);
-			data = ChestPieceData[chestPieceTypes[randomIndex]];
+			itemKey = chestPieceTypes[randomIndex];
 		} else {
 			const randomIndex = Math.floor(Math.random() * Object.keys(ChestPieceData).length);
-			data = Object.values(ChestPieceData)[randomIndex];
+			itemKey = Object.keys(ChestPieceData)[randomIndex] as ChestPiece;
 		}
 	} else if (rnd < (sourceWeight + catalystWeight + ringWeight + armorWeight) / totalWeight) {
 		itemType = EquippableItemType.RING;
 		if (ringTypes && ringTypes.length > 0) {
 			const randomIndex = Math.floor(Math.random() * ringTypes.length);
-			data = RingData[ringTypes[randomIndex]];
+			itemKey = ringTypes[randomIndex];
 		} else {
 			const randomIndex = Math.floor(Math.random() * Object.keys(RingData).length);
-			data = Object.values(RingData)[randomIndex];
+			itemKey = Object.keys(RingData)[randomIndex] as Ring;
 		}
 	} else {
 		itemType = EquippableItemType.AMULET;
 		if (amuletTypes && amuletTypes.length > 0) {
 			const randomIndex = Math.floor(Math.random() * amuletTypes.length);
-			data = AmuletData[amuletTypes[randomIndex]];
+			itemKey = amuletTypes[randomIndex];
 		} else {
 			const randomIndex = Math.floor(Math.random() * Object.keys(AmuletData).length);
-			data = Object.values(AmuletData)[randomIndex];
+			itemKey = Object.keys(AmuletData)[randomIndex] as Amulet;
 		}
 	}
-	return new EquippableItem(
-		Math.random() * MAX_HEALTH * (1 + level),
-		Math.random() * MAX_ADDITIONAL_DAMAGE * (1 + level * 0.5) + BASE_DAMAGE,
-		Math.random() * MAX_MOVEMENT_SPEED * (1 + level * 0.1),
-		Math.random() * MAX_ADDITIONAL_MAIN_STAT * (1 + level * 0.5) + BASE_MAIN_STAT,
-		itemType,
-		data
-	);
+	return { itemKey, level };
 };
 
 export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystItem) => {

@@ -109,49 +109,49 @@ export type RingKey =
 
 export const RingData: Record<Ring, AbilityLinkedItem> = {
 	[Ring.WILD]: {
-		ability: AbilityType.DUSTNOVA,
+		ability: AbilityType.FIREBALL,
 		name: 'Ring of Wild',
 		description: 'A ring giving you power associated with the color of magic: Wild',
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.ROYAL]: {
-		ability: AbilityType.DUSTNOVA,
+		ability: AbilityType.FIREBALL,
 		name: 'Ring of Royal',
 		description: 'A ring giving you power associated with the color of magic: Royal',
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.METAL]: {
-		ability: AbilityType.ROUND_HOUSE_KICK,
+		ability: AbilityType.FIREBALL,
 		name: 'Ring of Metal',
 		description: 'A ring giving you power associated with the color of magic: Metal',
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.PASSION]: {
-		ability: AbilityType.ROUND_HOUSE_KICK,
+		ability: AbilityType.FIREBALL,
 		name: 'Ring of Passion',
 		description: 'A ring giving you power associated with the color of magic: Passion',
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.FLUX]: {
-		ability: AbilityType.DUSTNOVA,
+		ability: AbilityType.FIREBALL,
 		name: 'Ring of Flux',
 		description: 'A ring giving you power associated with the color of magic: Flux',
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.DEATH]: {
-		ability: AbilityType.ROUND_HOUSE_KICK,
+		ability: AbilityType.FIREBALL,
 		name: 'Ring of Death',
 		description: 'A ring giving you power associated with the color of magic: Death',
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.CHANGE]: {
-		ability: AbilityType.DUSTNOVA,
+		ability: AbilityType.FIREBALL,
 		name: 'Ring of Change',
 		description: 'A ring giving you power associated with the color of magic: Change',
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.BLOOD]: {
-		ability: AbilityType.ROUND_HOUSE_KICK,
+		ability: AbilityType.FIREBALL,
 		name: 'Ring of Blood',
 		description: 'A ring giving you power associated with the color of magic: Blood',
 		iconFrame: 56,

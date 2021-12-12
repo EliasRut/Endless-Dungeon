@@ -26,14 +26,14 @@ import CharacterToken from '../drawables/tokens/CharacterToken';
 import { NpcOptions, NpcScript } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import Item from '../worldstate/Item';
-import { generateRandomItem } from '../helpers/item';
+import { EquippableDroppedItemData, generateRandomItem } from '../helpers/item';
 import SettingsScreen from '../screens/SettingsScreen';
 import DoorToken from '../drawables/tokens/DoorToken';
 
 import fixedItems from '../../items/fixedItems.json';
 import { DungeonRunData } from '../models/DungeonRunData';
 import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
-import { Catalyst, Source } from '../../items/itemData';
+import { Catalyst, Source, getItemDataForName } from '../../items/itemData';
 import Minimap from '../drawables/ui/Minimap';
 import { AbilityType } from '../abilities/abilityData';
 import LevelName from '../drawables/ui/LevelName';
@@ -385,9 +385,7 @@ export default class MainScene extends Phaser.Scene {
 		this.dropItem(
 			x, // - DEBUG__ITEM_OFFSET_X,
 			y, // - DEBUG__ITEM_OFFSET_Y,
-			{
-				...(fixedItems as { [id: string]: Partial<Item> })[id],
-			} as Item
+			id
 		);
 	}
 
@@ -697,8 +695,9 @@ export default class MainScene extends Phaser.Scene {
 		this.time.paused = false;
 	}
 
-	dropItem(x: number, y: number, item: Item) {
-		const itemToken = new WorldItemToken(this, x, y, item);
+	dropItem(x: number, y: number, itemKey: string, level?: number) {
+		const item = getItemDataForName(itemKey);
+		const itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0);
 		itemToken.setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.worldItems.push(itemToken);
 	}

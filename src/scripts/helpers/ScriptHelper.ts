@@ -9,7 +9,7 @@ import fixedItems from '../../items/fixedItems.json';
 import Item from '../worldstate/Item';
 import { generateRandomItem } from './item';
 import { Faction } from './constants';
-import { UneqippableItem } from '../../items/itemData';
+import { ItemData, UneqippableItem } from '../../items/itemData';
 
 const DIALOG_TEXT_TIME_MS = 5000;
 
@@ -341,13 +341,12 @@ export default class ScriptHelper {
 					targetX = (this.currentRoom!.x + currentStep.posX!) * TILE_WIDTH;
 					targetY = (this.currentRoom!.y + currentStep.posY!) * TILE_HEIGHT;
 				}
-				this.scene.dropItem(
-					targetX,
-					targetY,
-					currentStep.fixedId
-						? (fixedItems as unknown as { [name: string]: Item })[currentStep.fixedId]
-						: generateRandomItem(currentStep.itemOptions || {})
-				);
+				if (currentStep.fixedId) {
+					this.scene.dropItem(targetX, targetY, currentStep.fixedId);
+				} else {
+					const { itemKey, level } = generateRandomItem(currentStep.itemOptions || {});
+					this.scene.dropItem(targetX, targetY, itemKey, level);
+				}
 				break;
 			}
 			// To Do's:
