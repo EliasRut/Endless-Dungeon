@@ -5,7 +5,7 @@ import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 
-const BASE_ATTACK_DAMAGE = 10;
+const BASE_ATTACK_DAMAGE = 0.1;
 const REGULAR_ATTACK_RANGE = 25;
 const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
@@ -142,7 +142,7 @@ export default class ZombieToken extends EnemyToken {
 		const distance = this.getDistance(tx, ty);
 
 		if (distance < this.attackRange) {
-			player.health -= this.stateObject.damage;
+			this.scene.mainCharacter.receiveHit(this.stateObject.damage);
 		}
 	}
 }

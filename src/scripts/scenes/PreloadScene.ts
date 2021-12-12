@@ -50,6 +50,14 @@ export default class PreloadScene extends Phaser.Scene {
 			frameWidth: 40,
 			frameHeight: 40,
 		});
+		this.load.spritesheet('player-damage', 'assets/sprites/main-character-damagestun.png', {
+			frameWidth: 40,
+			frameHeight: 40,
+		});
+		this.load.spritesheet('player-stun', 'assets/sprites/main-character-damagestun.png', {
+			frameWidth: 40,
+			frameHeight: 40,
+		});
 
 		// Overlay screens
 		this.load.spritesheet('screen-background', 'assets/img/screen-background.png', {

@@ -98,9 +98,9 @@ export default class AbilityHelper {
 					collidingEffect.destroy();
 				}
 				effect.hitEnemyTokens.push(enemy);
-				enemy.stateObject.health -= origin.damage * Abilities[type].damageMultiplier;
+				enemy.receiveHit(origin.damage * Abilities[type].damageMultiplier);
 				if (Abilities[type].stun) {
-					stun(globalTime, Abilities[type].stun!, enemy.stateObject);
+					enemy.receiveStun(Abilities[type].stun!);
 				}
 				if (Abilities[type].necroticStacks) {
 					enemy.lastNecroticEffectTimestamp = globalTime;
@@ -153,9 +153,13 @@ export default class AbilityHelper {
 		});
 	}
 }
-export const stun = (time: number, duration: number, character: Character) => {
-	if (character.stunnedAt + character.stunDuration + 1000 > time) return;
-	character.stunned = true;
-	character.stunnedAt = time;
-	character.stunDuration = duration;
-};
+// export const stun = (time: number, duration: number, characterToken: CharacterToken) => {
+// 	const character = characterToken.stateObject;
+// 	if (character.stunnedAt + character.stunDuration > time) {
+// 		return;
+// 	}
+// 	character.stunned = true;
+// 	character.stunnedAt = time;
+// 	character.stunDuration = duration;
+// 	characterToken.receiveStun(duration);
+// };

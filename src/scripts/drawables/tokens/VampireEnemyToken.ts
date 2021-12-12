@@ -4,7 +4,6 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
-import { stun } from '../../helpers/AbilityHelper';
 
 const BASE_ATTACK_DAMAGE = 10;
 const REGULAR_ATTACK_RANGE = 75;
@@ -18,7 +17,7 @@ const HEALTH_DROP_CHANCE = 0.06;
 const CHARGE_TIME = 1500;
 const ATTACK_DURATION = 3000;
 const WALL_COLLISION_STUN = 2000;
-const PLAYER_STUN = 500;
+const PLAYER_STUN = 800;
 const COLLISION_STUN = 1000;
 const LAUNCH_SPEED = 100;
 export default class VampireToken extends EnemyToken {
@@ -129,6 +128,9 @@ export default class VampireToken extends EnemyToken {
 		super.destroy();
 	}
 
+	receiveHit(damage: number) {
+		super.receiveHit(damage);
+	}
 	// FRAME RATE: 16
 	attack(time: number) {
 		if (!this.attacking) {
@@ -170,12 +172,12 @@ export default class VampireToken extends EnemyToken {
 			if (withEnemy) {
 				stunDuration = COLLISION_STUN;
 				if (!this.damaged) {
-					globalState.playerCharacter.health -= this.stateObject.damage;
-					stun(globalState.gameTime, PLAYER_STUN, globalState.playerCharacter);
+					this.scene.mainCharacter.receiveStun(stunDuration);
+					this.scene.mainCharacter.receiveHit(this.stateObject.damage)
 					this.damaged = true;
 				}
 			}
-			stun(globalState.gameTime, stunDuration, this.stateObject);
+			this.receiveStun(stunDuration);
 			const tx = this.target.x;
 			const ty = this.target.y;
 			const xSpeed = tx - this.x;

@@ -56,6 +56,7 @@ export class WorldState {
 		this.dungeon = new Dungeon();
 		this.inventory = new Inventory();
 		this.itemList = [];
+		this.gameTime = 0;
 	}
 
 	storeState() {

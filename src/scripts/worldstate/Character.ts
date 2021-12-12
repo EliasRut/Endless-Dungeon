@@ -14,7 +14,7 @@ export default class Character {
 	public attackTime: number;
 	public stunDuration: number = 0;
 	public stunnedAt: number = 0;
-	public stunned: boolean = false;
+	public stunned: boolean = false
 
 	public currentFacing: Facings = Facings.SOUTH;
 	public isWalking = false;
@@ -22,7 +22,7 @@ export default class Character {
 	public x = 0;
 	public y = 0;
 	public vision = 0;
-	
+
 	public items: EquippableItem[] = [];
 
 	public faction: Faction;
@@ -45,6 +45,6 @@ export const updateStatus = (globalTime: number, character: Character) => {
 	if (character.stunned) {
 		if (globalTime > character.stunnedAt + character.stunDuration) {
 			character.stunned = false;
-		}		
+		}
 	}
 }
