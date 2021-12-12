@@ -107,7 +107,7 @@ export const generateRandomItem = (options: Partial<RandomItemOptions>) => {
 			data = Object.values(RingData)[randomIndex];
 		}
 	} else {
-		itemType = EquippableItemType.NECKLACE;
+		itemType = EquippableItemType.AMULET;
 		if (amuletTypes && amuletTypes.length > 0) {
 			const randomIndex = Math.floor(Math.random() * amuletTypes.length);
 			data = AmuletData[amuletTypes[randomIndex]];

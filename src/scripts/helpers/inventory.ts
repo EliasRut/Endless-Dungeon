@@ -214,6 +214,7 @@ export const getEquipmentDataForItemKey: (itemKey: EquipmentKey) => EquippedItem
 		case 'ring':
 			return globalState.inventory.rings[itemKey as Ring];
 	}
+	throw new Error(`Unknown equipment type ${itemKey}.`);
 };
 
 // export const getUnequippedItemsWithPositions = () => {
@@ -239,12 +240,13 @@ export const getItemDataForEquipmentSlot: (slot: EquipmentSlot) => ItemData | un
 
 export const getFullDataForEquipmentSlot: (
 	slot: EquipmentSlot
-) => [ItemData, EquippedItemData] | undefined = (slot) => {
+) => [ItemData, EquippedItemData] | [undefined, undefined] = (slot) => {
 	const itemKey = getItemKeyForEquipmentSlot(slot);
 	if (!itemKey) {
-		return undefined;
+		return [undefined, undefined];
 	}
 
 	const itemData = getItemDataForName(itemKey);
-	const equipmentData = globalState.inventory;
+	const equipmentData = getEquipmentDataForItemKey(itemKey);
+	return [itemData, equipmentData];
 };

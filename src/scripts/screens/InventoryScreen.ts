@@ -19,6 +19,7 @@ import {
 	getEquippedItems,
 	getItemKeyForEquipmentSlot,
 	getItemDataForEquipmentSlot,
+	getFullDataForEquipmentSlot,
 } from '../helpers/inventory';
 
 const INVENTORY_START_X = 500;
@@ -175,8 +176,8 @@ export default class InventoryScreen extends OverlayScreen {
 			// }
 		} else {
 			this.focusedSlot = slotName;
-			const itemData = getItemDataForEquipmentSlot(slotName);
-			this.scene.overlayScreens.itemScreen.update(itemData);
+			const [itemData, equipmentData] = getFullDataForEquipmentSlot(slotName);
+			this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
 			const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotName];
 			this.inventorySelection.setX(x);
 			this.inventorySelection.setY(y);

@@ -52,7 +52,7 @@ export default class ItemScreen extends OverlayScreen {
 		this.itemName.setScrollFactor(0);
 		this.add(this.itemName, true);
 
-		const lableLevel = new Phaser.GameObjects.BitmapText(
+		this.lableLevel = new Phaser.GameObjects.BitmapText(
 			scene,
 			SCREEN_X - 10,
 			SCREEN_Y + 30,
@@ -153,7 +153,7 @@ export default class ItemScreen extends OverlayScreen {
 			this.flavorText.setText(`${itemData.description}`);
 			let residualHeight = FLAVOR_HEIGHT - this.flavorText.getBounds().height;
 			residualHeight = residualHeight / 2;
-			this.flavorText.setY(SCREEN_Y + 80 + residualHeight);
+			this.flavorText.setY(SCREEN_Y + 20 + residualHeight);
 
 			// update item name
 			this.itemName.setText(`${itemData.name}`);
