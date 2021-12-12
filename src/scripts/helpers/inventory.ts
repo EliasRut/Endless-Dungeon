@@ -5,15 +5,17 @@ import {
 	EquipmentKey,
 	EquippableItemType,
 	equippableTypeNames,
+	getItemDataForName,
 	Ring,
 	Source,
 } from '../../items/itemData';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import EquippableItem, { ItemStats } from '../worldstate/EquippableItem';
-import { EquippedItems } from '../worldstate/Inventory';
+import { EquippedItemData, EquippedItems } from '../worldstate/Inventory';
 import Item from '../worldstate/Item';
 import { EquipmentSlot, BAG_BOXES_X, BAG_BOXES_Y } from './constants';
+import { ItemData } from '../../items/itemData';
 
 const BASE_HEALTH = 100;
 const BASE_MOVEMENT_SPEED = 200;
@@ -127,7 +129,7 @@ export const isEquippable = (item: Item) => {
 	return equippableTypeNames.includes(item.type);
 };
 
-export const getItemForEquipmentSlot: (slort: EquipmentSlot) => EquipmentKey | undefined = (
+export const getItemKeyForEquipmentSlot: (slot: EquipmentSlot) => EquipmentKey | undefined = (
 	slot
 ) => {
 	switch (slot) {
@@ -196,6 +198,24 @@ export const getEquippedItems: () => EquippedItems = () => {
 	};
 };
 
+export const getEquipmentDataForItemKey: (itemKey: EquipmentKey) => EquippedItemData = (
+	itemKey
+) => {
+	const prefix = itemKey.split('-')[0];
+	switch (prefix) {
+		case 'source':
+			return globalState.inventory.sources[itemKey as Source];
+		case 'amulet':
+			return globalState.inventory.amulets[itemKey as Amulet];
+		case 'chestpiece':
+			return globalState.inventory.chestPieces[itemKey as ChestPiece];
+		case 'amulet':
+			return globalState.inventory.amulets[itemKey as Amulet];
+		case 'ring':
+			return globalState.inventory.rings[itemKey as Ring];
+	}
+};
+
 // export const getUnequippedItemsWithPositions = () => {
 // 	return globalState.inventory.unequippedItemList;
 // };
@@ -205,3 +225,26 @@ export const getEquippedItems: () => EquippedItems = () => {
 // 		(item) => item.item.id === itemId);
 // 	return matchingItems.reduce((sum, item) => sum + item.item.amount, 0);
 // };
+
+export const getItemDataForEquipmentSlot: (slot: EquipmentSlot) => ItemData | undefined = (
+	slot
+) => {
+	const itemKey = getItemKeyForEquipmentSlot(slot);
+	if (!itemKey) {
+		return undefined;
+	}
+
+	return getItemDataForName(itemKey);
+};
+
+export const getFullDataForEquipmentSlot: (
+	slot: EquipmentSlot
+) => [ItemData, EquippedItemData] | undefined = (slot) => {
+	const itemKey = getItemKeyForEquipmentSlot(slot);
+	if (!itemKey) {
+		return undefined;
+	}
+
+	const itemData = getItemDataForName(itemKey);
+	const equipmentData = globalState.inventory;
+};

@@ -282,7 +282,7 @@ export const enum EquippableItemType {
 	SOURCE = 'source',
 	CATALYST = 'catalyst',
 	CHESTPIECE = 'chestpiece',
-	NECKLACE = 'necklace',
+	AMULET = 'amulet',
 	RING = 'ring',
 }
 
@@ -290,7 +290,7 @@ export const equippableTypeNames = [
 	EquippableItemType.SOURCE,
 	EquippableItemType.CATALYST,
 	EquippableItemType.CHESTPIECE,
-	EquippableItemType.NECKLACE,
+	EquippableItemType.AMULET,
 	EquippableItemType.RING,
 ] as string[];
 

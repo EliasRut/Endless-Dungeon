@@ -5,6 +5,8 @@ import OverlayScreen from './OverlayScreen';
 import { isEquippable } from '../helpers/inventory';
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import globalState from '../worldstate';
+import { ItemData } from '../../items/itemData';
+import { EquippedItemData } from '../worldstate/Inventory';
 
 const BASE_SIZE_NAME = 25;
 const FONT_SIZE_TEXT = 10;
@@ -15,8 +17,10 @@ const SCREEN_WIDTH = 200;
 const FLAVOR_HEIGHT = 150;
 export default class ItemScreen extends OverlayScreen {
 	itemName: Phaser.GameObjects.Text;
-	lableHealthValue: Phaser.GameObjects.BitmapText;
-	lableDamageValue: Phaser.GameObjects.BitmapText;
+	lableLevel: Phaser.GameObjects.BitmapText;
+	lableLevelValue: Phaser.GameObjects.BitmapText;
+	// lableEnchantment: Phaser.GameObjects.BitmapText;
+	lableEnchantmentValue: Phaser.GameObjects.BitmapText;
 	lableMovSpeedValue: Phaser.GameObjects.BitmapText;
 	flavorText: Phaser.GameObjects.Text;
 
@@ -48,15 +52,15 @@ export default class ItemScreen extends OverlayScreen {
 		this.itemName.setScrollFactor(0);
 		this.add(this.itemName, true);
 
-		const lableHealth = new Phaser.GameObjects.BitmapText(
+		const lableLevel = new Phaser.GameObjects.BitmapText(
 			scene,
 			SCREEN_X - 10,
 			SCREEN_Y + 30,
 			'pixelfont',
-			'Health',
+			'Level',
 			FONT_SIZE_TEXT
 		);
-		this.lableHealthValue = new Phaser.GameObjects.BitmapText(
+		this.lableLevelValue = new Phaser.GameObjects.BitmapText(
 			scene,
 			SCREEN_X + 74,
 			SCREEN_Y + 30,
@@ -64,22 +68,22 @@ export default class ItemScreen extends OverlayScreen {
 			``,
 			FONT_SIZE_TEXT
 		);
-		lableHealth.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		lableHealth.setScrollFactor(0);
-		this.lableHealthValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		this.lableHealthValue.setScrollFactor(0);
-		this.add(lableHealth, true);
-		this.add(this.lableHealthValue, true);
+		this.lableLevel.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		this.lableLevel.setScrollFactor(0);
+		this.lableLevelValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		this.lableLevelValue.setScrollFactor(0);
+		this.add(this.lableLevel, true);
+		this.add(this.lableLevelValue, true);
 
-		const lableDamage = new Phaser.GameObjects.BitmapText(
-			scene,
-			SCREEN_X - 10,
-			SCREEN_Y + 48,
-			'pixelfont',
-			'Damage',
-			FONT_SIZE_TEXT
-		);
-		this.lableDamageValue = new Phaser.GameObjects.BitmapText(
+		// const lableEnchantment = new Phaser.GameObjects.BitmapText(
+		// 	scene,
+		// 	SCREEN_X - 10,
+		// 	SCREEN_Y + 48,
+		// 	'pixelfont',
+		// 	'Enchantment',
+		// 	FONT_SIZE_TEXT
+		// );
+		this.lableEnchantmentValue = new Phaser.GameObjects.BitmapText(
 			scene,
 			SCREEN_X + 74,
 			SCREEN_Y + 48,
@@ -87,35 +91,35 @@ export default class ItemScreen extends OverlayScreen {
 			``,
 			FONT_SIZE_TEXT
 		);
-		lableDamage.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		lableDamage.setScrollFactor(0);
-		this.lableDamageValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		this.lableDamageValue.setScrollFactor(0);
-		this.add(lableDamage, true);
-		this.add(this.lableDamageValue, true);
+		// lableEnchantment.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		// lableEnchantment.setScrollFactor(0);
+		this.lableEnchantmentValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		this.lableEnchantmentValue.setScrollFactor(0);
+		// this.add(lableEnchantment, true);
+		this.add(this.lableEnchantmentValue, true);
 
-		const lableMovSpeed = new Phaser.GameObjects.BitmapText(
-			scene,
-			SCREEN_X - 10,
-			SCREEN_Y + 66,
-			'pixelfont',
-			'Speed',
-			FONT_SIZE_TEXT
-		);
-		this.lableMovSpeedValue = new Phaser.GameObjects.BitmapText(
-			scene,
-			SCREEN_X + 74,
-			SCREEN_Y + 66,
-			'pixelfont',
-			``,
-			FONT_SIZE_TEXT
-		);
-		lableMovSpeed.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		lableMovSpeed.setScrollFactor(0);
-		this.lableMovSpeedValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		this.lableMovSpeedValue.setScrollFactor(0);
-		this.add(lableMovSpeed, true);
-		this.add(this.lableMovSpeedValue, true);
+		// const lableMovSpeed = new Phaser.GameObjects.BitmapText(
+		// 	scene,
+		// 	SCREEN_X - 10,
+		// 	SCREEN_Y + 66,
+		// 	'pixelfont',
+		// 	'Speed',
+		// 	FONT_SIZE_TEXT
+		// );
+		// this.lableMovSpeedValue = new Phaser.GameObjects.BitmapText(
+		// 	scene,
+		// 	SCREEN_X + 74,
+		// 	SCREEN_Y + 66,
+		// 	'pixelfont',
+		// 	``,
+		// 	FONT_SIZE_TEXT
+		// );
+		// lableMovSpeed.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		// lableMovSpeed.setScrollFactor(0);
+		// this.lableMovSpeedValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		// this.lableMovSpeedValue.setScrollFactor(0);
+		// this.add(lableMovSpeed, true);
+		// this.add(this.lableMovSpeedValue, true);
 
 		this.flavorText = new Phaser.GameObjects.Text(scene, SCREEN_X - 10, SCREEN_Y + 80, '', {
 			fontSize: '12px',
@@ -129,26 +133,30 @@ export default class ItemScreen extends OverlayScreen {
 		this.setVisible(false);
 	}
 
-	update(item?: Item) {
-		if (item !== undefined) {
-			if (isEquippable(item)) {
-				const eItem = item as EquippableItem;
-				this.lableHealthValue.setText(`${eItem.maxHealth.toFixed(2)}`);
-				this.lableDamageValue.setText(`${eItem.damage.toFixed(2)}`);
-				this.lableMovSpeedValue.setText(`${eItem.movementSpeed.toFixed(2)}`);
+	update(itemData?: ItemData, equipmentData?: EquippedItemData) {
+		if (itemData !== undefined) {
+			if (equipmentData) {
+				this.lableLevel.setVisible(true);
+				this.lableLevelValue.setText(`${equipmentData.level}`);
+				// 	const eItem = item as EquippableItem;
+				// 	this.lableHealthValue.setText(`${eItem.maxHealth.toFixed(2)}`);
+				// 	this.lableDamageValue.setText(`${eItem.damage.toFixed(2)}`);
+				// 	this.lableMovSpeedValue.setText(`${eItem.movementSpeed.toFixed(2)}`);
 			} else {
-				this.lableHealthValue.setText(`${0}`);
-				this.lableDamageValue.setText(`${0}`);
-				this.lableMovSpeedValue.setText(`${0}`);
+				this.lableLevel.setVisible(false);
+				this.lableLevelValue.setText(``);
+				// 	this.lableHealthValue.setText(`${0}`);
+				// 	this.lableDamageValue.setText(`${0}`);
+				// 	this.lableMovSpeedValue.setText(`${0}`);
 			}
 			// center flavor text
-			this.flavorText.setText(`${item.flavorText}`);
+			this.flavorText.setText(`${itemData.description}`);
 			let residualHeight = FLAVOR_HEIGHT - this.flavorText.getBounds().height;
 			residualHeight = residualHeight / 2;
 			this.flavorText.setY(SCREEN_Y + 80 + residualHeight);
 
 			// update item name
-			this.itemName.setText(`${item.name}`);
+			this.itemName.setText(`${itemData.name}`);
 			let textHeight = 100;
 			let textWidth = SCREEN_WIDTH;
 			let variableSize = BASE_SIZE_NAME;
@@ -159,9 +167,10 @@ export default class ItemScreen extends OverlayScreen {
 				variableSize--;
 			}
 		} else {
-			this.lableHealthValue.setText(``);
-			this.lableDamageValue.setText(``);
-			this.lableMovSpeedValue.setText(``);
+			this.lableLevel.setVisible(false);
+			this.lableLevelValue.setText(``);
+			this.lableEnchantmentValue.setText(``);
+			// this.lableMovSpeedValue.setText(``);
 			this.flavorText.setText(``);
 			this.itemName.setText(``);
 		}
@@ -170,8 +179,8 @@ export default class ItemScreen extends OverlayScreen {
 	updateAbility(ability: AbilityType) {
 		const damageValue =
 			Abilities[ability as AbilityType].damageMultiplier * globalState.playerCharacter.damage;
-		this.lableDamageValue.setText(`${damageValue.toFixed(2)}`);
-		this.lableHealthValue.setText(`${0}`);
+		this.lableEnchantmentValue.setText(`${damageValue.toFixed(2)}`);
+		this.lableLevelValue.setText(`${0}`);
 		this.lableMovSpeedValue.setText(`${0}`);
 		// center flavor text
 		this.flavorText.setText(`${Abilities[ability].flavorText}`);

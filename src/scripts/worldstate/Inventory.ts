@@ -12,10 +12,7 @@ import {
 	ChestPieceKey,
 	AmuletKey,
 } from '../../items/itemData';
-
-export enum EnchantmentType {
-	NONE = 'none',
-}
+import { EnchantmentType } from '../../items/enchantmentData';
 
 export interface EquippedItemData {
 	level: number;
