@@ -44,6 +44,7 @@ interface AbilityData {
 	stun?: number;
 	necroticStacks?: number;
 	iceStacks?: number;
+	castOnEnemyDestroyed?: AbilityType;
 }
 
 export const enum AbilityType {
@@ -98,6 +99,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		//stun: 3000,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
+		castOnEnemyDestroyed: AbilityType.FIRE_NOVA,
 	},
 	[AbilityType.ARCANE_BOLT]: {
 		projectiles: 1,

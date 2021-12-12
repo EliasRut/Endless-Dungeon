@@ -77,7 +77,12 @@ export default class RangedEnemyToken extends EnemyToken {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.attackedAt = time;
-			this.scene.abilityHelper.triggerAbility(this.stateObject, AbilityType.HAIL_OF_FLAMES, time);
+			this.scene.abilityHelper.triggerAbility(
+				this.stateObject,
+				this.stateObject,
+				AbilityType.HAIL_OF_FLAMES,
+				time
+			);
 		}
 	}
 }
