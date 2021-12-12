@@ -266,3 +266,9 @@ export const equippableTypeNames = [
 	EquippableItemType.NECKLACE,
 	EquippableItemType.RING,
 ] as string[];
+
+export const enum UneqippableItem {
+	GOLD_KEY = 'goldKey',
+	SILVER_KEY = 'silverKey',
+	MYSTIC_BOOK = 'mysticBook',
+}
