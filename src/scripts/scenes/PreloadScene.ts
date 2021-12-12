@@ -3,7 +3,7 @@ import {
 	NUM_DIRECTIONS,
 	npcTypeToFileMap,
 	FacingRange,
-	npcTypeToAttackFileMap,
+	characterToSubAnimationFileMap,
 	essenceNames,
 	ColorsOfMagic,
 	activeMode,
@@ -215,16 +215,16 @@ export default class PreloadScene extends Phaser.Scene {
 						frameRate: 12,
 						repeat: -1,
 					});
-					const attackNames = Object.keys(npcTypeToAttackFileMap[token.name] || {});
+					const subAnimationNames = Object.keys(characterToSubAnimationFileMap[token.name] || {});
 					const directionFrameMultiplier = Math.floor(directionIndex / token.facingRange);
-					attackNames.forEach((attackName) => {
-						const attackData = npcTypeToAttackFileMap[token.name][attackName];
+					subAnimationNames.forEach((subAnimation) => {
+						const attackData = characterToSubAnimationFileMap[token.name][subAnimation];
 						const startFrame =
 							directionFrameMultiplier * attackData.framesPerDirection +
 							(attackData.frameOffset || 0);
 						this.anims.create({
-							key: `${token.name}-${attackName}-${directionName}`,
-							frames: this.anims.generateFrameNumbers(`${token.name}-${attackName}`, {
+							key: `${token.name}-${subAnimation}-${directionName}`,
+							frames: this.anims.generateFrameNumbers(`${token.name}-${subAnimation}`, {
 								start: startFrame,
 								end:
 									startFrame +

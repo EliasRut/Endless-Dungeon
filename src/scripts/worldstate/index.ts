@@ -2,7 +2,7 @@ import { Room } from '../../../typings/custom';
 import Character from './Character';
 import Door from './Door';
 import Dungeon from './Dungeon';
-import Inventory, { EmptyInventory } from './Inventory';
+import Inventory from './Inventory';
 import Item from './Item';
 import PlayerCharacter from './PlayerCharacter';
 import { QuestState } from './QuestState';
@@ -54,7 +54,7 @@ export class WorldState {
 	constructor() {
 		this.playerCharacter = new PlayerCharacter();
 		this.dungeon = new Dungeon();
-		this.inventory = { ...EmptyInventory };
+		this.inventory = new Inventory();
 		this.itemList = [];
 	}
 

@@ -146,7 +146,6 @@ export default class VampireToken extends EnemyToken {
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const attackAnimationName = `enemy-vampire-prepare-${facingToSpriteNameMap[newFacing]}`;
 			// 9 frames, so 9 frame rate for 1s.
-			//this.play({ key: attackAnimationName, frameRate: (9 / this.chargeTime * 1000)});
 			const frame = Math.round(((time - this.attackedAt) / this.chargeTime) * 8);
 			this.play({ key: attackAnimationName, frameRate: 10, startFrame: frame });
 		} else if (this.attackedAt + this.chargeTime <= time && !this.launched) {
