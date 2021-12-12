@@ -67,10 +67,10 @@ export const NUM_ITEM_ICONS = 64;
 export const NUM_DIRECTIONS = 8;
 
 export const enum EquipmentSlot {
-	MAIN_HAND = 'mainhand',
-	OFF_HAND = 'offhand',
+	SOURCE = 'source',
+	CATALYST = 'catalyst',
 	CHESTPIECE = 'chestpiece',
-	NECKLACE = 'necklace',
+	AMULET = 'amulet',
 	RIGHT_RING = 'rightRing',
 	LEFT_RING = 'leftRing',
 }
