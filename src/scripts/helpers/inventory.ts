@@ -1,4 +1,13 @@
-import { EquippableItemType, equippableTypeNames } from '../../items/itemData';
+import {
+	Amulet,
+	Catalyst,
+	ChestPiece,
+	EquipmentKey,
+	EquippableItemType,
+	equippableTypeNames,
+	Ring,
+	Source,
+} from '../../items/itemData';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import EquippableItem, { ItemStats } from '../worldstate/EquippableItem';
@@ -114,9 +123,32 @@ export const updateStats = (char: Character) => {
 // 	removeItemFromBagById(itemToRemove.id);
 // };
 
-// export const isEquippable = (item: Item) => {
-// 	return equippableTypeNames.includes(item.type);
-// };
+export const isEquippable = (item: Item) => {
+	return equippableTypeNames.includes(item.type);
+};
+
+export const getItemForEquipmentSlot: (slort: EquipmentSlot) => EquipmentKey | undefined = (
+	slot
+) => {
+	switch (slot) {
+		case EquipmentSlot.AMULET:
+			return globalState.inventory.equippedAmulet;
+		case EquipmentSlot.LEFT_RING:
+			return globalState.inventory.equippedLeftRing;
+		case EquipmentSlot.RIGHT_RING:
+			return globalState.inventory.equippedRightRing;
+		case EquipmentSlot.CHESTPIECE:
+			return globalState.inventory.equippedChestPiece;
+		case EquipmentSlot.AMULET:
+			return globalState.inventory.equippedAmulet;
+		case EquipmentSlot.SOURCE:
+			return globalState.inventory.equippedSource;
+		case EquipmentSlot.CATALYST:
+			return globalState.inventory.equippedCatalyst;
+		default:
+			return undefined;
+	}
+};
 
 // export const equipItem = (item: EquippableItem) => {
 // 	const inventory = globalState.inventory;
@@ -157,7 +189,7 @@ export const getEquippedItems: () => EquippedItems = () => {
 	return {
 		[EquipmentSlot.SOURCE]: inventory.equippedSource,
 		[EquipmentSlot.CATALYST]: inventory.equippedCatalyst,
-		[EquipmentSlot.CHESTPIECE]: inventory.equippedChestpiece,
+		[EquipmentSlot.CHESTPIECE]: inventory.equippedChestPiece,
 		[EquipmentSlot.AMULET]: inventory.equippedAmulet,
 		[EquipmentSlot.RIGHT_RING]: inventory.equippedRightRing,
 		[EquipmentSlot.LEFT_RING]: inventory.equippedLeftRing,

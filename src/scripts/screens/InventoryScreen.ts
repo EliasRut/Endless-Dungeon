@@ -12,10 +12,10 @@ import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import EquippableItem from '../worldstate/EquippableItem';
 import globalState from '../worldstate';
 import MainScene from '../scenes/MainScene';
-import { AbilityLinkedItem, CatalystItem } from '../../items/itemData';
+import { AbilityLinkedItem, CatalystItem, getItemDataForName } from '../../items/itemData';
 import { updateAbility } from '../worldstate/PlayerCharacter';
 import { getCatalystAbility } from '../helpers/item';
-import { getEquippedItems } from '../helpers/inventory';
+import { getEquippedItems, getItemForEquipmentSlot } from '../helpers/inventory';
 
 const INVENTORY_START_X = 500;
 const INVENTORY_START_Y = 198;
@@ -71,9 +71,9 @@ const EQUIPMENT_SLOT_TO_ABILITY_KEY = {
 // tslint:enable
 
 export default class InventoryScreen extends OverlayScreen {
-	itemTokenMap: { [id: string]: InventoryItemToken } = {};
+	equipmentSlotTokenMap: Partial<Record<EquipmentSlot, InventoryItemToken>> = {};
 	abilityIconMap: { [slot: string]: Phaser.GameObjects.Image } = {};
-	focusedItem?: Item;
+	focusedItem?: string;
 	scene: MainScene;
 	keyLastPressed: number = 0;
 	keyCD: number = 150;
@@ -107,6 +107,14 @@ export default class InventoryScreen extends OverlayScreen {
 		scene.add.existing(this);
 		this.setVisible(false);
 
+		Object.entries(EQUIPMENT_SLOT_COORDINATES).forEach(([slotName, [x, y]]) => {
+			this.equipmentSlotTokenMap[slotName as EquipmentSlot] = this.createItemToken(
+				slotName as EquipmentSlot,
+				x,
+				y
+			);
+		});
+
 		const equippedItems = getEquippedItems();
 		Object.keys(equippedItems)
 			.filter((slotKey) => !!equippedItems[slotKey as EquipmentSlot])
@@ -132,36 +140,39 @@ export default class InventoryScreen extends OverlayScreen {
 		this.currentXY = [0, 0];
 	}
 
-	createItemToken(item: Item, x: number, y: number) {
-		const itemToken = new InventoryItemToken(this.scene, x, y, item.iconFrame);
-		this.itemTokenMap[item.id] = itemToken;
+	createItemToken(slotName: EquipmentSlot, x: number, y: number) {
+		const itemName = getItemForEquipmentSlot(slotName);
+		const itemData = itemName ? getItemDataForName(itemName) : undefined;
+		const itemToken = new InventoryItemToken(this.scene, x, y, itemData?.iconFrame || -1);
+		// this.equipmentSlotTokenMap[itemname] = itemToken;
 		itemToken.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		itemToken.setScrollFactor(0);
 		itemToken.setInteractive();
 		itemToken.setVisible(false);
 		this.add(itemToken, true);
 		itemToken.on('pointerdown', () => {
-			this.handleInvetoryItemInteraction(item);
+			// this.handleInvetoryItemInteraction(itemname);
 		});
+		return itemToken;
 	}
 
-	handleInvetoryItemInteraction(item: Item) {
-		if (this.focusedItem === item) {
-			// if (isEquippable(item)) {
-			// 	const equippableItem = item as EquippableItem;
-			// 	if (isEquipped(equippableItem)) {
-			// 		unequipItem(equippableItem);
-			// 	} else {
-			// 		equipItem(equippableItem);
-			// 	}
-			// 	this.update();
-			// 	this.updateAbilities(false);
-			// }
-		} else {
-			this.focusedItem = item;
-			this.scene.overlayScreens.itemScreen.update(item);
-		}
-	}
+	// handleInvetoryItemInteraction(item: string) {
+	// 	if (this.focusedItem === item) {
+	// 		// if (isEquippable(item)) {
+	// 		// 	const equippableItem = item as EquippableItem;
+	// 		// 	if (isEquipped(equippableItem)) {
+	// 		// 		unequipItem(equippableItem);
+	// 		// 	} else {
+	// 		// 		equipItem(equippableItem);
+	// 		// 	}
+	// 		// 	this.update();
+	// 		// 	this.updateAbilities(false);
+	// 		// }
+	// 	} else {
+	// 		this.focusedItem = item;
+	// 		this.scene.overlayScreens.itemScreen.update(item);
+	// 	}
+	// }
 
 	// select next item in bag. Handles cd for key press
 	interactInventory(direction: string, globalTime: number) {
@@ -169,8 +180,8 @@ export default class InventoryScreen extends OverlayScreen {
 		if (globalTime - this.keyLastPressed > this.keyCD) this.keyLastPressed = globalTime;
 		else return;
 		if (direction === 'enter') {
-			if (this.focusedItem !== undefined) this.handleInvetoryItemInteraction(this.focusedItem);
-			else return;
+			// if (this.focusedItem !== undefined) this.handleInvetoryItemInteraction(this.focusedItem);
+			// else return;
 		}
 
 		// const item = this.getNextBagItem(direction);
@@ -352,7 +363,7 @@ export default class InventoryScreen extends OverlayScreen {
 	// We currently ignore amount.
 	removeFromInventory(itemId: string, amount: number) {
 		// removeItemFromBagById(itemId);
-		this.itemTokenMap[itemId].destroy(true);
+		// this.equipmentSlotTokenMap[itemId].destroy(true);
 	}
 
 	update() {

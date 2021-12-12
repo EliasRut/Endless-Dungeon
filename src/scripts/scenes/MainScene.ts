@@ -258,71 +258,71 @@ export default class MainScene extends Phaser.Scene {
 			this.sound.play('score-dungeon', { volume: 0.08, loop: true });
 		}
 
-		if (globalState.inventory.unequippedItemList.length === 0) {
-			const zeroWeights = {
-				sourceWeight: 0,
-				catalystWeight: 0,
-				armorWeight: 0,
-				ringWeight: 0,
-				amuletWeight: 0,
-			};
-			this.overlayScreens.inventory.addToInventory(
-				generateRandomItem({
-					...zeroWeights,
-					sourceWeight: 1,
-					sourceTypes: [Source.FIRE],
-				})
-			);
-			this.overlayScreens.inventory.addToInventory(
-				generateRandomItem({
-					...zeroWeights,
-					sourceWeight: 1,
-					sourceTypes: [Source.ICE],
-				})
-			);
-			this.overlayScreens.inventory.addToInventory(
-				generateRandomItem({
-					...zeroWeights,
-					sourceWeight: 1,
-					sourceTypes: [Source.FORCE],
-				})
-			);
-			this.overlayScreens.inventory.addToInventory(
-				generateRandomItem({
-					...zeroWeights,
-					sourceWeight: 1,
-					sourceTypes: [Source.NECROTIC],
-				})
-			);
-			this.overlayScreens.inventory.addToInventory(
-				generateRandomItem({
-					...zeroWeights,
-					catalystWeight: 1,
-					catalystTypes: [Catalyst.NOVA],
-				})
-			);
-			this.overlayScreens.inventory.addToInventory(
-				generateRandomItem({
-					...zeroWeights,
-					catalystWeight: 1,
-					catalystTypes: [Catalyst.CONE],
-				})
-			);
-			this.overlayScreens.inventory.addToInventory(
-				generateRandomItem({
-					...zeroWeights,
-					catalystWeight: 1,
-					catalystTypes: [Catalyst.STORM],
-				})
-			);
-			this.overlayScreens.inventory.addToInventory(
-				generateRandomItem({
-					...zeroWeights,
-					catalystWeight: 1,
-					catalystTypes: [Catalyst.SUMMON],
-				})
-			);
-		}
+		// if (globalState.inventory.unequippedItemList.length === 0) {
+		// 	const zeroWeights = {
+		// 		sourceWeight: 0,
+		// 		catalystWeight: 0,
+		// 		armorWeight: 0,
+		// 		ringWeight: 0,
+		// 		amuletWeight: 0,
+		// 	};
+		// 	this.overlayScreens.inventory.addToInventory(
+		// 		generateRandomItem({
+		// 			...zeroWeights,
+		// 			sourceWeight: 1,
+		// 			sourceTypes: [Source.FIRE],
+		// 		})
+		// 	);
+		// 	this.overlayScreens.inventory.addToInventory(
+		// 		generateRandomItem({
+		// 			...zeroWeights,
+		// 			sourceWeight: 1,
+		// 			sourceTypes: [Source.ICE],
+		// 		})
+		// 	);
+		// 	this.overlayScreens.inventory.addToInventory(
+		// 		generateRandomItem({
+		// 			...zeroWeights,
+		// 			sourceWeight: 1,
+		// 			sourceTypes: [Source.FORCE],
+		// 		})
+		// 	);
+		// 	this.overlayScreens.inventory.addToInventory(
+		// 		generateRandomItem({
+		// 			...zeroWeights,
+		// 			sourceWeight: 1,
+		// 			sourceTypes: [Source.NECROTIC],
+		// 		})
+		// 	);
+		// 	this.overlayScreens.inventory.addToInventory(
+		// 		generateRandomItem({
+		// 			...zeroWeights,
+		// 			catalystWeight: 1,
+		// 			catalystTypes: [Catalyst.NOVA],
+		// 		})
+		// 	);
+		// 	this.overlayScreens.inventory.addToInventory(
+		// 		generateRandomItem({
+		// 			...zeroWeights,
+		// 			catalystWeight: 1,
+		// 			catalystTypes: [Catalyst.CONE],
+		// 		})
+		// 	);
+		// 	this.overlayScreens.inventory.addToInventory(
+		// 		generateRandomItem({
+		// 			...zeroWeights,
+		// 			catalystWeight: 1,
+		// 			catalystTypes: [Catalyst.STORM],
+		// 		})
+		// 	);
+		// 	this.overlayScreens.inventory.addToInventory(
+		// 		generateRandomItem({
+		// 			...zeroWeights,
+		// 			catalystWeight: 1,
+		// 			catalystTypes: [Catalyst.SUMMON],
+		// 		})
+		// 	);
+		// }
 	}
 
 	addNpc(

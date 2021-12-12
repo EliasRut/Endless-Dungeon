@@ -5,11 +5,11 @@ import { TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import RoomPositioning from '../worldstate/RoomPositioning';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from './movement';
 import CharacterToken from '../drawables/tokens/CharacterToken';
-import { getUnequippedItemCount } from './inventory';
 import fixedItems from '../../items/fixedItems.json';
 import Item from '../worldstate/Item';
 import { generateRandomItem } from './item';
 import { Faction } from './constants';
+import { UneqippableItem } from '../../items/itemData';
 
 const DIALOG_TEXT_TIME_MS = 5000;
 
@@ -270,9 +270,8 @@ export default class ScriptHelper {
 			}
 			case 'condition': {
 				if (currentStep.conditionType === 'hasItem') {
-					const hasMatchingItems = !!globalState.inventory.unequippedItemList.find(
-						(item) => item.item.id === currentStep.itemId
-					);
+					const itemId = currentStep.itemId as UneqippableItem;
+					const hasMatchingItems = !!globalState.inventory.bag[itemId!];
 					if (hasMatchingItems) {
 						cleanUpStep = true;
 					} else {
@@ -573,7 +572,8 @@ export default class ScriptHelper {
 				}
 				(conditionStep.itemIds || []).forEach((itemId, index) => {
 					const requiredCount = (conditionStep.itemQuantities || [])[index] || 1;
-					if (getUnequippedItemCount(itemId) < requiredCount) {
+					const unequipedItemCount = globalState.inventory.bag[itemId as UneqippableItem] || 0;
+					if (unequipedItemCount < requiredCount) {
 						allConditionsFullfilled = false;
 					}
 				});

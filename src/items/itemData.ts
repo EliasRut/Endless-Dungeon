@@ -20,13 +20,14 @@ export const enum Source {
 	NECROTIC = 'source-necrotic',
 	FORCE = 'source-force',
 }
+export type SourceKey = 'source-fire' | 'source-ice' | 'source-necrotic' | 'source-force';
 
-export const SourceData = {
+export const SourceData: Record<Source, AbilityLinkedItem> = {
 	[Source.FIRE]: {
 		ability: AbilityType.FIREBALL,
 		name: 'Fire Source',
 		description:
-			'Channel the power of flame to deal high amounts of instant damage to ' + 'your enemies.',
+			'Channel the power of flame to deal high amounts of instant damage to your enemies.',
 		iconFrame: 24,
 	} as AbilityLinkedItem,
 	[Source.ICE]: {
@@ -57,8 +58,9 @@ export const enum Catalyst {
 	STORM = 'catalyst-storm',
 	SUMMON = 'catalyst-summon',
 }
+export type CatalystKey = 'catalyst-cone' | 'catalyst-nova' | 'catalyst-storm' | 'catalyst-summon';
 
-export const CatalystData = {
+export const CatalystData: Record<Catalyst, CatalystItem> = {
 	[Catalyst.CONE]: {
 		catalystType: Catalyst.CONE,
 		name: 'Cone Catalyst',
@@ -95,8 +97,17 @@ export const enum Ring {
 	CHANGE = 'ring-change',
 	BLOOD = 'ring-blood',
 }
+export type RingKey =
+	| 'ring-wild'
+	| 'ring-royal'
+	| 'ring-metal'
+	| 'ring-passion'
+	| 'ring-flux'
+	| 'ring-death'
+	| 'ring-change'
+	| 'ring-blood';
 
-export const RingData = {
+export const RingData: Record<Ring, AbilityLinkedItem> = {
 	[Ring.WILD]: {
 		ability: AbilityType.DUSTNOVA,
 		name: 'Ring of Wild',
@@ -157,8 +168,17 @@ export const enum Amulet {
 	CHANGE = 'amulet-change',
 	BLOOD = 'amulet-blood',
 }
+export type AmuletKey =
+	| 'amulet-wild'
+	| 'amulet-royal'
+	| 'amulet-metal'
+	| 'amulet-passion'
+	| 'amulet-flux'
+	| 'amulet-death'
+	| 'amulet-change'
+	| 'amulet-blood';
 
-export const AmuletData = {
+export const AmuletData: Record<Amulet, ItemData> = {
 	[Amulet.WILD]: {
 		name: 'Amulet of Wild',
 		description:
@@ -215,8 +235,13 @@ export const enum ChestPiece {
 	CLOAK = 'chestpiece-cloak',
 	GARB = 'chestpiece-garb',
 }
+export type ChestPieceKey =
+	| 'chestpiece-robe'
+	| 'chestpiece-armor'
+	| 'chestpiece-cloak'
+	| 'chestpiece-garb';
 
-export const ChestPieceData = {
+export const ChestPieceData: Record<ChestPiece, ItemData> = {
 	[ChestPiece.ROBE]: {
 		name: 'Robe',
 		description: 'A set of robes inscribed with runes to increase your casting speed.',
@@ -238,6 +263,8 @@ export const ChestPieceData = {
 		iconFrame: 14,
 	} as ItemData,
 };
+
+export type EquipmentKey = SourceKey | CatalystKey | ChestPieceKey | RingKey | AmuletKey;
 
 export const AbilityLinkedItems = {
 	...SourceData,
@@ -273,4 +300,39 @@ export const enum UneqippableItem {
 	MYSTIC_BOOK = 'mysticBook',
 }
 
-// export const getItemDataForName: ()
+export const UneqippableItemData = {
+	[UneqippableItem.GOLD_KEY]: {
+		name: 'Gold Key',
+		description: 'A key that can be used to open golden doors.',
+		iconFrame: 12,
+	} as ItemData,
+	[UneqippableItem.SILVER_KEY]: {
+		name: 'Silver Key',
+		description: 'A key that can be used to open silver doors.',
+		iconFrame: 7,
+	} as ItemData,
+	[UneqippableItem.MYSTIC_BOOK]: {
+		name: 'Mystic Book',
+		description: 'A book full of ancient runes. Smells like old bones.',
+		iconFrame: 5,
+	} as ItemData,
+};
+
+export const getItemDataForName = (name: string) => {
+	if (name.startsWith('source-')) {
+		return SourceData[name as Source] as AbilityLinkedItem;
+	}
+	if (name.startsWith('catalyst-')) {
+		return CatalystData[name as Catalyst] as CatalystItem;
+	}
+	if (name.startsWith('chestpiece-')) {
+		return ChestPieceData[name as ChestPiece] as ItemData;
+	}
+	if (name.startsWith('ring-')) {
+		return RingData[name as Ring] as AbilityLinkedItem;
+	}
+	if (name.startsWith('amulet-')) {
+		return AmuletData[name as Amulet] as ItemData;
+	}
+	return UneqippableItemData[name as UneqippableItem] as ItemData;
+};

@@ -28,11 +28,12 @@ export default class ItemScreen extends OverlayScreen {
 			scene,
 			SCREEN_X - 10,
 			SCREEN_Y - 15,
-			'Frostmourne\'s forgotten little brother',
+			"Frostmourne's forgotten little brother",
 			{
 				color: 'purple',
-				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true }
-			});
+				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
+			}
+		);
 		let textHeight = 100;
 		let textWidth = SCREEN_WIDTH;
 		let variableSize = BASE_SIZE_NAME;
@@ -53,14 +54,16 @@ export default class ItemScreen extends OverlayScreen {
 			SCREEN_Y + 30,
 			'pixelfont',
 			'Health',
-			FONT_SIZE_TEXT);
+			FONT_SIZE_TEXT
+		);
 		this.lableHealthValue = new Phaser.GameObjects.BitmapText(
 			scene,
 			SCREEN_X + 74,
 			SCREEN_Y + 30,
 			'pixelfont',
 			``,
-			FONT_SIZE_TEXT);
+			FONT_SIZE_TEXT
+		);
 		lableHealth.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		lableHealth.setScrollFactor(0);
 		this.lableHealthValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
@@ -74,14 +77,16 @@ export default class ItemScreen extends OverlayScreen {
 			SCREEN_Y + 48,
 			'pixelfont',
 			'Damage',
-			FONT_SIZE_TEXT);
+			FONT_SIZE_TEXT
+		);
 		this.lableDamageValue = new Phaser.GameObjects.BitmapText(
 			scene,
 			SCREEN_X + 74,
 			SCREEN_Y + 48,
 			'pixelfont',
 			``,
-			FONT_SIZE_TEXT);
+			FONT_SIZE_TEXT
+		);
 		lableDamage.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		lableDamage.setScrollFactor(0);
 		this.lableDamageValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
@@ -95,14 +100,16 @@ export default class ItemScreen extends OverlayScreen {
 			SCREEN_Y + 66,
 			'pixelfont',
 			'Speed',
-			FONT_SIZE_TEXT);
+			FONT_SIZE_TEXT
+		);
 		this.lableMovSpeedValue = new Phaser.GameObjects.BitmapText(
 			scene,
 			SCREEN_X + 74,
 			SCREEN_Y + 66,
 			'pixelfont',
 			``,
-			FONT_SIZE_TEXT);
+			FONT_SIZE_TEXT
+		);
 		lableMovSpeed.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		lableMovSpeed.setScrollFactor(0);
 		this.lableMovSpeedValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
@@ -110,16 +117,11 @@ export default class ItemScreen extends OverlayScreen {
 		this.add(lableMovSpeed, true);
 		this.add(this.lableMovSpeedValue, true);
 
-		this.flavorText = new Phaser.GameObjects.Text(
-			scene,
-			SCREEN_X - 10,
-			SCREEN_Y + 80,
-			'',
-			{
-				fontSize: '12px',
-				color: 'orange',
-				wordWrap: { width: SCREEN_WIDTH - 30, useAdvancedWrap: true }
-			});
+		this.flavorText = new Phaser.GameObjects.Text(scene, SCREEN_X - 10, SCREEN_Y + 80, '', {
+			fontSize: '12px',
+			color: 'orange',
+			wordWrap: { width: SCREEN_WIDTH - 30, useAdvancedWrap: true },
+		});
 		this.flavorText.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.flavorText.setScrollFactor(0);
 		this.add(this.flavorText, true);
@@ -131,9 +133,9 @@ export default class ItemScreen extends OverlayScreen {
 		if (item !== undefined) {
 			if (isEquippable(item)) {
 				const eItem = item as EquippableItem;
-				this.lableHealthValue.setText(`${(eItem.maxHealth).toFixed(2)}`);
-				this.lableDamageValue.setText(`${(eItem.damage).toFixed(2)}`);
-				this.lableMovSpeedValue.setText(`${(eItem.movementSpeed).toFixed(2)}`);
+				this.lableHealthValue.setText(`${eItem.maxHealth.toFixed(2)}`);
+				this.lableDamageValue.setText(`${eItem.damage.toFixed(2)}`);
+				this.lableMovSpeedValue.setText(`${eItem.movementSpeed.toFixed(2)}`);
 			} else {
 				this.lableHealthValue.setText(`${0}`);
 				this.lableDamageValue.setText(`${0}`);
@@ -166,9 +168,9 @@ export default class ItemScreen extends OverlayScreen {
 	}
 
 	updateAbility(ability: AbilityType) {
-		const damageValue = Abilities[ability as AbilityType].damageMultiplier
-			* globalState.playerCharacter.damage;
-		this.lableDamageValue.setText(`${(damageValue).toFixed(2)}`);
+		const damageValue =
+			Abilities[ability as AbilityType].damageMultiplier * globalState.playerCharacter.damage;
+		this.lableDamageValue.setText(`${damageValue.toFixed(2)}`);
 		this.lableHealthValue.setText(`${0}`);
 		this.lableMovSpeedValue.setText(`${0}`);
 		// center flavor text
