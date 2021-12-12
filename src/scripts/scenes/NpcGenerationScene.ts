@@ -1,7 +1,7 @@
 import { NpcData } from '../../../typings/custom';
 import {
 	FacingRange,
-	// npcTypeToAttackFileMap,
+	characterToSubAnimationFileMap,
 	npcTypeToFileMap,
 	NUM_DIRECTIONS,
 	spriteDirectionList,
@@ -51,23 +51,23 @@ export default class NpcGenerationScene extends Phaser.Scene {
 		});
 
 		// NPCs
-		// requiredNpcs.forEach((npc) => {
-		// 	if (npcTypeToFileMap[npc]) {
-		// 		this.load.spritesheet(npc, npcTypeToFileMap[npc].file, { frameWidth: 40, frameHeight: 40 });
-		// 		const attackNames = Object.keys(npcTypeToAttackFileMap[npc] || {});
-		// 		attackNames.forEach((attackName) => {
-		// 			this.load.spritesheet(
-		// 				`${npc}-${attackName}`,
-		// 				npcTypeToAttackFileMap[npc][attackName].file,
-		// 				{ frameWidth: 40, frameHeight: 40 }
-		// 			);
-		// 		});
-		// 	} else {
-		// 		if (!this.textures.exists(npc)) {
-		// 			this.npcForGeneration.push(npc);
-		// 		}
-		// 	}
-		// });
+		requiredNpcs.forEach((npc) => {
+			if (npcTypeToFileMap[npc]) {
+				this.load.spritesheet(npc, npcTypeToFileMap[npc].file, { frameWidth: 40, frameHeight: 40 });
+				const attackNames = Object.keys(characterToSubAnimationFileMap[npc] || {});
+				attackNames.forEach((attackName) => {
+					this.load.spritesheet(
+						`${npc}-${attackName}`,
+						characterToSubAnimationFileMap[npc][attackName].file,
+						{ frameWidth: 40, frameHeight: 40 }
+					);
+				});
+			} else {
+				if (!this.textures.exists(npc)) {
+					this.npcForGeneration.push(npc);
+				}
+			}
+		});
 
 		// Bodies
 		this.load.image('body-1', 'assets/npcSets/bodies/body1.png');

@@ -167,6 +167,20 @@ export const characterToSubAnimationFileMap: {
 			animationFrames: 2,
 		},
 	},
+	'player': {
+		damage: {
+			file: 'assets/sprites/main-character-damagestun.png',
+			framesPerDirection: 12,
+			frameOffset: 0,
+			animationFrames: 4,
+		},
+		stun: {
+			file: 'assets/sprites/main-character-damagestun.png',
+			framesPerDirection: 12,
+			frameOffset: 4,
+			animationFrames: 8,
+		},
+	},
 };
 
 export const essenceNames = [
