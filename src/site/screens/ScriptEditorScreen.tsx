@@ -27,13 +27,13 @@ export const ScriptEditorScreen = ({ user }: ScriptEditorScreenProps) => {
 			<NavigationWrapper>
 				<StyledLink to="/mapEditor">Map Editor</StyledLink>
 				<StyledLink to="/npcEditor">NPC Editor</StyledLink>
-				<StyledLink to="/scriptEditor">Script Editor</StyledLink>
+				<StyledLink to="/scriptEditor">Quest Editor</StyledLink>
 				<StyledLink to="/game">Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>
 				<MenueWrapper id="scriptEditorMenu">
 					<div>
-						<div>Load Room:</div>
+						<div>Load Quest:</div>
 						<Dropdown id="roomDropdown">
 							<option>Loading...</option>
 						</Dropdown>
@@ -42,13 +42,13 @@ export const ScriptEditorScreen = ({ user }: ScriptEditorScreenProps) => {
 						</ButtonWrapper>
 					</div>
 				</MenueWrapper>
-				<ScriptList>
+				<ScriptWrapper>
 					<ScriptContainer>
 						<div>On Entry:</div>
 						<div>On Clear:</div>
 						<div>On Exit:</div>
 					</ScriptContainer>
-				</ScriptList>
+				</ScriptWrapper>
 			</PageWrapper>
 		</PageContainer>
 	);
@@ -111,14 +111,15 @@ const StyledButton = styled.button`
 	width: 120px;
 	font-family: 'munro';
 	font-size: 1rem;
-	margin: 0 10px;
+	margin: 0;
 	padding: 8px;
 `;
 
-const ScriptList = styled.div`
+const ScriptWrapper = styled.div`
 	margin-top: 48px;
 	display: flex;
 	flex-direction: row;
+	flex-grow: 1;
 `;
 
 const ScriptContainer = styled.div`
