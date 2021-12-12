@@ -89,8 +89,14 @@ export default class VampireToken extends EnemyToken {
 			if (this.aggro) {
 				if (px !== tx || py !== ty || this.attackRange < this.getDistance(tx, ty)) {
 					const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
-					const xSpeed = ((tx - this.x) / totalDistance) * this.stateObject.movementSpeed;
-					const ySpeed = ((ty - this.y) / totalDistance) * this.stateObject.movementSpeed;
+					const xSpeed =
+						((tx - this.x) / totalDistance) *
+						this.stateObject.movementSpeed *
+						this.stateObject.slowFactor;
+					const ySpeed =
+						((ty - this.y) / totalDistance) *
+						this.stateObject.movementSpeed *
+						this.stateObject.slowFactor;
 					this.setVelocityX(xSpeed);
 					this.setVelocityY(ySpeed);
 					const newFacing = getFacing4Dir(xSpeed, ySpeed);
@@ -155,8 +161,8 @@ export default class VampireToken extends EnemyToken {
 			const tx = this.target.x;
 			const ty = this.target.y;
 			const speeds = getXYfromTotalSpeed(this.y - ty, this.x - tx);
-			const xSpeed = speeds[0] * LAUNCH_SPEED;
-			const ySpeed = speeds[1] * LAUNCH_SPEED;
+			const xSpeed = speeds[0] * LAUNCH_SPEED * this.stateObject.slowFactor;
+			const ySpeed = speeds[1] * LAUNCH_SPEED * this.stateObject.slowFactor;
 
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const attackAnimationName = `enemy-vampire-fly-${facingToSpriteNameMap[newFacing]}`;

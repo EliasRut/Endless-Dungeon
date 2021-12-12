@@ -89,8 +89,14 @@ export default class ZombieToken extends EnemyToken {
 			this.attackRange < distance
 		) {
 			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
-			const xSpeed = ((tx - this.x) / totalDistance) * this.stateObject.movementSpeed;
-			const ySpeed = ((ty - this.y) / totalDistance) * this.stateObject.movementSpeed;
+			const xSpeed =
+				((tx - this.x) / totalDistance) *
+				this.stateObject.movementSpeed *
+				this.stateObject.slowFactor;
+			const ySpeed =
+				((ty - this.y) / totalDistance) *
+				this.stateObject.movementSpeed *
+				this.stateObject.slowFactor;
 			this.setVelocityX(xSpeed);
 			this.setVelocityY(ySpeed);
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);

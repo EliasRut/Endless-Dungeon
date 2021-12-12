@@ -82,10 +82,14 @@ export default abstract class EnemyToken extends CharacterToken {
 		this.stateObject.health = this.stateObject.health - dot;
 	}
 
+	protected setSlowFactor() {
+		this.stateObject.slowFactor = Math.max(1 - this.iceEffectStacks / 4, 0.01);
+	}
+
 	// update from main Scene
 	public update(time: number, deltaTime: number) {
 		super.update(time, deltaTime);
-
+		this.setSlowFactor();
 		// set aggro boolean, use a linger time for aggro
 		if (this.lastUpdate <= time) {
 			const player = globalState.playerCharacter;
