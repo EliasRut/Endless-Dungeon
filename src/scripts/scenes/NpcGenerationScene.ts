@@ -1,7 +1,7 @@
 import { NpcData } from '../../../typings/custom';
 import {
 	FacingRange,
-	npcTypeToAttackFileMap,
+	characterToSubAnimationFileMap,
 	npcTypeToFileMap,
 	NUM_DIRECTIONS,
 	spriteDirectionList,
@@ -54,11 +54,11 @@ export default class NpcGenerationScene extends Phaser.Scene {
 		requiredNpcs.forEach((npc) => {
 			if (npcTypeToFileMap[npc]) {
 				this.load.spritesheet(npc, npcTypeToFileMap[npc].file, { frameWidth: 40, frameHeight: 40 });
-				const attackNames = Object.keys(npcTypeToAttackFileMap[npc] || {});
+				const attackNames = Object.keys(characterToSubAnimationFileMap[npc] || {});
 				attackNames.forEach((attackName) => {
 					this.load.spritesheet(
 						`${npc}-${attackName}`,
-						npcTypeToAttackFileMap[npc][attackName].file,
+						characterToSubAnimationFileMap[npc][attackName].file,
 						{ frameWidth: 40, frameHeight: 40 }
 					);
 				});
