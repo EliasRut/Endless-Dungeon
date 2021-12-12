@@ -98,7 +98,16 @@ export default class AbilityHelper {
 					collidingEffect.destroy();
 				}
 				effect.hitEnemyTokens.push(enemy);
-				enemy.stateObject.health -= origin.damage * Abilities[type].damageMultiplier;
+				const newEnemyHealth =
+					enemy.stateObject.health - origin.damage * Abilities[type].damageMultiplier;
+				if (enemy.stateObject.health > 0 && newEnemyHealth <= 0) {
+					// Enemy died from this attack
+					if (Abilities[type].castOnEnemyDestroyed) {
+						this.triggerAbility(origin, Abilities[type].castOnEnemyDestroyed!, globalTime);
+					}
+				}
+				enemy.stateObject.health = newEnemyHealth;
+
 				if (Abilities[type].stun) {
 					stun(globalTime, Abilities[type].stun!, enemy.stateObject);
 				}
