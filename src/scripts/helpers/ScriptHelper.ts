@@ -186,6 +186,7 @@ export default class ScriptHelper {
 				cleanUpStep = true;
 				this.scene.abilityHelper.triggerAbility(
 					globalState.playerCharacter,
+					globalState.playerCharacter,
 					currentStep.ability,
 					globalTime
 				);

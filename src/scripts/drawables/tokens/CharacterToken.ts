@@ -4,7 +4,11 @@ import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
 import Character from '../../worldstate/Character';
 
-const GREEN_DIFF = 0x003300;
+// const GREEN_DIFF = 0x003300;
+const DOT_TINT = [0xc8e44c, 0xb1db30, 0x98d023, 0x588800];
+// const BLUE_DIFF = 0x000033;
+// const ICE_TINT = [0xb3f1ff, 0x92d5ff, 0x4a9fff, 0x0085ff];
+const ICE_TINT = [0xdbf3fa, 0xb7e9f7, 0x92dff3, 0x7ad7f0];
 
 export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	stateObject: Character;
@@ -17,6 +21,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	lastMovedTimestamp: number;
 	lastNecroticEffectTimestamp: number;
 	necroticEffectStacks: number;
+	lastIceEffectTimestamp: number;
+	iceEffectStacks: number;
 
 	constructor(scene: MainScene, x: number, y: number, tileName: string, type: string, id: string) {
 		super(scene, x, y, tileName);
@@ -27,6 +33,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		this.lastMovedTimestamp = -Infinity;
 		this.lastNecroticEffectTimestamp = -Infinity;
 		this.necroticEffectStacks = 0;
+		this.lastIceEffectTimestamp = -Infinity;
+		this.iceEffectStacks = 0;
 	}
 
 	public onCollide(withEnemy: boolean) {}
@@ -47,6 +55,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	protected receiveDotDamage(deltaTime: number) {}
+	protected setSlowFactor() {}
 
 	// update from main Scene
 	public update(time: number, deltaTime: number) {
@@ -56,10 +65,25 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			if (this.lastNecroticEffectTimestamp <= time - 2000) {
 				this.necroticEffectStacks = 0;
 			}
+			if (this.necroticEffectStacks > 4) {
+				this.necroticEffectStacks = 4;
+			}
+			if (this.lastIceEffectTimestamp <= time - 2000) {
+				this.iceEffectStacks = 0;
+			}
+			if (this.iceEffectStacks > 4) {
+				this.iceEffectStacks = 4;
+			}
 			if (this.necroticEffectStacks > 0) {
-				// Color the token green
-				this.tint = Math.min(0x00ff00, 0x006600 + GREEN_DIFF * this.necroticEffectStacks);
+				// Color the token green and deal damage over time
+				this.tint = DOT_TINT[this.necroticEffectStacks - 1];
+				// this.tint = Math.min(0x00ff00, 0x006600 + GREEN_DIFF * this.necroticEffectStacks);
 				this.receiveDotDamage(deltaTime);
+			} else if (this.iceEffectStacks > 0) {
+				// Color the token blue and slows down
+				this.tint = ICE_TINT[this.iceEffectStacks - 1];
+				// this.tint = Math.min(0x0000ff, 0x000066 + BLUE_DIFF * this.iceEffectStacks);
+				this.setSlowFactor();
 			} else {
 				this.tint = tile.tint;
 			}
