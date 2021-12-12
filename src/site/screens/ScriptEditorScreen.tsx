@@ -44,8 +44,13 @@ export const ScriptEditorScreen = ({ user }: ScriptEditorScreenProps) => {
 				</MenueWrapper>
 				<ScriptWrapper>
 					<ScriptContainer>
-						<div>On Entry:</div>
-						<div>On Clear:</div>
+						<DropdownContainer>
+							<div>Room</div>
+							<Dropdown id="roomDropdown">
+								<option>Loading...</option>
+							</Dropdown>
+						</DropdownContainer>
+						<div>NPCs</div>
 						<div>On Exit:</div>
 					</ScriptContainer>
 				</ScriptWrapper>
@@ -57,6 +62,7 @@ export const ScriptEditorScreen = ({ user }: ScriptEditorScreenProps) => {
 const PageContainer = styled.div`
 	height: 100%;
 	width: 100%;
+	font-size: 1.2rem;
 `;
 
 const NavigationWrapper = styled.div`
@@ -108,7 +114,7 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled.button`
-	width: 120px;
+	width: 140px;
 	font-family: 'munro';
 	font-size: 1rem;
 	margin: 0;
@@ -116,14 +122,20 @@ const StyledButton = styled.button`
 `;
 
 const ScriptWrapper = styled.div`
-	margin-top: 48px;
+	margin-top: 24px;
+	margin-left: 48px;
 	display: flex;
 	flex-direction: row;
 	flex-grow: 1;
 `;
 
 const ScriptContainer = styled.div`
-	margin-top: 48px;
+	display: flex;
+	flex-direction: column;
+`;
+
+const DropdownContainer = styled.div`
+	margin-bottom: 24px;
 	display: flex;
 	flex-direction: column;
 `;
