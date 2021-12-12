@@ -22,12 +22,9 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	lastMovedTimestamp: number;
 	lastNecroticEffectTimestamp: number;
 	necroticEffectStacks: number;
-<<<<<<< HEAD
 	hitAt: number;
-=======
 	lastIceEffectTimestamp: number;
 	iceEffectStacks: number;
->>>>>>> 5065c619ecd32409748b6e4d955d6cc599443928
 
 	constructor(scene: MainScene, x: number, y: number, tileName: string, type: string, id: string) {
 		super(scene, x, y, tileName);

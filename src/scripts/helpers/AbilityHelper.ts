@@ -103,9 +103,6 @@ export default class AbilityHelper {
 					collidingEffect.destroy();
 				}
 				effect.hitEnemyTokens.push(enemy);
-<<<<<<< HEAD
-				enemy.receiveHit(origin.damage * Abilities[type].damageMultiplier);
-=======
 				const newEnemyHealth =
 					enemy.stateObject.health - caster.damage * Abilities[type].damageMultiplier;
 				if (enemy.stateObject.health > 0 && newEnemyHealth <= 0) {
@@ -120,8 +117,8 @@ export default class AbilityHelper {
 					}
 				}
 				enemy.stateObject.health = newEnemyHealth;
+				enemy.receiveHit(caster.damage * Abilities[type].damageMultiplier);
 
->>>>>>> 5065c619ecd32409748b6e4d955d6cc599443928
 				if (Abilities[type].stun) {
 					enemy.receiveStun(Abilities[type].stun!);
 				}
