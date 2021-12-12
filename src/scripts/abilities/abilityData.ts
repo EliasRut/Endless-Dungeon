@@ -43,6 +43,7 @@ interface AbilityData {
 	damageMultiplier: number;
 	stun?: number;
 	necroticStacks?: number;
+	iceStacks?: number;
 }
 
 export const enum AbilityType {
@@ -188,7 +189,9 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
 		cooldownMs: 3000,
+		// damageMultiplier: 0.01,
 		damageMultiplier: 0.25,
+		iceStacks: 1,
 		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`,
 		icon: ['icon-abilities', 1],
 	},
@@ -208,7 +211,9 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
 		cooldownMs: 400,
+		// damageMultiplier: 0.01,
 		damageMultiplier: 0.8,
+		iceStacks: 1,
 		flavorText: `A pointy icespike. Although it is generally used to impale the caster's adversaries, it has many alternative uses. Such as cooling drinks... or cooling anything, really.`,
 		icon: ['icon-abilities', 1],
 	},
@@ -368,7 +373,9 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sound: 'sound-icespike',
 		sfxVolume: 0.1,
 		cooldownMs: 1500,
+		// damageMultiplier: 0.01,
 		damageMultiplier: 0.15,
+		iceStacks: 1,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 1],
 	},
@@ -422,7 +429,9 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sound: 'sound-icespike',
 		sfxVolume: 0.1,
 		cooldownMs: 1500,
+		// damageMultiplier: 0.01,
 		damageMultiplier: 0.15,
+		iceStacks: 1,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 1],
 	},
@@ -496,6 +505,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sfxVolume: 0.1,
 		cooldownMs: 250,
 		damageMultiplier: 1,
+		// damageMultiplier: 0.01,
 		necroticStacks: 1,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
