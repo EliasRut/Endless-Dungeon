@@ -117,7 +117,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 			this.scene,
 			QUEST_DETAILS_BORDER_X - 5,
 			this.questDescriptionHeader.y + this.questDescriptionHeader.height,
-			quest.description,
+			quest.goal,
 			{
 				color: 'black',
 				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },

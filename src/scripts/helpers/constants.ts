@@ -167,7 +167,7 @@ export const characterToSubAnimationFileMap: {
 			animationFrames: 2,
 		},
 	},
-	'player': {
+	player: {
 		damage: {
 			file: 'assets/sprites/main-character-damagestun.png',
 			framesPerDirection: 12,
@@ -223,6 +223,7 @@ export const enum MODE {
 	GAME = 'game',
 	MAP_EDITOR = 'mapEditor',
 	NPC_EDITOR = 'npcEditor',
+	QUEST_EDITOR = 'questEditor',
 }
 
 export let activeMode = MODE.GAME;

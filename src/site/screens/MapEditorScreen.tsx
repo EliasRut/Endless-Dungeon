@@ -5,6 +5,7 @@ import { MODE, setActiveMode } from '../../scripts/helpers/constants';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import firebase from 'firebase';
+import { Dropdown } from '../components/Dropdown';
 import '../App.css';
 
 export interface MapEditorScreenProps {
@@ -27,7 +28,7 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 			<NavigationWrapper>
 				<StyledLink to="/mapEditor">Map Editor</StyledLink>
 				<StyledLink to="/npcEditor">NPC Editor</StyledLink>
-				<StyledLink to="/scriptEditor">Quest Editor</StyledLink>
+				<StyledLink to="/questEditor">Quest Editor</StyledLink>
 				<StyledLink to="/game">Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>
@@ -220,13 +221,6 @@ const MenueWrapper = styled.div`
 	font-size: 1.2rem;
 	padding: 24px;
 	padding-top: 0;
-`;
-
-const Dropdown = styled.select`
-	width: 148px;
-	height: 24px;
-	font-family: 'munro';
-	font-size: 1rem;
 `;
 
 const ButtonWrapper = styled.div`

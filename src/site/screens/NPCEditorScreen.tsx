@@ -5,6 +5,8 @@ import { MODE, setActiveMode } from '../../scripts/helpers/constants';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import firebase from 'firebase';
+import { Input } from '../components/Input';
+import { Dropdown } from '../components/Dropdown';
 import '../App.css';
 
 const showGame = true;
@@ -27,7 +29,7 @@ export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
 			<NavigationWrapper>
 				<StyledLink to="/mapEditor">Map Editor</StyledLink>
 				<StyledLink to="/npcEditor">NPC Editor</StyledLink>
-				<StyledLink to="/scriptEditor">Quest Editor</StyledLink>
+				<StyledLink to="/questEditor">Quest Editor</StyledLink>
 				<StyledLink to="/game">Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>
@@ -77,7 +79,7 @@ export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
 						</InputWrapper>
 					</SelectionWrapper>
 					<ExportButtonWrapper>
-						<StyledButton id="exportButton">Export</StyledButton>
+						<StyledButton id="exportButton">Save</StyledButton>
 					</ExportButtonWrapper>
 				</MenueWrapper>
 				<GameWrapper ref={phaserRef}></GameWrapper>
@@ -160,12 +162,6 @@ const MenueWrapper = styled.div`
 	padding: 24px;
 `;
 
-const Dropdown = styled.select`
-	width: 140px;
-	font-family: 'munro';
-	font-size: 1rem;
-`;
-
 const ButtonWrapper = styled.div`
 	margin-top: 18px;
 `;
@@ -186,12 +182,6 @@ const SelectionWrapper = styled.div`
 
 const InputWrapper = styled.div`
 	margin-top: 12px;
-`;
-
-const Input = styled.input`
-	width: 140px;
-	font-family: 'munro';
-	font-size: 1rem;
 `;
 
 const ExportButtonWrapper = styled.div`

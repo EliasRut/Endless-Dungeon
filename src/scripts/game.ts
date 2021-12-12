@@ -9,6 +9,7 @@ import RoomPreloaderScene from './scenes/RoomPreloaderScene';
 import NpcEditor from './scenes/NpcEditor';
 import { activeMode, MODE } from './helpers/constants';
 import NpcGenerationScene from './scenes/NpcGenerationScene';
+import QuestEditor from './scenes/QuestEditor';
 
 const firebaseConfig = {
 	apiKey: 'AIzaSyBwHFZ7A9t8rHi4p6r-D2wr5WDrt9O7Yow',
@@ -27,6 +28,19 @@ const DEFAULT_HEIGHT = 360;
 
 const NPC_EDITOR_WIDTH = 320;
 const NPC_EDITOR_HEIGHT = 240;
+
+const getEditorScenes: (mode: MODE) => typeof Phaser.Scene[] = (mode) => {
+	switch (mode) {
+		case MODE.MAP_EDITOR:
+			return [RoomPreloaderScene, NpcGenerationScene, PreloadScene, MapEditor];
+		case MODE.NPC_EDITOR:
+			return [NpcEditor];
+		case MODE.QUEST_EDITOR:
+			return [QuestEditor];
+		default:
+			return [];
+	}
+};
 
 // This is the configuration for Phaser
 export const getGameConfig = (parent: HTMLElement, mode: MODE) => ({
@@ -53,9 +67,7 @@ export const getGameConfig = (parent: HTMLElement, mode: MODE) => ({
 					DungeonDoorPreloadScene,
 					DungeonDoorScene,
 			  ]
-			: mode === MODE.MAP_EDITOR
-			? [RoomPreloaderScene, NpcGenerationScene, PreloadScene, MapEditor]
-			: [NpcEditor],
+			: getEditorScenes(mode),
 	// We are using Phasers arcade physics library
 	physics: {
 		default: 'arcade',

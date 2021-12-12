@@ -59,7 +59,6 @@ export interface ScriptWait {
 
 export interface ScriptCondition {
 	type: 'condition';
-	conditionType: 'hasItem' | 'scriptState';
 	itemId?: string;
 	scriptId?: string;
 	scriptState?: 'new' | 'ongoing' | 'finished';
@@ -78,7 +77,8 @@ export interface ScriptPausedCondition {
 
 export interface ScriptDialog {
 	type: 'dialog';
-	portrait: string;
+	speaker: string;
+	portrait?: string;
 	text: string[];
 }
 

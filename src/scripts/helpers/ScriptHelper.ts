@@ -269,7 +269,7 @@ export default class ScriptHelper {
 				break;
 			}
 			case 'condition': {
-				if (currentStep.conditionType === 'hasItem') {
+				if (currentStep.itemId) {
 					const hasMatchingItems = !!globalState.inventory.unequippedItemList.find(
 						(item) => item.item.id === currentStep.itemId
 					);
@@ -280,7 +280,7 @@ export default class ScriptHelper {
 						globalState.scripts.scriptStep = undefined;
 						return;
 					}
-				} else if (currentStep.conditionType === 'scriptState') {
+				} else if (currentStep.scriptId) {
 					const scriptId = `${globalState.currentLevel}_${this.currentRoom!.roomName}_${
 						currentStep.scriptId
 					}`;
