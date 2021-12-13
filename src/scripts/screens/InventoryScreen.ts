@@ -178,11 +178,23 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 
 	// select next item in bag. Handles cd for key press
-	interactInventory(direction: string, globalTime: number) {
-		if (direction === 'nothing') return;
+	interactInventory(directions: string[], globalTime: number) {
+		if (directions.includes('nothing')) return;
+
+		if (this.equipmentSelectionWheel.visiblity) {
+			if (directions.includes('enter')) {
+				this.equipmentSelectionWheel.executeSelection();
+				return;
+			}
+			const yAxis = directions.includes('up') ? -1 : directions.includes('down') ? 1 : 0;
+			const xAxis = directions.includes('left') ? -1 : directions.includes('right') ? 1 : 0;
+			this.equipmentSelectionWheel.updateSelection(xAxis, yAxis);
+			return;
+		}
+
 		if (globalTime - this.keyLastPressed > this.keyCD) this.keyLastPressed = globalTime;
 		else return;
-		if (direction === 'enter' && this.focusedSlot) {
+		if (directions.includes('enter') && this.focusedSlot) {
 			if (this.equipmentSelectionWheel.visiblity) {
 				this.equipmentSelectionWheel.toggleVisibility();
 			} else {
@@ -193,13 +205,14 @@ export default class InventoryScreen extends OverlayScreen {
 
 		const x = this.currentXY[0];
 		const y = this.currentXY[1];
-		if (direction === 'up') {
+		if (directions.includes('up')) {
 			this.currentXY[1] = y === 0 ? 1 : 0;
-		} else if (direction === 'down') {
+		} else if (directions.includes('down')) {
 			this.currentXY[1] = y === 1 ? 0 : 1;
-		} else if (direction === 'left') {
+		}
+		if (directions.includes('left')) {
 			this.currentXY[0] = x === 0 ? 2 : x - 1;
-		} else if (direction === 'right') {
+		} else if (directions.includes('right')) {
 			this.currentXY[0] = x === 2 ? 0 : x + 1;
 		}
 		this.focusedSlot = COORDINATES_TO_SLOT[`${this.currentXY[0]}_${this.currentXY[1]}`];
@@ -297,6 +310,7 @@ export default class InventoryScreen extends OverlayScreen {
 		abilityIcon.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		abilityIcon.setScrollFactor(0);
 		abilityIcon.setInteractive();
+		abilityIcon.setVisible(this.visiblity);
 		this.add(abilityIcon, true);
 		return abilityIcon;
 	}
@@ -306,8 +320,7 @@ export default class InventoryScreen extends OverlayScreen {
 		abilityIcon: Phaser.GameObjects.Image,
 		ability: AbilityType
 	) {
-		if (constructor) abilityIcon.setVisible(false);
-		else abilityIcon.setVisible(true);
+		abilityIcon.setVisible(this.visiblity);
 
 		abilityIcon.on('pointerdown', () => {
 			if (this.focusedSlot !== undefined) this.focusedSlot = undefined;

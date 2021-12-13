@@ -23,6 +23,7 @@ export default class AbilityHelper {
 		caster: Character,
 		pointOfOrigin: { currentFacing: Facings; x: number; y: number },
 		type: AbilityType,
+		abilityLevel: number,
 		globalTime: number
 	) {
 		// We allow for multiple projectiles per ability.
@@ -104,7 +105,8 @@ export default class AbilityHelper {
 				}
 				effect.hitEnemyTokens.push(enemy);
 				const newEnemyHealth =
-					enemy.stateObject.health - caster.damage * Abilities[type].damageMultiplier;
+					enemy.stateObject.health -
+					caster.damage * Abilities[type].damageMultiplier * abilityLevel;
 				if (enemy.stateObject.health > 0 && newEnemyHealth <= 0) {
 					// Enemy died from this attack
 					if (Abilities[type].castOnEnemyDestroyed) {
@@ -112,6 +114,7 @@ export default class AbilityHelper {
 							caster,
 							enemy.stateObject,
 							Abilities[type].castOnEnemyDestroyed!,
+							abilityLevel,
 							globalTime
 						);
 					}
@@ -165,9 +168,15 @@ export default class AbilityHelper {
 			this.scene.sound.play(Abilities[type].sound!, { volume: Abilities[type].sfxVolume! });
 		}
 	}
-	update(time: number, castAbilities: AbilityType[]) {
-		castAbilities.forEach((ability) => {
-			this.triggerAbility(globalState.playerCharacter, globalState.playerCharacter, ability, time);
+	update(time: number, castAbilities: [AbilityType, number][]) {
+		castAbilities.forEach(([ability, abilityLevel]) => {
+			this.triggerAbility(
+				globalState.playerCharacter,
+				globalState.playerCharacter,
+				ability,
+				abilityLevel,
+				time
+			);
 		});
 
 		this.abilityEffects = this.abilityEffects.filter((effect) => !effect.destroyed);

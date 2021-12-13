@@ -498,7 +498,7 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visiblity)) {
 			if (this.wasIPressed === false) {
 				this.icons.backpackIcon.toggleScreen();
-				this.overlayScreens.inventory.interactInventory('pressed', globalTime);
+				this.overlayScreens.inventory.interactInventory(['pressed'], globalTime);
 			}
 			this.wasIPressed = true;
 		} else {

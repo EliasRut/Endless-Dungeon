@@ -135,6 +135,7 @@ export default class LichtKingToken extends EnemyToken {
 				this.stateObject,
 				this.stateObject,
 				AbilityType.ARCANE_BLADE,
+				this.level,
 				time
 			);
 		}

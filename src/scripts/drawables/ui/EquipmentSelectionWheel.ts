@@ -1,7 +1,11 @@
 import { EquippedItemData } from '../../worldstate/Inventory';
 import { EquipmentSlot, UiDepths } from '../../helpers/constants';
-import { getItemDataForName } from '../../../items/itemData';
-import { equipItem } from '../../helpers/inventory';
+import { EquipmentKey, getItemDataForName } from '../../../items/itemData';
+import {
+	equipItem,
+	getFullDataForEquipmentSlot,
+	getFullDataForItemKey,
+} from '../../helpers/inventory';
 import MainScene from '../../scenes/MainScene';
 
 const EIGHT_ITEMS_OFFSETS = [
@@ -27,7 +31,10 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 	scene: MainScene;
 	leftBorderX: number;
 	topBorderY: number;
+	selection?: Phaser.GameObjects.Image;
+	equipmentSlot?: EquipmentSlot;
 	itemMap: { [key: string]: EquippedItemData };
+	selectedItem?: number;
 
 	constructor(scene: Phaser.Scene) {
 		super(scene);
@@ -42,6 +49,61 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.visiblity = !this.visiblity;
 	}
 
+	updateSelection(xAxis: -1 | 0 | 1, yAxis: -1 | 0 | 1) {
+		const numItems = Object.keys(this.itemMap).length;
+		let itemIndex = -1;
+		if (numItems === 8) {
+			if (xAxis === 0 && yAxis === -1) itemIndex = 0;
+			else if (xAxis === 1 && yAxis === -1) itemIndex = 1;
+			else if (xAxis === 1 && yAxis === 0) itemIndex = 2;
+			else if (xAxis === 1 && yAxis === 1) itemIndex = 3;
+			else if (xAxis === 0 && yAxis === 1) itemIndex = 4;
+			else if (xAxis === -1 && yAxis === 1) itemIndex = 5;
+			else if (xAxis === -1 && yAxis === 0) itemIndex = 6;
+			else if (xAxis === -1 && yAxis === -1) itemIndex = 7;
+		} else {
+			if (xAxis >= 0 && yAxis === -1) itemIndex = 0;
+			else if (xAxis === 1 && yAxis >= 0) itemIndex = 1;
+			else if (xAxis <= 0 && yAxis === 1) itemIndex = 2;
+			else if (xAxis === -1 && yAxis <= 0) itemIndex = 3;
+		}
+		this.selectedItem = itemIndex;
+		if (itemIndex === -1) {
+			this.selection?.setVisible(false);
+			this.scene.overlayScreens.itemScreen.update();
+			return;
+		}
+
+		const [itemData, equipmentData] = getFullDataForItemKey(
+			Object.keys(this.itemMap)[itemIndex] as EquipmentKey
+		);
+		if (equipmentData.level > 0) {
+			this.selection?.setVisible(true);
+			this.selection?.setRotation((itemIndex / numItems) * Math.PI * 2);
+			this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+		}
+	}
+
+	executeSelection() {
+		if (this.selectedItem === -1 || this.selectedItem === undefined) {
+			this.toggleVisibility();
+			this.selection?.setVisible(false);
+			return;
+		}
+
+		const itemKey = Object.keys(this.itemMap)[this.selectedItem!] as EquipmentKey;
+		const [itemData, equipmentData] = getFullDataForItemKey(itemKey);
+		if (equipmentData.level > 0) {
+			equipItem(this.equipmentSlot!, itemKey);
+			this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+		} else {
+			this.scene.overlayScreens.itemScreen.update();
+		}
+		this.scene.overlayScreens.inventory.update();
+		this.toggleVisibility();
+		this.selection?.setVisible(false);
+	}
+
 	update(
 		centerX: number,
 		centerY: number,
@@ -52,6 +114,10 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 			child.destroy(true);
 		}
 
+		this.equipmentSlot = equipmentSlot;
+		this.itemMap = itemMap;
+		const numItems = Object.keys(itemMap).length;
+		const useEightImages = numItems === 8;
 		const backgroundImage = new Phaser.GameObjects.Image(
 			this.scene,
 			centerX,
@@ -62,12 +128,16 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 			this.toggleVisibility();
 		});
 		backgroundImage.setInteractive();
-		// ;
-		this.itemMap = itemMap;
+		this.selection = new Phaser.GameObjects.Image(
+			this.scene,
+			centerX,
+			centerY,
+			useEightImages ? 'quickselect-wheel-selection-small' : 'quickselect-wheel-selection-large'
+		);
+		this.selection.setVisible(false);
 
 		const images: Phaser.GameObjects.Image[] = [];
 		const levelTexts: Phaser.GameObjects.Image[] = [];
-		const useEightImages = Object.keys(itemMap).length === 8;
 		Object.entries(itemMap).map(([itemKey, equipmentData], itemIndex) => {
 			const itemData = getItemDataForName(itemKey);
 			const [xOffset, yOffset] = useEightImages
@@ -83,15 +153,23 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 			if (equipmentData.level) {
 				itemImage.on('pointerdown', () => {
 					equipItem(equipmentSlot, itemKey);
+					const [itemData, equipmentData] = getFullDataForItemKey(itemKey as EquipmentKey);
+					this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
 					this.scene.overlayScreens.inventory.update();
 					this.toggleVisibility();
+				});
+				itemImage.on('pointerover', () => {
+					const [itemData, equipmentData] = getFullDataForItemKey(itemKey as EquipmentKey);
+					this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+					this.selection?.setVisible(true);
+					this.selection?.setRotation((itemIndex / numItems) * Math.PI * 2);
 				});
 				itemImage.setInteractive();
 			}
 			images.push(itemImage);
 		});
 
-		const pieces = [backgroundImage, ...images, ...levelTexts];
+		const pieces = [backgroundImage, this.selection, ...images, ...levelTexts];
 		pieces.forEach((piece) => {
 			piece.setDepth(UiDepths.UI_ABOVE_FOREGROUND_LAYER);
 			piece.setScrollFactor(0);

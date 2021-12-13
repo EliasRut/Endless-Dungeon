@@ -12,7 +12,7 @@ const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
 const BASE_HEALTH = 4;
 
-const ITEM_DROP_CHANCE = 0.15;
+const ITEM_DROP_CHANCE = 0.65;
 const HEALTH_DROP_CHANCE = 0.06;
 
 const CHARGE_TIME = 1500;
@@ -40,7 +40,7 @@ export default class VampireToken extends EnemyToken {
 	) {
 		super(scene, x, y, tokenName, id);
 		// cool effects!
-		this.level = level - 1;
+		this.level = level;
 		this.attackRange = REGULAR_ATTACK_RANGE;
 		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
 		this.attacking = false;

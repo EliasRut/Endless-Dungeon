@@ -19,6 +19,8 @@ export default class KeyboardHelper {
 	questsKey: Phaser.Input.Keyboard.Key;
 	enterKey: Phaser.Input.Keyboard.Key;
 
+	wasEnterKeyPressed: boolean;
+
 	abilityKeyPressed: { [key: number]: boolean } = {
 		[AbilityKey.ONE]: false,
 		[AbilityKey.TWO]: false,
@@ -54,6 +56,7 @@ export default class KeyboardHelper {
 		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
 		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+		this.wasEnterKeyPressed = false;
 
 		this.scene = scene;
 		this.isMoveUpPressed = () => {
@@ -203,12 +206,21 @@ export default class KeyboardHelper {
 	}
 
 	getInventoryKeyPress() {
-		if (this.isMoveDownPressed()) return 'down';
-		else if (this.isMoveLeftPressed()) return 'left';
-		else if (this.isMoveRightPressed()) return 'right';
-		else if (this.isMoveUpPressed()) return 'up';
-		else if (this.isEnterPressed()) return 'enter';
-		return 'nothing';
+		const keysPressed = [];
+		const isEnterPressed = this.isEnterPressed();
+		if (!this.wasEnterKeyPressed && isEnterPressed) {
+			this.wasEnterKeyPressed = true;
+			return ['enter'];
+		} else if (!isEnterPressed) {
+			this.wasEnterKeyPressed = false;
+		}
+		if (this.isMoveDownPressed()) keysPressed.push('down');
+		else if (this.isMoveUpPressed()) keysPressed.push('up');
+		if (this.isMoveLeftPressed()) keysPressed.push('left');
+		else if (this.isMoveRightPressed()) keysPressed.push('right');
+
+		if (keysPressed.length === 0) return ['nothing'];
+		return keysPressed;
 	}
 	updateGamepad() {
 		this.gamepad = this.scene.input.gamepad?.getPad(0);
@@ -255,12 +267,25 @@ export default class KeyboardHelper {
 	}
 
 	getCastedAbilities(gameTime: number) {
+		const inventory = globalState.inventory;
 		return [
-			this.castIfPressed(AbilityKey.ONE, gameTime),
-			this.castIfPressed(AbilityKey.TWO, gameTime),
-			this.castIfPressed(AbilityKey.THREE, gameTime),
-			this.castIfPressed(AbilityKey.FOUR, gameTime),
-		].filter((ability) => !!ability) as AbilityType[];
+			[
+				this.castIfPressed(AbilityKey.ONE, gameTime),
+				inventory.equippedSource ? inventory.sources[inventory.equippedSource].level : 0,
+			],
+			[
+				this.castIfPressed(AbilityKey.TWO, gameTime),
+				inventory.equippedCatalyst ? inventory.catalysts[inventory.equippedCatalyst].level : 0,
+			],
+			[
+				this.castIfPressed(AbilityKey.THREE, gameTime),
+				inventory.equippedLeftRing ? inventory.rings[inventory.equippedLeftRing].level : 0,
+			],
+			[
+				this.castIfPressed(AbilityKey.FOUR, gameTime),
+				inventory.equippedRightRing ? inventory.rings[inventory.equippedRightRing].level : 0,
+			],
+		].filter(([ability]) => !!ability) as [AbilityType, number][];
 	}
 
 	getAbilityCooldown(abilityKey: AbilityKey, gameTime: number) {

@@ -81,6 +81,7 @@ export default class RangedEnemyToken extends EnemyToken {
 				this.stateObject,
 				this.stateObject,
 				AbilityType.HAIL_OF_FLAMES,
+				this.level,
 				time
 			);
 		}

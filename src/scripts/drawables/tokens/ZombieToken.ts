@@ -13,7 +13,7 @@ const BASE_HEALTH = 4;
 
 const ATTACK_DAMAGE_DELAY = 250;
 
-const ITEM_DROP_CHANCE = 0.15;
+const ITEM_DROP_CHANCE = 0.65;
 const HEALTH_DROP_CHANCE = 0.06;
 
 export default class ZombieToken extends EnemyToken {
@@ -30,7 +30,7 @@ export default class ZombieToken extends EnemyToken {
 	) {
 		super(scene, x, y, tokenName, id);
 		// cool effects!
-		this.level = level - 1;
+		this.level = level;
 		this.attackRange = REGULAR_ATTACK_RANGE;
 		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
 		this.attackExecuted = false;

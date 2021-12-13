@@ -47,7 +47,7 @@ export const isEquippable = (itemKey: string) => {
 	if (itemParts.length !== 2) {
 		return false;
 	}
-	return equippableTypeNames.includes(itemParts[0]);
+	return equippableItemPrefixes.includes(itemParts[0]);
 };
 
 export const getItemKeyForEquipmentSlot: (slot: EquipmentSlot) => EquipmentKey | undefined = (
@@ -150,7 +150,12 @@ export const getFullDataForEquipmentSlot: (
 	if (!itemKey) {
 		return [undefined, undefined];
 	}
+	return getFullDataForItemKey(itemKey);
+};
 
+export const getFullDataForItemKey: (itemKey: EquipmentKey) => [ItemData, EquippedItemData] = (
+	itemKey
+) => {
 	const itemData = getItemDataForName(itemKey);
 	const equipmentData = getEquipmentDataForItemKey(itemKey);
 	return [itemData, equipmentData];
@@ -178,6 +183,35 @@ export const equipItem: (equipmentSlot: EquipmentSlot, itemKey: string) => void 
 			return;
 		case EquipmentSlot.RIGHT_RING:
 			globalState.inventory.equippedRightRing = itemKey as RingKey;
+			return;
+	}
+};
+
+export const equipItemIfNoneEquipped: (itemKey: EquipmentKey) => void = (itemKey) => {
+	const prefix = itemKey.split('-')[0];
+	switch (prefix) {
+		case 'source':
+			globalState.inventory.equippedSource =
+				globalState.inventory.equippedSource || (itemKey as SourceKey);
+			return;
+		case 'catalyst':
+			globalState.inventory.equippedCatalyst =
+				globalState.inventory.equippedCatalyst || (itemKey as CatalystKey);
+			return;
+		case 'amulet':
+			globalState.inventory.equippedAmulet =
+				globalState.inventory.equippedAmulet || (itemKey as AmuletKey);
+			return;
+		case 'chestpiece':
+			globalState.inventory.equippedChestPiece =
+				globalState.inventory.equippedChestPiece || (itemKey as ChestPieceKey);
+			return;
+		case 'ring':
+			if (!globalState.inventory.equippedLeftRing) {
+				globalState.inventory.equippedLeftRing = itemKey as RingKey;
+			} else if (!globalState.inventory.equippedRightRing) {
+				globalState.inventory.equippedRightRing = itemKey as RingKey;
+			}
 			return;
 	}
 };

@@ -2,7 +2,11 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import { ItemData, EquipmentKey, UneqippableItem } from '../../../items/itemData';
-import { isEquippable, getEquipmentDataForItemKey } from '../../helpers/inventory';
+import {
+	isEquippable,
+	getEquipmentDataForItemKey,
+	equipItemIfNoneEquipped,
+} from '../../helpers/inventory';
 
 const MAX_INTERACTION_DISTANCE = 30;
 const HEAL_PERCENTAGE = 1 / 4; // health
@@ -51,6 +55,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 					const equipmentData = getEquipmentDataForItemKey(this.itemKey as EquipmentKey);
 					if (this.level > equipmentData.level) {
 						equipmentData.level = this.level;
+						equipItemIfNoneEquipped(this.itemKey as EquipmentKey);
 					}
 					scene.overlayScreens.inventory.update();
 				} else {

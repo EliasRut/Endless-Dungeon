@@ -120,6 +120,7 @@ export default class RedlingBossToken extends EnemyToken {
 				this.stateObject,
 				this.stateObject,
 				AbilityType.HAIL_OF_FLAMES,
+				this.level,
 				time
 			);
 		}
