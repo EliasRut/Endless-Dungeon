@@ -114,6 +114,8 @@ export default class MainScene extends Phaser.Scene {
 
 	lastScriptUnpausing: number = Date.now();
 
+	wasStunned: boolean = false;
+
 	constructor() {
 		super({ key: 'MainScene' });
 	}
@@ -257,72 +259,6 @@ export default class MainScene extends Phaser.Scene {
 		} else {
 			this.sound.play('score-dungeon', { volume: 0.08, loop: true });
 		}
-
-		// if (globalState.inventory.unequippedItemList.length === 0) {
-		// 	const zeroWeights = {
-		// 		sourceWeight: 0,
-		// 		catalystWeight: 0,
-		// 		armorWeight: 0,
-		// 		ringWeight: 0,
-		// 		amuletWeight: 0,
-		// 	};
-		// 	this.overlayScreens.inventory.addToInventory(
-		// 		generateRandomItem({
-		// 			...zeroWeights,
-		// 			sourceWeight: 1,
-		// 			sourceTypes: [Source.FIRE],
-		// 		})
-		// 	);
-		// 	this.overlayScreens.inventory.addToInventory(
-		// 		generateRandomItem({
-		// 			...zeroWeights,
-		// 			sourceWeight: 1,
-		// 			sourceTypes: [Source.ICE],
-		// 		})
-		// 	);
-		// 	this.overlayScreens.inventory.addToInventory(
-		// 		generateRandomItem({
-		// 			...zeroWeights,
-		// 			sourceWeight: 1,
-		// 			sourceTypes: [Source.FORCE],
-		// 		})
-		// 	);
-		// 	this.overlayScreens.inventory.addToInventory(
-		// 		generateRandomItem({
-		// 			...zeroWeights,
-		// 			sourceWeight: 1,
-		// 			sourceTypes: [Source.NECROTIC],
-		// 		})
-		// 	);
-		// 	this.overlayScreens.inventory.addToInventory(
-		// 		generateRandomItem({
-		// 			...zeroWeights,
-		// 			catalystWeight: 1,
-		// 			catalystTypes: [Catalyst.NOVA],
-		// 		})
-		// 	);
-		// 	this.overlayScreens.inventory.addToInventory(
-		// 		generateRandomItem({
-		// 			...zeroWeights,
-		// 			catalystWeight: 1,
-		// 			catalystTypes: [Catalyst.CONE],
-		// 		})
-		// 	);
-		// 	this.overlayScreens.inventory.addToInventory(
-		// 		generateRandomItem({
-		// 			...zeroWeights,
-		// 			catalystWeight: 1,
-		// 			catalystTypes: [Catalyst.STORM],
-		// 		})
-		// 	);
-		// 	this.overlayScreens.inventory.addToInventory(
-		// 		generateRandomItem({
-		// 			...zeroWeights,
-		// 			catalystWeight: 1,
-		// 			catalystTypes: [Catalyst.SUMMON],
-		// 		})
-		// 	);
-		// }
 	}
 
 	addNpc(
@@ -485,11 +421,11 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	update(globalTime: number, delta: number) {
-		globalState.gameTime = globalTime;
+		globalState.gameTime += delta;
 		this.fpsText.update();
 		this.minimap?.update();
 		this.keyboardHelper.updateGamepad();
-		updateStatus(globalTime, globalState.playerCharacter);
+		updateStatus(globalState.gameTime, globalState.playerCharacter);
 
 		if (this.keyboardHelper.isKKeyPressed()) {
 			globalState.clearState();
@@ -498,7 +434,8 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visiblity)) {
 			if (this.wasIPressed === false) {
 				this.icons.backpackIcon.toggleScreen();
-				this.overlayScreens.inventory.interactInventory(['pressed'], globalTime);
+
+				this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
 			}
 			this.wasIPressed = true;
 		} else {
@@ -534,7 +471,7 @@ export default class MainScene extends Phaser.Scene {
 			return;
 		}
 
-		this.scriptHelper.handleScripts(globalTime);
+		this.scriptHelper.handleScripts(globalState.gameTime);
 
 		this.overlayScreens.statScreen.update();
 
@@ -542,14 +479,18 @@ export default class MainScene extends Phaser.Scene {
 			if (this.icons.backpackIcon.screens[0].visiblity)
 				this.overlayScreens.inventory.interactInventory(
 					this.keyboardHelper.getInventoryKeyPress(),
-					globalTime
+					globalState.gameTime
 				);
 			return;
 		}
 
 		if (!this.blockUserInteraction) {
-			if (globalState.playerCharacter.stunned === true) return;
-			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalTime);
+			if (globalState.playerCharacter.stunned === true) {
+				this.mainCharacter.setVelocity(0, 0);
+				this.wasStunned = true;
+				return;
+			}
+			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
 			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
 
 			const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
@@ -559,7 +500,11 @@ export default class MainScene extends Phaser.Scene {
 			const newFacing = getFacing8Dir(xFacing, yFacing);
 
 			const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
-			const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
+			let playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
+			if (this.wasStunned) {
+				playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing, true);
+				this.wasStunned = false;
+			}
 			const isWalking = this.mobilePadStick
 				? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
 				  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
@@ -572,11 +517,11 @@ export default class MainScene extends Phaser.Scene {
 			}
 			if (hasMoved) {
 				const shouldPlayLeftStepSfx =
-					!this.lastStepLeft || globalTime - this.lastStepLeft > STEP_SOUND_TIME;
+					!this.lastStepLeft || globalState.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
 
 				if (shouldPlayLeftStepSfx) {
 					this.sound.play('sound-step-grass-l', { volume: 0.25 });
-					this.lastStepLeft = globalTime;
+					this.lastStepLeft = globalState.gameTime;
 				}
 			} else {
 				this.lastStepLeft = undefined;
@@ -595,11 +540,11 @@ export default class MainScene extends Phaser.Scene {
 		globalState.playerCharacter.y = Math.round(this.mainCharacter.y);
 
 		if (!this.blockUserInteraction) {
-			const castAbilities = this.keyboardHelper.getCastedAbilities(globalTime);
-			this.abilityHelper.update(globalTime, castAbilities);
+			const castAbilities = this.keyboardHelper.getCastedAbilities(globalState.gameTime);
+			this.abilityHelper.update(globalState.gameTime, castAbilities);
 		}
 
-		const cooldowns = this.keyboardHelper.getAbilityCooldowns(globalTime);
+		const cooldowns = this.keyboardHelper.getAbilityCooldowns(globalState.gameTime);
 		this.avatar.update(cooldowns);
 
 		if (this.useDynamicLighting && this.dynamicLightingHelper) {
@@ -608,7 +553,7 @@ export default class MainScene extends Phaser.Scene {
 
 		// Updated npcs
 		Object.values(this.npcMap).forEach((curNpc) => {
-			curNpc.update(globalTime, delta);
+			curNpc.update(globalState.gameTime, delta);
 		});
 
 		// TODO: remove items that are picked up

@@ -2,6 +2,7 @@ import { NpcScript } from '../../../../typings/custom';
 import { Faction, VISITED_TILE_TINT } from '../../helpers/constants';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
+import globalState from '../../worldstate';
 import Character from '../../worldstate/Character';
 
 // const GREEN_DIFF = 0x003300;
@@ -21,6 +22,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	lastMovedTimestamp: number;
 	lastNecroticEffectTimestamp: number;
 	necroticEffectStacks: number;
+	hitAt: number;
 	lastIceEffectTimestamp: number;
 	iceEffectStacks: number;
 
@@ -38,6 +40,20 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	public onCollide(withEnemy: boolean) {}
+
+	public receiveHit(damage: number){
+		this.stateObject.health -= damage;
+	}
+	public receiveStun(duration: number){
+		const time = globalState.gameTime;
+		if (this.stateObject.stunnedAt + this.stateObject.stunDuration > time) {
+			return false;
+		}
+		this.stateObject.stunned = true;
+		this.stateObject.stunnedAt = time;
+		this.stateObject.stunDuration = duration;
+		return true;
+	}
 
 	public getDistance(px: number, py: number) {
 		const x = this.x - px;
