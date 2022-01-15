@@ -131,7 +131,7 @@ export default class ZombieToken extends EnemyToken {
 			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 
-			const attackAnimationName = `enemy-zombie-slash-${facingToSpriteNameMap[newFacing]}`;
+			const attackAnimationName = `${this.tokenName}-attack-${facingToSpriteNameMap[newFacing]}`;
 			this.play(attackAnimationName);
 
 			this.setVelocityX(0);

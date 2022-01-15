@@ -167,7 +167,7 @@ export default class LichtKingToken extends EnemyToken {
 				const xy = this.getUncollidingXY(this.stateObject.x, this.stateObject.y);
 				this.scene.addNpc(
 					'LichAdd_' + this.addsCounter.toString(),
-					'enemy-zombie',
+					'rich',
 					xy[0],
 					xy[1],
 					1,

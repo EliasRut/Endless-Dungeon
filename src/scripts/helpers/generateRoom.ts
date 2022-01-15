@@ -273,7 +273,7 @@ export default class RoomGenerator {
 				name: roomName,
 				scripts: {} as Scripting,
 				// npcs,
-				// usedNpcTypes: ['enemy-zombie']
+				// usedNpcTypes: ['rich']
 		};
 		return ret as Room;
 	}

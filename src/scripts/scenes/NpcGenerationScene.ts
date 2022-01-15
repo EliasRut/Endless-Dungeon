@@ -29,7 +29,7 @@ export default class NpcGenerationScene extends Phaser.Scene {
 	preload() {
 		this.npcForGeneration = [];
 		const requiredNpcs = new Set<string>();
-		requiredNpcs.add('enemy-zombie');
+		//requiredNpcs.add('rich');
 		requiredNpcs.add('enemy-vampire');
 		requiredNpcs.add('vanya-base');
 		requiredNpcs.add('agnes');

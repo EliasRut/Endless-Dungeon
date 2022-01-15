@@ -25,13 +25,13 @@
   "npcs": [
     {
       "id": "zom-1",
-      "type": "enemy-zombie",
+      "type": "rich",
       "x": 5,
       "y": 4
     },
     {
       "id": "zom-3",
-      "type": "enemy-zombie",
+      "type": "rich",
       "x": 12,
       "y": 5
     }
