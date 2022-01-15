@@ -20,7 +20,7 @@ const ATTACK_DURATION = 3000;
 export default class PierreToken extends EnemyToken {
 	attacking: boolean;
 	chargeTime: number = CHARGE_TIME;
-	startingHealth: number;			
+	startingHealth: number;
 
 	constructor(
 		scene: MainScene,
@@ -77,7 +77,11 @@ export default class PierreToken extends EnemyToken {
 			const px = globalState.playerCharacter.x;
 			const py = globalState.playerCharacter.y;
 			if (this.aggro) {
-				if (px !== tx || py !== ty || this.attackRange < this.getDistance(tx, ty)) {
+				if (
+					px !== tx ||
+					py !== ty ||
+					this.attackRange < this.getDistanceToWorldStatePosition(tx, ty)
+				) {
 					const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
 					const xSpeed =
 						((tx - this.x) / totalDistance) *
@@ -129,7 +133,7 @@ export default class PierreToken extends EnemyToken {
 	attack(time: number) {
 		if (!this.attacking) {
 			this.attackedAt = time;
-			this.attacking = true;			
+			this.attacking = true;
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 		}

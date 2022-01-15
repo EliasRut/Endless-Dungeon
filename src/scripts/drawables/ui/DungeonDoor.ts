@@ -28,7 +28,7 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 		for (let i = 0; i < 8; i++) {
 			const runePositionX = frameWidth * i;
 			const runePositionY = frameHeight;
-			const rune = scene.add.sprite(runePositionX, runePositionY, 'runes');
+			const rune = scene.add.sprite(runePositionX * SCALE, runePositionY * SCALE, 'runes');
 			this.runes.push(rune);
 		}
 

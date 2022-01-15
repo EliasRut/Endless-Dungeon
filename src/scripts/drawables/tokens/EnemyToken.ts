@@ -67,15 +67,6 @@ export default abstract class EnemyToken extends CharacterToken {
 		this.scene.addFixedItem(id, this.x, this.y);
 	}
 
-	protected getOccupiedTile() {
-		if (this.body) {
-			const x = Math.round(this.body.x / TILE_WIDTH);
-			const y = Math.round(this.body.y / TILE_HEIGHT);
-			return this.scene.tileLayer.getTileAt(x, y);
-		}
-		return null;
-	}
-
 	protected receiveDotDamage(deltaTime: number) {
 		// dot = damage over time, deltatime is in ms so we have to devide it by 1000
 		const dot =
@@ -96,7 +87,7 @@ export default abstract class EnemyToken extends CharacterToken {
 			const player = globalState.playerCharacter;
 			if (
 				this.checkLoS() &&
-				this.getDistanceToWorldStatePosition(player.x, player.y) < this.stateObject.vision
+				this.getDistanceToWorldStatePosition(player.x, player.y) < this.stateObject.vision * SCALE
 			) {
 				this.aggro = true;
 				this.lastUpdate = time;

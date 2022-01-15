@@ -64,8 +64,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 
 	protected getOccupiedTile() {
 		if (this.body) {
-			const x = Math.round(this.body.x / TILE_WIDTH);
-			const y = Math.round(this.body.y / TILE_HEIGHT);
+			const x = Math.round(this.body.x / TILE_WIDTH / SCALE);
+			const y = Math.round(this.body.y / TILE_HEIGHT / SCALE);
 			return this.scene.tileLayer.getTileAt(x, y);
 		}
 		return null;

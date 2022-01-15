@@ -56,7 +56,7 @@ export default class NpcToken extends CharacterToken {
 				this.openQuestSymbol.setScale(SCALE);
 			} else {
 				this.openQuestSymbol.x = this.body.x + 8 * SCALE;
-				this.openQuestSymbol.y = this.body.y - (14 - yOffset) * SCALE;
+				this.openQuestSymbol.y = this.body.y - (22 - yOffset) * SCALE;
 			}
 			const player = globalState.playerCharacter;
 			if (this.getDistanceToWorldStatePosition(player.x, player.y) < 60 * SCALE) {
