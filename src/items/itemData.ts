@@ -336,3 +336,8 @@ export const getItemDataForName = (name: string) => {
 	}
 	return UneqippableItemData[name as UneqippableItem] as ItemData;
 };
+
+export const ItemData = {
+	...EquippableItems,
+	...UneqippableItemData,
+};

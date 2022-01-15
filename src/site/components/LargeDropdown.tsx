@@ -6,8 +6,9 @@ export const LargeDropdown = (props: any) => (
 );
 
 const FormattedDropdown = styled.select`
-	width: 358px;
-	height: 24px;
+	width: 100%;
+	min-width: 197px;
+	box-sizing: border-box;
 	font-family: 'endlessDungeon';
-	font-size: 1rem;
+	font-size: 1.5rem;
 `;

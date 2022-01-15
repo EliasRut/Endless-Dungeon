@@ -1,23 +1,6 @@
-import { ScriptEntry } from '../../../typings/custom';
+import { Quest, ScriptEntry } from '../../../typings/custom';
 import { Source } from '../../items/itemData';
 import globalState from '../worldstate';
-
-export interface Quest {
-	questGiverId?: string;
-	questGiverName: string;
-	preconditions?: {
-		previousQuests?: string[];
-		hasItems?: string[];
-		dungeonLevelReached?: number;
-	};
-	completionCriterias?: {
-		previousQuests?: string[];
-		hasItems?: string[];
-		dungeonLevelReached?: number;
-	};
-	name: string;
-	goal: string;
-}
 
 export interface QuestScripts {
 	intro: ScriptEntry[];
@@ -59,7 +42,10 @@ export const Quests: { [name: string]: Quest } = {
 		goal: 'Get 10 wild plantling roots, find Euraliae seeds',
 		preconditions: {
 			previousQuests: ['theRescue'],
-			hasItems: ['Wild Rune', 'Death Rune'],
+			requiredItems: [
+				{ id: 'Wild Rune', count: 1 },
+				{ id: 'Death Rune', count: 1 },
+			],
 			dungeonLevelReached: 1,
 		},
 	},

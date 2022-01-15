@@ -25,7 +25,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 	questDescriptionHeader: Phaser.GameObjects.Text | undefined;
 	questDescription: Phaser.GameObjects.Text | undefined;
 	questRequirementsHeader: Phaser.GameObjects.Text | undefined;
-	questRequirements: Phaser.GameObjects.Text | undefined;
+	// questRequirements: Phaser.GameObjects.Text | undefined;
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
@@ -52,7 +52,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 		this.questDescriptionHeader?.destroy(true);
 		this.questDescription?.destroy(true);
 		this.questRequirementsHeader?.destroy(true);
-		this.questRequirements?.destroy(true);
+		// this.questRequirements?.destroy(true);
 
 		if (!this.activeQuestId) {
 			return;
@@ -169,22 +169,22 @@ export default class QuestDetailsScreen extends OverlayScreen {
 		this.questRequirementsHeader.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(this.questRequirementsHeader, true);
 
-		this.questRequirements = new Phaser.GameObjects.Text(
-			this.scene,
-			(QUEST_DETAILS_START_X + 24) * UI_SCALE,
-			this.questRequirementsHeader.y + this.questRequirementsHeader.height,
-			quest.preconditions?.hasItems ? quest.preconditions?.hasItems : '',
-			{
-				color: 'white',
-				wordWrap: { width: (SCREEN_WIDTH - 40) * UI_SCALE, useAdvancedWrap: true },
-				fontSize: `${12 * UI_SCALE}pt`,
-				fontFamily: 'endlessDungeon',
-			}
-		);
-		this.questRequirements.setOrigin(0);
-		this.questRequirements.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		this.questRequirements.setScrollFactor(0);
-		this.questRequirements.setShadow(0, 1 * UI_SCALE, 'black');
-		this.add(this.questRequirements, true);
+		// 	this.questRequirements = new Phaser.GameObjects.Text(
+		// 		this.scene,
+		// 		(QUEST_DETAILS_START_X + 24) * UI_SCALE,
+		// 		this.questRequirementsHeader.y + this.questRequirementsHeader.height,
+		// 		quest.preconditions?.hasItems ? quest.preconditions?.hasItems : '',
+		// 		{
+		// 			color: 'white',
+		// 			wordWrap: { width: (SCREEN_WIDTH - 40) * UI_SCALE, useAdvancedWrap: true },
+		// 			fontSize: `${12 * UI_SCALE}pt`,
+		// 			fontFamily: 'endlessDungeon',
+		// 		}
+		// 	);
+		// 	this.questRequirements.setOrigin(0);
+		// 	this.questRequirements.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		// 	this.questRequirements.setScrollFactor(0);
+		// 	this.questRequirements.setShadow(0, 1 * UI_SCALE, 'black');
+		// 	this.add(this.questRequirements, true);
 	}
 }

@@ -6,7 +6,8 @@ export const LargeInput = (props: any) => (
 );
 
 const FormattedInput = styled.input`
-	width: 350px;
+	width: 100%;
+	box-sizing: border-box;
 	font-family: 'endlessDungeon';
-	font-size: 1rem;
+	font-size: 1.5rem;
 `;
