@@ -8,7 +8,7 @@ import firebase from 'firebase';
 import '../App.css';
 import { Input } from '../components/Input';
 import { Dropdown } from '../components/Dropdown';
-import { NpcData, ItemWithCount, ScriptEntry } from '../../../typings/custom';
+import { NpcData, ItemWithCount, ScriptEntry, Quest } from '../../../typings/custom';
 import { Wait } from '../components/ScriptBlockTypes/Wait';
 import { Condition } from '../components/ScriptBlockTypes/Condition';
 import { ScriptTypeDropdown } from '../components/ScriptTypeDropdown';
@@ -25,6 +25,10 @@ export interface QuestEditorScreenProps {
 }
 
 export interface QuestEditorState {
+	knownQuests: {
+		id: string;
+		name: string;
+	}[];
 	npcs: {
 		name: string;
 		id: string;
@@ -40,10 +44,12 @@ export interface QuestEditorState {
 		requiredItems: ItemWithCount[];
 		dungeonLevelReached: number;
 	};
+	id?: string;
 }
 
 export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, QuestEditorState> {
 	state: QuestEditorState = {
+		knownQuests: [],
 		npcs: [],
 		questName: '',
 		questGiver: '',
@@ -61,15 +67,15 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 	componentDidMount() {
 		firebase
 			.firestore()
-			.collection('npcs')
+			.collection('quests')
 			.get()
-			.then((npcs) => {
+			.then((quests) => {
 				this.setState({
-					npcs: npcs.docs.map((npcDoc) => {
-						const npc = npcDoc.data() as NpcData;
+					knownQuests: quests.docs.map((questDoc) => {
+						const quest = questDoc.data() as Quest;
 						return {
-							name: npc.name,
-							id: npcDoc.id,
+							name: quest.name,
+							id: questDoc.id,
 						};
 					}),
 				});
@@ -346,7 +352,6 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 		);
 	}
 
-	// renderPreviousQuestsPrecondition(index: number, previousQuestsPreconditionBlock: string[]) {
 	renderPreviousQuestsPrecondition(index: number) {
 		return (
 			<ScriptBlockContainer>
@@ -360,24 +365,60 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 						<TextWrapper>Quest</TextWrapper>
 						<LargeDropdown
 							id="questItemPreconditionId"
-							defaultValue="none"
-							// value={previousQuestsPreconditionBlock}
-							// onChange={(e: any) =>
-							// 	this.replaceQuestItemPreconditionBlockData(index, {
-							// 		id: e.target.value,
-							// 		count: previousQuestsPreconditionBlock,
-							// 	})
-							// }
+							value={this.state.preconditionBlocks.previousQuests[index]}
+							onChange={(e: any) =>
+								this.replacePreviousQuestsPreconditionBlockData(index, e.target.value)
+							}
 						>
 							<option value="none"></option>
-							{/* {Object.entries(ItemData).map(([itemKey, itemData]) => (
-								<option value={itemKey}>{itemData.name}</option>
-							))} */}
+							{this.state.knownQuests.map(({ id, name }) => (
+								<option value={id}>{name}</option>
+							))}
 						</LargeDropdown>
 					</Wrapper>
 				</ItemIdContainer>
 			</ScriptBlockContainer>
 		);
+	}
+
+	saveQuest() {
+		const quest: Quest = {
+			questGiverId: this.state.questGiver,
+			questGiverName: '',
+			preconditions: this.state.preconditionBlocks,
+			name: this.state.questName,
+			goal: this.state.questDescription,
+			rewards: this.state.rewardBlocks,
+		};
+		if (this.state.id) {
+			firebase.firestore().collection('quests').doc(this.state.id).update(quest);
+		} else {
+			const questDoc = firebase.firestore().collection('quests').doc();
+			const questId = questDoc.id;
+			questDoc.set(quest);
+			this.setState({ id: questId });
+		}
+	}
+
+	async loadQuest() {
+		if (!this.state.id) {
+			return;
+		}
+		const questDoc = await firebase.firestore().collection('quests').doc(this.state.id).get();
+		const quest: Quest = questDoc.data() as Quest;
+
+		const questState = {
+			questGiver: quest.questGiverId!,
+			preconditionBlocks: {
+				previousQuests: quest.preconditions?.previousQuests || [],
+				requiredItems: quest.preconditions?.requiredItems || [],
+				dungeonLevelReached: quest.preconditions?.dungeonLevelReached || 0,
+			},
+			questName: quest.name,
+			questDescription: quest.goal,
+			rewardBlocks: quest.rewards || [],
+		};
+		this.setState(questState);
 	}
 
 	render() {
@@ -393,14 +434,30 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 					<MenueWrapper id="questEditorMenu">
 						<div>
 							<div>Load Quest</div>
-							<Dropdown id="questDropdown">
-								<option>Loading...</option>
+							<Dropdown
+								id="questDropdown"
+								onChange={(e: any) => this.setState({ id: e.target.value })}
+							>
+								<option value="">New quest</option>
+
+								{this.state.knownQuests.map(({ id, name }) => (
+									<option value={id}>{name}</option>
+								))}
 							</Dropdown>
 							<ButtonWrapper>
-								<StyledButton id="loadQuestButton">Load</StyledButton>
+								<StyledButton id="loadQuestButton" onClick={() => this.loadQuest()}>
+									Load
+								</StyledButton>
 							</ButtonWrapper>
 							<ButtonWrapper>
-								<StyledButton id="saveQuestButton">Save</StyledButton>
+								<StyledButton
+									id="saveQuestButton"
+									onClick={() => {
+										this.saveQuest();
+									}}
+								>
+									Save
+								</StyledButton>
 							</ButtonWrapper>
 						</div>
 					</MenueWrapper>
