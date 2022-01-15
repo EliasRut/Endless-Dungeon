@@ -517,6 +517,7 @@ export default class MainScene extends Phaser.Scene {
 				this.mainCharacter.play({
 					key: playerAnimation,
 					frameRate: globalState.playerCharacter.movementSpeed / (isWalking ? 20 : 10),
+					repeat: -1
 				});
 			}
 			if (hasMoved) {

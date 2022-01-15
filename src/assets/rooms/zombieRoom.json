@@ -4,73 +4,73 @@
     "npcs": [
         {
           "id": "zom-1",
-          "type": "enemy-zombie",
+          "type": "rich",
           "x": 5,
           "y": 11
         },
         {
           "id": "zom-2",
-          "type": "enemy-zombie",
+          "type": "rich",
           "x": 5,
           "y": 14
         },
         {
             "id": "zom-3",
-            "type": "enemy-zombie",
+            "type": "rich",
             "x": 9,
             "y": 9
           },
           {
             "id": "zom-4",
-            "type": "enemy-zombie",
+            "type": "rich",
             "x": 13,
             "y": 9
           }, 
           {
             "id": "zom-5",
-            "type": "enemy-zombie",
+            "type": "rich",
             "x": 16,
             "y": 11
           },
           {
             "id": "zom-6",
-            "type": "enemy-zombie",
+            "type": "rich",
             "x": 16,
             "y": 14
           },
           {
             "id": "zom-7",
-            "type": "enemy-zombie",
+            "type": "rich",
             "x": 16,
             "y": 3
           },
           {
             "id": "zom-8",
-            "type": "enemy-zombie",
+            "type": "rich",
             "x": 4,
             "y": 8
           },
           {
             "id": "zom-9",
-            "type": "enemy-zombie",
+            "type": "rich",
             "x": 5,
             "y": 7
           },
           {
             "id": "zom-10",
-            "type": "enemy-zombie",
+            "type": "rich",
             "x": 16,
             "y": 7
           },
           {
             "id": "zom-11",
-            "type": "enemy-zombie",
+            "type": "rich",
             "x": 18,
             "y": 8
           },
           {
             "id": "zom-12",
-            "type": "enemy-zombie",
+            "type": "rich",
             "x": 18,
             "y": 16
           }

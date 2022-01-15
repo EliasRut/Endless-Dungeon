@@ -7,6 +7,7 @@ import HealingLightEffect from '../drawables/effects/HealingLightEffect';
 import ArcaneBoltEffect from '../drawables/effects/ArcaneBoltEffect';
 import ConeEffect from '../drawables/effects/ConeEffect';
 import NecroticBoltEffect from '../drawables/effects/NecroticBoltEffect';
+import GenericFlyingObject from '../drawables/effects/GenericFlyingObject';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -46,6 +47,7 @@ interface AbilityData {
 	necroticStacks?: number;
 	iceStacks?: number;
 	castOnEnemyDestroyed?: AbilityType;
+	spriteName?: string;
 }
 
 export const enum AbilityType {
@@ -71,6 +73,7 @@ export const enum AbilityType {
 	NECROTIC_CONE = 'necroticCone',
 	NECROTIC_NOVA = 'necroticNova',
 	EXPLODING_CORPSE = 'explodingCorpse',
+	BAT = 'bat',
 }
 
 export const Abilities: { [type: string]: AbilityData } = {
@@ -550,5 +553,27 @@ export const Abilities: { [type: string]: AbilityData } = {
 		abilityName: `Hail of Death`,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.BAT]: {
+		projectiles: 1,
+		projectileData: {
+			velocity: 400,
+			xOffset: 16,
+			yOffset: 16,
+			effect: GenericFlyingObject,
+			collisionSound: 'sound-icespike-hit',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true
+		},
+		sound: 'sound-icespike',
+		sfxVolume: 0.3,
+		cooldownMs: 400,		
+		damageMultiplier: 0.8,		
+		abilityName: 'Angry Bat',
+		flavorText: `An angry bat.`,
+		icon: ['icon-abilities', 1],
+		spriteName: 'bat',
 	},
 };

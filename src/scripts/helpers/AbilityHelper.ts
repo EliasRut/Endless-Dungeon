@@ -51,7 +51,7 @@ export default class AbilityHelper {
 				this.scene,
 				pointOfOrigin.x + xMultiplier * projectileData!.xOffset,
 				pointOfOrigin.y + yMultiplier * projectileData!.yOffset,
-				'',
+				Abilities[type].spriteName || '',
 				getFacing8Dir(xMultiplier, yMultiplier),
 				projectileData
 			);
