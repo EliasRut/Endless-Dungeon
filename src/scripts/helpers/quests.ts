@@ -10,13 +10,13 @@ export interface Quest {
 		hasItems?: string[];
 		dungeonLevelReached?: number;
 	};
-	goals?: {
+	completionCriterias?: {
 		previousQuests?: string[];
 		hasItems?: string[];
 		dungeonLevelReached?: number;
 	};
 	name: string;
-	description: string;
+	goal: string;
 }
 
 export interface QuestScripts {
@@ -29,26 +29,26 @@ export const Quests: { [name: string]: Quest } = {
 		questGiverId: 'agnes',
 		questGiverName: 'Agnes',
 		name: 'The Rescue',
-		description: 'Rescue Erwin from the zombies',
+		goal: 'Rescue Erwin from the zombies',
 	},
 	hildaTalks: {
 		questGiverId: 'hilda',
 		questGiverName: 'Hilda',
 		name: 'Hilda needs Help',
-		description: 'Help Hila, immediately',
+		goal: 'Help Hila, immediately',
 		preconditions: {
-			previousQuests: ['theRescue'],
+			// previousQuests: ['theRescue'],
 		},
 	},
 	vanyaWantsBooks: {
 		questGiverId: 'vanya',
 		questGiverName: 'Vanya',
 		name: 'Vanya wants books',
-		description: 'Bring Vanya some very special books',
+		goal: 'Bring Vanya some very special books',
 		preconditions: {
 			previousQuests: ['hildaTalks'],
 		},
-		goals: {
+		completionCriterias: {
 			hasItems: ['book'],
 		},
 	},
@@ -56,7 +56,7 @@ export const Quests: { [name: string]: Quest } = {
 		questGiverId: 'agnes',
 		questGiverName: 'Agnes',
 		name: 'The Hunt',
-		description: 'Get 10 wild plantling roots, find Euraliae seeds',
+		goal: 'Get 10 wild plantling roots, find Euraliae seeds',
 		preconditions: {
 			previousQuests: ['theRescue'],
 			hasItems: ['Wild Rune', 'Death Rune'],
@@ -106,7 +106,7 @@ const questScripts: { [name: string]: QuestScripts } = {
 		intro: [
 			{
 				type: 'dialog',
-				portrait: 'player_happy',
+				speaker: 'Player',
 				text: ['Go visit Vanya in her book shop!'],
 			},
 			{
@@ -115,7 +115,7 @@ const questScripts: { [name: string]: QuestScripts } = {
 			},
 			{
 				type: 'dialog',
-				portrait: 'player_happy',
+				speaker: 'Player',
 				text: ["This must be the book shop I've heard about.", 'Then this must be Vanya.'],
 			},
 			{
@@ -129,7 +129,7 @@ const questScripts: { [name: string]: QuestScripts } = {
 		intro: [
 			{
 				type: 'dialog',
-				portrait: 'player_happy',
+				speaker: 'Player',
 				text: ['Get me some books, yo!'],
 			},
 			{
@@ -144,7 +144,7 @@ const questScripts: { [name: string]: QuestScripts } = {
 			},
 			{
 				type: 'dialog',
-				portrait: 'player_happy',
+				speaker: 'Player',
 				text: ['Thanks for the book, yo!'],
 			},
 			{
@@ -162,7 +162,7 @@ const questScripts: { [name: string]: QuestScripts } = {
 			},
 			{
 				type: 'dialog',
-				portrait: 'player_happy',
+				speaker: 'Player',
 				text: ["Take this Force Source, it'll come in handy!"],
 			},
 		],
@@ -171,7 +171,7 @@ const questScripts: { [name: string]: QuestScripts } = {
 		intro: [
 			{
 				type: 'dialog',
-				portrait: 'player_happy',
+				speaker: 'Player',
 				text: ['Young wizard, what a relief. I need your help!'],
 			},
 			{
@@ -185,7 +185,7 @@ const questScripts: { [name: string]: QuestScripts } = {
 			},
 			{
 				type: 'dialog',
-				portrait: 'player_happy',
+				speaker: 'Player',
 				text: ["Finally, we're back together!"],
 			},
 			{

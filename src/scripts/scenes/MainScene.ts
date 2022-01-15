@@ -13,7 +13,7 @@ import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
-import { essenceNames, Faction, NUM_ITEM_ICONS, UiDepths } from '../helpers/constants';
+import { essenceNames, Faction, NUM_ITEM_ICONS, SCALE, UiDepths } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
@@ -40,6 +40,7 @@ import LevelName from '../drawables/ui/LevelName';
 import QuestsIcon from '../drawables/ui/QuestsIcon';
 import QuestLogScreen from '../screens/QuestLogScreen';
 import QuestDetailsScreen from '../screens/QuestDetailsScreen';
+import { Scale } from 'phaser';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -127,7 +128,7 @@ export default class MainScene extends Phaser.Scene {
 
 	create() {
 		this.input.addPointer(2);
-
+		// this.cameras.main.zoom = 2;
 		this.alive = 0;
 		// tslint:disable-next-line:no-unused-expression
 		this.cameras.main.fadeIn(FADE_IN_TIME_MS);
@@ -152,6 +153,7 @@ export default class MainScene extends Phaser.Scene {
 			globalState.playerCharacter.x || startX,
 			globalState.playerCharacter.y || startY
 		);
+		this.mainCharacter.setScale(SCALE);
 		this.mainCharacter.setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.cameras.main.startFollow(this.mainCharacter, false);
 		this.physics.add.collider(this.mainCharacter, this.tileLayer);
@@ -272,6 +274,7 @@ export default class MainScene extends Phaser.Scene {
 		options?: NpcOptions
 	) {
 		const npc = spawnNpc(this, type, id, x, y, level, options);
+		npc.setScale(SCALE);
 		this.npcMap[id] = npc;
 		if (globalState.npcs[id]) {
 			const facing = getFacing8Dir(facingX, facingY);
@@ -349,9 +352,11 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayLayer = overlayLayer;
 
 		this.tileLayer.setDepth(UiDepths.BASE_TILE_LAYER);
+		this.tileLayer.setScale(SCALE);
 		this.decorationLayer.setDepth(UiDepths.DECORATION_TILE_LAYER);
-		this.overlayLayer.setDepth(UiDepths.OVERLAY_TILE_LAYER);
+		this.decorationLayer.setScale(SCALE);
 		this.overlayLayer.setDepth(UiDepths.TOP_TILE_LAYER);
+		this.overlayLayer.setScale(SCALE);
 
 		npcs.forEach((npc) => {
 			this.addNpc(
@@ -540,8 +545,8 @@ export default class MainScene extends Phaser.Scene {
 			this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
 			this.mainCharacter.body.velocity.normalize().scale(speed);
 		}
-		globalState.playerCharacter.x = Math.round(this.mainCharacter.x);
-		globalState.playerCharacter.y = Math.round(this.mainCharacter.y);
+		globalState.playerCharacter.x = Math.round(this.mainCharacter.x / SCALE);
+		globalState.playerCharacter.y = Math.round(this.mainCharacter.y / SCALE);
 
 		if (!this.blockUserInteraction) {
 			const castAbilities = this.keyboardHelper.getCastedAbilities(globalState.gameTime);

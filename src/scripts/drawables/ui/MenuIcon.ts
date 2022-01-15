@@ -1,7 +1,9 @@
 import MainScene from '../../scenes/MainScene';
-import { UiDepths } from '../../helpers/constants';
+import { UI_SCALE, UiDepths } from '../../helpers/constants';
 import { Icons } from './Icons';
 import OverlayScreen from '../../screens/OverlayScreen';
+
+export const MENU_ICON_LEFT_BORDER = 32;
 
 export default abstract class MenuIcon extends Phaser.GameObjects.Image implements Icons {
 	scene: MainScene;
@@ -20,6 +22,7 @@ export default abstract class MenuIcon extends Phaser.GameObjects.Image implemen
 
 		this.setName(texture.toString());
 		this.setScrollFactor(0);
+		this.setScale(UI_SCALE);
 		this.setInteractive();
 
 		this.setDepth(UiDepths.UI_BACKGROUND_LAYER);

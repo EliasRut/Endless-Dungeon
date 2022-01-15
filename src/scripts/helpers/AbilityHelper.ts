@@ -6,7 +6,7 @@ import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
-import { Facings, Faction, PossibleTargets } from './constants';
+import { Facings, Faction, PossibleTargets, SCALE } from './constants';
 import { getFacing8Dir, getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
 
@@ -49,8 +49,8 @@ export default class AbilityHelper {
 			const xMultiplier = Math.sin(currentSpread * Math.PI + facingRotation);
 			const effect = new projectileData!.effect(
 				this.scene,
-				pointOfOrigin.x + xMultiplier * projectileData!.xOffset,
-				pointOfOrigin.y + yMultiplier * projectileData!.yOffset,
+				pointOfOrigin.x + xMultiplier * projectileData!.xOffset * SCALE,
+				pointOfOrigin.y + yMultiplier * projectileData!.yOffset * SCALE,
 				Abilities[type].spriteName || '',
 				getFacing8Dir(xMultiplier, yMultiplier),
 				projectileData
@@ -59,13 +59,13 @@ export default class AbilityHelper {
 				(effect as TargetingEffect).allowedTargets =
 					caster.faction === Faction.PLAYER ? PossibleTargets.ENEMIES : PossibleTargets.PLAYER;
 			}
-			effect.setVelocity(xMultiplier, yMultiplier);
-			effect.setMaxVelocity(projectileData!.velocity);
+			effect.setVelocity(xMultiplier * SCALE, yMultiplier * SCALE);
+			effect.setMaxVelocity(projectileData!.velocity * SCALE);
 			effect.body.velocity.scale(projectileData!.velocity);
 
 			effect.setDrag(
-				(projectileData!.drag || 0) * Math.abs(xMultiplier),
-				(projectileData!.drag || 0) * Math.abs(yMultiplier)
+				(projectileData!.drag || 0) * SCALE * Math.abs(xMultiplier),
+				(projectileData!.drag || 0) * SCALE * Math.abs(yMultiplier)
 			);
 
 			effect.setDebug(true, true, 0xffff00);

@@ -8,7 +8,7 @@ import { NPCEditorScreen } from './screens/NPCEditorScreen';
 import { Login } from './screens/Login';
 import firebase from 'firebase';
 import './App.css';
-import { ScriptEditorScreen } from './screens/ScriptEditorScreen';
+import { QuestEditorScreen } from './screens/QuestEditorScreen';
 
 const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -59,8 +59,8 @@ export default function App() {
 					<Route path="/npcEditor">
 						<NPCEditorScreen user={user} />
 					</Route>
-					<Route path="/scriptEditor">
-						<ScriptEditorScreen user={user} />
+					<Route path="/questEditor">
+						<QuestEditorScreen user={user} />
 					</Route>
 					<Route path="/">
 						<StartScreen auth={auth} user={user} />

@@ -7,6 +7,7 @@ import {
 	getEquipmentDataForItemKey,
 	equipItemIfNoneEquipped,
 } from '../../helpers/inventory';
+import { SCALE } from '../../helpers/constants';
 
 const MAX_INTERACTION_DISTANCE = 30;
 const HEAL_PERCENTAGE = 1 / 4; // health
@@ -27,7 +28,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		item: ItemData,
 		level: number
 	) {
-		super(scene, x, y, 'test-items-spritesheet', item.iconFrame);
+		super(scene, x * SCALE, y * SCALE, 'test-items-spritesheet', item.iconFrame);
 		const tileX = Math.round(x / TILE_WIDTH);
 		const tileY = Math.round(y / TILE_HEIGHT);
 		this.itemKey = itemKey;
@@ -43,7 +44,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		const py = scene.mainCharacter.y;
 		const distance = Math.hypot(this.x - px, this.y - py);
 		// if you run over item, put into inventory
-		if (distance < MAX_INTERACTION_DISTANCE) {
+		if (distance < MAX_INTERACTION_DISTANCE * SCALE) {
 			if (this.itemKey === 'health') {
 				const heal = Math.round(globalState.playerCharacter.maxHealth / HEAL_PERCENTAGE);
 				globalState.playerCharacter.health =

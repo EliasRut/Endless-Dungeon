@@ -67,7 +67,7 @@ export default class RedlingBossToken extends EnemyToken {
 
 		const tx = this.target.x;
 		const ty = this.target.y;
-		const distance = this.getDistance(tx, ty);
+		const distance = this.getDistanceToWorldStatePosition(tx, ty);
 
 		const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
 		const xFactor = (tx - this.x) / totalDistance;

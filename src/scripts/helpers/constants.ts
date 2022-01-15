@@ -224,6 +224,7 @@ export const enum MODE {
 	GAME = 'game',
 	MAP_EDITOR = 'mapEditor',
 	NPC_EDITOR = 'npcEditor',
+	QUEST_EDITOR = 'questEditor',
 }
 
 export let activeMode = MODE.GAME;
@@ -234,3 +235,6 @@ export const setActiveMode = (mode: MODE) => {
 
 export const CHARACTER_SPRITE_WIDTH = 320;
 export const CHARACTER_SPRITE_HEIGHT = 240;
+
+export const SCALE = 3;
+export const UI_SCALE = (window.innerWidth >= 1900 && window.innerHeight) >= 840 ? 3 : 2;

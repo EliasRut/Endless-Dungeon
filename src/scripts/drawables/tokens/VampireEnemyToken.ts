@@ -87,7 +87,11 @@ export default class VampireToken extends EnemyToken {
 			const px = globalState.playerCharacter.x;
 			const py = globalState.playerCharacter.y;
 			if (this.aggro) {
-				if (px !== tx || py !== ty || this.attackRange < this.getDistance(tx, ty)) {
+				if (
+					px !== tx ||
+					py !== ty ||
+					this.attackRange < this.getDistanceToWorldStatePosition(tx, ty)
+				) {
 					const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
 					const xSpeed =
 						((tx - this.x) / totalDistance) *
@@ -179,7 +183,7 @@ export default class VampireToken extends EnemyToken {
 				stunDuration = COLLISION_STUN;
 				if (!this.damaged) {
 					this.scene.mainCharacter.receiveStun(stunDuration);
-					this.scene.mainCharacter.receiveHit(this.stateObject.damage)
+					this.scene.mainCharacter.receiveHit(this.stateObject.damage);
 					this.damaged = true;
 				}
 			}

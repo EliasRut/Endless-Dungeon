@@ -33,7 +33,7 @@ export default class PreloadScene extends Phaser.Scene {
 			this.cameras.main.centerY,
 			'Loading ...',
 			{
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 				color: 'white',
 				fontSize: '26px',
 			}
@@ -99,6 +99,10 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('icon-healthbar-background', 'assets/img/gui-healthbar.png');
 		this.load.image('ability-background-desktop', 'assets/img/ability-icon-background-desktop.png');
 		this.load.image('ability-background-mobile', 'assets/img/ability-icon-background-mobile.png');
+		this.load.image('ability-background-1', 'assets/img/ability-icon-background-1.png');
+		this.load.image('ability-background-2', 'assets/img/ability-icon-background-2.png');
+		this.load.image('ability-background-3', 'assets/img/ability-icon-background-3.png');
+		this.load.image('ability-background-4', 'assets/img/ability-icon-background-4.png');
 		this.load.image('icon-guibase', 'assets/img/gui-base.png');
 		this.load.image('icon-healthbar', 'assets/img/gui-life.png');
 		this.load.image('inventory-borders', 'assets/img/inventory-borders-tall.png');

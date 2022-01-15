@@ -1,4 +1,4 @@
-import { Faction, VISITED_TILE_TINT } from '../../helpers/constants';
+import { Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
 import FireBallEffect from '../effects/FireBallEffect';
@@ -94,7 +94,10 @@ export default abstract class EnemyToken extends CharacterToken {
 		// set aggro boolean, use a linger time for aggro
 		if (this.lastUpdate <= time) {
 			const player = globalState.playerCharacter;
-			if (this.checkLoS() && this.getDistance(player.x, player.y) < this.stateObject.vision) {
+			if (
+				this.checkLoS() &&
+				this.getDistanceToWorldStatePosition(player.x, player.y) < this.stateObject.vision
+			) {
 				this.aggro = true;
 				this.lastUpdate = time;
 				this.target.x = player.x;

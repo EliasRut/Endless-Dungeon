@@ -1,4 +1,4 @@
-import { UiDepths } from '../helpers/constants';
+import { UiDepths, UI_SCALE } from '../helpers/constants';
 
 export default class OverlayScreen extends Phaser.GameObjects.Group {
 	visiblity: boolean;
@@ -13,10 +13,10 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 		const screenWidth = width;
 		const screenHeight = height;
 		const tileSize = 64;
-		const rightBorderX = leftBorderX + screenWidth - tileSize;
-		const bottomBorderY = topBorderY + screenHeight - tileSize;
-		const middlePieceX = leftBorderX + screenWidth / 2 - tileSize / 2;
-		const middlePieceY = topBorderY + screenHeight / 2 - tileSize / 2;
+		const rightBorderX = leftBorderX + screenWidth - tileSize * UI_SCALE;
+		const bottomBorderY = topBorderY + screenHeight - tileSize * UI_SCALE;
+		const middlePieceX = leftBorderX + tileSize;
+		const middlePieceY = topBorderY + tileSize;
 		const xStretchFactor = (screenWidth - 2 * tileSize) / tileSize;
 		const yStretchFactor = (screenHeight - 2 * tileSize) / tileSize;
 
@@ -49,6 +49,10 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 			'screen-background',
 			8
 		);
+		topLeftCorner.setScale(UI_SCALE);
+		topRightCorner.setScale(UI_SCALE);
+		bottomLeftCorner.setScale(UI_SCALE);
+		bottomRightCorner.setScale(UI_SCALE);
 
 		const topBorder = new Phaser.GameObjects.Image(
 			scene,
@@ -57,6 +61,7 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 			'screen-background',
 			1
 		);
+		topBorder.scaleY = UI_SCALE;
 		topBorder.scaleX = xStretchFactor;
 		const bottomBorder = new Phaser.GameObjects.Image(
 			scene,
@@ -65,6 +70,7 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 			'screen-background',
 			7
 		);
+		bottomBorder.scaleY = UI_SCALE;
 		bottomBorder.scaleX = xStretchFactor;
 
 		const leftBorder = new Phaser.GameObjects.Image(
@@ -74,6 +80,7 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 			'screen-background',
 			3
 		);
+		leftBorder.scaleX = UI_SCALE;
 		leftBorder.scaleY = yStretchFactor;
 		const rightBorder = new Phaser.GameObjects.Image(
 			scene,
@@ -82,6 +89,7 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 			'screen-background',
 			5
 		);
+		rightBorder.scaleX = UI_SCALE;
 		rightBorder.scaleY = yStretchFactor;
 
 		const centerPiece = new Phaser.GameObjects.Image(
@@ -109,6 +117,7 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 		pieces.forEach((piece) => {
 			piece.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 			piece.setScrollFactor(0);
+			piece.setOrigin(0);
 		});
 		this.addMultiple(pieces, true);
 	}

@@ -1,16 +1,25 @@
-import { AbilityKey, UiDepths } from '../../helpers/constants';
+import { AbilityKey, UI_SCALE, UiDepths } from '../../helpers/constants';
 import globalState from '../../worldstate';
-import { AbilityType, Abilities} from '../../abilities/abilityData';
+import { AbilityType, Abilities } from '../../abilities/abilityData';
 import MainScene from '../../scenes/MainScene';
 
+const SCREEN_OFFSET_X = 8;
+const SCREEN_OFFSET_Y = 8;
+
+const HEALTH_BAR_START_X = SCREEN_OFFSET_X + 50;
+const HEALTH_BAR_START_Y = SCREEN_OFFSET_Y + 24;
 const HEALTH_BAR_WIDTH = 98;
 
+const ABILITY_START_X = SCREEN_OFFSET_X + 50;
+const ABILITY_START_Y = SCREEN_OFFSET_Y + 48;
+const ABILITY_WIDTH = 29;
+
 const ABILITY_COORDINATES_DESKTOP = {
-	[AbilityKey.ONE]: [72, 62.5],
-	[AbilityKey.TWO]: [101, 62.5],
-	[AbilityKey.THREE]: [130, 62.5],
-	[AbilityKey.FOUR]: [159, 62.5],
-	[AbilityKey.FIVE]: [159, 62.5],
+	[AbilityKey.ONE]: [ABILITY_START_X + 4, ABILITY_START_Y + 3],
+	[AbilityKey.TWO]: [ABILITY_START_X + 4 + ABILITY_WIDTH, ABILITY_START_Y + 3],
+	[AbilityKey.THREE]: [ABILITY_START_X + 4 + ABILITY_WIDTH * 2, ABILITY_START_Y + 3],
+	[AbilityKey.FOUR]: [ABILITY_START_X + 4 + ABILITY_WIDTH * 3, ABILITY_START_Y + 3],
+	[AbilityKey.FIVE]: [ABILITY_START_X + 4 + ABILITY_WIDTH * 3, ABILITY_START_Y + 3],
 };
 
 const ABILITY_COORDINATES_MOBILE = {
@@ -30,65 +39,92 @@ export default class Avatar extends Phaser.GameObjects.Group {
 		this.setDepth(UiDepths.UI_MAIN_LAYER);
 
 		// tslint:disable: no-magic-numbers
-		const heroIcon = scene.add.image(32, 40, 'icon-hero');
+		const heroIcon = scene.add.image(
+			SCREEN_OFFSET_X * UI_SCALE,
+			SCREEN_OFFSET_Y * UI_SCALE,
+			'icon-hero'
+		);
 		heroIcon.setScrollFactor(0);
+		heroIcon.setScale(UI_SCALE);
 		heroIcon.setDepth(UiDepths.UI_MAIN_LAYER);
+		heroIcon.setOrigin(0);
 
-		const guiBaseIcon = scene.add.image(116, 50, 'icon-healthbar-background');
+		const guiBaseIcon = scene.add.image(
+			HEALTH_BAR_START_X * UI_SCALE,
+			HEALTH_BAR_START_Y * UI_SCALE,
+			'icon-healthbar-background'
+		);
 		guiBaseIcon.setScrollFactor(0);
+		guiBaseIcon.setScale(UI_SCALE);
 		guiBaseIcon.setDepth(UiDepths.UI_MAIN_LAYER);
+		guiBaseIcon.setOrigin(0);
 
 		let abilityBackground: Phaser.GameObjects.Image;
 		if (scene.isMobile) {
-			abilityBackground = scene.add.image(32, 194, 'ability-background-mobile');
+			abilityBackground = scene.add.image(
+				32 * UI_SCALE,
+				194 * UI_SCALE,
+				'ability-background-mobile'
+			);
 		} else {
-			abilityBackground = scene.add.image(116, 62, 'ability-background-desktop');
+			abilityBackground = scene.add.image(
+				ABILITY_START_X * UI_SCALE,
+				ABILITY_START_Y * UI_SCALE,
+				'ability-background-desktop'
+			);
 		}
 		abilityBackground.setScrollFactor(0);
+		abilityBackground.setOrigin(0);
+		abilityBackground.setScale(UI_SCALE);
 		abilityBackground.setDepth(UiDepths.UI_MAIN_LAYER);
 
-		this.healthBar = scene.add.image(62, 35, 'icon-healthbar');
+		this.healthBar = scene.add.image(
+			(HEALTH_BAR_START_X + 4) * UI_SCALE,
+			(HEALTH_BAR_START_Y + 4) * UI_SCALE,
+			'icon-healthbar'
+		);
 		this.healthBar.setScrollFactor(0);
-		this.healthBar.setOrigin(0, 0.5);
+		this.healthBar.setScale(UI_SCALE);
+		this.healthBar.setOrigin(0);
 		this.healthBar.setDepth(UiDepths.UI_MAIN_LAYER);
 		this.abilityIcons = new Map();
 	}
 
 	update([cooldown1, cooldown2, cooldown3, cooldown4]: number[]) {
 		const healthRatio = globalState.playerCharacter.health / globalState.playerCharacter.maxHealth;
-		this.healthBar.scaleX = Math.max(0, healthRatio * HEALTH_BAR_WIDTH);
+		this.healthBar.scaleX = Math.max(0, healthRatio * HEALTH_BAR_WIDTH * UI_SCALE);
 
-		if(this.abilityIcons.has(AbilityKey.ONE)) {
+		if (this.abilityIcons.has(AbilityKey.ONE)) {
 			this.abilityIcons.get(AbilityKey.ONE)!.setAlpha(cooldown1);
 		}
-		if(this.abilityIcons.has(AbilityKey.TWO)) {
+		if (this.abilityIcons.has(AbilityKey.TWO)) {
 			this.abilityIcons.get(AbilityKey.TWO)!.setAlpha(cooldown2);
 		}
-		if(this.abilityIcons.has(AbilityKey.THREE)) {
+		if (this.abilityIcons.has(AbilityKey.THREE)) {
 			this.abilityIcons.get(AbilityKey.THREE)!.setAlpha(cooldown3);
 		}
-		if(this.abilityIcons.has(AbilityKey.FOUR)) {
+		if (this.abilityIcons.has(AbilityKey.FOUR)) {
 			this.abilityIcons.get(AbilityKey.FOUR)!.setAlpha(cooldown4);
 		}
 	}
 
 	updateAbility(abilityKey: AbilityKey, ability: AbilityType) {
-		if(this.abilityIcons.has(abilityKey)) {
+		if (this.abilityIcons.has(abilityKey)) {
 			this.abilityIcons.get(abilityKey)!.destroy(true);
 			this.abilityIcons.delete(abilityKey);
 		}
 		if (ability !== AbilityType.NOTHING) {
-			const mainScene = (this.scene as MainScene);
-			const coordinate = mainScene.isMobile ?
-				ABILITY_COORDINATES_MOBILE[abilityKey] :
-				ABILITY_COORDINATES_DESKTOP[abilityKey];
+			const mainScene = this.scene as MainScene;
+			const coordinate = mainScene.isMobile
+				? ABILITY_COORDINATES_MOBILE[abilityKey]
+				: ABILITY_COORDINATES_DESKTOP[abilityKey];
 			const abilityIcon = this.scene.add.image(
-				coordinate[0],
-				coordinate[1],
-				Abilities[ability].icon![0], Abilities[ability].icon![1]
+				coordinate[0] * UI_SCALE,
+				coordinate[1] * UI_SCALE,
+				Abilities[ability].icon![0],
+				Abilities[ability].icon![1]
 			);
 			if (mainScene.isMobile) {
-				abilityIcon.setScale(2);
 				const hitArea = new Phaser.Geom.Circle(10, 10, 14);
 				abilityIcon.setInteractive(hitArea, Phaser.Geom.Circle.Contains);
 				abilityIcon.on('pointerdown', () => {
@@ -101,6 +137,8 @@ export default class Avatar extends Phaser.GameObjects.Group {
 				});
 			}
 			abilityIcon.setScrollFactor(0);
+			abilityIcon.setScale(UI_SCALE);
+			abilityIcon.setOrigin(0);
 			abilityIcon.setDepth(UiDepths.UI_MAIN_LAYER);
 			this.abilityIcons.set(abilityKey, abilityIcon);
 		}

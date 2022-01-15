@@ -1,5 +1,5 @@
 import { NpcScript } from '../../../../typings/custom';
-import { Faction, VISITED_TILE_TINT } from '../../helpers/constants';
+import { Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -27,9 +27,10 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	iceEffectStacks: number;
 
 	constructor(scene: MainScene, x: number, y: number, tileName: string, type: string, id: string) {
-		super(scene, x, y, tileName);
+		super(scene, x * SCALE, y * SCALE, tileName);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
+		this.setScale(SCALE);
 		this.type = type;
 		this.id = id;
 		this.lastMovedTimestamp = -Infinity;
@@ -41,10 +42,10 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 
 	public onCollide(withEnemy: boolean) {}
 
-	public receiveHit(damage: number){
+	public receiveHit(damage: number) {
 		this.stateObject.health -= damage;
 	}
-	public receiveStun(duration: number){
+	public receiveStun(duration: number) {
 		const time = globalState.gameTime;
 		if (this.stateObject.stunnedAt + this.stateObject.stunDuration > time) {
 			return false;
@@ -55,9 +56,9 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		return true;
 	}
 
-	public getDistance(px: number, py: number) {
-		const x = this.x - px;
-		const y = this.y - py;
+	public getDistanceToWorldStatePosition(px: number, py: number) {
+		const x = this.x - px * SCALE;
+		const y = this.y - py * SCALE;
 		return Math.hypot(x, y);
 	}
 

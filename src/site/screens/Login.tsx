@@ -5,30 +5,29 @@ import { ButtonContainer, SiteHeader } from './StartScreen';
 import styled from 'styled-components';
 
 interface Props {
-  auth: () => void;
+	auth: () => void;
 }
 
 export const Login: React.FC<Props> = ({ auth }) => {
-  
-  return(
-    <CenteredContainer>
-      <SiteHeader>Project <br/> Endless Dungeon</SiteHeader>
-      <ButtonContainer>
-        <StyledButton onClick={auth} >
-          Login
-        </StyledButton>
-      </ButtonContainer>
-    </CenteredContainer>
-  );
+	return (
+		<CenteredContainer>
+			<SiteHeader>
+				Project <br /> Endless Dungeon
+			</SiteHeader>
+			<ButtonContainer>
+				<StyledButton onClick={auth}>Login</StyledButton>
+			</ButtonContainer>
+		</CenteredContainer>
+	);
 };
 
 const StyledButton = styled.button`
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 3rem;
-  padding: 6px 24px;
+	padding: 6px 24px;
 	cursor: pointer;
 	color: white;
-  background-color: black;
+	background-color: black;
 	border-style: solid;
 	border-radius: 0.5rem;
 	border-color: white;

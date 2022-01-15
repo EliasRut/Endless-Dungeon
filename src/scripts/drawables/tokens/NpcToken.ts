@@ -1,5 +1,5 @@
 import { NpcOptions } from '../../../../typings/custom';
-import { Faction, UiDepths } from '../../helpers/constants';
+import { Faction, SCALE, UiDepths } from '../../helpers/constants';
 import globalState from '../../worldstate';
 import Character from '../../worldstate/Character';
 import CharacterToken from './CharacterToken';
@@ -45,20 +45,21 @@ export default class NpcToken extends CharacterToken {
 	update(globalTime: number, deltaTime: number) {
 		super.update(globalTime, deltaTime);
 		if (this.questGiverId && hasAnyOpenQuests(this.questGiverId)) {
-			const yOffset = Math.abs(500 - (globalTime % 1000)) / 125;
+			const yOffset = (Math.abs(500 - (globalTime % 1000)) / 125) * SCALE;
 			if (!this.openQuestSymbol) {
 				this.openQuestSymbol = this.scene.add.image(
-					this.body.x + 10,
-					this.body.y - 12 - yOffset,
+					this.body.x + 8 * SCALE,
+					this.body.y - (14 - yOffset) * SCALE,
 					'quest'
 				);
 				this.openQuestSymbol.setDepth(UiDepths.TOKEN_FOREGROUND_LAYER);
+				this.openQuestSymbol.setScale(SCALE);
 			} else {
-				this.openQuestSymbol.x = this.body.x + 10;
-				this.openQuestSymbol.y = this.body.y - 12 - yOffset;
+				this.openQuestSymbol.x = this.body.x + 8 * SCALE;
+				this.openQuestSymbol.y = this.body.y - (14 - yOffset) * SCALE;
 			}
 			const player = globalState.playerCharacter;
-			if (this.getDistance(player.x, player.y) < 60) {
+			if (this.getDistanceToWorldStatePosition(player.x, player.y) < 60 * SCALE) {
 				const mainScene = this.scene as MainScene;
 				if (!mainScene.scriptHelper.isScriptRunning()) {
 					const nextQuestId = getNextQuestId(this.questGiverId);

@@ -1,17 +1,27 @@
-import { UiDepths } from '../helpers/constants';
+import { UiDepths, UI_SCALE } from '../helpers/constants';
 import OverlayScreen from './OverlayScreen';
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { ItemData } from '../../items/itemData';
 import { EquippedItemData } from '../worldstate/Inventory';
 import { Enchantment } from '../../items/enchantmentData';
+import { STAT_SCREEN_RIGHT_BORDER } from './StatScreen';
+import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
 
-const BASE_SIZE_NAME = 25;
+const BASE_SIZE_NAME = 20;
 
-const SCREEN_X = 250;
-const SCREEN_Y = 95;
+const SCREEN_Y = 24;
 const SCREEN_WIDTH = 200;
+const SCREEN_HEIGHT = 280;
 const FLAVOR_HEIGHT = 150;
+
+const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
+
+const AVAILABLE_WINDOW_WIDTH =
+	SCALED_WINDOW_WIDTH - STAT_SCREEN_RIGHT_BORDER - MENU_ICON_LEFT_BORDER;
+
+const SCREEN_X = STAT_SCREEN_RIGHT_BORDER + AVAILABLE_WINDOW_WIDTH / 2 - SCREEN_WIDTH - 10;
+
 export default class ItemScreen extends OverlayScreen {
 	itemName: Phaser.GameObjects.Text;
 	lableLevel: Phaser.GameObjects.Text;
@@ -22,94 +32,112 @@ export default class ItemScreen extends OverlayScreen {
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
-		super(scene, SCREEN_X, SCREEN_Y, SCREEN_WIDTH, 280);
+		super(
+			scene,
+			SCREEN_X * UI_SCALE,
+			SCREEN_Y * UI_SCALE,
+			SCREEN_WIDTH * UI_SCALE,
+			SCREEN_HEIGHT * UI_SCALE
+		);
 
-		this.itemName = new Phaser.GameObjects.Text(scene, SCREEN_X - 15, SCREEN_Y - 15, '', {
-			color: 'purple',
-			wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
-		});
-		let textHeight = 100;
-		let textWidth = SCREEN_WIDTH;
-		let variableSize = BASE_SIZE_NAME;
-		while (textHeight > 40 || textWidth > SCREEN_WIDTH - 40) {
-			this.itemName.setFontSize(variableSize);
-			textHeight = this.itemName.getBounds().height;
-			textWidth = this.itemName.getBounds().width;
-			variableSize--;
-		}
+		this.itemName = new Phaser.GameObjects.Text(
+			scene,
+			(SCREEN_X + 16) * UI_SCALE,
+			(SCREEN_Y + 12) * UI_SCALE,
+			'',
+			{
+				color: 'white',
+				fontFamily: 'endlessDungeon',
+				wordWrap: { width: (SCREEN_WIDTH - 40) * UI_SCALE, useAdvancedWrap: true },
+				fontSize: `${BASE_SIZE_NAME * UI_SCALE}pt`,
+			}
+		);
+		// let textHeight = 100;
+		// let textWidth = SCREEN_WIDTH;
+		// let variableSize = BASE_SIZE_NAME;
+		// while (textHeight > 40 || textWidth > SCREEN_WIDTH - 40) {
+		// 	this.itemName.setFontSize(variableSize * UI_SCALE);
+		// 	textHeight = this.itemName.getBounds().height;
+		// 	textWidth = this.itemName.getBounds().width;
+		// 	variableSize--;
+		// }
 		this.itemName.setOrigin(0);
 		this.itemName.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.itemName.setScrollFactor(0);
+		this.itemName.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(this.itemName, true);
 
-		this.flavorText = new Phaser.GameObjects.Text(scene, SCREEN_X - 15, SCREEN_Y + 28, '', {
-			fontSize: '12px',
-			color: '#333',
-			wordWrap: { width: SCREEN_WIDTH - 30, useAdvancedWrap: true },
-		});
-		this.flavorText.setOrigin(0, 0);
+		this.flavorText = new Phaser.GameObjects.Text(
+			scene,
+			(SCREEN_X + 16) * UI_SCALE,
+			(SCREEN_Y + 48) * UI_SCALE,
+			'',
+			{
+				fontSize: `${12 * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+				color: 'white',
+				wordWrap: { width: (SCREEN_WIDTH - 40) * UI_SCALE, useAdvancedWrap: true },
+			}
+		);
+		this.flavorText.setShadow(0, 1 * UI_SCALE, 'black');
+		this.flavorText.setOrigin(0);
 		this.flavorText.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.flavorText.setScrollFactor(0);
 		this.add(this.flavorText, true);
 
-		this.lableEnchantment = new Phaser.GameObjects.Text(scene, SCREEN_X - 15, SCREEN_Y + 120, '', {
-			fontSize: '12px',
-			color: 'purple',
-			wordWrap: { width: SCREEN_WIDTH - 30, useAdvancedWrap: true },
-		});
+		this.lableEnchantment = new Phaser.GameObjects.Text(
+			scene,
+			(SCREEN_X + 16) * UI_SCALE,
+			(SCREEN_Y + 120) * UI_SCALE,
+			'',
+			{
+				fontSize: `${12 * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+				color: '#ffae00',
+				wordWrap: { width: (SCREEN_WIDTH - 40) * UI_SCALE, useAdvancedWrap: true },
+			}
+		);
 		this.lableEnchantmentValue = new Phaser.GameObjects.Text(
 			scene,
-			SCREEN_X - 15,
-			SCREEN_Y + 148,
+			(SCREEN_X + 16) * UI_SCALE,
+			(SCREEN_Y + 156) * UI_SCALE,
 			``,
 			{
-				fontSize: '12px',
-				color: '#333',
-				wordWrap: { width: SCREEN_WIDTH - 30, useAdvancedWrap: true },
+				color: 'white',
+				wordWrap: { width: (SCREEN_WIDTH - 40) * UI_SCALE, useAdvancedWrap: true },
+				fontSize: `${12 * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
 			}
 		);
 		this.lableEnchantment.setOrigin(0, 0);
 		this.lableEnchantment.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.lableEnchantment.setScrollFactor(0);
+		this.lableEnchantment.setShadow(0, 1 * UI_SCALE, 'black');
 		this.lableEnchantmentValue.setOrigin(0, 0);
 		this.lableEnchantmentValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.lableEnchantmentValue.setScrollFactor(0);
+		this.lableEnchantmentValue.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(this.lableEnchantment, true);
 		this.add(this.lableEnchantmentValue, true);
 
-		this.lableLevel = new Phaser.GameObjects.Text(scene, SCREEN_X - 15, SCREEN_Y + 216, 'Level', {
-			fontSize: '12px',
-			color: 'black',
-			align: 'right',
-			fixedWidth: SCREEN_WIDTH - 36,
-		});
-		this.lableLevel.setOrigin(0, 0);
+		this.lableLevel = new Phaser.GameObjects.Text(
+			scene,
+			(SCREEN_X + 16) * UI_SCALE,
+			(SCREEN_Y + SCREEN_HEIGHT - 30) * UI_SCALE,
+			'Level',
+			{
+				color: 'white',
+				fontSize: `${12 * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+				align: 'right',
+				fixedWidth: (SCREEN_WIDTH - 36) * UI_SCALE,
+			}
+		);
+		this.lableLevel.setOrigin(0);
 		this.lableLevel.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.lableLevel.setScrollFactor(0);
+		this.lableLevel.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(this.lableLevel, true);
-
-		// const lableMovSpeed = new Phaser.GameObjects.BitmapText(
-		// 	scene,
-		// 	SCREEN_X - 10,
-		// 	SCREEN_Y + 66,
-		// 	'pixelfont',
-		// 	'Speed',
-		// 	FONT_SIZE_TEXT
-		// );
-		// this.lableMovSpeedValue = new Phaser.GameObjects.BitmapText(
-		// 	scene,
-		// 	SCREEN_X + 74,
-		// 	SCREEN_Y + 66,
-		// 	'pixelfont',
-		// 	``,
-		// 	FONT_SIZE_TEXT
-		// );
-		// lableMovSpeed.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		// lableMovSpeed.setScrollFactor(0);
-		// this.lableMovSpeedValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		// this.lableMovSpeedValue.setScrollFactor(0);
-		// this.add(lableMovSpeed, true);
-		// this.add(this.lableMovSpeedValue, true);
 
 		scene.add.existing(this);
 		this.setVisible(false);
@@ -142,15 +170,6 @@ export default class ItemScreen extends OverlayScreen {
 
 			// update item name
 			this.itemName.setText(`${itemData.name}`);
-			let textHeight = 100;
-			let textWidth = SCREEN_WIDTH;
-			let variableSize = BASE_SIZE_NAME;
-			while (textHeight > 40 || textWidth > SCREEN_WIDTH - 40) {
-				this.itemName.setFontSize(variableSize);
-				textHeight = this.itemName.getBounds().height;
-				textWidth = this.itemName.getBounds().width;
-				variableSize--;
-			}
 		} else {
 			this.lableLevel.setText(``);
 			this.lableEnchantment.setText(``);

@@ -283,7 +283,7 @@ export default class ScriptHelper {
 						globalState.scripts.scriptStep = undefined;
 						return;
 					}
-				} else if (currentStep.conditionType === 'scriptState') {
+				} else if (currentStep.scriptId) {
 					const scriptId = `${globalState.currentLevel}_${this.currentRoom!.roomName}_${
 						currentStep.scriptId
 					}`;

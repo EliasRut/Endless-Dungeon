@@ -78,7 +78,8 @@ export interface ScriptPausedCondition {
 
 export interface ScriptDialog {
 	type: 'dialog';
-	portrait: string;
+	speaker: string;
+	portrait?: string;
 	text: string[];
 }
 
