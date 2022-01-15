@@ -1,4 +1,4 @@
-import { Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
+import { facingToSpriteNameMap, Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
 import FireBallEffect from '../effects/FireBallEffect';
@@ -76,6 +76,13 @@ export default abstract class EnemyToken extends CharacterToken {
 		return null;
 	}
 
+	public receiveHit(damage: number){
+		super.receiveHit(damage);
+		if(super.receiveStun(250)) {
+			this.play({key: `player-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`});
+		}
+	}
+	
 	protected receiveDotDamage(deltaTime: number) {
 		// dot = damage over time, deltatime is in ms so we have to devide it by 1000
 		const dot =

@@ -7,8 +7,9 @@ import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import { Facings, Faction, PossibleTargets, SCALE } from './constants';
-import { getFacing8Dir, getRotationInRadiansForFacing } from './movement';
+import { getFacing4Dir, getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
+import Enemy from '../worldstate/Enemy';
 
 export default class AbilityHelper {
 	scene: MainScene;
@@ -45,14 +46,18 @@ export default class AbilityHelper {
 				currentSpread = spread[0] + spreadDistance * (projectileIndex / (numProjectiles - 1 || 1));
 			}
 			// We want to combine the arc position with the characters facing to allow cone-like effects
-			const yMultiplier = -Math.cos(currentSpread * Math.PI + facingRotation);
-			const xMultiplier = Math.sin(currentSpread * Math.PI + facingRotation);
+			let yMultiplier = -Math.cos(currentSpread * Math.PI + facingRotation);
+			let xMultiplier = Math.sin(currentSpread * Math.PI + facingRotation);
+			if (caster.faction === Faction.ENEMIES) {
+				xMultiplier = (caster as Enemy).exactTargetXFactor;
+				yMultiplier = (caster as Enemy).exactTargetYFactor;
+			}
 			const effect = new projectileData!.effect(
 				this.scene,
 				pointOfOrigin.x + xMultiplier * projectileData!.xOffset * SCALE,
 				pointOfOrigin.y + yMultiplier * projectileData!.yOffset * SCALE,
 				Abilities[type].spriteName || '',
-				getFacing8Dir(xMultiplier, yMultiplier),
+				getFacing4Dir(xMultiplier, yMultiplier),
 				projectileData
 			);
 			if (projectileData?.targeting) {
@@ -120,7 +125,7 @@ export default class AbilityHelper {
 						);
 					}
 				}
-				enemy.stateObject.health = newEnemyHealth;
+				//enemy.stateObject.health = newEnemyHealth;
 				enemy.receiveHit(caster.damage * Abilities[type].damageMultiplier);
 
 				if (Abilities[type].stun) {

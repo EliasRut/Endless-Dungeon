@@ -2,8 +2,7 @@ import {
 	spriteDirectionList,
 	NUM_DIRECTIONS,
 	npcTypeToFileMap,
-	FacingRange,
-	characterToSubAnimationFileMap,
+	FacingRange,	
 	essenceNames,
 	ColorsOfMagic,
 	activeMode,
@@ -62,6 +61,8 @@ export default class PreloadScene extends Phaser.Scene {
 
 		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');		
 		this.load.aseprite('rich', 'assets/sprites/rich.png', 'assets/sprites/rich.json');
+		this.load.aseprite('jacques', 'assets/sprites/jacques.png', 'assets/sprites/jacques.json');
+		this.load.aseprite('pierre', 'assets/sprites/pierre.png', 'assets/sprites/pierre.json');
 
 		// Overlay screens
 		this.load.spritesheet('screen-background', 'assets/img/screen-background.png', {
@@ -194,12 +195,6 @@ export default class PreloadScene extends Phaser.Scene {
 				facingRange: npcTypeToFileMap[npc]?.facing || FacingRange.ONLY_NESW,
 			});
 		});
-
-		this.load.aseprite(
-			'Pierre',
-			'assets/sprites/Vampire-shoot.png',
-			'assets/sprites/Vampire-shoot.json'
-		);
 	}
 
 	create() {
@@ -218,6 +213,8 @@ export default class PreloadScene extends Phaser.Scene {
 		// Create character animations
 		this.anims.createFromAseprite('player');
 		this.anims.createFromAseprite('rich');
+		this.anims.createFromAseprite('jacques');
+		this.anims.createFromAseprite('pierre');
 		for (let directionIndex = 0; directionIndex < NUM_DIRECTIONS; directionIndex++) {
 			const numIdleFrames = 4;
 			const numWalkFrames = 8;
@@ -248,29 +245,29 @@ export default class PreloadScene extends Phaser.Scene {
 						frameRate: 12,
 						repeat: -1,
 					});
-					const subAnimationNames = Object.keys(characterToSubAnimationFileMap[token.name] || {});
-					const directionFrameMultiplier = Math.floor(directionIndex / token.facingRange);
-					subAnimationNames.forEach((subAnimation) => {
-						const attackData = characterToSubAnimationFileMap[token.name][subAnimation];
-						const startFrame =
-							directionFrameMultiplier * attackData.framesPerDirection +
-							(attackData.frameOffset || 0);
+					// const subAnimationNames = Object.keys(characterToSubAnimationFileMap[token.name] || {});
+					// const directionFrameMultiplier = Math.floor(directionIndex / token.facingRange);
+					// subAnimationNames.forEach((subAnimation) => {
+					// 	const attackData = characterToSubAnimationFileMap[token.name][subAnimation];
+					// 	const startFrame =
+					// 		directionFrameMultiplier * attackData.framesPerDirection +
+					// 		(attackData.frameOffset || 0);
 
-						this.anims.create({
-							key: `${token.name}-${subAnimation}-${directionName}`,
-							frames: this.anims.generateFrameNumbers(`${token.name}-${subAnimation}`, {
-								start: startFrame,
-								end:
-									startFrame +
-									(attackData.animationFrames
-										? attackData.animationFrames
-										: attackData.framesPerDirection) -
-									1,
-							}),
-							// frameRate: 16,
-							repeat: 0,
-						});
-					});
+					// 	this.anims.create({
+					// 		key: `${token.name}-${subAnimation}-${directionName}`,
+					// 		frames: this.anims.generateFrameNumbers(`${token.name}-${subAnimation}`, {
+					// 			start: startFrame,
+					// 			end:
+					// 				startFrame +
+					// 				(attackData.animationFrames
+					// 					? attackData.animationFrames
+					// 					: attackData.framesPerDirection) -
+					// 				1,
+					// 		}),
+					// 		// frameRate: 16,
+					// 		repeat: 0,
+					// 	});
+					// });
 				}
 			});
 		}

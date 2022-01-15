@@ -49,7 +49,7 @@ interface MultiLevelLayout {
 
 type LevelHistory = MultiLevelLayout[];
 
-const npcKeys = ['hilda-base', 'vanya-base', 'agnes', 'erwin', 'rich', 'enemy-vampire'];
+const npcKeys = ['hilda-base', 'vanya-base', 'agnes', 'erwin', 'rich', 'jacques', 'pierre'];
 
 export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;

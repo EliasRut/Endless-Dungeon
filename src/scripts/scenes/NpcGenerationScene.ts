@@ -1,7 +1,6 @@
 import { NpcData } from '../../../typings/custom';
 import {
 	FacingRange,
-	characterToSubAnimationFileMap,
 	npcTypeToFileMap,
 	NUM_DIRECTIONS,
 	spriteDirectionList,
@@ -28,9 +27,7 @@ export default class NpcGenerationScene extends Phaser.Scene {
 
 	preload() {
 		this.npcForGeneration = [];
-		const requiredNpcs = new Set<string>();
-		//requiredNpcs.add('rich');
-		requiredNpcs.add('enemy-vampire');
+		const requiredNpcs = new Set<string>();		
 		requiredNpcs.add('vanya-base');
 		requiredNpcs.add('agnes');
 		requiredNpcs.add('erwin');
@@ -54,14 +51,14 @@ export default class NpcGenerationScene extends Phaser.Scene {
 		requiredNpcs.forEach((npc) => {
 			if (npcTypeToFileMap[npc]) {
 				this.load.spritesheet(npc, npcTypeToFileMap[npc].file, { frameWidth: 40, frameHeight: 40 });
-				const attackNames = Object.keys(characterToSubAnimationFileMap[npc] || {});
-				attackNames.forEach((attackName) => {
-					this.load.spritesheet(
-						`${npc}-${attackName}`,
-						characterToSubAnimationFileMap[npc][attackName].file,
-						{ frameWidth: 40, frameHeight: 40 }
-					);
-				});
+				// const attackNames = Object.keys(characterToSubAnimationFileMap[npc] || {});
+				// attackNames.forEach((attackName) => {
+				// 	this.load.spritesheet(
+				// 		`${npc}-${attackName}`,
+				// 		characterToSubAnimationFileMap[npc][attackName].file,
+				// 		{ frameWidth: 40, frameHeight: 40 }
+				// 	);
+				// });
 			} else {
 				if (!this.textures.exists(npc)) {
 					this.npcForGeneration.push(npc);

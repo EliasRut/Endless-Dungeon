@@ -1,10 +1,11 @@
-import { facingToSpriteNameMap, KNOCKBACK_TIME } from '../../helpers/constants';
+import { Facings, facingToSpriteNameMap, KNOCKBACK_TIME } from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 import { AbilityType } from '../../abilities/abilityData';
+import Enemy from '../../worldstate/Enemy';
 
 const BASE_ATTACK_DAMAGE = 10;
 const REGULAR_ATTACK_RANGE = 75;
@@ -15,12 +16,13 @@ const BASE_HEALTH = 4;
 const ITEM_DROP_CHANCE = 0.65;
 const HEALTH_DROP_CHANCE = 0.06;
 
-const CHARGE_TIME = 1500;
-const ATTACK_DURATION = 3000;
+const CHARGE_TIME = 1000;
+const ATTACK_DURATION = 2000;
 export default class PierreToken extends EnemyToken {
 	attacking: boolean;
 	chargeTime: number = CHARGE_TIME;
-	startingHealth: number;			
+	startingHealth: number;	
+	launched: boolean = false;	
 
 	constructor(
 		scene: MainScene,
@@ -77,7 +79,7 @@ export default class PierreToken extends EnemyToken {
 			const px = globalState.playerCharacter.x;
 			const py = globalState.playerCharacter.y;
 			if (this.aggro) {
-				if (px !== tx || py !== ty || this.attackRange < this.getDistance(tx, ty)) {
+				if (px !== tx || py !== ty || this.attackRange < this.getDistanceToWorldStatePosition(tx, ty)) {
 					const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
 					const xSpeed =
 						((tx - this.x) / totalDistance) *
@@ -112,6 +114,7 @@ export default class PierreToken extends EnemyToken {
 		} else {
 			if (this.attackedAt + this.stateObject.attackTime < time) {
 				this.attacking = false;
+				this.launched = false;
 			} else this.attack(time);
 		}
 		this.stateObject.x = this.body.x;
@@ -128,6 +131,13 @@ export default class PierreToken extends EnemyToken {
 	// FRAME RATE: 16
 	attack(time: number) {
 		if (!this.attacking) {
+			const tx = this.target.x;
+			const ty = this.target.y;
+			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
+			const xFactor = (tx - this.x) / totalDistance;
+			const yFactor = (ty - this.y) / totalDistance;
+			(this.stateObject as Enemy).exactTargetXFactor = xFactor;
+			(this.stateObject as Enemy).exactTargetYFactor = yFactor;
 			this.attackedAt = time;
 			this.attacking = true;			
 			this.setVelocityX(0);
@@ -138,12 +148,18 @@ export default class PierreToken extends EnemyToken {
 			const ty = this.target.y;
 			const xSpeed = tx - this.x;
 			const ySpeed = ty - this.y;
-			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const attackAnimationName = `enemy-vampire-prepare-${facingToSpriteNameMap[newFacing]}`;
+			const newFacing = getFacing4Dir(xSpeed, ySpeed);			
 			// 9 frames, so 9 frame rate for 1s.
-			const frame = Math.round(((time - this.attackedAt) / this.chargeTime) * 8);
-			this.play({ key: attackAnimationName, startFrame: frame });
-		} else {
+			if (this.attackedAt === time || this.stateObject.currentFacing !== newFacing) {
+				const attackAnimationName = `pierre-throw-${facingToSpriteNameMap[newFacing]}`;
+				this.play({ key: attackAnimationName , frameRate: 8});
+				this.anims.setProgress(((time - this.attackedAt) / this.chargeTime));
+				this.stateObject.currentFacing = newFacing;
+			}
+		} else if (!this.launched) {
+			this.launched = true;
+			this.setVelocityX(0);
+			this.setVelocityY(0);			
 			this.scene.abilityHelper.triggerAbility(
 				this.stateObject,
 				this.stateObject,

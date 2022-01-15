@@ -1,4 +1,4 @@
-import { facingToSpriteNameMap, KNOCKBACK_TIME } from '../../helpers/constants';
+import { Facings, facingToSpriteNameMap, KNOCKBACK_TIME } from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -14,8 +14,8 @@ const BASE_HEALTH = 4;
 const ITEM_DROP_CHANCE = 0.65;
 const HEALTH_DROP_CHANCE = 0.06;
 
-const CHARGE_TIME = 1500;
-const ATTACK_DURATION = 3000;
+const CHARGE_TIME = 650;
+const ATTACK_DURATION = 2500;
 const WALL_COLLISION_STUN = 2000;
 const PLAYER_STUN = 800;
 const COLLISION_STUN = 1000;
@@ -27,7 +27,7 @@ export default class VampireToken extends EnemyToken {
 	launched: boolean = false;
 	damaged: boolean = false;
 	launchX: number;
-	launchY: number;
+	launchY: number;	
 
 	constructor(
 		scene: MainScene,
@@ -155,11 +155,14 @@ export default class VampireToken extends EnemyToken {
 			const ty = this.target.y;
 			const xSpeed = tx - this.x;
 			const ySpeed = ty - this.y;
-			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const attackAnimationName = `enemy-vampire-prepare-${facingToSpriteNameMap[newFacing]}`;
+			const newFacing = getFacing4Dir(xSpeed, ySpeed);			
 			// 9 frames, so 9 frame rate for 1s.
-			const frame = Math.round(((time - this.attackedAt) / this.chargeTime) * 8);
-			this.play({ key: attackAnimationName, frameRate: 10, startFrame: frame });
+			if (this.attackedAt === time || this.stateObject.currentFacing !== newFacing) {				
+				const attackAnimationName = `jacques-attack-${facingToSpriteNameMap[newFacing]}`;
+				this.play({ key: attackAnimationName, frameRate: 9});
+				this.anims.setProgress(((time - this.attackedAt) / this.chargeTime));
+				this.stateObject.currentFacing = newFacing;
+			}
 		} else if (this.attackedAt + this.chargeTime <= time && !this.launched) {
 			this.launched = true;
 			const tx = this.target.x;
@@ -169,8 +172,8 @@ export default class VampireToken extends EnemyToken {
 			const ySpeed = speeds[1] * LAUNCH_SPEED * this.stateObject.slowFactor;
 
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const attackAnimationName = `enemy-vampire-fly-${facingToSpriteNameMap[newFacing]}`;
-			this.play({ key: attackAnimationName, repeat: -1 });
+			const attackAnimationName = `jacques-attack-${facingToSpriteNameMap[newFacing]}`;
+			this.play({ key: attackAnimationName, startFrame: 8 });
 			this.launchX = xSpeed;
 			this.launchY = ySpeed;
 		}
@@ -193,13 +196,13 @@ export default class VampireToken extends EnemyToken {
 			const xSpeed = tx - this.x;
 			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const attackAnimationName = `enemy-vampire-stun-${facingToSpriteNameMap[newFacing]}`;
-			const attackAnimationRecover = `enemy-vampire-recover-${facingToSpriteNameMap[newFacing]}`;
+			const stunAnimation = `jacques-stun-${facingToSpriteNameMap[newFacing]}`;
+			const recoverAnimation = `jacques-shake-${facingToSpriteNameMap[newFacing]}`;
 			// 4 repeats per second, at currently 16 fps.
 			this.play({
-				key: attackAnimationName,
+				key: stunAnimation,
 				repeat: Math.floor((4 * (stunDuration - 500)) / 1000),
-			}).chain({ key: attackAnimationRecover, repeat: 3 });
+			}).chain({ key: recoverAnimation, repeat: 3 });			
 		}
 	}
 }

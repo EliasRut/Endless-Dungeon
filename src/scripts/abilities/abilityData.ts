@@ -7,7 +7,7 @@ import HealingLightEffect from '../drawables/effects/HealingLightEffect';
 import ArcaneBoltEffect from '../drawables/effects/ArcaneBoltEffect';
 import ConeEffect from '../drawables/effects/ConeEffect';
 import NecroticBoltEffect from '../drawables/effects/NecroticBoltEffect';
-import GenericFlyingObject from '../drawables/effects/GenericFlyingObject';
+import BatEffect from '../drawables/effects/BatEffect';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -96,7 +96,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			explodeOnDestruction: true,
+			explodeOnDestruction: true			
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
@@ -557,10 +557,10 @@ export const Abilities: { [type: string]: AbilityData } = {
 	[AbilityType.BAT]: {
 		projectiles: 1,
 		projectileData: {
-			velocity: 400,
+			velocity: 100,
 			xOffset: 16,
 			yOffset: 16,
-			effect: GenericFlyingObject,
+			effect: BatEffect,
 			collisionSound: 'sound-icespike-hit',
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
@@ -570,10 +570,10 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
 		cooldownMs: 400,		
-		damageMultiplier: 0.8,		
+		damageMultiplier: 0.0,		
 		abilityName: 'Angry Bat',
 		flavorText: `An angry bat.`,
 		icon: ['icon-abilities', 1],
-		spriteName: 'bat',
+		spriteName: 'bat'
 	},
 };
