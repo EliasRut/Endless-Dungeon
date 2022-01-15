@@ -108,6 +108,7 @@ export default class AbilityHelper {
 					enemy.stateObject.health -
 					caster.damage * Abilities[type].damageMultiplier * abilityLevel;
 				if (enemy.stateObject.health > 0 && newEnemyHealth <= 0) {
+					console.log(`Enemy died`);
 					// Enemy died from this attack
 					if (Abilities[type].castOnEnemyDestroyed) {
 						this.triggerAbility(

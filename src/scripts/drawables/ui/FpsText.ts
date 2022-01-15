@@ -17,7 +17,8 @@ export default class FpsText extends Phaser.GameObjects.Text {
 	public update() {
 		const xPos = Math.round(globalState.playerCharacter.x / BLOCK_SIZE / TILE_WIDTH);
 		const yPos = Math.round(globalState.playerCharacter.y / BLOCK_SIZE / TILE_HEIGHT);
-		this.setText(`fps: ${Math.floor(this.scene.game.loop.actualFps)}. ` +
-			`Pos y${yPos}, x${xPos}.`);
+		this.setText(
+			`fps: ${Math.floor(this.scene.game.loop.actualFps)}. ` + `Pos y${yPos}, x${xPos}.`
+		);
 	}
 }

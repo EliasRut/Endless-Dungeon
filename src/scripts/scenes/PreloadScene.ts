@@ -188,6 +188,12 @@ export default class PreloadScene extends Phaser.Scene {
 				facingRange: npcTypeToFileMap[npc]?.facing || FacingRange.ONLY_NESW,
 			});
 		});
+
+		this.load.aseprite(
+			'Pierre',
+			'assets/sprites/Vampire-shoot.png',
+			'assets/sprites/Vampire-shoot.json'
+		);
 	}
 
 	create() {
@@ -200,6 +206,8 @@ export default class PreloadScene extends Phaser.Scene {
 			this.scene.start('MapEditor');
 			return;
 		}
+
+		console.log(this.anims.createFromAseprite('Pierre'));
 
 		// Create character animations
 		for (let directionIndex = 0; directionIndex < NUM_DIRECTIONS; directionIndex++) {
@@ -239,6 +247,7 @@ export default class PreloadScene extends Phaser.Scene {
 						const startFrame =
 							directionFrameMultiplier * attackData.framesPerDirection +
 							(attackData.frameOffset || 0);
+
 						this.anims.create({
 							key: `${token.name}-${subAnimation}-${directionName}`,
 							frames: this.anims.generateFrameNumbers(`${token.name}-${subAnimation}`, {
@@ -250,7 +259,7 @@ export default class PreloadScene extends Phaser.Scene {
 										: attackData.framesPerDirection) -
 									1,
 							}),
-							frameRate: 16,
+							// frameRate: 16,
 							repeat: 0,
 						});
 					});

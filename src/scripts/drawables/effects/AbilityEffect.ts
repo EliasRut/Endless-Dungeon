@@ -3,6 +3,7 @@ import { Facings, PossibleTargets } from '../../helpers/constants';
 import { isCollidingTile } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import CharacterToken from '../tokens/CharacterToken';
+import globalState from '../../worldstate/index';
 
 export default class AbilityEffect extends Phaser.Physics.Arcade.Sprite {
 	effectScale: number;
@@ -21,7 +22,7 @@ export default class AbilityEffect extends Phaser.Physics.Arcade.Sprite {
 		projectileData?: ProjectileData
 	) {
 		super(scene, x, y, spriteName);
-		this.castTime = scene.time.now;
+		this.castTime = globalState.gameTime;
 		this.explodeOnDestruction = !!projectileData?.explodeOnDestruction;
 		this.effectScale = projectileData?.effectScale || 1;
 

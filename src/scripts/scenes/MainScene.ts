@@ -277,6 +277,7 @@ export default class MainScene extends Phaser.Scene {
 			const facing = getFacing8Dir(facingX, facingY);
 			const animation = updateMovingState(globalState.npcs[id], false, facing, true);
 			if (animation) {
+				// npc.play({ key: 'DashR', repeat: -1 });
 				npc.play(animation);
 			}
 		}
@@ -499,16 +500,19 @@ export default class MainScene extends Phaser.Scene {
 			);
 			const newFacing = getFacing8Dir(xFacing, yFacing);
 
-			const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
+			// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
+			const hasMoved = xFacing !== 0 || yFacing !== 0;
 			let playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
 			if (this.wasStunned) {
 				playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing, true);
 				this.wasStunned = false;
 			}
-			const isWalking = this.mobilePadStick
-				? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
-				  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
-				: false;
+			const isWalking =
+				isCasting ||
+				(this.mobilePadStick
+					? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
+					  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
+					: false);
 			if (playerAnimation) {
 				this.mainCharacter.play({
 					key: playerAnimation,
@@ -527,11 +531,10 @@ export default class MainScene extends Phaser.Scene {
 				this.lastStepLeft = undefined;
 			}
 
-			let speed = isCasting ? 0 : getCharacterSpeed(globalState.playerCharacter);
-
-			if (isWalking) {
-				speed = speed / 2;
-			}
+			let speed =
+				isCasting || isWalking
+					? getCharacterSpeed(globalState.playerCharacter) / 2
+					: getCharacterSpeed(globalState.playerCharacter);
 
 			this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
 			this.mainCharacter.body.velocity.normalize().scale(speed);
