@@ -2,7 +2,7 @@ import 'phaser';
 import React, { useEffect, useRef } from 'react';
 import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import firebase from 'firebase';
 import { Dropdown } from '../components/Dropdown';
@@ -37,7 +37,7 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 						<ButtonWrapper>
 							<StyledButton id="createNewButton">Create New</StyledButton>
 						</ButtonWrapper>
-						<LoadRoomHeader>Load Room:</LoadRoomHeader>
+						<LoadRoomHeader>Load Room</LoadRoomHeader>
 						<Dropdown id="roomDropdown">
 							<option>Loading...</option>
 						</Dropdown>
@@ -184,17 +184,22 @@ const LoadRoomHeader = styled.div`
 	margin-top: 16px;
 `;
 
-const StyledLink = styled(Link)`
-	font-family: 'endlessDungeon';
-	font-size: 2rem;
-	padding: 6px 24px;
-	cursor: pointer;
-	text-decoration: none;
-	color: black;
-	background-color: white;
-	border-style: solid;
-	border-radius: 0.5rem;
-	margin: 0 24px;
+const StyledLink = styled(NavLink)`
+	& {
+		font-family: 'endlessDungeon';
+		font-size: 2rem;
+		padding: 6px 24px;
+		cursor: pointer;
+		text-decoration: none;
+		color: black;
+		background-color: #ffffff;
+		border-style: solid;
+		border-radius: 0.5rem;
+		margin: 0 24px;
+	}
+	&.active {
+		background-color: #a09f9f;
+	}
 `;
 
 const NavigationWrapper = styled.div`
@@ -213,12 +218,13 @@ const PageWrapper = styled.div`
 `;
 
 const MenueWrapper = styled.div`
+	width: 245px;
 	background-color: black;
 	color: white;
 	display: flex;
 	flex-direction: column;
 	font-family: 'endlessDungeon';
-	font-size: 1.2rem;
+	font-size: 2rem;
 	padding: 24px;
 	padding-top: 0;
 `;
@@ -228,10 +234,10 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled.button`
-	width: 148px;
+	width: 100%;
 	font-family: 'endlessDungeon';
-	font-size: 1rem;
-	padding: 8px;
+	font-size: 1.8rem;
+	/* padding: 8px; */
 `;
 
 const StyledRedButton = styled(StyledButton)`
@@ -256,9 +262,9 @@ const InputWrapper = styled.div`
 `;
 
 const Input = styled.input`
-	width: 140px;
+	width: 100%;
 	font-family: 'endlessDungeon';
-	font-size: 1rem;
+	font-size: 2rem;
 `;
 
 const ExportButtonWrapper = styled.div`
@@ -322,7 +328,7 @@ const ItemDetailsDialog = styled.div`
 const DialogTitle = styled.h2`
 	color: #fff;
 	font-family: 'endlessDungeon';
-	font-size: 1.2rem;
+	font-size: 2rem;
 	margin: 0;
 `;
 

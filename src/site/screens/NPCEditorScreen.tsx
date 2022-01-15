@@ -2,7 +2,7 @@ import 'phaser';
 import React, { useEffect, useRef } from 'react';
 import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import firebase from 'firebase';
 import { Input } from '../components/Input';
@@ -132,17 +132,22 @@ const NavigationWrapper = styled.div`
 	padding: 24px 0;
 `;
 
-const StyledLink = styled(Link)`
-	font-family: 'endlessDungeon';
-	font-size: 2rem;
-	padding: 6px 24px;
-	cursor: pointer;
-	text-decoration: none;
-	color: black;
-	background-color: white;
-	border-style: solid;
-	border-radius: 0.5rem;
-	margin: 0 24px;
+const StyledLink = styled(NavLink)`
+	& {
+		font-family: 'endlessDungeon';
+		font-size: 2rem;
+		padding: 6px 24px;
+		cursor: pointer;
+		text-decoration: none;
+		color: black;
+		background-color: #ffffff;
+		border-style: solid;
+		border-radius: 0.5rem;
+		margin: 0 24px;
+	}
+	&.active {
+		background-color: #a09f9f;
+	}
 `;
 
 const PageWrapper = styled.div`
@@ -153,13 +158,15 @@ const PageWrapper = styled.div`
 `;
 
 const MenueWrapper = styled.div`
+	width: 245px;
 	background-color: black;
 	color: white;
 	display: flex;
 	flex-direction: column;
 	font-family: 'endlessDungeon';
-	font-size: 1.2rem;
+	font-size: 2rem;
 	padding: 24px;
+	padding-top: 0;
 `;
 
 const ButtonWrapper = styled.div`
@@ -167,11 +174,11 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled.button`
-	width: 120px;
+	width: 100%;
 	font-family: 'endlessDungeon';
-	font-size: 1rem;
-	margin: 0 10px;
-	padding: 8px;
+	font-size: 1.8rem;
+	/* margin: 0 10px; */
+	/* padding: 8px; */
 `;
 
 const SelectionWrapper = styled.div`
@@ -202,7 +209,7 @@ const ColorManagerWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	font-family: 'endlessDungeon';
-	font-size: 1.2rem;
+	font-size: 1.5rem;
 	padding: 24px;
 `;
 

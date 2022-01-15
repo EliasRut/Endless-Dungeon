@@ -6,8 +6,8 @@ export const LargeTextArea = (props: any) => (
 );
 
 const FormattedTextArea = styled.textarea`
-	width: 352px;
-	height: 48px;
+	width: 100%;
+	box-sizing: border-box;
 	font-family: 'endlessDungeon';
-	font-size: 1rem;
+	font-size: 1.5rem;
 `;
