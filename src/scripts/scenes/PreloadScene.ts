@@ -2,7 +2,7 @@ import {
 	spriteDirectionList,
 	NUM_DIRECTIONS,
 	npcTypeToFileMap,
-	FacingRange,	
+	FacingRange,
 	essenceNames,
 	ColorsOfMagic,
 	activeMode,
@@ -23,7 +23,7 @@ export default class PreloadScene extends Phaser.Scene {
 	}
 
 	//neededAnimations = [{ name: 'player', facingRange: FacingRange.ALL_DIRECTIONS }];
-	neededAnimations = new Array<{name: string, facingRange: FacingRange}>();
+	neededAnimations = new Array<{ name: string; facingRange: FacingRange }>();
 
 	init() {
 		const text = new Phaser.GameObjects.Text(
@@ -59,7 +59,7 @@ export default class PreloadScene extends Phaser.Scene {
 		// 	frameHeight: 40,
 		// });
 
-		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');		
+		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');
 		this.load.aseprite('rich', 'assets/sprites/rich.png', 'assets/sprites/rich.json');
 		this.load.aseprite('jacques', 'assets/sprites/jacques.png', 'assets/sprites/jacques.json');
 		this.load.aseprite('pierre', 'assets/sprites/pierre.png', 'assets/sprites/pierre.json');
@@ -100,6 +100,10 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('icon-healthbar-background', 'assets/img/gui-healthbar.png');
 		this.load.image('ability-background-desktop', 'assets/img/ability-icon-background-desktop.png');
 		this.load.image('ability-background-mobile', 'assets/img/ability-icon-background-mobile.png');
+		this.load.image('gui-text-equipment', 'assets/img/gui-text-equipment.png');
+		this.load.image('gui-text-info', 'assets/img/gui-text-info.png');
+		this.load.image('gui-text-stats', 'assets/img/gui-text-stats.png');
+		this.load.image('ability-background-p', 'assets/img/ability-icon-background-p.png');
 		this.load.image('ability-background-1', 'assets/img/ability-icon-background-1.png');
 		this.load.image('ability-background-2', 'assets/img/ability-icon-background-2.png');
 		this.load.image('ability-background-3', 'assets/img/ability-icon-background-3.png');

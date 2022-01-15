@@ -20,24 +20,36 @@ export default class StatScreen extends OverlayScreen {
 		// tslint:disable: no-magic-numbers
 		super(scene, SCREEN_X * UI_SCALE, SCREEN_Y * UI_SCALE, SCREEN_WIDTH * UI_SCALE, 208 * UI_SCALE);
 
-		const header = new Phaser.GameObjects.Text(
+		const itemText = new Phaser.GameObjects.Image(
 			scene,
-			(SCREEN_X + 16) * UI_SCALE,
-			(SCREEN_Y + 8) * UI_SCALE,
-			'Statistics',
-			{
-				color: 'white',
-				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-				fontSize: `${FONT_SIZE_HEADER * UI_SCALE}pt`,
-				fontFamily: 'endlessDungeon',
-				resolution: window.devicePixelRatio,
-			}
+			(SCREEN_X + 14) * UI_SCALE,
+			(SCREEN_Y - 1) * UI_SCALE,
+			'gui-text-stats'
 		);
-		header.setOrigin(0);
-		header.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		header.setScrollFactor(0);
-		header.setShadow(0, 1 * UI_SCALE, 'black');
-		this.add(header, true);
+		itemText.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		itemText.setScrollFactor(0);
+		itemText.setOrigin(0);
+		itemText.setScale(UI_SCALE);
+		this.add(itemText, true);
+
+		// const header = new Phaser.GameObjects.Text(
+		// 	scene,
+		// 	(SCREEN_X + 16) * UI_SCALE,
+		// 	(SCREEN_Y + 8) * UI_SCALE,
+		// 	'Statistics',
+		// 	{
+		// 		color: 'white',
+		// 		// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
+		// 		fontSize: `${FONT_SIZE_HEADER * UI_SCALE}pt`,
+		// 		fontFamily: 'endlessDungeon',
+		// 		resolution: window.devicePixelRatio,
+		// 	}
+		// );
+		// header.setOrigin(0);
+		// header.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		// header.setScrollFactor(0);
+		// header.setShadow(0, 1 * UI_SCALE, 'black');
+		// this.add(header, true);
 
 		const currentHealth = Math.round(globalState.playerCharacter.health);
 		const maxHealth = Math.round(globalState.playerCharacter.maxHealth);
@@ -47,7 +59,7 @@ export default class StatScreen extends OverlayScreen {
 		const lableHealth = new Phaser.GameObjects.Text(
 			scene,
 			(SCREEN_X + 16) * UI_SCALE,
-			(SCREEN_Y + 32) * UI_SCALE,
+			(SCREEN_Y + 12) * UI_SCALE,
 			'Health',
 			{
 				color: 'white',
@@ -60,7 +72,7 @@ export default class StatScreen extends OverlayScreen {
 		this.lableHealthValue = new Phaser.GameObjects.Text(
 			scene,
 			(SCREEN_X + 74) * UI_SCALE,
-			(SCREEN_Y + 32) * UI_SCALE,
+			(SCREEN_Y + 12) * UI_SCALE,
 			`${currentHealth}/${maxHealth}`,
 			{
 				color: 'white',
@@ -82,7 +94,7 @@ export default class StatScreen extends OverlayScreen {
 		const lableDamage = new Phaser.GameObjects.Text(
 			scene,
 			(SCREEN_X + 16) * UI_SCALE,
-			(SCREEN_Y + 48) * UI_SCALE,
+			(SCREEN_Y + 28) * UI_SCALE,
 			'Damage',
 			{
 				color: 'white',
@@ -95,7 +107,7 @@ export default class StatScreen extends OverlayScreen {
 		this.lableDamageValue = new Phaser.GameObjects.Text(
 			scene,
 			(SCREEN_X + 74) * UI_SCALE,
-			(SCREEN_Y + 48) * UI_SCALE,
+			(SCREEN_Y + 28) * UI_SCALE,
 			`${currentDamage}`,
 			{
 				color: 'white',
@@ -117,7 +129,7 @@ export default class StatScreen extends OverlayScreen {
 		const lableMovSpeed = new Phaser.GameObjects.Text(
 			scene,
 			(SCREEN_X + 16) * UI_SCALE,
-			(SCREEN_Y + 66) * UI_SCALE,
+			(SCREEN_Y + 46) * UI_SCALE,
 			'Speed',
 			{
 				color: 'white',
@@ -131,7 +143,7 @@ export default class StatScreen extends OverlayScreen {
 			scene,
 			(SCREEN_X + 74) * UI_SCALE,
 
-			(SCREEN_Y + 66) * UI_SCALE,
+			(SCREEN_Y + 46) * UI_SCALE,
 			`${currentMovSpeed}`,
 			{
 				color: 'white',

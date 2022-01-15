@@ -40,6 +40,18 @@ export default class ItemScreen extends OverlayScreen {
 			SCREEN_HEIGHT * UI_SCALE
 		);
 
+		const itemText = new Phaser.GameObjects.Image(
+			scene,
+			(SCREEN_X + 14) * UI_SCALE,
+			(SCREEN_Y - 1) * UI_SCALE,
+			'gui-text-info'
+		);
+		itemText.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		itemText.setScrollFactor(0);
+		itemText.setOrigin(0);
+		itemText.setScale(UI_SCALE);
+		this.add(itemText, true);
+
 		this.itemName = new Phaser.GameObjects.Text(
 			scene,
 			(SCREEN_X + 16) * UI_SCALE,

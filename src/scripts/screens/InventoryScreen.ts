@@ -125,6 +125,19 @@ export default class InventoryScreen extends OverlayScreen {
 		inventoryField.setOrigin(0);
 		inventoryField.setScale(UI_SCALE);
 		this.add(inventoryField, true);
+
+		const equipmentText = new Phaser.GameObjects.Image(
+			scene,
+			(INVENTORY_START_X + 14) * UI_SCALE,
+			(INVENTORY_START_Y - 1) * UI_SCALE,
+			'gui-text-equipment'
+		);
+		equipmentText.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		equipmentText.setScrollFactor(0);
+		equipmentText.setOrigin(0);
+		equipmentText.setScale(UI_SCALE);
+		this.add(equipmentText, true);
+
 		// tslint:enable
 		this.inventorySelection = new Phaser.GameObjects.Image(
 			scene,
@@ -138,6 +151,12 @@ export default class InventoryScreen extends OverlayScreen {
 		this.add(this.inventorySelection, true);
 
 		const abilityIconBackgrounds = [
+			new Phaser.GameObjects.Image(
+				scene,
+				(INVENTORY_START_X + 12) * UI_SCALE,
+				(INVENTORY_START_Y + ABILITY_BACKGROUND_START - 28) * UI_SCALE,
+				'ability-background-p'
+			),
 			new Phaser.GameObjects.Image(
 				scene,
 				(INVENTORY_START_X + 12) * UI_SCALE,
