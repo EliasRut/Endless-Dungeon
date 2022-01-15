@@ -37,7 +37,7 @@ export const Quests: { [name: string]: Quest } = {
 		name: 'Hilda needs Help',
 		goal: 'Help Hila, immediately',
 		preconditions: {
-			previousQuests: ['theRescue'],
+			// previousQuests: ['theRescue'],
 		},
 	},
 	vanyaWantsBooks: {

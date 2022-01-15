@@ -1,12 +1,16 @@
-import { UiDepths } from '../helpers/constants';
+import { UiDepths, UI_SCALE } from '../helpers/constants';
 import globalState from '../worldstate';
 import OverlayScreen from './OverlayScreen';
 
-const FONT_SIZE_HEADER = 16;
-const FONT_SIZE_TEXT = 10;
+const FONT_SIZE_HEADER = 20;
+const FONT_SIZE_TEXT = 12;
 
-const SCREEN_X = 50;
-const SCREEN_Y = 120;
+const SCREEN_X = 8;
+const SCREEN_Y = 96;
+
+const SCREEN_WIDTH = 172;
+export const STAT_SCREEN_RIGHT_BORDER = SCREEN_X + SCREEN_WIDTH;
+
 export default class StatScreen extends OverlayScreen {
 	lableHealthValue: Phaser.GameObjects.Text;
 	lableDamageValue: Phaser.GameObjects.Text;
@@ -14,18 +18,25 @@ export default class StatScreen extends OverlayScreen {
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
-		super(scene, SCREEN_X, SCREEN_Y, 200, 220);
+		super(scene, SCREEN_X * UI_SCALE, SCREEN_Y * UI_SCALE, SCREEN_WIDTH * UI_SCALE, 208 * UI_SCALE);
 
-		const header = new Phaser.GameObjects.Text(scene, SCREEN_X - 10, SCREEN_Y - 10, 'Statistics', {
-			color: 'black',
-			// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-			fontSize: '24pt',
-			fontFamily: 'endlessDungeon',
-			resolution: window.devicePixelRatio,
-		});
+		const header = new Phaser.GameObjects.Text(
+			scene,
+			(SCREEN_X + 16) * UI_SCALE,
+			(SCREEN_Y + 8) * UI_SCALE,
+			'Statistics',
+			{
+				color: 'white',
+				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
+				fontSize: `${FONT_SIZE_HEADER * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+				resolution: window.devicePixelRatio,
+			}
+		);
 		header.setOrigin(0);
 		header.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		header.setScrollFactor(0);
+		header.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(header, true);
 
 		const currentHealth = Math.round(globalState.playerCharacter.health);
@@ -33,90 +44,109 @@ export default class StatScreen extends OverlayScreen {
 		const currentDamage = Math.round(globalState.playerCharacter.damage);
 		const currentMovSpeed = Math.round(globalState.playerCharacter.movementSpeed);
 
-		const lableHealth = new Phaser.GameObjects.Text(scene, SCREEN_X - 10, SCREEN_Y + 30, 'Health', {
-			color: 'black',
-			// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-			fontSize: '12pt',
-			fontFamily: 'endlessDungeon',
-			resolution: window.devicePixelRatio,
-		});
+		const lableHealth = new Phaser.GameObjects.Text(
+			scene,
+			(SCREEN_X + 16) * UI_SCALE,
+			(SCREEN_Y + 32) * UI_SCALE,
+			'Health',
+			{
+				color: 'white',
+				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
+				fontSize: `${FONT_SIZE_TEXT * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+				resolution: window.devicePixelRatio,
+			}
+		);
 		this.lableHealthValue = new Phaser.GameObjects.Text(
 			scene,
-			SCREEN_X + 74,
-			SCREEN_Y + 30,
+			(SCREEN_X + 74) * UI_SCALE,
+			(SCREEN_Y + 32) * UI_SCALE,
 			`${currentHealth}/${maxHealth}`,
 			{
-				color: 'black',
+				color: 'white',
 				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-				fontSize: '12pt',
+				fontSize: `${12 * UI_SCALE}pt`,
 				fontFamily: 'endlessDungeon',
 				resolution: window.devicePixelRatio,
 			}
 		);
 		lableHealth.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		lableHealth.setScrollFactor(0);
+		lableHealth.setShadow(0, 1 * UI_SCALE, 'black');
 		this.lableHealthValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.lableHealthValue.setScrollFactor(0);
+		this.lableHealthValue.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(lableHealth, true);
 		this.add(this.lableHealthValue, true);
 
-		const lableDamage = new Phaser.GameObjects.Text(scene, SCREEN_X - 10, SCREEN_Y + 48, 'Damage', {
-			color: 'black',
-			// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-			fontSize: '12pt',
-			fontFamily: 'endlessDungeon',
-			resolution: window.devicePixelRatio,
-		});
+		const lableDamage = new Phaser.GameObjects.Text(
+			scene,
+			(SCREEN_X + 16) * UI_SCALE,
+			(SCREEN_Y + 48) * UI_SCALE,
+			'Damage',
+			{
+				color: 'white',
+				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
+				fontSize: `${12 * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+				resolution: window.devicePixelRatio,
+			}
+		);
 		this.lableDamageValue = new Phaser.GameObjects.Text(
 			scene,
-			SCREEN_X + 74,
-			SCREEN_Y + 48,
+			(SCREEN_X + 74) * UI_SCALE,
+			(SCREEN_Y + 48) * UI_SCALE,
 			`${currentDamage}`,
 			{
-				color: 'black',
+				color: 'white',
 				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-				fontSize: '12pt',
+				fontSize: `${12 * UI_SCALE}pt`,
 				fontFamily: 'endlessDungeon',
 				resolution: window.devicePixelRatio,
 			}
 		);
 		lableDamage.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		lableDamage.setScrollFactor(0);
+		lableDamage.setShadow(0, 1 * UI_SCALE, 'black');
 		this.lableDamageValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.lableDamageValue.setScrollFactor(0);
+		this.lableDamageValue.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(lableDamage, true);
 		this.add(this.lableDamageValue, true);
 
 		const lableMovSpeed = new Phaser.GameObjects.Text(
 			scene,
-			SCREEN_X - 10,
-			SCREEN_Y + 66,
+			(SCREEN_X + 16) * UI_SCALE,
+			(SCREEN_Y + 66) * UI_SCALE,
 			'Speed',
 			{
-				color: 'black',
+				color: 'white',
 				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-				fontSize: '12pt',
+				fontSize: `${12 * UI_SCALE}pt`,
 				fontFamily: 'endlessDungeon',
 				resolution: window.devicePixelRatio,
 			}
 		);
 		this.lableMovSpeedValue = new Phaser.GameObjects.Text(
 			scene,
-			SCREEN_X + 74,
-			SCREEN_Y + 66,
+			(SCREEN_X + 74) * UI_SCALE,
+
+			(SCREEN_Y + 66) * UI_SCALE,
 			`${currentMovSpeed}`,
 			{
-				color: 'black',
+				color: 'white',
 				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-				fontSize: '12pt',
+				fontSize: `${12 * UI_SCALE}pt`,
 				fontFamily: 'endlessDungeon',
 				resolution: window.devicePixelRatio,
 			}
 		);
 		lableMovSpeed.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		lableMovSpeed.setScrollFactor(0);
+		lableMovSpeed.setShadow(0, 1 * UI_SCALE, 'black');
 		this.lableMovSpeedValue.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.lableMovSpeedValue.setScrollFactor(0);
+		this.lableMovSpeedValue.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(lableMovSpeed, true);
 		this.add(this.lableMovSpeedValue, true);
 

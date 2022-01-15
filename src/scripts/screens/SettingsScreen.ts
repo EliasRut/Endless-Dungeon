@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { isJSON } from 'validator';
-import { UiDepths } from '../helpers/constants';
+import { UiDepths, UI_SCALE } from '../helpers/constants';
 import MainScene from '../scenes/MainScene';
 import RoomPreloaderScene from '../scenes/RoomPreloaderScene';
 import globalState, { WorldState } from '../worldstate';
@@ -8,6 +8,13 @@ import PlayerCharacter from '../worldstate/PlayerCharacter';
 import OverlayScreen from './OverlayScreen';
 import * as data from '../../assets/newgame.json';
 
+const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
+const SCALED_WINDOW_HEIGHT = window.innerHeight / UI_SCALE;
+
+const SETTINGS_WIDTH = 100;
+const SETTINGS_HEIGHT = 114;
+const SETTINGS_START_X = (SCALED_WINDOW_WIDTH - SETTINGS_WIDTH) / 2;
+const SETTINGS_START_Y = (SCALED_WINDOW_HEIGHT - SETTINGS_HEIGHT) / 2;
 export default class SettingsScreen extends OverlayScreen {
 	saveIcon: Phaser.GameObjects.Text;
 	loadIcon: Phaser.GameObjects.Text;
@@ -16,34 +23,36 @@ export default class SettingsScreen extends OverlayScreen {
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
-		const height = scene.sys.game.canvas.height;
-		const width = scene.sys.game.canvas.width;
-		const SETTINGS_START_X = width / 3 + 30;
-		const SETTINGS_START_Y = height / 3;
-		const SETTINGS_WIDTH = width / 3;
-		const SETTINGS_HEIGHT = height / 3;
 
-		super(scene, SETTINGS_START_X, SETTINGS_START_Y, SETTINGS_WIDTH, SETTINGS_HEIGHT);
+		super(
+			scene,
+			SETTINGS_START_X * UI_SCALE,
+			SETTINGS_START_Y * UI_SCALE,
+			SETTINGS_WIDTH * UI_SCALE,
+			SETTINGS_HEIGHT * UI_SCALE
+		);
 
 		this.scene = scene as MainScene;
 
 		this.saveIcon = new Phaser.GameObjects.Text(
 			scene,
-			SETTINGS_START_X + SETTINGS_WIDTH / 2 - 100,
-			SETTINGS_START_Y + 5,
+			(SETTINGS_START_X + 12) * UI_SCALE,
+			(SETTINGS_START_Y + 18) * UI_SCALE,
 			'Save',
 			{
-				color: 'black',
+				color: 'white',
 				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-				fontSize: '24pt',
+				fontSize: `${12 * UI_SCALE}pt`,
 				fontFamily: 'endlessDungeon',
-				resolution: window.devicePixelRatio,
+				align: 'center',
+				fixedWidth: (SETTINGS_WIDTH - 28) * UI_SCALE,
 			}
 		);
 		// this.dialogText.setOrigin(0, 0);
 		this.saveIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		this.saveIcon.setScrollFactor(0);
 		this.saveIcon.setInteractive();
+		this.saveIcon.setShadow(0, 1 * UI_SCALE, 'black');
 		this.saveIcon.on('pointerdown', () => {
 			// scene.overlayScreens.settingsScreen.save();
 			// tslint:disable-next-line: no-console
@@ -72,21 +81,22 @@ export default class SettingsScreen extends OverlayScreen {
 
 		this.loadIcon = new Phaser.GameObjects.Text(
 			scene,
-			SETTINGS_START_X + SETTINGS_WIDTH / 2 - 10,
-			SETTINGS_START_Y + 5,
+			(SETTINGS_START_X + 12) * UI_SCALE,
+			(SETTINGS_START_Y + 46) * UI_SCALE,
 			'Load',
 			{
-				color: 'black',
-				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-				fontSize: '24pt',
+				color: 'white',
+				fontSize: `${12 * UI_SCALE}pt`,
 				fontFamily: 'endlessDungeon',
-				resolution: window.devicePixelRatio,
+				align: 'center',
+				fixedWidth: (SETTINGS_WIDTH - 28) * UI_SCALE,
 			}
 		);
 		// this.dialogText.setOrigin(0, 0);
 		this.loadIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		this.loadIcon.setScrollFactor(0);
 		this.loadIcon.setInteractive();
+		this.loadIcon.setShadow(0, 1 * UI_SCALE, 'black');
 		this.loadIcon.on('pointerdown', () => {
 			// scene.overlayScreens.settingsScreen.save();
 			// tslint:disable-next-line: no-console
@@ -98,21 +108,23 @@ export default class SettingsScreen extends OverlayScreen {
 
 		this.newGameIcon = new Phaser.GameObjects.Text(
 			scene,
-			SETTINGS_START_X + SETTINGS_WIDTH / 2 - 80,
-			SETTINGS_START_Y + 50,
+			(SETTINGS_START_X + 12) * UI_SCALE,
+			(SETTINGS_START_Y + 74) * UI_SCALE,
 			'New Game',
 			{
-				color: 'black',
+				color: 'white',
 				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
-				fontSize: '24pt',
+				fontSize: `${12 * UI_SCALE}pt`,
 				fontFamily: 'endlessDungeon',
-				resolution: window.devicePixelRatio,
+				align: 'center',
+				fixedWidth: (SETTINGS_WIDTH - 28) * UI_SCALE,
 			}
 		);
 		// this.dialogText.setOrigin(0, 0);
 		this.newGameIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		this.newGameIcon.setScrollFactor(0);
 		this.newGameIcon.setInteractive();
+		this.newGameIcon.setShadow(0, 1 * UI_SCALE, 'black');
 		this.newGameIcon.on('pointerdown', () => {
 			this.load(data);
 			this.scene.scene.start('RoomPreloaderScene');

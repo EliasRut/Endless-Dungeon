@@ -57,7 +57,7 @@ export default class MeleeEnemyToken extends EnemyToken {
 
 		const tx = this.target.x;
 		const ty = this.target.y;
-		const distance = this.getDistance(tx, ty);
+		const distance = this.getDistanceToWorldStatePosition(tx, ty);
 
 		// damages & slows you if you're close
 		if (distance < MAX_SLOW_DISTANCE) {

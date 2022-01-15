@@ -1,4 +1,4 @@
-import { UiDepths, RuneAssignment, ColorsArray } from '../../helpers/constants';
+import { UiDepths, RuneAssignment, ColorsArray, SCALE } from '../../helpers/constants';
 import DungeonDoorScene from '../../scenes/DungeonDoorScene';
 
 const socketPositions = [
@@ -23,23 +23,26 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 		this.setScrollFactor(0);
 		this.setInteractive();
 		this.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		this.setScale(SCALE);
 
 		for (let i = 0; i < 8; i++) {
 			const runePositionX = frameWidth * i;
 			const runePositionY = frameHeight;
 			const rune = scene.add.sprite(runePositionX, runePositionY, 'runes');
 			this.runes.push(rune);
-		};
+		}
 
-		this.doorknob = scene.add.image(250, 186, 'doorknob');
+		this.doorknob = scene.add.image(250 * SCALE, 186 * SCALE, 'doorknob');
 		this.doorknob.setScrollFactor(0);
 		this.doorknob.setDepth(UiDepths.UI_MAIN_LAYER);
 		this.doorknob.setInteractive();
-		this.doorknob.on('pointerdown', () => { this.openDoor(); });
+		this.doorknob.on('pointerdown', () => {
+			this.openDoor();
+		});
 
 		for (let i = 0; i < 5; i++) {
 			const [x, y] = socketPositions[i];
-			const runeSocket = scene.add.sprite(x, y, 'runeSocket');
+			const runeSocket = scene.add.sprite(x * SCALE, y * SCALE, 'runeSocket');
 			runeSocket.setScrollFactor(0);
 			runeSocket.setDepth(UiDepths.UI_MAIN_LAYER);
 			runeSocket.play('runeSocket-anim');
@@ -57,9 +60,7 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 			this.runes[i].setScrollFactor(0);
 			this.runes[i].setInteractive();
 			this.runes[i].setDepth(UiDepths.UI_FOREGROUND_LAYER);
-			const usedRune = (i === 0) ?
-				5 :
-				((i === 1) ? 5 : Math.floor(Math.random() * 8));
+			const usedRune = i === 0 ? 5 : i === 1 ? 5 : Math.floor(Math.random() * 8);
 			this.runes[i].setFrame(usedRune);
 			usedRunes.push(usedRune);
 		}
@@ -69,7 +70,7 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 			secondaryContent: ColorsArray[usedRunes[1]],
 			wanderingMonsters: ColorsArray[usedRunes[2]],
 			playerBuff: ColorsArray[usedRunes[3]],
-			randomNpc: ColorsArray[usedRunes[4]]
+			randomNpc: ColorsArray[usedRunes[4]],
 		};
 
 		window.setTimeout(() => {

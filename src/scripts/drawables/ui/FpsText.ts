@@ -1,13 +1,13 @@
 import globalState from '../../worldstate/index';
 import { BLOCK_SIZE, TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
-import { UiDepths } from '../../helpers/constants';
+import { SCALE, UiDepths } from '../../helpers/constants';
 
-const X_POSITION = window.innerWidth / 2;
-const Y_POSITION = window.innerHeight / 2;
+const X_POSITION = 4;
+const Y_POSITION = 4;
 
 export default class FpsText extends Phaser.GameObjects.Text {
 	constructor(scene: Phaser.Scene) {
-		super(scene, X_POSITION, Y_POSITION, '', {
+		super(scene, X_POSITION * SCALE, Y_POSITION * SCALE, '', {
 			fontFamily: 'endlessDungeon',
 			color: 'white',
 			fontSize: '18pt',

@@ -1,4 +1,4 @@
-import { AbilityKey, BAG_BOXES_X, EquipmentSlot, UiDepths } from '../helpers/constants';
+import { AbilityKey, BAG_BOXES_X, EquipmentSlot, UiDepths, UI_SCALE } from '../helpers/constants';
 import { AbilityType, Abilities } from '../abilities/abilityData';
 import OverlayScreen from './OverlayScreen';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
@@ -20,48 +20,65 @@ import {
 	getFullDataForEquipmentSlot,
 	getEquipmentDataRecordForEquipmentSlot,
 } from '../helpers/inventory';
+import { STAT_SCREEN_RIGHT_BORDER } from './StatScreen';
+import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
 
-const INVENTORY_START_X = 500;
-const INVENTORY_START_Y = 198;
-const INVENTORY_BORDER_OFFSET_X = 53;
-const INVENTORY_BORDER_OFFSET_Y = 103;
-const INVENTORY_BORDER_X = INVENTORY_START_X - INVENTORY_BORDER_OFFSET_X;
-const INVENTORY_BORDER_Y = INVENTORY_START_Y - INVENTORY_BORDER_OFFSET_Y;
+const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
 
-const BOX_SIZE = 16;
+const AVAILABLE_WINDOW_WIDTH =
+	SCALED_WINDOW_WIDTH - STAT_SCREEN_RIGHT_BORDER - MENU_ICON_LEFT_BORDER;
 
-const BAG_OFFSET_X = 56;
-const BAG_OFFSET_Y = -61;
-const BAG_START_X = INVENTORY_START_X - BAG_OFFSET_X;
-const BAG_START_Y = INVENTORY_START_Y - BAG_OFFSET_Y;
+const SCREEN_WIDTH = 200;
+const SCREEN_HEIGHT = 280;
+
+const ABILITY_BACKGROUND_START = 150;
+
+const INVENTORY_START_X = STAT_SCREEN_RIGHT_BORDER + AVAILABLE_WINDOW_WIDTH / 2 + 10;
+
+const INVENTORY_START_Y = 24;
 
 const ABILITY_ICON_SIZE = 34;
 // tslint:disable: no-magic-numbers
 const ITEM_ABILITY_COORDINATES = {
-	[EquipmentSlot.SOURCE]: [INVENTORY_START_X - 56, INVENTORY_START_Y + 1],
-	[EquipmentSlot.CATALYST]: [INVENTORY_START_X - 22, INVENTORY_START_Y + 25],
-	[EquipmentSlot.CHESTPIECE]: [INVENTORY_START_X - 16, INVENTORY_START_Y + 1],
-	[EquipmentSlot.AMULET]: [INVENTORY_START_X - 0, INVENTORY_START_Y - 15],
-	[EquipmentSlot.RIGHT_RING]: [INVENTORY_START_X + 56, INVENTORY_START_Y + 1],
-	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X + 22, INVENTORY_START_Y + 25],
+	[EquipmentSlot.CHESTPIECE]: [-1, -1],
+	[EquipmentSlot.AMULET]: [
+		INVENTORY_START_X + 16,
+		INVENTORY_START_Y + ABILITY_BACKGROUND_START + 4,
+	],
+	[EquipmentSlot.SOURCE]: [
+		INVENTORY_START_X + 16,
+		INVENTORY_START_Y + ABILITY_BACKGROUND_START + 4,
+	],
+	[EquipmentSlot.CATALYST]: [
+		INVENTORY_START_X + 16,
+		INVENTORY_START_Y + ABILITY_BACKGROUND_START + 32,
+	],
+	[EquipmentSlot.RIGHT_RING]: [
+		INVENTORY_START_X + 16,
+		INVENTORY_START_Y + ABILITY_BACKGROUND_START + 60,
+	],
+	[EquipmentSlot.LEFT_RING]: [
+		INVENTORY_START_X + 16,
+		INVENTORY_START_Y + ABILITY_BACKGROUND_START + 88,
+	],
 };
 
 const EQUIPMENT_SLOT_COORDINATES = {
-	[EquipmentSlot.SOURCE]: [INVENTORY_START_X - 42, INVENTORY_START_Y - 80],
-	[EquipmentSlot.CATALYST]: [INVENTORY_START_X + 42, INVENTORY_START_Y - 80],
-	[EquipmentSlot.CHESTPIECE]: [INVENTORY_START_X + 0, INVENTORY_START_Y - 70],
-	[EquipmentSlot.AMULET]: [INVENTORY_START_X + 0, INVENTORY_START_Y - 107],
-	[EquipmentSlot.RIGHT_RING]: [INVENTORY_START_X + 42.5, INVENTORY_START_Y - 45.5],
-	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X - 41, INVENTORY_START_Y - 45.5],
+	[EquipmentSlot.SOURCE]: [INVENTORY_START_X + 48, INVENTORY_START_Y + 54],
+	[EquipmentSlot.CATALYST]: [INVENTORY_START_X + 144, INVENTORY_START_Y + 54],
+	[EquipmentSlot.CHESTPIECE]: [INVENTORY_START_X + 95, INVENTORY_START_Y + 74],
+	[EquipmentSlot.AMULET]: [INVENTORY_START_X + 96, INVENTORY_START_Y + 29],
+	[EquipmentSlot.RIGHT_RING]: [INVENTORY_START_X + 49, INVENTORY_START_Y + 100],
+	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X + 145, INVENTORY_START_Y + 100],
 };
 
 const COORDINATES_TO_SLOT: { [id: string]: EquipmentSlot } = {
 	'0_0': EquipmentSlot.SOURCE,
 	'1_0': EquipmentSlot.AMULET,
 	'2_0': EquipmentSlot.CATALYST,
-	'0_1': EquipmentSlot.LEFT_RING,
+	'0_1': EquipmentSlot.RIGHT_RING,
 	'1_1': EquipmentSlot.CHESTPIECE,
-	'2_1': EquipmentSlot.RIGHT_RING,
+	'2_1': EquipmentSlot.LEFT_RING,
 };
 
 const EQUIPMENT_SLOT_TO_ABILITY_KEY = {
@@ -88,28 +105,72 @@ export default class InventoryScreen extends OverlayScreen {
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
-		super(scene, INVENTORY_BORDER_X, INVENTORY_BORDER_Y, 175, 280);
+		super(
+			scene,
+			INVENTORY_START_X * UI_SCALE,
+			INVENTORY_START_Y * UI_SCALE,
+			SCREEN_WIDTH * UI_SCALE,
+			SCREEN_HEIGHT * UI_SCALE
+		);
 		this.scene = scene as MainScene;
 		this.focusedSlot = EquipmentSlot.SOURCE;
 		const inventoryField = new Phaser.GameObjects.Image(
 			scene,
-			INVENTORY_START_X,
-			INVENTORY_START_Y,
+			(INVENTORY_START_X + 14) * UI_SCALE,
+			(INVENTORY_START_Y + 6) * UI_SCALE,
 			'inventory-borders'
 		);
 		inventoryField.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		inventoryField.setScrollFactor(0);
+		inventoryField.setOrigin(0);
+		inventoryField.setScale(UI_SCALE);
 		this.add(inventoryField, true);
 		// tslint:enable
 		this.inventorySelection = new Phaser.GameObjects.Image(
 			scene,
-			EQUIPMENT_SLOT_COORDINATES.source[0],
-			EQUIPMENT_SLOT_COORDINATES.source[1],
+			EQUIPMENT_SLOT_COORDINATES.source[0] * UI_SCALE,
+			EQUIPMENT_SLOT_COORDINATES.source[1] * UI_SCALE,
 			'inventory-selection'
 		);
 		this.inventorySelection.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		this.inventorySelection.setScrollFactor(0);
+		this.inventorySelection.setScale(UI_SCALE);
 		this.add(this.inventorySelection, true);
+
+		const abilityIconBackgrounds = [
+			new Phaser.GameObjects.Image(
+				scene,
+				(INVENTORY_START_X + 12) * UI_SCALE,
+				(INVENTORY_START_Y + ABILITY_BACKGROUND_START) * UI_SCALE,
+				'ability-background-1'
+			),
+			new Phaser.GameObjects.Image(
+				scene,
+				(INVENTORY_START_X + 12) * UI_SCALE,
+				(INVENTORY_START_Y + ABILITY_BACKGROUND_START + 28) * UI_SCALE,
+				'ability-background-2'
+			),
+			new Phaser.GameObjects.Image(
+				scene,
+				(INVENTORY_START_X + 12) * UI_SCALE,
+				(INVENTORY_START_Y + ABILITY_BACKGROUND_START + 56) * UI_SCALE,
+				'ability-background-3'
+			),
+			new Phaser.GameObjects.Image(
+				scene,
+				(INVENTORY_START_X + 12) * UI_SCALE,
+				(INVENTORY_START_Y + ABILITY_BACKGROUND_START + 84) * UI_SCALE,
+				'ability-background-4'
+			),
+		];
+		abilityIconBackgrounds.forEach((iconBackground) => {
+			this.add(iconBackground, true);
+			iconBackground.setOrigin(0);
+			iconBackground.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+			iconBackground.setScrollFactor(0);
+			iconBackground.setScale(UI_SCALE);
+			scene.add.existing(iconBackground);
+		});
 
 		scene.add.existing(this);
 		this.setVisible(false);
@@ -117,8 +178,8 @@ export default class InventoryScreen extends OverlayScreen {
 		Object.entries(EQUIPMENT_SLOT_COORDINATES).forEach(([slotName, [x, y]]) => {
 			this.equipmentSlotTokenMap[slotName as EquipmentSlot] = this.createItemToken(
 				slotName as EquipmentSlot,
-				x,
-				y
+				x * UI_SCALE,
+				y * UI_SCALE
 			);
 		});
 
@@ -133,12 +194,18 @@ export default class InventoryScreen extends OverlayScreen {
 	createItemToken(slotName: EquipmentSlot, x: number, y: number) {
 		const itemName = getItemKeyForEquipmentSlot(slotName);
 		const itemData = itemName ? getItemDataForName(itemName) : undefined;
-		const itemToken = new InventoryItemToken(this.scene, x, y, itemData?.iconFrame || -1);
+		const itemToken = new InventoryItemToken(
+			this.scene,
+			x * UI_SCALE,
+			y * UI_SCALE,
+			itemData?.iconFrame || -1
+		);
 
 		itemToken.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		itemToken.setScrollFactor(0);
 		itemToken.setInteractive();
 		itemToken.setVisible(this.visiblity);
+		itemToken.setScale(UI_SCALE);
 		this.add(itemToken, true);
 		itemToken.on('pointerdown', () => {
 			this.handleEquipmentSlotInteraction(slotName);
@@ -220,8 +287,8 @@ export default class InventoryScreen extends OverlayScreen {
 		this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
 		const selectionPos = EQUIPMENT_SLOT_COORDINATES[this.focusedSlot];
 
-		this.inventorySelection.setX(selectionPos[0]);
-		this.inventorySelection.setY(selectionPos[1]);
+		this.inventorySelection.setX(selectionPos[0] * UI_SCALE);
+		this.inventorySelection.setY(selectionPos[1] * UI_SCALE);
 	}
 
 	// hard coded for inventory highlighting, special cases when 0 > y
@@ -300,8 +367,8 @@ export default class InventoryScreen extends OverlayScreen {
 		const [iconX, iconY] = ITEM_ABILITY_COORDINATES[slotKey];
 		const abilityIcon = new Phaser.GameObjects.Image(
 			this.scene,
-			iconX,
-			iconY,
+			iconX * UI_SCALE,
+			iconY * UI_SCALE,
 			Abilities[ability].icon![0],
 			Abilities[ability].icon![1]
 		);
@@ -309,8 +376,10 @@ export default class InventoryScreen extends OverlayScreen {
 		abilityIcon.displayHeight = ABILITY_ICON_SIZE;
 		abilityIcon.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		abilityIcon.setScrollFactor(0);
+		abilityIcon.setScale(UI_SCALE);
 		abilityIcon.setInteractive();
 		abilityIcon.setVisible(this.visiblity);
+		abilityIcon.setOrigin(0);
 		this.add(abilityIcon, true);
 		return abilityIcon;
 	}

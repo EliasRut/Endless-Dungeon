@@ -1,5 +1,5 @@
 import { EquippedItemData } from '../../worldstate/Inventory';
-import { EquipmentSlot, UiDepths } from '../../helpers/constants';
+import { EquipmentSlot, UiDepths, UI_SCALE } from '../../helpers/constants';
 import { EquipmentKey, getItemDataForName } from '../../../items/itemData';
 import {
 	equipItem,
@@ -120,21 +120,23 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		const useEightImages = numItems === 8;
 		const backgroundImage = new Phaser.GameObjects.Image(
 			this.scene,
-			centerX,
-			centerY,
+			centerX * UI_SCALE,
+			centerY * UI_SCALE,
 			'quickselect-wheel'
 		);
 		backgroundImage.on('pointerdown', () => {
 			this.toggleVisibility();
 		});
 		backgroundImage.setInteractive();
+		backgroundImage.setScale(UI_SCALE);
 		this.selection = new Phaser.GameObjects.Image(
 			this.scene,
-			centerX,
-			centerY,
+			centerX * UI_SCALE,
+			centerY * UI_SCALE,
 			useEightImages ? 'quickselect-wheel-selection-small' : 'quickselect-wheel-selection-large'
 		);
 		this.selection.setVisible(false);
+		this.selection.setScale(UI_SCALE);
 
 		const images: Phaser.GameObjects.Image[] = [];
 		const levelTexts: Phaser.GameObjects.Image[] = [];
@@ -145,11 +147,12 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 				: FOUR_ITEMS_OFFSETS[itemIndex];
 			const itemImage = new Phaser.GameObjects.Image(
 				this.scene,
-				centerX + xOffset,
-				centerY + yOffset,
+				(centerX + xOffset) * UI_SCALE,
+				(centerY + yOffset) * UI_SCALE,
 				equipmentData.level ? 'test-items-spritesheet' : 'empty-tile',
 				equipmentData.level ? itemData.iconFrame : 0
 			);
+			itemImage.setScale(UI_SCALE);
 			if (equipmentData.level) {
 				itemImage.on('pointerdown', () => {
 					equipItem(equipmentSlot, itemKey);
@@ -173,6 +176,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		pieces.forEach((piece) => {
 			piece.setDepth(UiDepths.UI_ABOVE_FOREGROUND_LAYER);
 			piece.setScrollFactor(0);
+			piece.setScale(UI_SCALE);
 		});
 		this.addMultiple(pieces, true);
 	}
