@@ -270,6 +270,7 @@ export type HexValue =
 	| 'e'
 	| 'f';
 export type HashtagHexColor = string;
+
 export interface NpcData {
 	name: string;
 	bodyTemplate: string;
@@ -283,4 +284,26 @@ export interface NpcData {
 	pantsTemplate: string;
 	pantsColor: HashtagHexColor;
 	shoesColor: HashtagHexColor;
+}
+
+export interface Quest {
+	questGiverId?: string;
+	questGiverName: string;
+	preconditions?: {
+		previousQuests?: string[];
+		hasItems?: string[];
+		dungeonLevelReached?: number;
+	};
+	completionCriterias?: {
+		previousQuests?: string[];
+		hasItems?: string[];
+		dungeonLevelReached?: number;
+	};
+	name: string;
+	goal: string;
+	rewards?: {
+		items: {
+			[id: string]: number;
+		};
+	};
 }

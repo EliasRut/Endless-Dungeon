@@ -37,7 +37,7 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 						<ButtonWrapper>
 							<StyledButton id="createNewButton">Create New</StyledButton>
 						</ButtonWrapper>
-						<LoadRoomHeader>Load Room:</LoadRoomHeader>
+						<LoadRoomHeader>Load Room</LoadRoomHeader>
 						<Dropdown id="roomDropdown">
 							<option>Loading...</option>
 						</Dropdown>
@@ -213,12 +213,13 @@ const PageWrapper = styled.div`
 `;
 
 const MenueWrapper = styled.div`
+	width: 245px;
 	background-color: black;
 	color: white;
 	display: flex;
 	flex-direction: column;
 	font-family: 'endlessDungeon';
-	font-size: 1.2rem;
+	font-size: 2rem;
 	padding: 24px;
 	padding-top: 0;
 `;
@@ -228,10 +229,10 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled.button`
-	width: 148px;
+	width: 100%;
 	font-family: 'endlessDungeon';
-	font-size: 1rem;
-	padding: 8px;
+	font-size: 1.8rem;
+	/* padding: 8px; */
 `;
 
 const StyledRedButton = styled(StyledButton)`
@@ -256,9 +257,9 @@ const InputWrapper = styled.div`
 `;
 
 const Input = styled.input`
-	width: 140px;
+	width: 100%;
 	font-family: 'endlessDungeon';
-	font-size: 1rem;
+	font-size: 2rem;
 `;
 
 const ExportButtonWrapper = styled.div`
@@ -322,7 +323,7 @@ const ItemDetailsDialog = styled.div`
 const DialogTitle = styled.h2`
 	color: #fff;
 	font-family: 'endlessDungeon';
-	font-size: 1.2rem;
+	font-size: 2rem;
 	margin: 0;
 `;
 

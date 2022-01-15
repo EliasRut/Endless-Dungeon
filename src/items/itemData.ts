@@ -266,3 +266,8 @@ export const equippableTypeNames = [
 	EquippableItemType.NECKLACE,
 	EquippableItemType.RING,
 ] as string[];
+
+export const ItemData = {
+	...EquippableItems,
+	// ...UneqippableItemData,
+};

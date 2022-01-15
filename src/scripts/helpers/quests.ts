@@ -1,23 +1,6 @@
-import { ScriptEntry } from '../../../typings/custom';
+import { Quest, ScriptEntry } from '../../../typings/custom';
 import { Source } from '../../items/itemData';
 import globalState from '../worldstate';
-
-export interface Quest {
-	questGiverId?: string;
-	questGiverName: string;
-	preconditions?: {
-		previousQuests?: string[];
-		hasItems?: string[];
-		dungeonLevelReached?: number;
-	};
-	completionCriterias?: {
-		previousQuests?: string[];
-		hasItems?: string[];
-		dungeonLevelReached?: number;
-	};
-	name: string;
-	goal: string;
-}
 
 export interface QuestScripts {
 	intro: ScriptEntry[];

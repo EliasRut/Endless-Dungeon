@@ -70,5 +70,7 @@ const TypeContainer = styled.div`
 `;
 
 const TextWrapper = styled.div`
-	width: 140px;
+	width: 200px;
+	flex-shrink: 0;
+	flex-grow: 0;
 `;

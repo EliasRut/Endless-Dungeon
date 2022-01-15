@@ -153,13 +153,15 @@ const PageWrapper = styled.div`
 `;
 
 const MenueWrapper = styled.div`
+	width: 245px;
 	background-color: black;
 	color: white;
 	display: flex;
 	flex-direction: column;
 	font-family: 'endlessDungeon';
-	font-size: 1.2rem;
+	font-size: 2rem;
 	padding: 24px;
+	padding-top: 0;
 `;
 
 const ButtonWrapper = styled.div`
@@ -167,11 +169,11 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled.button`
-	width: 120px;
+	width: 100%;
 	font-family: 'endlessDungeon';
-	font-size: 1rem;
-	margin: 0 10px;
-	padding: 8px;
+	font-size: 1.8rem;
+	/* margin: 0 10px; */
+	/* padding: 8px; */
 `;
 
 const SelectionWrapper = styled.div`
@@ -202,7 +204,7 @@ const ColorManagerWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	font-family: 'endlessDungeon';
-	font-size: 1.2rem;
+	font-size: 1.5rem;
 	padding: 24px;
 `;
 

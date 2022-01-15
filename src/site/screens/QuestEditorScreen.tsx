@@ -190,7 +190,7 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 				<PageWrapper>
 					<MenueWrapper id="questEditorMenu">
 						<div>
-							<div>Load Quest:</div>
+							<div>Load Quest</div>
 							<Dropdown id="questDropdown">
 								<option>Loading...</option>
 							</Dropdown>
@@ -218,7 +218,7 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 							</InputWrapper>
 							<InputWrapper>
 								<div>Quest Giver</div>
-								<LargeDropdown
+								<LargeInput
 									id="questGiver"
 									value={this.state.questGiver}
 									onChange={(e: any) =>
@@ -236,7 +236,7 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 									) : (
 										<option>Loading...</option>
 									)}
-								</LargeDropdown>
+								</LargeInput>
 								<InputWrapper>
 									<div>Quest Description</div>
 									<LargeTextArea
@@ -302,7 +302,7 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 const PageContainer = styled.div`
 	height: 100%;
 	width: 100%;
-	font-size: 1.2rem;
+	font-size: 2rem;
 `;
 
 const NavigationWrapper = styled.div`
@@ -334,12 +334,13 @@ const PageWrapper = styled.div`
 `;
 
 const MenueWrapper = styled.div`
+	width: 245px;
 	background-color: black;
 	color: white;
 	display: flex;
 	flex-direction: column;
 	font-family: 'endlessDungeon';
-	font-size: 1.2rem;
+	font-size: 2rem;
 	padding: 24px;
 `;
 
@@ -348,11 +349,11 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled.button`
-	width: 148px;
+	width: 100%;
 	font-family: 'endlessDungeon';
-	font-size: 1rem;
-	margin: 0;
-	padding: 8px;
+	font-size: 1.8rem;
+	/* margin: 0; */
+	/* padding: 8px; */
 `;
 
 const QuestWrapper = styled.div`
@@ -366,6 +367,7 @@ const QuestWrapper = styled.div`
 const QuestContainer = styled.div`
 	display: flex;
 	flex-direction: column;
+	min-width: 300px;
 `;
 
 const InputWrapper = styled.div`
@@ -373,11 +375,11 @@ const InputWrapper = styled.div`
 `;
 
 const LargeInput = styled(Input)`
-	width: 350px;
+	width: 100%;
 `;
 
 const LargeDropdown = styled(Dropdown)`
-	width: 358px;
+	width: 100%;
 `;
 
 const ScriptContainer = styled.div`
@@ -408,4 +410,5 @@ const ScriptBlockContainer = styled.div`
 	border: 2px solid white;
 	padding: 0 12px 6px 12px;
 	border-radius: 4px;
+	/* font-size: 1.5rem; */
 `;

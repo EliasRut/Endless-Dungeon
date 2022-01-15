@@ -292,7 +292,8 @@ const Wrapper = styled.div`
 `;
 
 const RightWrapper = styled.div`
-	margin: 0 48px 0 96px;
+	margin: 0 48px 0 120px;
+	min-width: 500px;
 	display: flex;
 	flex-direction: row;
 `;
@@ -300,7 +301,7 @@ const RightWrapper = styled.div`
 const ItemsContainer = styled.div`
 	display: flex;
 	flex-direction: row;
-	justify-content: space-between;
+	justify-content: flex-start;
 	align-items: center;
 	margin-bottom: 12px;
 `;
@@ -322,7 +323,9 @@ const AddButtonText = styled.text`
 `;
 
 const TextWrapper = styled.div`
-	width: 140px;
+	width: 200px;
+	flex-shrink: 0;
+	flex-grow: 0;
 `;
 
 const HeaderWrapper = styled.div`
