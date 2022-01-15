@@ -30,7 +30,7 @@ export default class QuestLogScreen extends OverlayScreen {
 				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
 				fontSize: '20px',
 				fontStyle: 'bold',
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 			}
 		);
 		questHeader.setDepth(UiDepths.UI_BACKGROUND_LAYER);
@@ -75,7 +75,7 @@ export default class QuestLogScreen extends OverlayScreen {
 				{
 					color: 'black',
 					wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
-					fontFamily: 'munro',
+					fontFamily: 'endlessDungeon',
 				}
 			);
 			questBox.setOrigin(0);

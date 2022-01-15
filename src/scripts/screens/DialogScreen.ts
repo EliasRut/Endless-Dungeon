@@ -11,13 +11,11 @@ export default class DialogScreen extends OverlayScreen {
 
 		// this.dialogText = new Phaser.GameObjects.BitmapText(
 		// 	scene, 24, 308, 'pixelfont', '', 12);
-		this.dialogText = new Phaser.GameObjects.Text(
-			scene, 24, 286, '', {
-				fontFamily: 'munro',
-				fontSize: '20px',
-				color: '#000'
-			}
-		);
+		this.dialogText = new Phaser.GameObjects.Text(scene, 24, 286, '', {
+			fontFamily: 'endlessDungeon',
+			fontSize: '20px',
+			color: '#000',
+		});
 		this.dialogText.setResolution(32);
 		this.dialogText.setOrigin(0, 0);
 		this.dialogText.setDepth(UiDepths.UI_FOREGROUND_LAYER);
@@ -29,7 +27,7 @@ export default class DialogScreen extends OverlayScreen {
 		this.setVisible(false);
 	}
 
-	setText (text: string) {
+	setText(text: string) {
 		this.dialogText.setText(text);
 	}
 }

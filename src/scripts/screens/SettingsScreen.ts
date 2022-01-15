@@ -9,9 +9,9 @@ import OverlayScreen from './OverlayScreen';
 import * as data from '../../assets/newgame.json';
 
 export default class SettingsScreen extends OverlayScreen {
-	saveIcon: Phaser.GameObjects.BitmapText;
-	loadIcon: Phaser.GameObjects.BitmapText;
-	newGameIcon: Phaser.GameObjects.BitmapText;
+	saveIcon: Phaser.GameObjects.Text;
+	loadIcon: Phaser.GameObjects.Text;
+	newGameIcon: Phaser.GameObjects.Text;
 	scene: MainScene;
 
 	constructor(scene: Phaser.Scene) {
@@ -27,13 +27,18 @@ export default class SettingsScreen extends OverlayScreen {
 
 		this.scene = scene as MainScene;
 
-		this.saveIcon = new Phaser.GameObjects.BitmapText(
+		this.saveIcon = new Phaser.GameObjects.Text(
 			scene,
 			SETTINGS_START_X + SETTINGS_WIDTH / 2 - 100,
 			SETTINGS_START_Y + 5,
-			'pixelfont',
 			'Save',
-			12
+			{
+				color: 'black',
+				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
+				fontSize: '24pt',
+				fontFamily: 'endlessDungeon',
+				resolution: window.devicePixelRatio,
+			}
 		);
 		// this.dialogText.setOrigin(0, 0);
 		this.saveIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
@@ -65,13 +70,18 @@ export default class SettingsScreen extends OverlayScreen {
 		);
 		document.body.appendChild(fileInput);
 
-		this.loadIcon = new Phaser.GameObjects.BitmapText(
+		this.loadIcon = new Phaser.GameObjects.Text(
 			scene,
 			SETTINGS_START_X + SETTINGS_WIDTH / 2 - 10,
 			SETTINGS_START_Y + 5,
-			'pixelfont',
 			'Load',
-			12
+			{
+				color: 'black',
+				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
+				fontSize: '24pt',
+				fontFamily: 'endlessDungeon',
+				resolution: window.devicePixelRatio,
+			}
 		);
 		// this.dialogText.setOrigin(0, 0);
 		this.loadIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
@@ -86,13 +96,18 @@ export default class SettingsScreen extends OverlayScreen {
 		});
 		this.add(this.loadIcon, true);
 
-		this.newGameIcon = new Phaser.GameObjects.BitmapText(
+		this.newGameIcon = new Phaser.GameObjects.Text(
 			scene,
 			SETTINGS_START_X + SETTINGS_WIDTH / 2 - 80,
 			SETTINGS_START_Y + 50,
-			'pixelfont',
 			'New Game',
-			12
+			{
+				color: 'black',
+				// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
+				fontSize: '24pt',
+				fontFamily: 'endlessDungeon',
+				resolution: window.devicePixelRatio,
+			}
 		);
 		// this.dialogText.setOrigin(0, 0);
 		this.newGameIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);

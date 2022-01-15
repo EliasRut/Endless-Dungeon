@@ -59,7 +59,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
 				fontSize: '20px',
 				fontStyle: 'bold',
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 			}
 		);
 		this.questTitle.setDepth(UiDepths.UI_BACKGROUND_LAYER);
@@ -74,7 +74,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 			{
 				color: 'black',
 				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 			}
 		);
 		this.questGiverHeader.setOrigin(0);
@@ -90,7 +90,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 			{
 				color: 'black',
 				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 			}
 		);
 		this.questGiver.setDepth(UiDepths.UI_BACKGROUND_LAYER);
@@ -105,7 +105,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 			{
 				color: 'black',
 				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 			}
 		);
 		this.questDescriptionHeader.setOrigin(0);
@@ -117,11 +117,11 @@ export default class QuestDetailsScreen extends OverlayScreen {
 			this.scene,
 			QUEST_DETAILS_BORDER_X - 5,
 			this.questDescriptionHeader.y + this.questDescriptionHeader.height,
-			quest.description,
+			quest.goal,
 			{
 				color: 'black',
 				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 			}
 		);
 		this.questDescription.setDepth(UiDepths.UI_BACKGROUND_LAYER);
@@ -136,7 +136,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 			{
 				color: 'black',
 				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 			}
 		);
 		this.questRequirementsHeader.setOrigin(0);
@@ -152,7 +152,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 			{
 				color: 'black',
 				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 			}
 		);
 		this.questRequirements.setDepth(UiDepths.UI_BACKGROUND_LAYER);

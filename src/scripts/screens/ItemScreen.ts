@@ -26,6 +26,7 @@ export default class ItemScreen extends OverlayScreen {
 
 		this.itemName = new Phaser.GameObjects.Text(scene, SCREEN_X - 15, SCREEN_Y - 15, '', {
 			color: 'purple',
+			fontFamily: 'endlessDungeon',
 			wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
 		});
 		let textHeight = 100;
@@ -43,7 +44,8 @@ export default class ItemScreen extends OverlayScreen {
 		this.add(this.itemName, true);
 
 		this.flavorText = new Phaser.GameObjects.Text(scene, SCREEN_X - 15, SCREEN_Y + 28, '', {
-			fontSize: '12px',
+			fontSize: '12pt',
+			fontFamily: 'endlessDungeon',
 			color: '#333',
 			wordWrap: { width: SCREEN_WIDTH - 30, useAdvancedWrap: true },
 		});
@@ -53,7 +55,8 @@ export default class ItemScreen extends OverlayScreen {
 		this.add(this.flavorText, true);
 
 		this.lableEnchantment = new Phaser.GameObjects.Text(scene, SCREEN_X - 15, SCREEN_Y + 120, '', {
-			fontSize: '12px',
+			fontSize: '12pt',
+			fontFamily: 'endlessDungeon',
 			color: 'purple',
 			wordWrap: { width: SCREEN_WIDTH - 30, useAdvancedWrap: true },
 		});
@@ -63,9 +66,10 @@ export default class ItemScreen extends OverlayScreen {
 			SCREEN_Y + 148,
 			``,
 			{
-				fontSize: '12px',
 				color: '#333',
 				wordWrap: { width: SCREEN_WIDTH - 30, useAdvancedWrap: true },
+				fontSize: '12pt',
+				fontFamily: 'endlessDungeon',
 			}
 		);
 		this.lableEnchantment.setOrigin(0, 0);
@@ -78,8 +82,9 @@ export default class ItemScreen extends OverlayScreen {
 		this.add(this.lableEnchantmentValue, true);
 
 		this.lableLevel = new Phaser.GameObjects.Text(scene, SCREEN_X - 15, SCREEN_Y + 216, 'Level', {
-			fontSize: '12px',
 			color: 'black',
+			fontSize: '12pt',
+			fontFamily: 'endlessDungeon',
 			align: 'right',
 			fixedWidth: SCREEN_WIDTH - 36,
 		});

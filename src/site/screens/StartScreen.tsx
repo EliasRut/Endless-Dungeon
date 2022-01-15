@@ -43,7 +43,7 @@ export const ButtonContainer = styled.div`
 `;
 
 const StyledButton = styled.button`
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 3rem;
 	padding: 6px 24px;
 	cursor: pointer;
@@ -57,7 +57,7 @@ const StyledButton = styled.button`
 `;
 
 const StyledLinkButton = styled(Link)`
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 3rem;
 	padding: 6px 24px;
 	cursor: pointer;
