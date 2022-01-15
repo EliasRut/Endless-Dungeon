@@ -8,13 +8,7 @@ export default class PlayerCharacter extends Character {
 	public x = 0;
 	public y = 0;
 
-
-	public abilityCastTime = [
-		-Infinity,
-		-Infinity,
-		-Infinity,
-		-Infinity
-	];
+	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity];
 
 	constructor() {
 		// tslint:disable-next-line: no-magic-numbers
@@ -30,8 +24,13 @@ export default class PlayerCharacter extends Character {
 		[AbilityKey.FIVE]: AbilityType.NOTHING,
 	};
 }
-export const updateAbility=(scene: MainScene, player: PlayerCharacter, abilityKey: AbilityKey, ability: AbilityType) => {
+export const updateAbility = (
+	scene: MainScene,
+	player: PlayerCharacter,
+	abilityKey: AbilityKey,
+	ability: AbilityType
+) => {
 	if (abilityKey === AbilityKey.FIVE) return;
 	player.abilityKeyMapping[abilityKey] = ability;
 	scene.avatar.updateAbility(abilityKey, ability);
-}
+};

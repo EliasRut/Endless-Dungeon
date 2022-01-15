@@ -6,7 +6,7 @@ import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
-import { Faction, PossibleTargets } from './constants';
+import { Facings, Faction, PossibleTargets } from './constants';
 import { getFacing8Dir, getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
 
@@ -19,12 +19,18 @@ export default class AbilityHelper {
 		this.scene = scene;
 	}
 
-	triggerAbility(origin: Character, type: AbilityType, globalTime: number) {
+	triggerAbility(
+		caster: Character,
+		pointOfOrigin: { currentFacing: Facings; x: number; y: number },
+		type: AbilityType,
+		abilityLevel: number,
+		globalTime: number
+	) {
 		// We allow for multiple projectiles per ability.
 		// Let's get the data for ability projectiles first.
 		const projectileData = Abilities[type].projectileData;
 		// Since we're allowing projectiles to have a spread, we'll be using radians for easier math
-		const facingRotation = getRotationInRadiansForFacing(origin.currentFacing);
+		const facingRotation = getRotationInRadiansForFacing(pointOfOrigin.currentFacing);
 		const numProjectiles = Abilities[type].projectiles || 0;
 		const fireProjectile = (projectileIndex: number) => {
 			// Spread multiple projectiles over an arc on a circle
@@ -43,15 +49,15 @@ export default class AbilityHelper {
 			const xMultiplier = Math.sin(currentSpread * Math.PI + facingRotation);
 			const effect = new projectileData!.effect(
 				this.scene,
-				origin.x + xMultiplier * projectileData!.xOffset,
-				origin.y + yMultiplier * projectileData!.yOffset,
-				'',
+				pointOfOrigin.x + xMultiplier * projectileData!.xOffset,
+				pointOfOrigin.y + yMultiplier * projectileData!.yOffset,
+				Abilities[type].spriteName || '',
 				getFacing8Dir(xMultiplier, yMultiplier),
 				projectileData
 			);
 			if (projectileData?.targeting) {
 				(effect as TargetingEffect).allowedTargets =
-					origin.faction === Faction.PLAYER ? PossibleTargets.ENEMIES : PossibleTargets.PLAYER;
+					caster.faction === Faction.PLAYER ? PossibleTargets.ENEMIES : PossibleTargets.PLAYER;
 			}
 			effect.setVelocity(xMultiplier, yMultiplier);
 			effect.setMaxVelocity(projectileData!.velocity);
@@ -86,7 +92,7 @@ export default class AbilityHelper {
 			});
 
 			const targetTokens =
-				origin.faction === Faction.PLAYER
+				caster.faction === Faction.PLAYER
 					? Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES)
 					: this.scene.mainCharacter;
 			const collidingCallback = (collidingEffect: AbilityEffect, enemy: CharacterToken) => {
@@ -98,13 +104,34 @@ export default class AbilityHelper {
 					collidingEffect.destroy();
 				}
 				effect.hitEnemyTokens.push(enemy);
-				enemy.stateObject.health -= origin.damage * Abilities[type].damageMultiplier;
+				const newEnemyHealth =
+					enemy.stateObject.health -
+					caster.damage * Abilities[type].damageMultiplier * abilityLevel;
+				if (enemy.stateObject.health > 0 && newEnemyHealth <= 0) {
+					// Enemy died from this attack
+					if (Abilities[type].castOnEnemyDestroyed) {
+						this.triggerAbility(
+							caster,
+							enemy.stateObject,
+							Abilities[type].castOnEnemyDestroyed!,
+							abilityLevel,
+							globalTime
+						);
+					}
+				}
+				enemy.stateObject.health = newEnemyHealth;
+				enemy.receiveHit(caster.damage * Abilities[type].damageMultiplier);
+
 				if (Abilities[type].stun) {
-					stun(globalTime, Abilities[type].stun!, enemy.stateObject);
+					enemy.receiveStun(Abilities[type].stun!);
 				}
 				if (Abilities[type].necroticStacks) {
 					enemy.lastNecroticEffectTimestamp = globalTime;
 					enemy.necroticEffectStacks += Abilities[type].necroticStacks!;
+				}
+				if (Abilities[type].iceStacks) {
+					enemy.lastIceEffectTimestamp = globalTime;
+					enemy.iceEffectStacks += Abilities[type].iceStacks!;
 				}
 				if (projectileData?.knockback) {
 					enemy.lastMovedTimestamp = globalTime;
@@ -142,9 +169,15 @@ export default class AbilityHelper {
 			this.scene.sound.play(Abilities[type].sound!, { volume: Abilities[type].sfxVolume! });
 		}
 	}
-	update(time: number, castAbilities: AbilityType[]) {
-		castAbilities.forEach((ability) => {
-			this.triggerAbility(globalState.playerCharacter, ability, time);
+	update(time: number, castAbilities: [AbilityType, number][]) {
+		castAbilities.forEach(([ability, abilityLevel]) => {
+			this.triggerAbility(
+				globalState.playerCharacter,
+				globalState.playerCharacter,
+				ability,
+				abilityLevel,
+				time
+			);
 		});
 
 		this.abilityEffects = this.abilityEffects.filter((effect) => !effect.destroyed);
@@ -153,9 +186,13 @@ export default class AbilityHelper {
 		});
 	}
 }
-export const stun = (time: number, duration: number, character: Character) => {
-	if (character.stunnedAt + character.stunDuration + 1000 > time) return;
-	character.stunned = true;
-	character.stunnedAt = time;
-	character.stunDuration = duration;
-};
+// export const stun = (time: number, duration: number, characterToken: CharacterToken) => {
+// 	const character = characterToken.stateObject;
+// 	if (character.stunnedAt + character.stunDuration > time) {
+// 		return;
+// 	}
+// 	character.stunned = true;
+// 	character.stunnedAt = time;
+// 	character.stunDuration = duration;
+// 	characterToken.receiveStun(duration);
+// };

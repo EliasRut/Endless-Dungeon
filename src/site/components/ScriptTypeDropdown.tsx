@@ -50,18 +50,19 @@ const ButtonContainer = styled.div`
 `;
 
 const CloseButton = styled.button`
-	width: 22px;
-	height: 24px;
+	width: 30px;
+	height: 30px;
 	background-color: black;
 	border: 0.5px solid #9c1309;
 	border-radius: 4px;
 	cursor: pointer;
 `;
 
-const ButtonText = styled.text`
+const ButtonText = styled.p`
 	font-family: 'endlessDungeon';
 	font-size: 1rem;
 	color: #9c1309;
+	margin: 0 1px 0 2px;
 `;
 
 const TypeContainer = styled.div`

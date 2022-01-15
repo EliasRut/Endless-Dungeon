@@ -5,11 +5,11 @@ import { TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import RoomPositioning from '../worldstate/RoomPositioning';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from './movement';
 import CharacterToken from '../drawables/tokens/CharacterToken';
-import { getUnequippedItemCount } from './inventory';
 import fixedItems from '../../items/fixedItems.json';
 import Item from '../worldstate/Item';
 import { generateRandomItem } from './item';
 import { Faction } from './constants';
+import { ItemData, UneqippableItem } from '../../items/itemData';
 
 const DIALOG_TEXT_TIME_MS = 5000;
 
@@ -186,7 +186,9 @@ export default class ScriptHelper {
 				cleanUpStep = true;
 				this.scene.abilityHelper.triggerAbility(
 					globalState.playerCharacter,
+					globalState.playerCharacter,
 					currentStep.ability,
+					1,
 					globalTime
 				);
 				break;
@@ -243,10 +245,12 @@ export default class ScriptHelper {
 			}
 			case 'takeItem': {
 				cleanUpStep = true;
-				this.scene.overlayScreens.inventory.removeFromInventory(
-					currentStep.itemId,
-					currentStep.amount
-				);
+				if (globalState.inventory.bag[currentStep.itemId as UneqippableItem]) {
+					globalState.inventory.bag[currentStep.itemId as UneqippableItem]! -= currentStep.amount;
+					if (globalState.inventory.bag[currentStep.itemId as UneqippableItem]! < 0) {
+						delete globalState.inventory.bag[currentStep.itemId as UneqippableItem];
+					}
+				}
 				break;
 			}
 			case 'placeItem': {
@@ -269,10 +273,9 @@ export default class ScriptHelper {
 				break;
 			}
 			case 'condition': {
-				if (currentStep.itemId) {
-					const hasMatchingItems = !!globalState.inventory.unequippedItemList.find(
-						(item) => item.item.id === currentStep.itemId
-					);
+				if (currentStep.conditionType === 'hasItem') {
+					const itemId = currentStep.itemId as UneqippableItem;
+					const hasMatchingItems = !!globalState.inventory.bag[itemId!];
 					if (hasMatchingItems) {
 						cleanUpStep = true;
 					} else {
@@ -341,13 +344,12 @@ export default class ScriptHelper {
 					targetX = (this.currentRoom!.x + currentStep.posX!) * TILE_WIDTH;
 					targetY = (this.currentRoom!.y + currentStep.posY!) * TILE_HEIGHT;
 				}
-				this.scene.dropItem(
-					targetX,
-					targetY,
-					currentStep.fixedId
-						? (fixedItems as unknown as { [name: string]: Item })[currentStep.fixedId]
-						: generateRandomItem(currentStep.itemOptions || {})
-				);
+				if (currentStep.fixedId) {
+					this.scene.dropItem(targetX, targetY, currentStep.fixedId);
+				} else {
+					const { itemKey, level } = generateRandomItem(currentStep.itemOptions || {});
+					this.scene.dropItem(targetX, targetY, itemKey, level);
+				}
 				break;
 			}
 			// To Do's:
@@ -509,7 +511,8 @@ export default class ScriptHelper {
 					globalState.scripts.runningScript =
 						globalState.availableRooms[lastRoomName].scripts.onExit;
 					globalState.scripts.scriptStep = 0;
-					globalState.scripts.runningScriptId = `${globalState.currentLevel}_${lastRoomName}_onExit`;
+					const scriptId = `${globalState.currentLevel}_${lastRoomName}_onExit`;
+					globalState.scripts.runningScriptId = scriptId;
 				} else if (
 					currentRooomName &&
 					globalState.availableRooms[currentRooomName].scripts.onEntry &&
@@ -518,7 +521,8 @@ export default class ScriptHelper {
 					globalState.scripts.runningScript =
 						globalState.availableRooms[currentRooomName].scripts.onEntry;
 					globalState.scripts.scriptStep = 0;
-					globalState.scripts.runningScriptId = `${globalState.currentLevel}_${currentRooomName}_onEntry`;
+					const scriptId = `${globalState.currentLevel}_${currentRooomName}_onEntry`;
+					globalState.scripts.runningScriptId = scriptId;
 				}
 			} else if (
 				currentRooomName &&
@@ -529,7 +533,8 @@ export default class ScriptHelper {
 				globalState.scripts.runningScript =
 					globalState.availableRooms[currentRooomName].scripts.onClear;
 				globalState.scripts.scriptStep = 0;
-				globalState.scripts.runningScriptId = `${globalState.currentLevel}_${currentRooomName}_onClear`;
+				const scriptId = `${globalState.currentLevel}_${currentRooomName}_onClear`;
+				globalState.scripts.runningScriptId = scriptId;
 			}
 		}
 		if (globalState.scripts.runningScript) {
@@ -573,7 +578,8 @@ export default class ScriptHelper {
 				}
 				(conditionStep.itemIds || []).forEach((itemId, index) => {
 					const requiredCount = (conditionStep.itemQuantities || [])[index] || 1;
-					if (getUnequippedItemCount(itemId) < requiredCount) {
+					const unequipedItemCount = globalState.inventory.bag[itemId as UneqippableItem] || 0;
+					if (unequipedItemCount < requiredCount) {
 						allConditionsFullfilled = false;
 					}
 				});

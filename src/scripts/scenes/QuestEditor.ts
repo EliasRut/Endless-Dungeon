@@ -15,8 +15,14 @@ export default class QuestEditor extends Phaser.Scene {
 	// Details Dialog elements
 	questsDropdownElement: HTMLSelectElement;
 	loadButtonElement: HTMLButtonElement;
-	questNameElement: HTMLInputElement;
 	questGiverDropdownElement: HTMLSelectElement;
+
+	// Quest Data
+	questNameElement: HTMLInputElement;
+	questGiverElement: HTMLInputElement;
+	questDescriptionElement: HTMLTextAreaElement;
+	questPreconditionsElement: HTMLInputElement;
+	// questPreconditionsElement: HTMLInputElement;
 
 	constructor() {
 		super({ key: 'QuestEditor' });
@@ -24,21 +30,24 @@ export default class QuestEditor extends Phaser.Scene {
 
 		this.questsDropdownElement = document.getElementById('questDropdown') as HTMLSelectElement;
 		this.loadButtonElement = document.getElementById('loadQuestButton') as HTMLButtonElement;
-		this.questNameElement = document.getElementById('questName') as HTMLInputElement;
 		this.questGiverDropdownElement = document.getElementById('questGiver') as HTMLSelectElement;
+
+		// Quest Data
+		this.questNameElement = document.getElementById('questName') as HTMLInputElement;
+		this.questGiverElement = document.getElementById('questGiver') as HTMLInputElement;
+		this.questDescriptionElement = document.getElementById(
+			'questDescription'
+		) as HTMLTextAreaElement;
+		this.questPreconditionsElement = document.getElementById(
+			'questPreconditions'
+		) as HTMLInputElement;
 	}
 
 	populateFromDatabase(databaseSelectedQuest: Quest) {
-		const selectedQuest = this.fileData;
-		this.questNameElement.value = selectedQuest.name;
-
-		this.npcs = selectedQuest.npcs || [];
-		this.items = selectedQuest.items || [];
-
-		this.npcTokens.forEach((token) => {
-			token.destroy(true);
-		});
-		this.npcTokens = [];
+		this.questNameElement.value = databaseSelectedQuest.name;
+		this.questNameElement.value = databaseSelectedQuest.name;
+		this.questNameElement.value = databaseSelectedQuest.name;
+		this.questNameElement.value = databaseSelectedQuest.name;
 	}
 
 	async loadNpcList() {
@@ -81,11 +90,11 @@ export default class QuestEditor extends Phaser.Scene {
 		});
 
 		this.loadButtonElement.onclick = async () => {
-			const roomName = this.loadButtonElement.value;
+			const questName = this.loadButtonElement.value;
 
-			const selectedRoomDoc = await this.database.doc(roomName).get();
-			const databaseSelectedRoom = selectedRoomDoc.data() as DatabaseRoom;
-			this.populateFromDatabase(databaseSelectedRoom);
+			const selectedQuestDoc = await this.database.doc(questName).get();
+			const databaseSelectedQuest = selectedQuestDoc.data() as Quest;
+			this.populateFromDatabase(databaseSelectedQuest);
 		};
 	}
 }

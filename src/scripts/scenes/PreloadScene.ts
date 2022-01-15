@@ -23,7 +23,8 @@ export default class PreloadScene extends Phaser.Scene {
 		super({ key: 'PreloadScene' });
 	}
 
-	neededAnimations = [{ name: 'player', facingRange: FacingRange.ALL_DIRECTIONS }];
+	//neededAnimations = [{ name: 'player', facingRange: FacingRange.ALL_DIRECTIONS }];
+	neededAnimations = new Array<{name: string, facingRange: FacingRange}>();
 
 	init() {
 		const text = new Phaser.GameObjects.Text(
@@ -46,10 +47,21 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('search-icon', 'assets/img/search-icon.png');
 
 		// Player
-		this.load.spritesheet('player', 'assets/sprites/main-character.png', {
-			frameWidth: 40,
-			frameHeight: 40,
-		});
+		// this.load.spritesheet('player', 'assets/sprites/main-character.png', {
+		// 	frameWidth: 40,
+		// 	frameHeight: 40,
+		// });
+		// this.load.spritesheet('player-damage', 'assets/sprites/main-character-damagestun.png', {
+		// 	frameWidth: 40,
+		// 	frameHeight: 40,
+		// });
+		// this.load.spritesheet('player-stun', 'assets/sprites/main-character-damagestun.png', {
+		// 	frameWidth: 40,
+		// 	frameHeight: 40,
+		// });
+
+		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');		
+		this.load.aseprite('rich', 'assets/sprites/rich.png', 'assets/sprites/rich.json');
 
 		// Overlay screens
 		this.load.spritesheet('screen-background', 'assets/img/screen-background.png', {
@@ -69,6 +81,15 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('quest', 'assets/img/quest.png');
 
 		// GUI
+		this.load.image('quickselect-wheel', 'assets/img/quickselect-wheel.png');
+		this.load.image(
+			'quickselect-wheel-selection-large',
+			'assets/img/quickselect-wheel-selection-large.png'
+		);
+		this.load.image(
+			'quickselect-wheel-selection-small',
+			'assets/img/quickselect-wheel-selection-small.png'
+		);
 		this.load.image('pad-background', 'assets/img/pad-background.png');
 		this.load.image('pad-stick', 'assets/img/pad-stick.png');
 		this.load.image('icon-backpack', 'assets/img/backpack-icon.png');
@@ -128,8 +149,6 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Find out which files we need by going through all rendered rooms
 		const requiredNpcs = new Set<string>();
-		requiredNpcs.add('enemy-zombie');
-		requiredNpcs.add('enemy-vampire');
 		Object.values(globalState.availableRooms).forEach((room) => {
 			if (!globalState.availableTilesets.includes(room.tileset)) {
 				globalState.availableTilesets.push(room.tileset);
@@ -185,6 +204,8 @@ export default class PreloadScene extends Phaser.Scene {
 		}
 
 		// Create character animations
+		this.anims.createFromAseprite('player');
+		this.anims.createFromAseprite('rich');
 		for (let directionIndex = 0; directionIndex < NUM_DIRECTIONS; directionIndex++) {
 			const numIdleFrames = 4;
 			const numWalkFrames = 8;

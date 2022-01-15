@@ -4,6 +4,7 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
+import { AbilityType } from '../../abilities/abilityData';
 
 const BASE_ATTACK_DAMAGE = 10;
 const REGULAR_ATTACK_RANGE = 75;
@@ -16,18 +17,10 @@ const HEALTH_DROP_CHANCE = 0.06;
 
 const CHARGE_TIME = 1500;
 const ATTACK_DURATION = 3000;
-const WALL_COLLISION_STUN = 2000;
-const PLAYER_STUN = 800;
-const COLLISION_STUN = 1000;
-const LAUNCH_SPEED = 100;
-export default class VampireToken extends EnemyToken {
+export default class PierreToken extends EnemyToken {
 	attacking: boolean;
 	chargeTime: number = CHARGE_TIME;
-	startingHealth: number;
-	launched: boolean = false;
-	damaged: boolean = false;
-	launchX: number;
-	launchY: number;
+	startingHealth: number;			
 
 	constructor(
 		scene: MainScene,
@@ -74,9 +67,6 @@ export default class VampireToken extends EnemyToken {
 
 		if (this.lastMovedTimestamp + KNOCKBACK_TIME > time) {
 			return;
-		} else if (this.launched) {
-			this.setVelocityX(this.launchX);
-			this.setVelocityY(this.launchY);
 		}
 
 		// follows you only if you're close enough, then runs straight at you,
@@ -122,10 +112,8 @@ export default class VampireToken extends EnemyToken {
 		} else {
 			if (this.attackedAt + this.stateObject.attackTime < time) {
 				this.attacking = false;
-				this.launched = false;
 			} else this.attack(time);
 		}
-
 		this.stateObject.x = this.body.x;
 		this.stateObject.y = this.body.y;
 	}
@@ -141,8 +129,7 @@ export default class VampireToken extends EnemyToken {
 	attack(time: number) {
 		if (!this.attacking) {
 			this.attackedAt = time;
-			this.attacking = true;
-			this.damaged = false;
+			this.attacking = true;			
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 		}
@@ -155,47 +142,15 @@ export default class VampireToken extends EnemyToken {
 			const attackAnimationName = `enemy-vampire-prepare-${facingToSpriteNameMap[newFacing]}`;
 			// 9 frames, so 9 frame rate for 1s.
 			const frame = Math.round(((time - this.attackedAt) / this.chargeTime) * 8);
-			this.play({ key: attackAnimationName, frameRate: 10, startFrame: frame });
-		} else if (this.attackedAt + this.chargeTime <= time && !this.launched) {
-			this.launched = true;
-			const tx = this.target.x;
-			const ty = this.target.y;
-			const speeds = getXYfromTotalSpeed(this.y - ty, this.x - tx);
-			const xSpeed = speeds[0] * LAUNCH_SPEED * this.stateObject.slowFactor;
-			const ySpeed = speeds[1] * LAUNCH_SPEED * this.stateObject.slowFactor;
-
-			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const attackAnimationName = `enemy-vampire-fly-${facingToSpriteNameMap[newFacing]}`;
-			this.play({ key: attackAnimationName, repeat: -1 });
-			this.launchX = xSpeed;
-			this.launchY = ySpeed;
-		}
-	}
-
-	onCollide(withEnemy: boolean) {
-		if (this.launched) {
-			let stunDuration = WALL_COLLISION_STUN;
-			if (withEnemy) {
-				stunDuration = COLLISION_STUN;
-				if (!this.damaged) {
-					this.scene.mainCharacter.receiveStun(stunDuration);
-					this.scene.mainCharacter.receiveHit(this.stateObject.damage)
-					this.damaged = true;
-				}
-			}
-			this.receiveStun(stunDuration);
-			const tx = this.target.x;
-			const ty = this.target.y;
-			const xSpeed = tx - this.x;
-			const ySpeed = ty - this.y;
-			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const attackAnimationName = `enemy-vampire-stun-${facingToSpriteNameMap[newFacing]}`;
-			const attackAnimationRecover = `enemy-vampire-recover-${facingToSpriteNameMap[newFacing]}`;
-			// 4 repeats per second, at currently 16 fps.
-			this.play({
-				key: attackAnimationName,
-				repeat: Math.floor((4 * (stunDuration - 500)) / 1000),
-			}).chain({ key: attackAnimationRecover, repeat: 3 });
+			this.play({ key: attackAnimationName, startFrame: frame });
+		} else {
+			this.scene.abilityHelper.triggerAbility(
+				this.stateObject,
+				this.stateObject,
+				AbilityType.BAT,
+				this.level,
+				time
+			);
 		}
 	}
 }

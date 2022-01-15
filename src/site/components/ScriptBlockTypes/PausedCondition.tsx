@@ -307,8 +307,8 @@ const ItemsContainer = styled.div`
 `;
 
 const AddButton = styled.button`
-	width: 24px;
-	height: 30px;
+	width: 30px;
+	/* height: 30px; */
 	/* margin-top: 12px; */
 	background-color: black;
 	border: 0.5px solid #2ca831;
@@ -316,10 +316,11 @@ const AddButton = styled.button`
 	cursor: pointer;
 `;
 
-const AddButtonText = styled.text`
+const AddButtonText = styled.p`
 	font-family: 'endlessDungeon';
 	font-size: 1.5rem;
 	color: #2ca831;
+	margin: 0 1px 0 2px;
 `;
 
 const TextWrapper = styled.div`
@@ -333,16 +334,17 @@ const HeaderWrapper = styled.div`
 `;
 
 const CloseButton = styled.button`
-	width: 22px;
-	height: 24px;
+	width: 30px;
+	height: 30px;
 	background-color: black;
 	border: 0.5px solid #9c1309;
 	border-radius: 4px;
 	cursor: pointer;
 `;
 
-const CloseButtonText = styled.text`
+const CloseButtonText = styled.p`
 	font-family: 'endlessDungeon';
 	font-size: 1rem;
 	color: #9c1309;
+	margin: 0 1px 0 2px;
 `;

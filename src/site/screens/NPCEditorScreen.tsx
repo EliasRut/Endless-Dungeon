@@ -2,7 +2,7 @@ import 'phaser';
 import React, { useEffect, useRef } from 'react';
 import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import firebase from 'firebase';
 import { Input } from '../components/Input';
@@ -132,17 +132,22 @@ const NavigationWrapper = styled.div`
 	padding: 24px 0;
 `;
 
-const StyledLink = styled(Link)`
-	font-family: 'endlessDungeon';
-	font-size: 2rem;
-	padding: 6px 24px;
-	cursor: pointer;
-	text-decoration: none;
-	color: black;
-	background-color: white;
-	border-style: solid;
-	border-radius: 0.5rem;
-	margin: 0 24px;
+const StyledLink = styled(NavLink)`
+	& {
+		font-family: 'endlessDungeon';
+		font-size: 2rem;
+		padding: 6px 24px;
+		cursor: pointer;
+		text-decoration: none;
+		color: black;
+		background-color: #ffffff;
+		border-style: solid;
+		border-radius: 0.5rem;
+		margin: 0 24px;
+	}
+	&.active {
+		background-color: #a09f9f;
+	}
 `;
 
 const PageWrapper = styled.div`

@@ -5,7 +5,7 @@ import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 
-const BASE_ATTACK_DAMAGE = 10;
+const BASE_ATTACK_DAMAGE = 0.1;
 const REGULAR_ATTACK_RANGE = 25;
 const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
@@ -13,7 +13,7 @@ const BASE_HEALTH = 4;
 
 const ATTACK_DAMAGE_DELAY = 250;
 
-const ITEM_DROP_CHANCE = 0.15;
+const ITEM_DROP_CHANCE = 0.65;
 const HEALTH_DROP_CHANCE = 0.06;
 
 export default class ZombieToken extends EnemyToken {
@@ -30,7 +30,7 @@ export default class ZombieToken extends EnemyToken {
 	) {
 		super(scene, x, y, tokenName, id);
 		// cool effects!
-		this.level = level - 1;
+		this.level = level;
 		this.attackRange = REGULAR_ATTACK_RANGE;
 		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
 		this.attackExecuted = false;
@@ -89,8 +89,14 @@ export default class ZombieToken extends EnemyToken {
 			this.attackRange < distance
 		) {
 			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
-			const xSpeed = ((tx - this.x) / totalDistance) * this.stateObject.movementSpeed;
-			const ySpeed = ((ty - this.y) / totalDistance) * this.stateObject.movementSpeed;
+			const xSpeed =
+				((tx - this.x) / totalDistance) *
+				this.stateObject.movementSpeed *
+				this.stateObject.slowFactor;
+			const ySpeed =
+				((ty - this.y) / totalDistance) *
+				this.stateObject.movementSpeed *
+				this.stateObject.slowFactor;
 			this.setVelocityX(xSpeed);
 			this.setVelocityY(ySpeed);
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
@@ -125,7 +131,7 @@ export default class ZombieToken extends EnemyToken {
 			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 
-			const attackAnimationName = `enemy-zombie-slash-${facingToSpriteNameMap[newFacing]}`;
+			const attackAnimationName = `${this.tokenName}-attack-${facingToSpriteNameMap[newFacing]}`;
 			this.play(attackAnimationName);
 
 			this.setVelocityX(0);
@@ -142,7 +148,7 @@ export default class ZombieToken extends EnemyToken {
 		const distance = this.getDistance(tx, ty);
 
 		if (distance < this.attackRange) {
-			player.health -= this.stateObject.damage;
+			this.scene.mainCharacter.receiveHit(this.stateObject.damage);
 		}
 	}
 }

@@ -9,6 +9,7 @@ import { QuestState } from './QuestState';
 import RoomAssignment from './RoomAssignment';
 import { RoomCoordinates } from './RoomCoordinates';
 import ScriptState from './ScriptState';
+import { EmptyInventory } from './Inventory';
 
 /*
 	This file contains the full, current game state. It is intended to handle all information that
@@ -54,8 +55,9 @@ export class WorldState {
 	constructor() {
 		this.playerCharacter = new PlayerCharacter();
 		this.dungeon = new Dungeon();
-		this.inventory = new Inventory();
+		this.inventory = { ...EmptyInventory };
 		this.itemList = [];
+		this.gameTime = 0;
 	}
 
 	storeState() {

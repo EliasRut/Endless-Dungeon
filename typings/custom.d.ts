@@ -59,6 +59,7 @@ export interface ScriptWait {
 
 export interface ScriptCondition {
 	type: 'condition';
+	conditionType: 'hasItem' | 'scriptState';
 	itemId?: string;
 	scriptId?: string;
 	scriptState?: 'new' | 'ongoing' | 'finished';
@@ -291,7 +292,7 @@ export interface Quest {
 	questGiverName: string;
 	preconditions?: {
 		previousQuests?: string[];
-		hasItems?: string[];
+		requiredItems?: ItemWithCount[];
 		dungeonLevelReached?: number;
 	};
 	completionCriterias?: {
@@ -301,9 +302,10 @@ export interface Quest {
 	};
 	name: string;
 	goal: string;
-	rewards?: {
-		items: {
-			[id: string]: number;
-		};
-	};
+	rewards?: ItemWithCount[];
+}
+
+export interface ItemWithCount {
+	id: string;
+	count: number;
 }

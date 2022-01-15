@@ -13,6 +13,7 @@ import { UiDepths } from '../helpers/constants';
 import fixedItems from '../../items/fixedItems.json';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import Item from '../worldstate/Item';
+import { getItemDataForName, UneqippableItem } from '../../items/itemData';
 
 const MIN_ZOOM_LEVEL = 0.125;
 
@@ -48,7 +49,7 @@ interface MultiLevelLayout {
 
 type LevelHistory = MultiLevelLayout[];
 
-const npcKeys = ['hilda-base', 'vanya-base', 'agnes', 'erwin', 'enemy-zombie', 'enemy-vampire'];
+const npcKeys = ['hilda-base', 'vanya-base', 'agnes', 'erwin', 'rich', 'enemy-vampire'];
 
 export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
@@ -807,14 +808,14 @@ export default class MapEditor extends Phaser.Scene {
 
 		const { x, y, id } = itemPosition;
 
-		const item = {
-			...(fixedItems as { [id: string]: Partial<Item> })[id],
-		} as Item;
+		const itemData = getItemDataForName(id);
 		const itemToken = new WorldItemToken(
 			this as any,
 			x * TILE_WIDTH - this.widthInPixels / 2,
 			y * TILE_HEIGHT - this.heightInPixels / 2,
-			item
+			id as UneqippableItem,
+			itemData,
+			0
 		);
 		itemToken.setAlpha(this.activeLayerDropdownElement.value === 'items' ? 1 : 0.7);
 		itemToken.setDepth(DEPTHS.npcLayer);
@@ -841,14 +842,14 @@ export default class MapEditor extends Phaser.Scene {
 		};
 
 		const { id } = itemPosition;
-		const item = {
-			...(fixedItems as { [id: string]: Partial<Item> })[id],
-		} as Item;
+		const itemData = getItemDataForName(id);
 		const itemToken = new WorldItemToken(
 			this as any,
 			x * TILE_WIDTH - this.widthInPixels / 2,
 			y * TILE_HEIGHT - this.heightInPixels / 2,
-			item
+			id as UneqippableItem,
+			itemData,
+			0
 		);
 		this.add.existing(itemToken);
 		itemToken.setAlpha(1);
@@ -1359,14 +1360,14 @@ export default class MapEditor extends Phaser.Scene {
 		(this.items || []).forEach((itemPosition, index) => {
 			const { x, y, id } = itemPosition;
 
-			const item = {
-				...(fixedItems as { [id: string]: Partial<Item> })[id],
-			} as Item;
+			const itemData = getItemDataForName(id);
 			const itemToken = new WorldItemToken(
 				this as any,
 				x * TILE_WIDTH - this.widthInPixels / 2,
 				y * TILE_HEIGHT - this.heightInPixels / 2,
-				item
+				id as UneqippableItem,
+				itemData,
+				0
 			);
 
 			this.itemTokens.push(itemToken);

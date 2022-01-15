@@ -21,7 +21,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 	questDescriptionHeader: Phaser.GameObjects.Text | undefined;
 	questDescription: Phaser.GameObjects.Text | undefined;
 	questRequirementsHeader: Phaser.GameObjects.Text | undefined;
-	questRequirements: Phaser.GameObjects.Text | undefined;
+	// questRequirements: Phaser.GameObjects.Text | undefined;
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
@@ -42,7 +42,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 		this.questDescriptionHeader?.destroy(true);
 		this.questDescription?.destroy(true);
 		this.questRequirementsHeader?.destroy(true);
-		this.questRequirements?.destroy(true);
+		// this.questRequirements?.destroy(true);
 
 		if (!this.activeQuestId) {
 			return;
@@ -144,19 +144,19 @@ export default class QuestDetailsScreen extends OverlayScreen {
 		this.questRequirementsHeader.setScrollFactor(0);
 		this.add(this.questRequirementsHeader, true);
 
-		this.questRequirements = new Phaser.GameObjects.Text(
-			this.scene,
-			QUEST_DETAILS_BORDER_X - 5,
-			this.questRequirementsHeader.y + this.questRequirementsHeader.height,
-			quest.preconditions?.hasItems ? quest.preconditions?.hasItems : '',
-			{
-				color: 'black',
-				wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
-				fontFamily: 'endlessDungeon',
-			}
-		);
-		this.questRequirements.setDepth(UiDepths.UI_BACKGROUND_LAYER);
-		this.questRequirements.setScrollFactor(0);
-		this.add(this.questRequirements, true);
+		// this.questRequirements = new Phaser.GameObjects.Text(
+		// 	this.scene,
+		// 	QUEST_DETAILS_BORDER_X - 5,
+		// 	this.questRequirementsHeader.y + this.questRequirementsHeader.height,
+		// 	quest.preconditions?.requiredItems ? quest.preconditions?.requiredItems : [],
+		// 	{
+		// 		color: 'black',
+		// 		wordWrap: { width: SCREEN_WIDTH - 40, useAdvancedWrap: true },
+		// 		fontFamily: 'endlessDungeon',
+		// 	}
+		// );
+		// this.questRequirements.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		// this.questRequirements.setScrollFactor(0);
+		// this.add(this.questRequirements, true);
 	}
 }
