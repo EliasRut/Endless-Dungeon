@@ -1,4 +1,4 @@
-import { facingToSpriteNameMap, KNOCKBACK_TIME } from '../../helpers/constants';
+import { facingToSpriteNameMap, KNOCKBACK_TIME, SCALE } from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -88,13 +88,13 @@ export default class ZombieToken extends EnemyToken {
 			this.attackedAt + this.stateObject.attackTime < time &&
 			this.attackRange < distance
 		) {
-			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
+			const totalDistance = Math.abs(tx * SCALE - this.x) + Math.abs(ty * SCALE - this.y);
 			const xSpeed =
-				((tx - this.x) / totalDistance) *
+				((tx * SCALE - this.x) / totalDistance) *
 				this.stateObject.movementSpeed *
 				this.stateObject.slowFactor;
 			const ySpeed =
-				((ty - this.y) / totalDistance) *
+				((ty * SCALE - this.y) / totalDistance) *
 				this.stateObject.movementSpeed *
 				this.stateObject.slowFactor;
 			this.setVelocityX(xSpeed);
@@ -102,21 +102,29 @@ export default class ZombieToken extends EnemyToken {
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const animation = updateMovingState(this.stateObject, true, newFacing);
 			if (animation) {
-				this.play(animation);
+				if (this.anims.exists(animation)) {
+					this.play(animation);
+				} else {
+					console.log(`Animation ${animation} does not exist.`);
+				}
 			}
 		} else {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
 			if (animation) {
-				this.play(animation);
+				if (this.anims.exists(animation)) {
+					this.play(animation);
+				} else {
+					console.log(`Animation ${animation} does not exist.`);
+				}
 			}
 		}
 		if (distance <= this.attackRange) {
 			this.attack(time);
 		}
-		this.stateObject.x = this.body.x;
-		this.stateObject.y = this.body.y;
+		this.stateObject.x = this.body.x / SCALE;
+		this.stateObject.y = this.body.y / SCALE;
 	}
 
 	destroy() {
@@ -125,8 +133,8 @@ export default class ZombieToken extends EnemyToken {
 
 	attack(time: number) {
 		if (this.attackedAt + this.stateObject.attackTime < time) {
-			const tx = this.target.x;
-			const ty = this.target.y;
+			const tx = this.target.x * SCALE;
+			const ty = this.target.y * SCALE;
 			const xSpeed = tx - this.x;
 			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
@@ -147,7 +155,7 @@ export default class ZombieToken extends EnemyToken {
 		const ty = player.y;
 		const distance = this.getDistanceToWorldStatePosition(tx, ty);
 
-		if (distance < this.attackRange) {
+		if (distance < this.attackRange * SCALE) {
 			this.scene.mainCharacter.receiveHit(this.stateObject.damage);
 		}
 	}

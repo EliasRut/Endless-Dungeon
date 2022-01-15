@@ -1,4 +1,4 @@
-import { Facings, facingToSpriteNameMap, KNOCKBACK_TIME } from '../../helpers/constants';
+import { Facings, facingToSpriteNameMap, KNOCKBACK_TIME, SCALE } from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -27,7 +27,7 @@ export default class VampireToken extends EnemyToken {
 	launched: boolean = false;
 	damaged: boolean = false;
 	launchX: number;
-	launchY: number;	
+	launchY: number;
 
 	constructor(
 		scene: MainScene,
@@ -153,14 +153,14 @@ export default class VampireToken extends EnemyToken {
 		if (this.attackedAt + this.chargeTime > time) {
 			const tx = this.target.x;
 			const ty = this.target.y;
-			const xSpeed = tx - this.x;
-			const ySpeed = ty - this.y;
-			const newFacing = getFacing4Dir(xSpeed, ySpeed);			
+			const xSpeed = tx * SCALE - this.x;
+			const ySpeed = ty * SCALE - this.y;
+			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			// 9 frames, so 9 frame rate for 1s.
-			if (this.attackedAt === time || this.stateObject.currentFacing !== newFacing) {				
+			if (this.attackedAt === time || this.stateObject.currentFacing !== newFacing) {
 				const attackAnimationName = `jacques-attack-${facingToSpriteNameMap[newFacing]}`;
-				this.play({ key: attackAnimationName, frameRate: 9});
-				this.anims.setProgress(((time - this.attackedAt) / this.chargeTime));
+				this.play({ key: attackAnimationName, frameRate: 9 });
+				this.anims.setProgress((time - this.attackedAt) / this.chargeTime);
 				this.stateObject.currentFacing = newFacing;
 			}
 		} else if (this.attackedAt + this.chargeTime <= time && !this.launched) {
@@ -202,7 +202,7 @@ export default class VampireToken extends EnemyToken {
 			this.play({
 				key: stunAnimation,
 				repeat: Math.floor((4 * (stunDuration - 500)) / 1000),
-			}).chain({ key: recoverAnimation, repeat: 3 });			
+			}).chain({ key: recoverAnimation, repeat: 3 });
 		}
 	}
 }

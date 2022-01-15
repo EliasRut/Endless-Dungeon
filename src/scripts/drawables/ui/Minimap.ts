@@ -1,14 +1,10 @@
 import globalState from '../../worldstate/index';
-import {
-	BLOCK_SIZE,
-	TILE_WIDTH,
-	TILE_HEIGHT
-} from '../../helpers/generateDungeon';
+import { BLOCK_SIZE, TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
-import { UiDepths } from '../../helpers/constants';
+import { UiDepths, UI_SCALE } from '../../helpers/constants';
 
 const X_POSITION = 10;
-const Y_POSITION = 200;
+const Y_POSITION = 160;
 
 const isTileVisible = (tile: Phaser.Tilemaps.Tile) => {
 	// tslint:disable-next-line: no-magic-numbers
@@ -17,9 +13,9 @@ const isTileVisible = (tile: Phaser.Tilemaps.Tile) => {
 
 export default class Minimap extends Phaser.GameObjects.Text {
 	constructor(scene: Phaser.Scene) {
-		super(scene, X_POSITION, Y_POSITION, '', {
+		super(scene, X_POSITION * UI_SCALE, Y_POSITION * UI_SCALE, '', {
 			color: 'white',
-			fontSize: '5px'
+			fontSize: `${4 * UI_SCALE}pt`,
 		});
 		this.setScrollFactor(0);
 		scene.add.existing(this);
@@ -37,10 +33,10 @@ export default class Minimap extends Phaser.GameObjects.Text {
 		const width = layout[0].length;
 		const height = layout.length;
 
-		const yDown = 	(yyPos - 3*TILE_HEIGHT);
-		const yUp = 	(yyPos + 3*TILE_HEIGHT);
-		const xLeft = 	(xxPos - 3*TILE_WIDTH);
-		const xRight = 	(xxPos + 3*TILE_WIDTH);
+		const yDown = yyPos - 3 * TILE_HEIGHT;
+		const yUp = yyPos + 3 * TILE_HEIGHT;
+		const xLeft = xxPos - 3 * TILE_WIDTH;
+		const xRight = xxPos + 3 * TILE_WIDTH;
 
 		let map = '';
 
@@ -60,7 +56,6 @@ export default class Minimap extends Phaser.GameObjects.Text {
 			secondRow = '';
 			thirdRow = '';
 			for (let x = Math.max(0, xLeft); x < Math.min(width, xRight); x += BLOCK_SIZE) {
-
 				// tslint:disable: no-magic-numbers
 				const topLeftTile = mainScene.tileLayer.getTileAt(x, y);
 				const topMiddleTile = mainScene.tileLayer.getTileAt(x + 4, y);

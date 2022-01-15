@@ -1,8 +1,8 @@
-import { UiDepths } from '../../helpers/constants';
+import { UiDepths, UI_SCALE } from '../../helpers/constants';
 import globalState from '../../worldstate/index';
 
 const X_POSITION = 10;
-const Y_POSITION = 180;
+const Y_POSITION = 146;
 
 const isTileVisible = (tile: Phaser.Tilemaps.Tile) => {
 	// tslint:disable-next-line: no-magic-numbers
@@ -11,9 +11,10 @@ const isTileVisible = (tile: Phaser.Tilemaps.Tile) => {
 
 export default class Minimap extends Phaser.GameObjects.Text {
 	constructor(scene: Phaser.Scene) {
-		super(scene, X_POSITION, Y_POSITION, '', {
+		super(scene, X_POSITION * UI_SCALE, Y_POSITION * UI_SCALE, '', {
 			color: 'white',
-			fontSize: '10px'
+			fontSize: `${6 * UI_SCALE}pt`,
+			fontFamily: 'endlessDungeon',
 		});
 		this.setScrollFactor(0);
 		scene.add.existing(this);
@@ -21,5 +22,4 @@ export default class Minimap extends Phaser.GameObjects.Text {
 		this.setText(globalState.roomAssignment[globalState.currentLevel]?.title || '');
 		this.setDepth(UiDepths.UI_STICK_LAYER);
 	}
-
 }

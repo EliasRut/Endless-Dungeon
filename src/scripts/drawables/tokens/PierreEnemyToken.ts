@@ -1,4 +1,4 @@
-import { Facings, facingToSpriteNameMap, KNOCKBACK_TIME } from '../../helpers/constants';
+import { Facings, facingToSpriteNameMap, KNOCKBACK_TIME, SCALE } from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -82,16 +82,18 @@ export default class PierreToken extends EnemyToken {
 				if (
 					px !== tx ||
 					py !== ty ||
-					this.attackRange < this.getDistanceToWorldStatePosition(tx, ty)
+					this.attackRange * SCALE < this.getDistanceToWorldStatePosition(tx, ty)
 				) {
 					const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
 					const xSpeed =
-						((tx - this.x) / totalDistance) *
+						((tx * SCALE - this.x) / totalDistance) *
 						this.stateObject.movementSpeed *
+						SCALE *
 						this.stateObject.slowFactor;
 					const ySpeed =
-						((ty - this.y) / totalDistance) *
+						((ty * SCALE - this.y) / totalDistance) *
 						this.stateObject.movementSpeed *
+						SCALE *
 						this.stateObject.slowFactor;
 					this.setVelocityX(xSpeed);
 					this.setVelocityY(ySpeed);
@@ -121,8 +123,8 @@ export default class PierreToken extends EnemyToken {
 				this.launched = false;
 			} else this.attack(time);
 		}
-		this.stateObject.x = this.body.x;
-		this.stateObject.y = this.body.y;
+		this.stateObject.x = this.body.x / SCALE;
+		this.stateObject.y = this.body.y / SCALE;
 	}
 
 	destroy() {
@@ -135,8 +137,8 @@ export default class PierreToken extends EnemyToken {
 	// FRAME RATE: 16
 	attack(time: number) {
 		if (!this.attacking) {
-			const tx = this.target.x;
-			const ty = this.target.y;
+			const tx = this.target.x * SCALE;
+			const ty = this.target.y * SCALE;
 			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
 			const xFactor = (tx - this.x) / totalDistance;
 			const yFactor = (ty - this.y) / totalDistance;
@@ -148,8 +150,8 @@ export default class PierreToken extends EnemyToken {
 			this.setVelocityY(0);
 		}
 		if (this.attackedAt + this.chargeTime > time) {
-			const tx = this.target.x;
-			const ty = this.target.y;
+			const tx = this.target.x * SCALE;
+			const ty = this.target.y * SCALE;
 			const xSpeed = tx - this.x;
 			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);

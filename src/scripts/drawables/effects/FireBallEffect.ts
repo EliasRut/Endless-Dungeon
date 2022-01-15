@@ -28,7 +28,6 @@ export default class FireBallEffect extends TargetingEffect {
 		scene.physics.add.existing(this);
 		this.body.setCircle(BODY_RADIUS, 0, 0);
 		this.body.setMass(1);
-		this.play({ key: 'Bat Down', frameRate: 120 });
 
 		const particles = scene.add.particles('fire');
 		this.emitter = particles.createEmitter({
