@@ -185,7 +185,7 @@ const LoadRoomHeader = styled.div`
 `;
 
 const StyledLink = styled(Link)`
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 2rem;
 	padding: 6px 24px;
 	cursor: pointer;
@@ -217,7 +217,7 @@ const MenueWrapper = styled.div`
 	color: white;
 	display: flex;
 	flex-direction: column;
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1.2rem;
 	padding: 24px;
 	padding-top: 0;
@@ -229,7 +229,7 @@ const ButtonWrapper = styled.div`
 
 const StyledButton = styled.button`
 	width: 148px;
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1rem;
 	padding: 8px;
 `;
@@ -257,7 +257,7 @@ const InputWrapper = styled.div`
 
 const Input = styled.input`
 	width: 140px;
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1rem;
 `;
 
@@ -321,7 +321,7 @@ const ItemDetailsDialog = styled.div`
 
 const DialogTitle = styled.h2`
 	color: #fff;
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1.2rem;
 	margin: 0;
 `;

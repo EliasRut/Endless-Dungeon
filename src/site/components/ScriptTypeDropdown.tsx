@@ -59,7 +59,7 @@ const CloseButton = styled.button`
 `;
 
 const ButtonText = styled.text`
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1rem;
 	color: #9c1309;
 `;

@@ -316,7 +316,7 @@ const AddButton = styled.button`
 `;
 
 const AddButtonText = styled.text`
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1.5rem;
 	color: #2ca831;
 `;
@@ -339,7 +339,7 @@ const CloseButton = styled.button`
 `;
 
 const CloseButtonText = styled.text`
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1rem;
 	color: #9c1309;
 `;

@@ -314,7 +314,7 @@ const NavigationWrapper = styled.div`
 `;
 
 const StyledLink = styled(Link)`
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 2rem;
 	padding: 6px 24px;
 	cursor: pointer;
@@ -338,7 +338,7 @@ const MenueWrapper = styled.div`
 	color: white;
 	display: flex;
 	flex-direction: column;
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1.2rem;
 	padding: 24px;
 `;
@@ -349,7 +349,7 @@ const ButtonWrapper = styled.div`
 
 const StyledButton = styled.button`
 	width: 148px;
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1rem;
 	margin: 0;
 	padding: 8px;
@@ -398,7 +398,7 @@ const AddButton = styled.button`
 `;
 
 const ButtonText = styled.text`
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1.5rem;
 	color: #2ca831;
 `;

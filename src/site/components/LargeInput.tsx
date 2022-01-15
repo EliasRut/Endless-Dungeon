@@ -7,6 +7,6 @@ export const LargeInput = (props: any) => (
 
 const FormattedInput = styled.input`
 	width: 350px;
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1rem;
 `;

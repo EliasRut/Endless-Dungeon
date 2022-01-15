@@ -5,6 +5,6 @@ export const Input = (props: any) => <FormattedInput {...props}>{props.children}
 
 const FormattedInput = styled.input`
 	width: 140px;
-	font-family: 'munro';
+	font-family: 'endlessDungeon';
 	font-size: 1rem;
 `;

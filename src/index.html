@@ -1,69 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-    />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+		/>
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-    <meta name="theme-color" content="#000000" />
+		<meta name="theme-color" content="#000000" />
 
-    <link rel="manifest" href="./manifest.json" />
+		<link rel="manifest" href="./manifest.json" />
 
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="application-name" content="<%= htmlWebpackPlugin.options.gameName %>" />
-    <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.gameName %>" />
-    <meta name="msapplication-starturl" content="./" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="application-name" content="<%= htmlWebpackPlugin.options.gameName %>" />
+		<meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.gameName %>" />
+		<meta name="msapplication-starturl" content="./" />
 
-    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icons-192.png" />
-    <link rel="apple-touch-icon" type="image/png" sizes="192x192" href="./icons/icons-192.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="./icons/icons-192.png" />
+		<link rel="apple-touch-icon" type="image/png" sizes="192x192" href="./icons/icons-192.png" />
 
-    <link rel="icon" type="image/png" sizes="512x512" href="./icons/icons-512.png" />
-    <link rel="apple-touch-icon" type="image/png" sizes="512x512" href="./icons/icons-512.png" />
+		<link rel="icon" type="image/png" sizes="512x512" href="./icons/icons-512.png" />
+		<link rel="apple-touch-icon" type="image/png" sizes="512x512" href="./icons/icons-512.png" />
 
-    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+		<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
 
-    <title><%= htmlWebpackPlugin.options.gameName %></title>
-    <style>
-      @font-face {
-        font-family: munro;
-        src: url('./assets/fonts/munro.ttf');
-        font-weight: 400;
-        font-weight: normal;
-      }
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        background-color: #000000;
-      }
-      html, body, #phaser-game {
-        image-rendering: optimizeSpeed;              /* Older versions of FF */
-        image-rendering: -moz-crisp-edges;           /* FF 6.0+ */
-        image-rendering: -webkit-optimize-contrast;  /* Webkit (non standard naming) */
-        image-rendering: -o-crisp-edges;             /* OS X & Windows Opera (12.02+) */
-        image-rendering: crisp-edges;                /* Possible future browsers. */
-        -ms-interpolation-mode: nearest-neighbor;    /* IE (non standard naming) */
-        image-rendering: pixelated;                  /* Chrome 41 */
-      }
-    </style>
-    <div style="font-family:munro; position:absolute; left:-1000px; visibility:hidden;">.</div>
-    <noscript>Please enable javascript to continue using this application.</noscript>
+		<title><%= htmlWebpackPlugin.options.gameName %></title>
+		<style>
+			@font-face {
+				font-family: endlessDungeon;
+				/* src: url('./assets/fonts/munro.ttf'); */
+				src: url('./assets/fonts/endlessDungeon.ttf');
+				font-weight: 400;
+				font-weight: normal;
+			}
+			html,
+			body {
+				height: 100%;
+				margin: 0;
+				background-color: #000000;
+			}
+			html,
+			body,
+			#phaser-game {
+				image-rendering: optimizeSpeed; /* Older versions of FF */
+				image-rendering: -moz-crisp-edges; /* FF 6.0+ */
+				image-rendering: -webkit-optimize-contrast; /* Webkit (non standard naming) */
+				image-rendering: -o-crisp-edges; /* OS X & Windows Opera (12.02+) */
+				image-rendering: crisp-edges; /* Possible future browsers. */
+				-ms-interpolation-mode: nearest-neighbor; /* IE (non standard naming) */
+				image-rendering: pixelated; /* Chrome 41 */
+			}
+		</style>
+		<div style="font-family: endlessDungeon; position: absolute; left: -1000px; visibility: hidden">
+			.
+		</div>
+		<noscript>Please enable javascript to continue using this application.</noscript>
 
-    <!-- installs the serviceWorker -->
-    <!-- <script>
+		<!-- installs the serviceWorker -->
+		<!-- <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js')
         })
       }
     </script> -->
-  </head>
-  <body>
-    <div id="root" style="height:100%"></div>
-    <!-- <div id="phaser-game" style="flex-grow: 1"></div> -->
-  </body>
+	</head>
+	<body>
+		<div id="root" style="height: 100%"></div>
+		<!-- <div id="phaser-game" style="flex-grow: 1"></div> -->
+	</body>
 </html>

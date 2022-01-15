@@ -32,7 +32,7 @@ export default class PreloadScene extends Phaser.Scene {
 			this.cameras.main.centerY,
 			'Loading ...',
 			{
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 				color: 'white',
 				fontSize: '26px',
 			}
