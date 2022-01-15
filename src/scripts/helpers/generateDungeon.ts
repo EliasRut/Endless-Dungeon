@@ -436,7 +436,7 @@ export default class DungeonGenerator {
 				this.npcs.push({
 					facingX: 0,
 					facingY: 0,
-					type: 'enemy-vampire',
+					type: 'pierre',
 					id: `filler-${lastId++}`,
 					x: x * TILE_WIDTH,
 					y: y * TILE_HEIGHT

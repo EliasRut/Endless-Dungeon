@@ -6,19 +6,19 @@ import {
 	TARGETABLE_TILE_TINT,
 	VISITED_TILE_TINT,
 } from '../../helpers/constants';
-import { getFacing8Dir } from '../../helpers/movement';
+import { getFacing4Dir } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import CharacterToken from '../tokens/CharacterToken';
 import AbilityEffect from './AbilityEffect';
 
 export default class TargetingEffect extends AbilityEffect {
 	allowedTargets: PossibleTargets = PossibleTargets.NONE;
-	seekingSpeed: number = 3000;
+	seekingSpeed: number = 500;
 	seekingTimeOffset: number = 150;
-	animations: boolean = false;	
+	animationName: string = '';	
 
 	update(time: number) {
-		if (time - this.castTime < this.seekingTimeOffset) {
+		if (time - this.castTime < this.seekingTimeOffset) {			
 			return;
 		}
 		let nearestEnemy: CharacterToken | undefined;
@@ -46,13 +46,13 @@ export default class TargetingEffect extends AbilityEffect {
 				nearestEnemy.y > this.y ? this.seekingSpeed : -this.seekingSpeed
 			);			
 		}
-		if(this.animations === true) {			
+		if(this.animationName !== '') {			
 			const xSpeed = this.body.velocity.x;
 			const ySpeed = this.body.velocity.y;
-			const newFacing = getFacing8Dir(xSpeed, ySpeed);
-			if(this.facing !== newFacing) {
+			const newFacing = getFacing4Dir(xSpeed, ySpeed);
+			if(this.facing !== newFacing) {				
 				this.facing = newFacing;
-				const animation = `${this.spriteName}-${facingToSpriteNameMap[newFacing]}`;
+				const animation = `${this.animationName}-${facingToSpriteNameMap[newFacing]}`;
 				this.play({ key: animation, repeat: -1 });
 			}
 		}		

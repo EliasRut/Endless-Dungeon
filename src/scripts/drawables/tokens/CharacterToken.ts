@@ -1,5 +1,5 @@
 import { NpcScript } from '../../../../typings/custom';
-import { Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
+import { facingToSpriteNameMap, Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -25,6 +25,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	hitAt: number;
 	lastIceEffectTimestamp: number;
 	iceEffectStacks: number;
+	tokenName: string;
 
 	constructor(scene: MainScene, x: number, y: number, tileName: string, type: string, id: string) {
 		super(scene, x * SCALE, y * SCALE, tileName);
@@ -38,12 +39,18 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		this.necroticEffectStacks = 0;
 		this.lastIceEffectTimestamp = -Infinity;
 		this.iceEffectStacks = 0;
+		this.tokenName = tileName;
 	}
 
 	public onCollide(withEnemy: boolean) {}
 
 	public receiveHit(damage: number) {
 		this.stateObject.health -= damage;
+		if(this.receiveStun(250)) {
+			console.log(this.type);
+			this.play({key: `${this.type}-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`})
+			.chain({key: `${this.type}-idle-${facingToSpriteNameMap[this.stateObject.currentFacing]}`});
+		}
 	}
 	public receiveStun(duration: number) {
 		const time = globalState.gameTime;

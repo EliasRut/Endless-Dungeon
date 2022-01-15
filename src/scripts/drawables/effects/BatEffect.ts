@@ -7,7 +7,7 @@ const BODY_RADIUS = 6;
 const VISIBILITY_DELAY = 50;
 
 
-export default class GenericFlyingObject extends TargetingEffect {
+export default class BatEffect extends TargetingEffect {
     constructor(
         scene: Phaser.Scene,
         x: number,
@@ -16,18 +16,17 @@ export default class GenericFlyingObject extends TargetingEffect {
         facing: Facings,
         projectileData: ProjectileData
     ) {
-        super(scene, x, y, spriteName, facing, projectileData);
+        super(scene, x, y, 'empty-tile', facing, projectileData);
         scene.add.existing(this);
-        this.setRotation(getRotationInRadiansForFacing(facing));
         this.setDepth(1);
         scene.physics.add.existing(this);
         this.body.setCircle(BODY_RADIUS, 0, 0);
         this.body.setMass(1);
-        if (projectileData.targeting && spriteName !== '') {
-            this.animations = true;
-			const animation = `${spriteName}-${facingToSpriteNameMap[facing]}`;
-			this.play({ key: animation, repeat: -1 });
-        }        
+        if (projectileData.targeting) this.animationName = `${spriteName}-fly`;
+        const spawnAnimation = `${spriteName}-spawn-${facingToSpriteNameMap[facing]}`;
+        const animation = `${this.animationName}-${facingToSpriteNameMap[facing]}`;
+        this.play({ key: spawnAnimation })
+            .chain({ key: animation, repeat: -1 })        
 
         if (projectileData?.timeToLive) {
             setTimeout(() => {

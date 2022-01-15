@@ -122,7 +122,8 @@ export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingR
 	'red-link': { file: 'assets/sprites/red-link.png', facing: FacingRange.ALL_DIRECTIONS },
 	'naked-guy': { file: 'assets/sprites/naked-guy.png', facing: FacingRange.ALL_DIRECTIONS },
 	'rich': { file: 'assets/sprites/rich.png', facing: FacingRange.ONLY_NESW },
-	'enemy-vampire': { file: 'assets/sprites/enemy-vampire.png', facing: FacingRange.ONLY_NESW },
+	'jacques': { file: 'assets/sprites/jacques.png', facing: FacingRange.ONLY_NESW },
+	'pierre': { file: 'assets/sprites/pierre.png', facing: FacingRange.ONLY_NESW },
 	'lich-king': { file: 'assets/sprites/rich.png', facing: FacingRange.ONLY_NESW },
 };
 
@@ -142,46 +143,46 @@ export const characterToSubAnimationFileMap: {
 	// 		framesPerDirection: 16,
 	// 	},
 	// },
-	'enemy-vampire': {
-		prepare: {
-			file: 'assets/sprites/enemy-vampire-charge.png',
-			framesPerDirection: 16,
-			frameOffset: 0,
-			animationFrames: 9,
-		},
-		fly: {
-			file: 'assets/sprites/enemy-vampire-charge.png',
-			framesPerDirection: 16,
-			frameOffset: 9,
-			animationFrames: 1,
-		},
-		stun: {
-			file: 'assets/sprites/enemy-vampire-charge.png',
-			framesPerDirection: 16,
-			frameOffset: 10,
-			animationFrames: 4,
-		},
-		recover: {
-			file: 'assets/sprites/enemy-vampire-charge.png',
-			framesPerDirection: 16,
-			frameOffset: 14,
-			animationFrames: 2,
-		},
-	},
-	player: {
-		damage: {
-			file: 'assets/sprites/main-character-damagestun.png',
-			framesPerDirection: 12,
-			frameOffset: 0,
-			animationFrames: 4,
-		},
-		stun: {
-			file: 'assets/sprites/main-character-damagestun.png',
-			framesPerDirection: 12,
-			frameOffset: 4,
-			animationFrames: 8,
-		},
-	},
+	// 'jacques': {
+	// 	prepare: {
+	// 		file: 'assets/sprites/jacques-charge.png',
+	// 		framesPerDirection: 16,
+	// 		frameOffset: 0,
+	// 		animationFrames: 9,
+	// 	},
+	// 	fly: {
+	// 		file: 'assets/sprites/jacques-charge.png',
+	// 		framesPerDirection: 16,
+	// 		frameOffset: 9,
+	// 		animationFrames: 1,
+	// 	},
+	// 	stun: {
+	// 		file: 'assets/sprites/jacques-charge.png',
+	// 		framesPerDirection: 16,
+	// 		frameOffset: 10,
+	// 		animationFrames: 4,
+	// 	},
+	// 	recover: {
+	// 		file: 'assets/sprites/jacques-charge.png',
+	// 		framesPerDirection: 16,
+	// 		frameOffset: 14,
+	// 		animationFrames: 2,
+	// 	},
+	// },
+	// player: {
+	// 	damage: {
+	// 		file: 'assets/sprites/main-character-damagestun.png',
+	// 		framesPerDirection: 12,
+	// 		frameOffset: 0,
+	// 		animationFrames: 4,
+	// 	},
+	// 	stun: {
+	// 		file: 'assets/sprites/main-character-damagestun.png',
+	// 		framesPerDirection: 12,
+	// 		frameOffset: 4,
+	// 		animationFrames: 8,
+	// 	},
+	// },
 };
 
 export const essenceNames = [
@@ -216,7 +217,8 @@ export const colorOfMagicToTilesetMap = {
 
 export const enemyBudgetCost = {
 	'rich': 1,
-	'enemy-vampire': 1,
+	'jacques': 1,
+	'pierre': 1,	
 	'redling-boss': 10,
 };
 
