@@ -47,6 +47,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 	toggleVisibility() {
 		this.toggleVisible();
 		this.visiblity = !this.visiblity;
+		this.selection?.setVisible(false);
 	}
 
 	updateSelection(xAxis: -1 | 0 | 1, yAxis: -1 | 0 | 1) {
@@ -101,6 +102,10 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		}
 		this.scene.overlayScreens.inventory.update();
 		this.toggleVisibility();
+		this.selection?.setVisible(false);
+	}
+
+	closeSelection() {
 		this.selection?.setVisible(false);
 	}
 

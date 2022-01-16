@@ -54,8 +54,8 @@ export default class AbilityHelper {
 			}
 			const effect = new projectileData!.effect(
 				this.scene,
-				pointOfOrigin.x + xMultiplier * projectileData!.xOffset * SCALE,
-				pointOfOrigin.y + yMultiplier * projectileData!.yOffset * SCALE,
+				pointOfOrigin.x + xMultiplier * projectileData!.xOffset, //  * SCALE
+				pointOfOrigin.y + yMultiplier * projectileData!.yOffset, //  * SCALE
 				Abilities[type].spriteName || '',
 				getFacing4Dir(xMultiplier, yMultiplier),
 				projectileData

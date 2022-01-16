@@ -67,9 +67,9 @@ const EQUIPMENT_SLOT_COORDINATES = {
 	[EquipmentSlot.SOURCE]: [INVENTORY_START_X + 48, INVENTORY_START_Y + 54],
 	[EquipmentSlot.CATALYST]: [INVENTORY_START_X + 144, INVENTORY_START_Y + 54],
 	[EquipmentSlot.CHESTPIECE]: [INVENTORY_START_X + 95, INVENTORY_START_Y + 74],
-	[EquipmentSlot.AMULET]: [INVENTORY_START_X + 96, INVENTORY_START_Y + 29],
+	[EquipmentSlot.AMULET]: [INVENTORY_START_X + 96, INVENTORY_START_Y + 30],
 	[EquipmentSlot.RIGHT_RING]: [INVENTORY_START_X + 49, INVENTORY_START_Y + 100],
-	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X + 145, INVENTORY_START_Y + 100],
+	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X + 144, INVENTORY_START_Y + 100],
 };
 
 const COORDINATES_TO_SLOT: { [id: string]: EquipmentSlot } = {
@@ -94,6 +94,7 @@ const EQUIPMENT_SLOT_TO_ABILITY_KEY = {
 export default class InventoryScreen extends OverlayScreen {
 	equipmentSlotTokenMap: Partial<Record<EquipmentSlot, InventoryItemToken>> = {};
 	abilityIconMap: { [slot: string]: Phaser.GameObjects.Image } = {};
+	abilityTextMap: { [slot: string]: Phaser.GameObjects.Text } = {};
 	focusedSlot?: EquipmentSlot;
 	scene: MainScene;
 	keyLastPressed: number = 0;
@@ -250,6 +251,7 @@ export default class InventoryScreen extends OverlayScreen {
 		if (this.focusedSlot === slotName) {
 			if (this.equipmentSelectionWheel.visiblity) {
 				this.equipmentSelectionWheel.toggleVisibility();
+				this.equipmentSelectionWheel.closeSelection();
 			} else {
 				this.showEquipmentSelectionWheel();
 			}
@@ -258,8 +260,8 @@ export default class InventoryScreen extends OverlayScreen {
 			const [itemData, equipmentData] = getFullDataForEquipmentSlot(slotName);
 			this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
 			const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotName];
-			this.inventorySelection.setX(x);
-			this.inventorySelection.setY(y);
+			this.inventorySelection.setX(x * UI_SCALE);
+			this.inventorySelection.setY(y * UI_SCALE);
 		}
 	}
 
@@ -282,7 +284,6 @@ export default class InventoryScreen extends OverlayScreen {
 		else return;
 		if (directions.includes('enter') && this.focusedSlot) {
 			if (this.equipmentSelectionWheel.visiblity) {
-				this.equipmentSelectionWheel.toggleVisibility();
 			} else {
 				this.showEquipmentSelectionWheel();
 			}
@@ -332,11 +333,14 @@ export default class InventoryScreen extends OverlayScreen {
 			// Remove ability if no item is equipped in slot
 			if (equippedItems[slotKey] === undefined) {
 				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
+				if (this.abilityTextMap[slotKey]) this.abilityTextMap[slotKey].destroy();
 				if (slotKey === EquipmentSlot.SOURCE) {
 					updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
 					const newAbilityIcon = this.createAbilityIcon();
 					this.handleIconOptions(constructor, newAbilityIcon, AbilityType.FIREBALL);
 					this.abilityIconMap[EquipmentSlot.SOURCE] = newAbilityIcon;
+					const newAbilityText = this.createAbilityText();
+					this.abilityTextMap[slotKey] = newAbilityText;
 				} else {
 					updateAbility(
 						this.scene,
@@ -368,6 +372,10 @@ export default class InventoryScreen extends OverlayScreen {
 			const abilityIcon = this.createAbilityIcon(slotKey, ability);
 			if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 			this.abilityIconMap[slotKey] = abilityIcon;
+
+			const abilityText = this.createAbilityText(slotKey, ability);
+			if (this.abilityTextMap[slotKey]) this.abilityTextMap[slotKey].destroy();
+			this.abilityTextMap[slotKey] = abilityText;
 
 			updateAbility(
 				this.scene,
@@ -401,6 +409,31 @@ export default class InventoryScreen extends OverlayScreen {
 		abilityIcon.setOrigin(0);
 		this.add(abilityIcon, true);
 		return abilityIcon;
+	}
+
+	createAbilityText(
+		slotKey: EquipmentSlot = EquipmentSlot.SOURCE,
+		ability: AbilityType = AbilityType.FIREBALL
+	) {
+		const [iconX, iconY] = ITEM_ABILITY_COORDINATES[slotKey];
+		const abilityText = new Phaser.GameObjects.Text(
+			this.scene,
+			(iconX + 28) * UI_SCALE,
+			(iconY - 3) * UI_SCALE,
+			Abilities[ability].abilityName,
+			{
+				color: 'white',
+				fontSize: `${12 * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+			}
+		);
+		abilityText.setOrigin(0);
+		abilityText.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		abilityText.setScrollFactor(0);
+		abilityText.setShadow(0, 1 * UI_SCALE, 'black');
+		abilityText.setVisible(this.visiblity);
+		this.add(abilityText, true);
+		return abilityText;
 	}
 
 	handleIconOptions(

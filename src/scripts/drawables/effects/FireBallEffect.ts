@@ -25,6 +25,7 @@ export default class FireBallEffect extends TargetingEffect {
 		super(scene, x, y, 'empty-tile', facing, projectileData);
 		scene.add.existing(this);
 		this.setDepth(UiDepths.TOKEN_FOREGROUND_LAYER);
+		this.setScale(SCALE);
 		scene.physics.add.existing(this);
 		this.body.setCircle(BODY_RADIUS, 0, 0);
 		this.body.setMass(1);

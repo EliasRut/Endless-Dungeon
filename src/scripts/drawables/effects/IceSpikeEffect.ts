@@ -1,4 +1,4 @@
-import { Facings, UiDepths } from '../../helpers/constants';
+import { Facings, SCALE, UiDepths } from '../../helpers/constants';
 import {
 	getFacing8Dir,
 	getRotationInRadiansForFacing,
@@ -8,7 +8,7 @@ import { ProjectileData } from '../../abilities/abilityData';
 import TargetingEffect from './TargetingEffect';
 
 const VISIBILITY_DELAY = 50;
-const SPRITE_SCALE = 0.5;
+const SPRITE_SCALE = 0.4;
 const BODY_RADIUS = 14;
 const BODY_Y_OFFSET = 6;
 const PARTICLE_START_X_OFFSET = -8;
@@ -30,7 +30,7 @@ export default class IceSpikeEffect extends TargetingEffect {
 		projectileData: ProjectileData
 	) {
 		super(scene, x, y, 'ice', facing, projectileData);
-		this.setScale(SPRITE_SCALE * (projectileData.spriteScale || 1));
+		this.setScale(SPRITE_SCALE * (projectileData.spriteScale || 1) * SCALE);
 		this.setRotation(getRotationInRadiansForFacing(facing));
 		scene.add.existing(this);
 		this.setDepth(1);
@@ -46,9 +46,9 @@ export default class IceSpikeEffect extends TargetingEffect {
 		this.snowEmitter = snowParticles.createEmitter({
 			alpha: { start: 1, end: 0.4 },
 			// scale: { start: 0.3, end: 0.05 },
-			scale: { start: 0.4 * (projectileData.effectScale || 1), end: 0.1 },
+			scale: { start: 0.2 * (projectileData.effectScale || 1) * SCALE, end: 0.1 * SCALE },
 			// tint: 0x3366ff,//{ start: 0xff945e, end: 0x660000 }, //0x663300
-			speed: { min: 60, max: 100 },
+			speed: { min: 60 * SCALE, max: 100 * SCALE },
 			// accelerationY: -300,
 			angle: { min: -180, max: 180 },
 			rotate: { min: -180, max: 180 },
@@ -56,24 +56,24 @@ export default class IceSpikeEffect extends TargetingEffect {
 			frequency: 10,
 			// blendMode: Phaser.BlendModes.ADD,
 			maxParticles: projectileData.shape === 'cone' || projectileData.shape === 'nova' ? 20 : 200,
-			x: PARTICLE_START_X_OFFSET * facingVectors.x,
-			y: PARTICLE_START_Y_OFFSET * facingVectors.y,
+			x: PARTICLE_START_X_OFFSET * facingVectors.x * SCALE,
+			y: PARTICLE_START_Y_OFFSET * facingVectors.y * SCALE,
 		});
 
 		const iceParticles = scene.add.particles('ice');
 		iceParticles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		this.spikeEmitter = iceParticles.createEmitter({
 			alpha: { start: 1, end: 0.4 },
-			scale: { start: 0.4 * (projectileData.effectScale || 1), end: 0 },
-			speed: { min: 60, max: 100 },
+			scale: { start: 0.2 * (projectileData.effectScale || 1) * SCALE, end: 0 },
+			speed: { min: 60 * SCALE, max: 100 * SCALE },
 			angle: { min: -180, max: 180 },
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 400, max: 600 },
 			frequency: 1,
 			blendMode: Phaser.BlendModes.ADD,
 			maxParticles: projectileData.shape === 'cone' || projectileData.shape === 'nova' ? 20 : 200,
-			x: PARTICLE_START_X_OFFSET * facingVectors.x,
-			y: PARTICLE_START_Y_OFFSET * facingVectors.y,
+			x: PARTICLE_START_X_OFFSET * facingVectors.x * SCALE,
+			y: PARTICLE_START_Y_OFFSET * facingVectors.y * SCALE,
 		});
 
 		this.snowEmitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
@@ -98,17 +98,17 @@ export default class IceSpikeEffect extends TargetingEffect {
 	// tslint:disable: no-magic-numbers
 	destroy() {
 		this.snowEmitter.setEmitterAngle({ min: -180, max: 180 });
-		this.snowEmitter.setSpeed({ min: 10, max: 40 });
+		this.snowEmitter.setSpeed({ min: 10 * SCALE, max: 40 * SCALE });
 		this.snowEmitter.explode(100, this.body.x, this.body.y);
 		setTimeout(() => {
-			this.snowEmitter.setSpeed({ min: 15, max: 40 });
+			this.snowEmitter.setSpeed({ min: 15 * SCALE, max: 40 * SCALE });
 			this.snowEmitter.setFrequency(80);
 			this.snowEmitter.setLifespan(700);
 			this.spikeEmitter.start();
 		}, 0);
 		this.spikeEmitter.stopFollow();
 		this.spikeEmitter.setEmitterAngle({ min: -180, max: 180 });
-		this.spikeEmitter.setSpeed({ min: 10, max: 40 });
+		this.spikeEmitter.setSpeed({ min: 10 * SCALE, max: 40 * SCALE });
 		this.spikeEmitter.explode(10, this.body.x, this.body.y);
 		this.body.stop();
 		this.body.destroy();
@@ -143,8 +143,8 @@ export default class IceSpikeEffect extends TargetingEffect {
 		if (this.wasStuckToEnemy) {
 			if (this.stuckEnemy) {
 				this.setPosition(
-					this.stuckEnemy.position.x - this.stuckEnemyOffset!.x,
-					this.stuckEnemy.position.y - this.stuckEnemyOffset!.y
+					this.stuckEnemy.position.x - this.stuckEnemyOffset!.x * SCALE,
+					this.stuckEnemy.position.y - this.stuckEnemyOffset!.y * SCALE
 				);
 			} else {
 				this.spikeEmitter.stop();
