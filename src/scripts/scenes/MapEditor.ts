@@ -9,10 +9,8 @@ import firebase from 'firebase';
 import { DatabaseRoom, ItemsPositioning, NpcPositioning, Room } from '../../../typings/custom';
 import { deserializeRoom } from '../helpers/serialization';
 import { spawnNpc } from '../helpers/spawn';
-import { UiDepths } from '../helpers/constants';
 import fixedItems from '../../items/fixedItems.json';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
-import Item from '../worldstate/Item';
 import { getItemDataForName, UneqippableItem } from '../../items/itemData';
 
 const MIN_ZOOM_LEVEL = 0.125;
@@ -1195,15 +1193,18 @@ export default class MapEditor extends Phaser.Scene {
 			}
 		};
 
-		const onPointerUp: (tilemapLayer: Phaser.Tilemaps.TilemapLayer, x: number, y: number) => void =
-			(tilemapLayer, x, y) => {
-				this.isPointerDown = false;
-				if (this.shiftKey.isDown) {
-					const [tileX, tileY] = this.getDataFromClick(x, y, tilemapLayer);
-					this.selectionEndPoint = [tileX, tileY];
-					this.endSelection(this.ctrlKey.isDown);
-				}
-			};
+		const onPointerUp: (
+			tilemapLayer: Phaser.Tilemaps.TilemapLayer,
+			x: number,
+			y: number
+		) => void = (tilemapLayer, x, y) => {
+			this.isPointerDown = false;
+			if (this.shiftKey.isDown) {
+				const [tileX, tileY] = this.getDataFromClick(x, y, tilemapLayer);
+				this.selectionEndPoint = [tileX, tileY];
+				this.endSelection(this.ctrlKey.isDown);
+			}
+		};
 
 		const onPointerOut: () => void = () => {
 			this.isPointerDown = false;

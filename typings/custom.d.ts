@@ -1,6 +1,7 @@
 import { AbilityType } from '../src/scripts/abilities/abilityData';
 import { ColorsOfMagic } from '../src/scripts/helpers/constants';
 import { RandomItemOptions } from '../src/scripts/helpers/item';
+import { QuestScripts } from '../src/scripts/helpers/quests';
 
 export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
 
@@ -303,6 +304,7 @@ export interface Quest {
 	name: string;
 	goal: string;
 	rewards?: ItemWithCount[];
+	scripts?: QuestScripts;
 }
 
 export interface ItemWithCount {
