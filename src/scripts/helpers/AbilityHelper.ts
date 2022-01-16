@@ -192,13 +192,3 @@ export default class AbilityHelper {
 		});
 	}
 }
-// export const stun = (time: number, duration: number, characterToken: CharacterToken) => {
-// 	const character = characterToken.stateObject;
-// 	if (character.stunnedAt + character.stunDuration > time) {
-// 		return;
-// 	}
-// 	character.stunned = true;
-// 	character.stunnedAt = time;
-// 	character.stunDuration = duration;
-// 	characterToken.receiveStun(duration);
-// };

@@ -6,7 +6,7 @@ import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 
 const BASE_ATTACK_DAMAGE = 10;
-const REGULAR_ATTACK_RANGE = 75;
+const REGULAR_ATTACK_RANGE = 75 * SCALE;
 const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
 const BASE_HEALTH = 4;
@@ -106,7 +106,7 @@ export default class VampireToken extends EnemyToken {
 					const newFacing = getFacing4Dir(xSpeed, ySpeed);
 					const animation = updateMovingState(this.stateObject, true, newFacing);
 					if (animation) {
-						this.play(animation);
+						this.play({key: animation, repeat: -1});
 					}
 				} else {
 					this.attack(time);

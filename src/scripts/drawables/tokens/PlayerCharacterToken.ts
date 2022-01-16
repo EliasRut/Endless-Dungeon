@@ -19,20 +19,4 @@ export default class PlayerCharacterToken extends CharacterToken {
 		this.stateObject = globalState.playerCharacter;
 		this.faction = Faction.PLAYER;
 	}
-	// public receiveHit(damage: number){
-	// 	super.receiveHit(damage);
-	// 	if(super.receiveStun(250)) {
-	// 		this.play({key: `player-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`});
-	// 	}
-	// }
-	// Duration should be multiples of 500!
-	public receiveStun(duration: number){
-		if(super.receiveStun(duration)) {
-			this.play({key: `player-stun-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
-		// 1 run = 500ms
-		repeat: Math.floor(2 * duration / 1000)});
-		return true;
-		}
-		return false;
-	}
 }

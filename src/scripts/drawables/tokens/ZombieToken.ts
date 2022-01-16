@@ -31,7 +31,7 @@ export default class ZombieToken extends EnemyToken {
 		super(scene, x, y, tokenName, id);
 		// cool effects!
 		this.level = level;
-		this.attackRange = REGULAR_ATTACK_RANGE;
+		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
 		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
 		this.attackExecuted = false;
 		this.startingHealth = BASE_HEALTH * (1 + this.level * 0.5);
@@ -102,10 +102,11 @@ export default class ZombieToken extends EnemyToken {
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const animation = updateMovingState(this.stateObject, true, newFacing);
 			if (animation) {
-				if (this.anims.exists(animation)) {
-					this.play(animation);
+				if (this.scene.game.anims.exists(animation)) {
+					this.play({key: animation, repeat: -1});
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
+					this.play({key: animation, repeat: -1});
 				}
 			}
 		} else {
@@ -113,10 +114,11 @@ export default class ZombieToken extends EnemyToken {
 			this.setVelocityY(0);
 			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
 			if (animation) {
-				if (this.anims.exists(animation)) {
+				if (this.scene.game.anims.exists(animation)) {
 					this.play(animation);
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
+					this.play(animation);
 				}
 			}
 		}
@@ -144,6 +146,7 @@ export default class ZombieToken extends EnemyToken {
 
 			this.setVelocityX(0);
 			this.setVelocityY(0);
+			this.stateObject.isWalking = false;
 			this.attackedAt = time;
 			this.attackExecuted = false;
 		}
@@ -155,7 +158,7 @@ export default class ZombieToken extends EnemyToken {
 		const ty = player.y;
 		const distance = this.getDistanceToWorldStatePosition(tx, ty);
 
-		if (distance < this.attackRange * SCALE) {
+		if (distance < this.attackRange) {
 			this.scene.mainCharacter.receiveHit(this.stateObject.damage);
 		}
 	}

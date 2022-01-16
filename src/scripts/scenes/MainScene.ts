@@ -98,9 +98,7 @@ export default class MainScene extends Phaser.Scene {
 		questsIcon: QuestsIcon;
 	};
 
-	wasIPressed: boolean = false;
-	wasEscPressed: boolean = false;
-	wasJPressed: boolean = false;
+	overlayPressed: number = 0;
 
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
@@ -438,30 +436,28 @@ export default class MainScene extends Phaser.Scene {
 			location.reload();
 		}
 		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visiblity)) {
-			if (this.wasIPressed === false) {
+				if (globalState.gameTime - this.overlayPressed > 250) {
 				this.icons.backpackIcon.toggleScreen();
-
 				this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
+				this.overlayPressed = globalState.gameTime;
 			}
-			this.wasIPressed = true;
-		} else {
-			this.wasIPressed = false;
 		}
 		if (this.keyboardHelper.isSettingsPressed()) {
-			if (this.wasEscPressed === false) {
-				this.icons.settingsIcon.toggleScreen();
+				if (globalState.gameTime - this.overlayPressed > 250) {
+				if(this.icons.backpackIcon.screens[0].visiblity){
+					this.icons.backpackIcon.toggleScreen();
+					this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
+				} else if (this.icons.questsIcon.screens[0].visiblity) this.icons.questsIcon.toggleScreen();
+				else this.icons.settingsIcon.toggleScreen();
+				this.overlayPressed = globalState.gameTime;
 			}
-			this.wasEscPressed = true;
-		} else {
-			this.wasEscPressed = false;
 		}
+
 		if (this.keyboardHelper.isQuestsPressed()) {
-			if (this.wasJPressed === false) {
+				if (globalState.gameTime - this.overlayPressed > 250) {
 				this.icons.questsIcon.toggleScreen();
+				this.overlayPressed = globalState.gameTime;
 			}
-			this.wasJPressed = true;
-		} else {
-			this.wasJPressed = false;
 		}
 
 		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {

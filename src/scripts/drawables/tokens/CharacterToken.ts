@@ -1,3 +1,4 @@
+import { Game } from 'phaser';
 import { NpcScript } from '../../../../typings/custom';
 import { facingToSpriteNameMap, Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
@@ -46,8 +47,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 
 	public receiveHit(damage: number) {
 		this.stateObject.health -= damage;
-		if(this.receiveStun(250)) {
-			console.log(this.type);
+		if(!this.receiveStun(250)) {
 			this.play({key: `${this.type}-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`})
 			.chain({key: `${this.type}-idle-${facingToSpriteNameMap[this.stateObject.currentFacing]}`});
 		}
@@ -55,12 +55,22 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	public receiveStun(duration: number) {
 		const time = globalState.gameTime;
 		if (this.stateObject.stunnedAt + this.stateObject.stunDuration > time) {
-			return false;
+			return true;
 		}
 		this.stateObject.stunned = true;
 		this.stateObject.stunnedAt = time;
 		this.stateObject.stunDuration = duration;
-		return true;
+		this.stateObject.isWalking = false;
+		const animation = `${this.type}-stun-${facingToSpriteNameMap[this.stateObject.currentFacing]}`
+		if (duration >= 500 && this.scene.game.anims.exists(animation)){
+			this.play({
+				key: animation,
+				// 1 run = 500ms
+				repeat: Math.floor((2 * duration) / 1000),
+			});
+			return true;
+		}
+		return false;
 	}
 
 	public getDistanceToWorldStatePosition(px: number, py: number) {

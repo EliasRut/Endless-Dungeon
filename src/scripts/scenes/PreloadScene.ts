@@ -212,8 +212,6 @@ export default class PreloadScene extends Phaser.Scene {
 			return;
 		}
 
-		console.log(this.anims.createFromAseprite('Pierre'));
-
 		// Create character animations
 		this.anims.createFromAseprite('player');
 		this.anims.createFromAseprite('rich');
