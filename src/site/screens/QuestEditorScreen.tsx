@@ -1,14 +1,12 @@
 import 'phaser';
-import React, { useEffect, useRef, useState } from 'react';
-import { getGameConfig } from '../../scripts/game';
-import { MODE, setActiveMode } from '../../scripts/helpers/constants';
-import { Link, NavLink } from 'react-router-dom';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import firebase from 'firebase';
 import '../App.css';
 import { Input } from '../components/Input';
 import { Dropdown } from '../components/Dropdown';
-import { NpcData, ItemWithCount, ScriptEntry, Quest } from '../../../typings/custom';
+import { ItemWithCount, ScriptEntry, Quest } from '../../../typings/custom';
 import { Wait } from '../components/ScriptBlockTypes/Wait';
 import { Condition } from '../components/ScriptBlockTypes/Condition';
 import { ScriptTypeDropdown } from '../components/ScriptTypeDropdown';
@@ -17,6 +15,7 @@ import { Move } from '../components/ScriptBlockTypes/Move';
 import { Dialog } from '../components/ScriptBlockTypes/Dialog';
 import { LargeTextArea } from '../components/LargeTextArea';
 import { ItemData } from '../../items/itemData';
+import { QuestScripts } from '../../scripts/helpers/quests';
 
 const showGame = true;
 
@@ -45,6 +44,7 @@ export interface QuestEditorState {
 		dungeonLevelReached: number;
 	};
 	id?: string;
+	scripts: QuestScripts;
 }
 
 export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, QuestEditorState> {
@@ -61,6 +61,9 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 			previousQuests: [],
 			requiredItems: [],
 			dungeonLevelReached: 0,
+		},
+		scripts: {
+			intro: [],
 		},
 	};
 
@@ -389,6 +392,9 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 			name: this.state.questName,
 			goal: this.state.questDescription,
 			rewards: this.state.rewardBlocks,
+			scripts: {
+				intro: this.state.scriptBlocks as ScriptEntry[],
+			},
 		};
 		if (this.state.id) {
 			firebase.firestore().collection('quests').doc(this.state.id).update(quest);
@@ -417,6 +423,7 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 			questName: quest.name,
 			questDescription: quest.goal,
 			rewardBlocks: quest.rewards || [],
+			scriptBlocks: quest.scripts?.intro || [],
 		};
 		this.setState(questState);
 	}
