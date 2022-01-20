@@ -8,6 +8,7 @@ import {
 	activeMode,
 	MODE,
 	NUM_COLORS_OF_MAGIC,
+	npcToAespriteMap,
 } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
@@ -46,23 +47,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('search-icon', 'assets/img/search-icon.png');
 
 		// Player
-		// this.load.spritesheet('player', 'assets/sprites/main-character.png', {
-		// 	frameWidth: 40,
-		// 	frameHeight: 40,
-		// });
-		// this.load.spritesheet('player-damage', 'assets/sprites/main-character-damagestun.png', {
-		// 	frameWidth: 40,
-		// 	frameHeight: 40,
-		// });
-		// this.load.spritesheet('player-stun', 'assets/sprites/main-character-damagestun.png', {
-		// 	frameWidth: 40,
-		// 	frameHeight: 40,
-		// });
-
 		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');
-		this.load.aseprite('rich', 'assets/sprites/rich.png', 'assets/sprites/rich.json');
-		this.load.aseprite('jacques', 'assets/sprites/jacques.png', 'assets/sprites/jacques.json');
-		this.load.aseprite('pierre', 'assets/sprites/pierre.png', 'assets/sprites/pierre.json');
 
 		// Overlay screens
 		this.load.spritesheet('screen-background', 'assets/img/screen-background.png', {
@@ -214,20 +199,22 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Create character animations
 		this.anims.createFromAseprite('player');
-		this.anims.createFromAseprite('rich');
-		this.anims.createFromAseprite('jacques');
-		this.anims.createFromAseprite('pierre');
-		for (let directionIndex = 0; directionIndex < NUM_DIRECTIONS; directionIndex++) {
-			const numIdleFrames = 4;
-			const numWalkFrames = 8;
 
-			const idleFrameOffset = numIdleFrames * directionIndex;
-			const firstWalkFrame = numIdleFrames * spriteDirectionList.length;
-			const walkFrameOffset = firstWalkFrame + numWalkFrames * directionIndex;
+		this.neededAnimations.forEach((token) => {
+			if(npcToAespriteMap[token.name]) {
+				this.anims.createFromAseprite(token.name);
+				return;
+			}
+			for (let directionIndex = 0; directionIndex < NUM_DIRECTIONS; directionIndex++) {
+				const numIdleFrames = 4;
+				const numWalkFrames = 8;
 
-			const directionName = spriteDirectionList[directionIndex];
+				const idleFrameOffset = numIdleFrames * directionIndex;
+				const firstWalkFrame = numIdleFrames * spriteDirectionList.length;
+				const walkFrameOffset = firstWalkFrame + numWalkFrames * directionIndex;
 
-			this.neededAnimations.forEach((token) => {
+				const directionName = spriteDirectionList[directionIndex];
+
 				if (directionIndex % token.facingRange === 0) {
 					this.anims.create({
 						key: `${token.name}-idle-${directionName}`,
@@ -271,8 +258,8 @@ export default class PreloadScene extends Phaser.Scene {
 					// 	});
 					// });
 				}
-			});
-		}
+			}
+		});
 
 		// Prepare essence animations
 		essenceNames.forEach((name, index) => {

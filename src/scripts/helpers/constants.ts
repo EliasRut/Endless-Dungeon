@@ -121,10 +121,13 @@ export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingR
 	'redling-boss': { file: 'assets/sprites/red-ball.png', facing: FacingRange.ALL_DIRECTIONS },
 	'red-link': { file: 'assets/sprites/red-link.png', facing: FacingRange.ALL_DIRECTIONS },
 	'naked-guy': { file: 'assets/sprites/naked-guy.png', facing: FacingRange.ALL_DIRECTIONS },
-	'rich': { file: 'assets/sprites/rich.png', facing: FacingRange.ONLY_NESW },
-	'jacques': { file: 'assets/sprites/jacques.png', facing: FacingRange.ONLY_NESW },
-	'pierre': { file: 'assets/sprites/pierre.png', facing: FacingRange.ONLY_NESW },
-	'lich-king': { file: 'assets/sprites/rich.png', facing: FacingRange.ONLY_NESW },
+};
+
+export const npcToAespriteMap: { [name: string]: { png: string; json: string } } = {
+	'rich': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
+	'jacques': { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
+	'pierre': { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
+	'lich-king': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
 };
 
 export const characterToSubAnimationFileMap: {
