@@ -9,6 +9,7 @@ import {
 	MODE,
 	NUM_COLORS_OF_MAGIC,
 	npcToAespriteMap,
+	NpcTypeList,
 } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
@@ -23,7 +24,6 @@ export default class PreloadScene extends Phaser.Scene {
 		super({ key: 'PreloadScene' });
 	}
 
-	//neededAnimations = [{ name: 'player', facingRange: FacingRange.ALL_DIRECTIONS }];
 	neededAnimations = new Array<{ name: string; facingRange: FacingRange }>();
 
 	init() {
@@ -175,6 +175,11 @@ export default class PreloadScene extends Phaser.Scene {
 			this.load.image('decoration-background', 'assets/tilesets/decoration-background.png');
 			this.load.image('overlay-background', 'assets/tilesets/overlay-background.png');
 			this.load.image('map-editor-highlighting', 'assets/img/map-editor-highlighting.png');
+
+			NpcTypeList.forEach((type) => {
+				console.log(`Preparing ${type}.`);
+				requiredNpcs.add(type);
+			});
 		}
 
 		// NPCs
@@ -201,7 +206,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.anims.createFromAseprite('player');
 
 		this.neededAnimations.forEach((token) => {
-			if(npcToAespriteMap[token.name]) {
+			if (npcToAespriteMap[token.name]) {
 				this.anims.createFromAseprite(token.name);
 				return;
 			}
