@@ -557,10 +557,14 @@ export const Abilities: { [type: string]: AbilityData } = {
 	[AbilityType.BAT]: {
 		projectiles: 1,
 		projectileData: {
-			velocity: 100,
+			// velocity: 0,
 			xOffset: 16,
 			yOffset: 16,
+			velocity: 100,
+			// xOffset: 16,
+			// yOffset: 16,
 			effect: BatEffect,
+			// effect: FireBallEffect,
 			collisionSound: 'sound-icespike-hit',
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,

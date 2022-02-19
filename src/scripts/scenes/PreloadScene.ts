@@ -52,6 +52,11 @@ export default class PreloadScene extends Phaser.Scene {
 		// Player
 		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');
 
+		// Prepare aseprite listings for enemies
+		this.load.aseprite('rich', 'assets/sprites/rich.png', 'assets/sprites/rich.json');
+		this.load.aseprite('jacques', 'assets/sprites/jacques.png', 'assets/sprites/jacques.json');
+		this.load.aseprite('pierre', 'assets/sprites/pierre.png', 'assets/sprites/pierre.json');
+
 		// death
 		this.load.aseprite(
 			'death_anim_small',
@@ -228,7 +233,6 @@ export default class PreloadScene extends Phaser.Scene {
 
 		this.neededAnimations.forEach((token) => {
 			if (npcToAespriteMap[token.name]) {
-				console.log(`Loading animation from aseprite for ${token.name}`);
 				this.anims.createFromAseprite(token.name);
 				return;
 			}
