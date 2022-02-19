@@ -22,7 +22,8 @@ export default class PierreToken extends EnemyToken {
 	attacking: boolean;
 	chargeTime: number = CHARGE_TIME;
 	startingHealth: number;
-	launched: boolean = false;
+	firedShot: boolean = false;
+	dead: boolean = false;
 
 	constructor(
 		scene: MainScene,
@@ -53,13 +54,17 @@ export default class PierreToken extends EnemyToken {
 		);
 
 		// check death
-		if (this.stateObject.health <= 0) {
+		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
 				this.dropRandomItem(this.level);
-			} else if (Math.random() < HEALTH_DROP_CHANCE) this.dropFixedItem('health');
-			this.destroy();
+			} else if (Math.random() < HEALTH_DROP_CHANCE) {
+				this.dropFixedItem('health');
+			}
+			this.dead = true;
+			this.die();
 			return;
-		}
+		} else if (this.dead) return;
+
 		updateStatus(time, this.stateObject);
 		if (this.stateObject.stunned) {
 			this.setVelocityX(0);
@@ -132,7 +137,7 @@ export default class PierreToken extends EnemyToken {
 		} else {
 			if (this.attackedAt + this.stateObject.attackTime < time) {
 				this.attacking = false;
-				this.launched = false;
+				this.firedShot = false;
 			} else this.attack(time);
 		}
 		this.stateObject.x = this.body.x / SCALE;
@@ -175,8 +180,8 @@ export default class PierreToken extends EnemyToken {
 				this.anims.setProgress((time - this.attackedAt) / this.chargeTime);
 				this.stateObject.currentFacing = newFacing;
 			}
-		} else if (!this.launched) {
-			this.launched = true;
+		} else if (!this.firedShot) {
+			this.firedShot = true;
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.scene.abilityHelper.triggerAbility(

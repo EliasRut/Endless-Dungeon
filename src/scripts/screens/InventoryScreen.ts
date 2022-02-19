@@ -9,6 +9,7 @@ import {
 	getItemDataForName,
 	SourceData,
 	CatalystData,
+	getItemTexture,
 } from '../../items/itemData';
 import { updateAbility } from '../worldstate/PlayerCharacter';
 import { getCatalystAbility } from '../helpers/item';
@@ -225,12 +226,23 @@ export default class InventoryScreen extends OverlayScreen {
 		itemToken.setScrollFactor(0);
 		itemToken.setInteractive();
 		itemToken.setVisible(this.visiblity);
+		this.playItemAnimation(itemToken, itemName);
 		itemToken.setScale(UI_SCALE);
 		this.add(itemToken, true);
 		itemToken.on('pointerdown', () => {
 			this.handleEquipmentSlotInteraction(slotName);
 		});
 		return itemToken;
+	}
+
+	playItemAnimation( itemToken: InventoryItemToken, itemName?: string) {
+		const animation = itemName + '1';
+		if (this.scene.game.anims.exists(animation))
+			itemToken.play({ key: animation, repeat : -1});
+
+		// if('test-items-spritesheet' !== getItemTexture(itemName)){
+		// 	itemToken.play({ key: getItemTexture(itemName), repeat : -1});
+		// }
 	}
 
 	showEquipmentSelectionWheel() {

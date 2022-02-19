@@ -324,6 +324,12 @@ export const UneqippableItemData = {
 	} as ItemData,
 };
 
+export const getItemTexture = (name?: string) => {
+	if (name === 'source-fire') return 'icon-source-fire1';
+	if (name === 'source-force') return 'icon-source-force1';
+	return 'test-items-spritesheet';
+}
+
 export const getItemDataForName = (name: string) => {
 	if (name.startsWith('source-')) {
 		return SourceData[name as Source] as AbilityLinkedItem;

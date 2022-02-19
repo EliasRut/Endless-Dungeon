@@ -101,8 +101,11 @@ export default abstract class EnemyToken extends CharacterToken {
 
 	die() {
 		this.play('death_anim_small');
-		this.body.destroy();
-		this.on('animationcomplete', () => this.destroy());
+		// 925 ms
+		// new Promise(r => setTimeout(r, 925)).then(result => {
+		// 	this.destroy();
+		// })
+		this.on('animationcomplete', () => this.destroy())
 	}
 
 	// destroy the enemy

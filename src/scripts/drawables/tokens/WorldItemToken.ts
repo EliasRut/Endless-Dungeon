@@ -26,9 +26,11 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		y: number,
 		itemKey: string,
 		item: ItemData,
-		level: number
-	) {		
-		super(scene, x, y, 'test-items-spritesheet', item.iconFrame);
+		level: number,
+		texture: string = 'test-items-spritesheet'
+	) {
+		super(scene, x, y, texture, texture === 'test-items-spritesheet' ? item.iconFrame : 0);
+		this.loadIcon();
 		const tileX = Math.round(x / TILE_WIDTH);
 		const tileY = Math.round(y / TILE_HEIGHT);
 		this.itemKey = itemKey;
@@ -40,6 +42,9 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		scene.add.existing(this);
 	}
 
+	loadIcon() {
+
+	}
 	public update(scene: MainScene) {
 		const px = scene.mainCharacter.x;
 		const py = scene.mainCharacter.y;
@@ -74,4 +79,11 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 			this.tint = this.tile?.tint;
 		}
 	}
+
+	// public playItemAnimation() {
+	// 	if(this.itemKey === 'source-fire') {
+	// 		this.setScale(1);
+	// 		this.play('source_fire1');
+	// 	}		
+	// }
 }
