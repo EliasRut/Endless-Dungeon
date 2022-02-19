@@ -29,7 +29,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	tokenName: string;
 
 	constructor(scene: MainScene, x: number, y: number, tileName: string, type: string, id: string) {
-		super(scene, x * SCALE, y * SCALE, tileName);
+		super(scene, x * SCALE, y * SCALE, 'empty-tile');
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.setScale(SCALE);
@@ -47,9 +47,12 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 
 	public receiveHit(damage: number) {
 		this.stateObject.health -= damage;
-		if(!this.receiveStun(250)) {
-			this.play({key: `${this.type}-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`})
-			.chain({key: `${this.type}-idle-${facingToSpriteNameMap[this.stateObject.currentFacing]}`});
+		if (!this.receiveStun(250)) {
+			this.play({
+				key: `${this.type}-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
+			}).chain({
+				key: `${this.type}-idle-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
+			});
 		}
 	}
 	public receiveStun(duration: number) {
@@ -61,8 +64,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		this.stateObject.stunnedAt = time;
 		this.stateObject.stunDuration = duration;
 		this.stateObject.isWalking = false;
-		const animation = `${this.type}-stun-${facingToSpriteNameMap[this.stateObject.currentFacing]}`
-		if (duration >= 500 && this.scene.game.anims.exists(animation)){
+		const animation = `${this.type}-stun-${facingToSpriteNameMap[this.stateObject.currentFacing]}`;
+		if (duration >= 500 && this.scene.game.anims.exists(animation)) {
 			this.play({
 				key: animation,
 				// 1 run = 500ms

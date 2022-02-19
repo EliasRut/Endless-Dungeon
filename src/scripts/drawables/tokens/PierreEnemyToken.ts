@@ -112,7 +112,7 @@ export default class PierreToken extends EnemyToken {
 					const newFacing = getFacing4Dir(xSpeed, ySpeed);
 					const animation = updateMovingState(this.stateObject, true, newFacing);
 					if (animation) {
-						this.play({key: animation, repeat: -1});
+						this.play({ key: animation, repeat: -1 });
 					}
 				} else {
 					this.attack(time);

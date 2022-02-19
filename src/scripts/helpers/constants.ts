@@ -237,14 +237,14 @@ export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
 		[1, 'pierre'],
 	],
 	[ColorsOfMagic.BLOOD]: [
-		// [0.5, 'rich'],
-		[0.85, 'pierre'],
-		[1, 'rich'],
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
 	],
 	[ColorsOfMagic.DEATH]: [
-		// [0.5, 'rich'],
-		[0.85, 'pierre'],
-		[1, 'rich'],
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
 	],
 	[ColorsOfMagic.PASSION]: [
 		[0.5, 'rich'],
