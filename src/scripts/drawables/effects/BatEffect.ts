@@ -5,7 +5,7 @@ import { getRotationInRadiansForFacing, isCollidingTile } from '../../helpers/mo
 
 const BODY_RADIUS = 6;
 const OFFSET = 14;
-const VISIBILITY_DELAY = 50;
+const VISIBILITY_DELAY = 0;
 
 export default class BatEffect extends TargetingEffect {
 	constructor(

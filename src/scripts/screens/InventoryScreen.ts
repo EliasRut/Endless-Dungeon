@@ -465,4 +465,12 @@ export default class InventoryScreen extends OverlayScreen {
 			: [undefined, undefined];
 		this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
 	}
+
+	setVisible(value: boolean, index?: number, direction?: number): this {
+		super.setVisible(value, index, direction);
+		if (!value) {
+			this.equipmentSelectionWheel?.setVisible(false);
+		}
+		return this;
+	}
 }

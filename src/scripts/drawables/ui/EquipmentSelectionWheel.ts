@@ -50,6 +50,12 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.selection?.setVisible(false);
 	}
 
+	setVisible(value: boolean, index?: number, direction?: number): this {
+		super.setVisible(value, index, direction);
+		this.visiblity = false;
+		return this;
+	}
+
 	updateSelection(xAxis: -1 | 0 | 1, yAxis: -1 | 0 | 1) {
 		const numItems = Object.keys(this.itemMap).length;
 		let itemIndex = -1;
