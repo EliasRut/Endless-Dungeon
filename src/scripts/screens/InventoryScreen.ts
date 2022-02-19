@@ -9,6 +9,7 @@ import {
 	getItemDataForName,
 	SourceData,
 	CatalystData,
+	getItemTexture,
 } from '../../items/itemData';
 import { updateAbility } from '../worldstate/PlayerCharacter';
 import { getCatalystAbility } from '../helpers/item';
@@ -235,9 +236,13 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 
 	playItemAnimation( itemToken: InventoryItemToken, itemName?: string) {
-		if(itemName === 'source-fire'){
-			itemToken.play({ key: 'source_fire1', repeat : -1});
-		}
+		const animation = itemName + '1';
+		if (this.scene.game.anims.exists(animation))
+			itemToken.play({ key: animation, repeat : -1});
+
+		// if('test-items-spritesheet' !== getItemTexture(itemName)){
+		// 	itemToken.play({ key: getItemTexture(itemName), repeat : -1});
+		// }
 	}
 
 	showEquipmentSelectionWheel() {

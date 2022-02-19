@@ -130,8 +130,10 @@ export default class PreloadScene extends Phaser.Scene {
 			frameWidth: 16,
 			frameHeight: 16,
 		});
-		this.load.aseprite('source_fire1', 'assets/sprites/source_flame01.png', 'assets/sprites/source_flame01.json')
-		this.load.image('icon_source_fire1', 'assets/img/source_icon_flame01.png');
+		this.load.aseprite('source-fire1', 'assets/sprites/source_flame01.png', 'assets/sprites/source_flame01.json');
+		this.load.aseprite('source-force1', 'assets/sprites/source_force01.png', 'assets/sprites/source_force01.json');
+		this.load.image('icon-source-fire1', 'assets/img/source_icon_flame01.png');
+		this.load.image('icon-source-force1', 'assets/img/source_icon_force01.png');
 
 		// Doors
 		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png', {
@@ -225,7 +227,8 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Item animation
 
-		this.anims.createFromAseprite('source_fire1');
+		this.anims.createFromAseprite('source-fire1');
+		this.anims.createFromAseprite('source-force1');
 
 		// Create character animations
 		this.anims.createFromAseprite('player');

@@ -99,12 +99,12 @@
  "meta": {
   "app": "https://www.aseprite.org/",
   "version": "1.2.33-x64",
-  "image": "source_flame01.png",
+  "image": "source_arcane01.png",
   "format": "RGBA8888",
   "size": { "w": 124, "h": 123 },
   "scale": "1",
   "frameTags": [
-   { "name": "source-fire1", "from": 0, "to": 11, "direction": "forward" }
+   { "name": "source-force1", "from": 0, "to": 11, "direction": "forward" }
   ]
  }
 }
