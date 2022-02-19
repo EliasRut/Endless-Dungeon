@@ -96,7 +96,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			explodeOnDestruction: true			
+			explodeOnDestruction: true,
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
@@ -565,15 +565,15 @@ export const Abilities: { [type: string]: AbilityData } = {
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			targeting: true
+			targeting: true,
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
-		cooldownMs: 400,		
-		damageMultiplier: 0.0,		
+		cooldownMs: 400,
+		damageMultiplier: 0.0,
 		abilityName: 'Angry Bat',
 		flavorText: `An angry bat.`,
 		icon: ['icon-abilities', 1],
-		spriteName: 'bat'
+		spriteName: 'bat',
 	},
 };

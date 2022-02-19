@@ -7,7 +7,7 @@ export interface QuestScripts {
 	end?: ScriptEntry[];
 }
 
-export const Quests: { [name: string]: Quest } = {
+let quests: { [name: string]: Quest } = {
 	theRescue: {
 		questGiverId: 'agnes',
 		questGiverName: 'Agnes',
@@ -51,6 +51,14 @@ export const Quests: { [name: string]: Quest } = {
 	},
 };
 
+export const getQuest: (id: string) => Quest | undefined = (id) => {
+	return quests[id];
+};
+
+export const fillLoadedQuestFromDb = (loadedQuests: { [id: string]: Quest }) => {
+	quests = loadedQuests;
+};
+
 export const areQuestPreconditionsMet: (quest: Quest) => boolean = (quest) => {
 	if (!quest.preconditions) {
 		return true;
@@ -65,7 +73,7 @@ export const areQuestPreconditionsMet: (quest: Quest) => boolean = (quest) => {
 };
 
 export const getOpenQuestIds: (questGiverId: string) => string[] = (questGiverId) => {
-	return Object.entries(Quests)
+	return Object.entries(quests)
 		.filter(([key, quest]) => {
 			return (
 				quest.questGiverId === questGiverId &&
@@ -77,7 +85,7 @@ export const getOpenQuestIds: (questGiverId: string) => string[] = (questGiverId
 };
 
 export const getNextQuestId: (questGiverId: string) => string | undefined = (questGiverId) => {
-	const nextQuestParts = Object.entries(Quests).find(([key, quest]) => {
+	const nextQuestParts = Object.entries(quests).find(([key, quest]) => {
 		return quest.questGiverId === questGiverId && areQuestPreconditionsMet(quest);
 	});
 	return nextQuestParts ? nextQuestParts[0] : undefined;
@@ -87,7 +95,7 @@ export const hasAnyOpenQuests: (questGiverId: string) => boolean = (questGiverId
 	return getOpenQuestIds(questGiverId).length > 0;
 };
 
-const questScripts: { [name: string]: QuestScripts } = {
+let questScripts: { [name: string]: QuestScripts } = {
 	hildaTalks: {
 		intro: [
 			{
@@ -181,6 +189,11 @@ const questScripts: { [name: string]: QuestScripts } = {
 			},
 		],
 	},
+};
+
+export const fillQuestScriptsFromDb = (scripts: { [name: string]: QuestScripts }) => {
+	questScripts = scripts;
+	console.log(scripts);
 };
 
 export const loadQuestScript: (questId: string) => ScriptEntry[] = (questId) => {

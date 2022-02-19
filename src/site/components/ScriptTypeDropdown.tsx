@@ -28,6 +28,7 @@ export const ScriptTypeDropdown = (props: ScriptTypeDropdownProps) => (
 				<option value="pauseUntilCondition">Pause Until Condition</option>
 				<option value="dialog">Dialog</option>
 				<option value="move">Move</option>
+				<option value="setQuestState">Set Quest State</option>
 			</LargeDropdown>
 		</TypeContainer>
 	</SingleInputWrapper>

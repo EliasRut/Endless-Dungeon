@@ -7,7 +7,7 @@ import MapEditor from './scenes/MapEditor';
 import PreloadScene from './scenes/PreloadScene';
 import RoomPreloaderScene from './scenes/RoomPreloaderScene';
 import NpcEditor from './scenes/NpcEditor';
-import { activeMode, MODE } from './helpers/constants';
+import { MODE } from './helpers/constants';
 import NpcGenerationScene from './scenes/NpcGenerationScene';
 
 const firebaseConfig = {
