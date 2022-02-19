@@ -49,7 +49,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		this.stateObject.health -= damage;
 		if(!this.receiveStun(250)) {
 			this.play({key: `${this.type}-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`})
-			.chain({key: `${this.type}-idle-${facingToSpriteNameMap[this.stateObject.currentFacing]}`});
+			//.chain({key: `${this.type}-idle-${facingToSpriteNameMap[this.stateObject.currentFacing]}`});
 		}
 	}
 	public receiveStun(duration: number) {

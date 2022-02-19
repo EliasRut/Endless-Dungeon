@@ -225,12 +225,19 @@ export default class InventoryScreen extends OverlayScreen {
 		itemToken.setScrollFactor(0);
 		itemToken.setInteractive();
 		itemToken.setVisible(this.visiblity);
+		this.playItemAnimation(itemToken, itemName);
 		itemToken.setScale(UI_SCALE);
 		this.add(itemToken, true);
 		itemToken.on('pointerdown', () => {
 			this.handleEquipmentSlotInteraction(slotName);
 		});
 		return itemToken;
+	}
+
+	playItemAnimation( itemToken: InventoryItemToken, itemName?: string) {
+		if(itemName === 'source-fire'){
+			itemToken.play({ key: 'source_fire1', repeat : -1});
+		}
 	}
 
 	showEquipmentSelectionWheel() {

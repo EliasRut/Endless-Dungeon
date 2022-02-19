@@ -28,6 +28,7 @@ export default class VampireToken extends EnemyToken {
 	damaged: boolean = false;
 	launchX: number;
 	launchY: number;
+	dead: boolean = false;
 
 	constructor(
 		scene: MainScene,
@@ -58,13 +59,17 @@ export default class VampireToken extends EnemyToken {
 		);
 
 		// check death
-		if (this.stateObject.health <= 0) {
+		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
 				this.dropRandomItem(this.level);
-			} else if (Math.random() < HEALTH_DROP_CHANCE) this.dropFixedItem('health');
-			this.destroy();
+			} else if (Math.random() < HEALTH_DROP_CHANCE) {
+				this.dropFixedItem('health');
+			}
+			this.dead = true;
+			this.die();
 			return;
-		}
+		} else if (this.dead) return;
+
 		updateStatus(time, this.stateObject);
 		if (this.stateObject.stunned) {
 			this.setVelocityX(0);

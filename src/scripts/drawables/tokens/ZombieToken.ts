@@ -5,7 +5,7 @@ import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 
-const BASE_ATTACK_DAMAGE = 4;
+const BASE_ATTACK_DAMAGE = 0.1;
 const REGULAR_ATTACK_RANGE = 25;
 const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
@@ -55,10 +55,11 @@ export default class ZombieToken extends EnemyToken {
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
 				this.dropFixedItem('health');
 			}
+			//this.dropFixedItem('source-fire');
 			this.dead = true;
 			this.die();
 			return;
-		}
+		} else if (this.dead) return;
 
 		updateStatus(time, this.stateObject);
 		if (this.stateObject.stunned) return;

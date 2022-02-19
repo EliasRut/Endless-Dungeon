@@ -7,6 +7,8 @@ import {
 	getFullDataForItemKey,
 } from '../../helpers/inventory';
 import MainScene from '../../scenes/MainScene';
+import ItemToken from '../tokens/WorldItemToken';
+import { ScriptPlaceItem } from '../../../../typings/custom';
 
 const EIGHT_ITEMS_OFFSETS = [
 	[0, -40],
@@ -109,6 +111,12 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.selection?.setVisible(false);
 	}
 
+	playItemAnimation( itemToken: Phaser.GameObjects.Sprite, itemName?: string) {
+		if(itemName === 'source-fire'){
+			itemToken.play({ key: 'source_fire1', repeat : -1});
+		}
+	}
+
 	update(
 		centerX: number,
 		centerY: number,
@@ -143,14 +151,14 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.selection.setVisible(false);
 		this.selection.setScale(UI_SCALE);
 
-		const images: Phaser.GameObjects.Image[] = [];
+		const images: Phaser.GameObjects.Sprite[] = [];
 		const levelTexts: Phaser.GameObjects.Image[] = [];
 		Object.entries(itemMap).map(([itemKey, equipmentData], itemIndex) => {
 			const itemData = getItemDataForName(itemKey);
 			const [xOffset, yOffset] = useEightImages
 				? EIGHT_ITEMS_OFFSETS[itemIndex]
 				: FOUR_ITEMS_OFFSETS[itemIndex];
-			const itemImage = new Phaser.GameObjects.Image(
+			const itemImage = new Phaser.GameObjects.Sprite(
 				this.scene,
 				(centerX + xOffset) * UI_SCALE,
 				(centerY + yOffset) * UI_SCALE,
@@ -158,6 +166,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 				equipmentData.level ? itemData.iconFrame : 0
 			);
 			itemImage.setScale(UI_SCALE);
+			this.playItemAnimation(itemImage, itemKey);
 			if (equipmentData.level) {
 				itemImage.on('pointerdown', () => {
 					equipItem(equipmentSlot, itemKey);
