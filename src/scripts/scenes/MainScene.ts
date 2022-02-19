@@ -436,28 +436,42 @@ export default class MainScene extends Phaser.Scene {
 			location.reload();
 		}
 		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visiblity)) {
+			if (!this.scriptHelper.isScriptRunning())
 				if (globalState.gameTime - this.overlayPressed > 250) {
-				this.icons.backpackIcon.toggleScreen();
-				this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
-				this.overlayPressed = globalState.gameTime;
-			}
-		}
-		if (this.keyboardHelper.isSettingsPressed()) {
-				if (globalState.gameTime - this.overlayPressed > 250) {
-				if(this.icons.backpackIcon.screens[0].visiblity){
 					this.icons.backpackIcon.toggleScreen();
 					this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
-				} else if (this.icons.questsIcon.screens[0].visiblity) this.icons.questsIcon.toggleScreen();
-				else this.icons.settingsIcon.toggleScreen();
-				this.overlayPressed = globalState.gameTime;
+					this.overlayPressed = globalState.gameTime;
+				}
+		}
+		if (this.keyboardHelper.isSettingsPressed()) {
+			if (!this.scriptHelper.isScriptRunning()) {
+				if (globalState.gameTime - this.overlayPressed > 250) {
+					if (this.icons.backpackIcon.screens[0].visiblity) {
+						this.icons.backpackIcon.toggleScreen();
+						this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
+					} else if (this.icons.questsIcon.screens[0].visiblity)
+						this.icons.questsIcon.toggleScreen();
+					else this.icons.settingsIcon.toggleScreen();
+					this.overlayPressed = globalState.gameTime;
+				}
+			} else {
+				this.scriptHelper.handleScriptStep(globalState.gameTime, true);
+				return;
+			}
+		}
+		if ((this, this.keyboardHelper.isEnterPressed())) {
+			if (this.scriptHelper.isScriptRunning()) {
+				this.scriptHelper.handleScriptStep(globalState.gameTime, true);
+				return;
 			}
 		}
 
 		if (this.keyboardHelper.isQuestsPressed()) {
+			if (!this.scriptHelper.isScriptRunning())
 				if (globalState.gameTime - this.overlayPressed > 250) {
-				this.icons.questsIcon.toggleScreen();
-				this.overlayPressed = globalState.gameTime;
-			}
+					this.icons.questsIcon.toggleScreen();
+					this.overlayPressed = globalState.gameTime;
+				}
 		}
 
 		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
@@ -518,7 +532,7 @@ export default class MainScene extends Phaser.Scene {
 				this.mainCharacter.play({
 					key: playerAnimation,
 					frameRate: globalState.playerCharacter.movementSpeed / (isWalking ? 20 : 10),
-					repeat: -1
+					repeat: -1,
 				});
 			}
 			if (hasMoved) {
@@ -636,6 +650,16 @@ export default class MainScene extends Phaser.Scene {
 	pause() {
 		this.isPaused = true;
 		this.physics.pause();
+		let playerAnimation = updateMovingState(
+			globalState.playerCharacter,
+			false,
+			globalState.playerCharacter.currentFacing
+		);
+		if (playerAnimation) this.mainCharacter.play(playerAnimation);
+		Object.values(this.npcMap).forEach((curNpc) => {
+			curNpc.update(globalState.gameTime, 0);
+		});
+
 		this.time.paused = true;
 	}
 

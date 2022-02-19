@@ -71,6 +71,18 @@ export default class VampireToken extends EnemyToken {
 			this.setVelocityY(0);
 			return;
 		}
+		if (this.scene.isPaused) {
+			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
+			if (animation && !this.launched) {
+				if (this.scene.game.anims.exists(animation)) {
+					this.play(animation);
+				} else {
+					console.log(`Animation ${animation} does not exist.`);
+					this.play(animation);
+				}
+			}
+			return;
+		}
 
 		if (this.lastMovedTimestamp + KNOCKBACK_TIME > time) {
 			return;

@@ -44,7 +44,7 @@ export default class ScriptHelper {
 		return currentRoom;
 	}
 
-	handleScriptStep(globalTime: number) {
+	handleScriptStep(globalTime: number, userCancelled?: boolean) {
 		const currentStep = globalState.scripts.runningScript![globalState.scripts.scriptStep!];
 		let cleanUpStep = false;
 		if (!currentStep) {
@@ -108,7 +108,7 @@ export default class ScriptHelper {
 						currentStep.text[globalState.scripts.scriptSubStep!]
 					);
 					this.scene.overlayScreens.dialogScreen.setVisible(true);
-				} else if (globalState.scripts.scriptStepStartMs + DIALOG_TEXT_TIME_MS < globalTime) {
+				} else if (globalState.scripts.scriptStepStartMs + DIALOG_TEXT_TIME_MS < globalTime || userCancelled) {
 					globalState.scripts.scriptSubStep = globalState.scripts.scriptSubStep! + 1;
 					if (currentStep.text.length <= globalState.scripts.scriptSubStep) {
 						this.scene.overlayScreens.dialogScreen.setVisible(false);

@@ -54,11 +54,24 @@ export default class ZombieToken extends EnemyToken {
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
 				this.dropFixedItem('health');
 			}
-			this.destroy();
+			this.die();
 			return;
 		}
+
 		updateStatus(time, this.stateObject);
 		if (this.stateObject.stunned) return;
+		if (this.scene.isPaused) {
+			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
+			if (animation) {
+				if (this.scene.game.anims.exists(animation)) {
+					this.play(animation);
+				} else {
+					console.log(`Animation ${animation} does not exist.`);
+					this.play(animation);
+				}
+			}
+			return;
+		}
 
 		if (this.lastMovedTimestamp + KNOCKBACK_TIME > time) {
 			return;
@@ -127,10 +140,6 @@ export default class ZombieToken extends EnemyToken {
 		}
 		this.stateObject.x = this.body.x / SCALE;
 		this.stateObject.y = this.body.y / SCALE;
-	}
-
-	destroy() {
-		super.destroy();
 	}
 
 	attack(time: number) {

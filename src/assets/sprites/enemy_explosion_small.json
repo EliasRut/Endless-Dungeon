@@ -1,0 +1,101 @@
+{ "frames": {
+   "enemy_explosion_small 0.aseprite": {
+    "frame": { "x": 1, "y": 52, "w": 12, "h": 8 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 19, "y": 21, "w": 10, "h": 6 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 100
+   },
+   "enemy_explosion_small 1.aseprite": {
+    "frame": { "x": 46, "y": 45, "w": 14, "h": 14 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 18, "y": 16, "w": 12, "h": 12 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 75
+   },
+   "enemy_explosion_small 2.aseprite": {
+    "frame": { "x": 27, "y": 45, "w": 18, "h": 21 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 15, "y": 12, "w": 16, "h": 19 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 75
+   },
+   "enemy_explosion_small 3.aseprite": {
+    "frame": { "x": 1, "y": 28, "w": 25, "h": 23 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 12, "y": 10, "w": 23, "h": 21 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 50
+   },
+   "enemy_explosion_small 4.aseprite": {
+    "frame": { "x": 1, "y": 1, "w": 31, "h": 26 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 8, "y": 7, "w": 29, "h": 24 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 50
+   },
+   "enemy_explosion_small 5.aseprite": {
+    "frame": { "x": 33, "y": 1, "w": 33, "h": 23 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 8, "y": 6, "w": 31, "h": 21 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 75
+   },
+   "enemy_explosion_small 6.aseprite": {
+    "frame": { "x": 67, "y": 1, "w": 35, "h": 21 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 7, "y": 5, "w": 33, "h": 19 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 100
+   },
+   "enemy_explosion_small 7.aseprite": {
+    "frame": { "x": 67, "y": 23, "w": 34, "h": 21 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 8, "y": 4, "w": 32, "h": 19 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 100
+   },
+   "enemy_explosion_small 8.aseprite": {
+    "frame": { "x": 33, "y": 25, "w": 34, "h": 19 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 8, "y": 4, "w": 32, "h": 17 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 100
+   },
+   "enemy_explosion_small 9.aseprite": {
+    "frame": { "x": 80, "y": 45, "w": 14, "h": 8 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 18, "y": 7, "w": 12, "h": 6 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 100
+   },
+   "enemy_explosion_small 10.aseprite": {
+    "frame": { "x": 61, "y": 45, "w": 18, "h": 7 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 16, "y": 7, "w": 16, "h": 5 },
+    "sourceSize": { "w": 48, "h": 48 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.2.33-x64",
+  "image": "enemy_explosion_small.png",
+  "format": "RGBA8888",
+  "size": { "w": 102, "h": 66 },
+  "scale": "1",
+  "frameTags": [
+  ]
+ }
+}
