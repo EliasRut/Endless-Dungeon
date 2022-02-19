@@ -108,7 +108,10 @@ export default class ScriptHelper {
 						currentStep.text[globalState.scripts.scriptSubStep!]
 					);
 					this.scene.overlayScreens.dialogScreen.setVisible(true);
-				} else if (globalState.scripts.scriptStepStartMs + DIALOG_TEXT_TIME_MS < globalTime || userCancelled) {
+				} else if (
+					globalState.scripts.scriptStepStartMs + DIALOG_TEXT_TIME_MS < globalTime ||
+					userCancelled
+				) {
 					globalState.scripts.scriptSubStep = globalState.scripts.scriptSubStep! + 1;
 					if (currentStep.text.length <= globalState.scripts.scriptSubStep) {
 						this.scene.overlayScreens.dialogScreen.setVisible(false);
@@ -152,6 +155,9 @@ export default class ScriptHelper {
 			case 'move': {
 				cleanUpStep = true;
 				if (currentStep.target === 'player') {
+					if (!this.currentRoom) {
+						this.currentRoom = this.findRoomForToken(this.scene.mainCharacter);
+					}
 					this.scene.mainCharacter.x =
 						(this.currentRoom!.x + currentStep.posX) * TILE_WIDTH * SCALE;
 					this.scene.mainCharacter.y =

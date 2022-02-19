@@ -74,6 +74,7 @@ export const enum AbilityType {
 	NECROTIC_NOVA = 'necroticNova',
 	EXPLODING_CORPSE = 'explodingCorpse',
 	BAT = 'bat',
+	FIRE_SUMMON = 'fireSummon',
 }
 
 export const Abilities: { [type: string]: AbilityData } = {
@@ -96,7 +97,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			explodeOnDestruction: true			
+			explodeOnDestruction: true,
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
@@ -565,15 +566,37 @@ export const Abilities: { [type: string]: AbilityData } = {
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
-			targeting: true
+			targeting: true,
 		},
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
-		cooldownMs: 400,		
-		damageMultiplier: 0.0,		
+		cooldownMs: 400,
+		damageMultiplier: 0.0,
 		abilityName: 'Angry Bat',
 		flavorText: `An angry bat.`,
 		icon: ['icon-abilities', 1],
-		spriteName: 'bat'
+		spriteName: 'bat',
+	},
+	[AbilityType.FIRE_SUMMON]: {
+		// projectiles: 1,
+		projectileData: {
+			velocity: 100,
+			xOffset: 16,
+			yOffset: 16,
+			effect: BatEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.3,
+		cooldownMs: 400,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an fiery elemental.`,
+		icon: ['icon-abilities', 1],
+		spriteName: 'bat',
 	},
 };
