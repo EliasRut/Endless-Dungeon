@@ -1,6 +1,6 @@
 import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
 import { UiDepths, UI_SCALE } from '../helpers/constants';
-import { Quests } from '../helpers/quests';
+import { getQuest } from '../helpers/quests';
 import OverlayScreen from './OverlayScreen';
 import { STAT_SCREEN_RIGHT_BORDER } from './StatScreen';
 
@@ -57,8 +57,10 @@ export default class QuestDetailsScreen extends OverlayScreen {
 		if (!this.activeQuestId) {
 			return;
 		}
-		const quest = Quests[this.activeQuestId];
-
+		const quest = getQuest(this.activeQuestId);
+		if (!quest) {
+			return;
+		}
 		this.questTitle = new Phaser.GameObjects.Text(
 			this.scene,
 			(QUEST_DETAILS_START_X + 16) * UI_SCALE,
@@ -83,7 +85,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 			this.questTitle.y +
 				this.questTitle.height +
 				HEADER_FIRST_QUEST_DETAILS_TEXT_OFFSET * UI_SCALE,
-			'Quest Giver:',
+			'Quest Giver',
 			{
 				color: 'white',
 				wordWrap: { width: (SCREEN_WIDTH - 40) * UI_SCALE, useAdvancedWrap: true },
@@ -119,7 +121,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 			this.scene,
 			(QUEST_DETAILS_START_X + 16) * UI_SCALE,
 			this.questGiver.y + this.questGiver.height + OFFSET_BETWEEN_BLOCKS * UI_SCALE,
-			'Goal:',
+			'Goal',
 			{
 				color: 'white',
 				wordWrap: { width: (SCREEN_WIDTH - 40) * UI_SCALE, useAdvancedWrap: true },
@@ -155,7 +157,7 @@ export default class QuestDetailsScreen extends OverlayScreen {
 			this.scene,
 			(QUEST_DETAILS_START_X + 16) * UI_SCALE,
 			this.questDescription.y + this.questDescription.height + OFFSET_BETWEEN_BLOCKS * UI_SCALE,
-			'Requirements:',
+			'Requirements',
 			{
 				color: 'white',
 				wordWrap: { width: (SCREEN_WIDTH - 40) * UI_SCALE, useAdvancedWrap: true },

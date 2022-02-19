@@ -13,6 +13,9 @@ import {
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 import { BLOCK_SIZE } from '../helpers/generateRoom';
+import firebase from 'firebase';
+import { Quest } from '../../../typings/custom';
+import { fillLoadedQuestFromDb, fillQuestScriptsFromDb, QuestScripts } from '../helpers/quests';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -184,9 +187,11 @@ export default class PreloadScene extends Phaser.Scene {
 				facingRange: npcTypeToFileMap[npc]?.facing || FacingRange.ONLY_NESW,
 			});
 		});
+
+		// Quests
 	}
 
-	create() {
+	async create() {
 		if (activeMode === MODE.NPC_EDITOR) {
 			this.scene.start('NpcEditor');
 			return;
@@ -201,7 +206,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.anims.createFromAseprite('player');
 
 		this.neededAnimations.forEach((token) => {
-			if(npcToAespriteMap[token.name]) {
+			if (npcToAespriteMap[token.name]) {
 				this.anims.createFromAseprite(token.name);
 				return;
 			}
@@ -330,6 +335,24 @@ export default class PreloadScene extends Phaser.Scene {
 
 			globalState.dungeon.levels[globalState.currentLevel] = roomLevelData;
 		}
+
+		// Load quests from database
+		const questDb = firebase.firestore().collection('quests');
+		const questQuery = await questDb.get();
+		const quests = questQuery.docs.map((doc) => [doc.id, doc.data() as Quest]) as [string, Quest][];
+		const loadedQuestScripts = quests.reduce((obj, [id, quest]) => {
+			if (quest.scripts) {
+				obj[id] = quest.scripts;
+			}
+			return obj;
+		}, {} as { [name: string]: QuestScripts });
+		fillQuestScriptsFromDb(loadedQuestScripts);
+
+		const loadedQuests = quests.reduce((obj, [id, quest]) => {
+			obj[id] = quest;
+			return obj;
+		}, {} as { [name: string]: Quest });
+		fillLoadedQuestFromDb(loadedQuests);
 
 		this.scene.start('MainScene');
 	}

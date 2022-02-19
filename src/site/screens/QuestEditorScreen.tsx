@@ -12,6 +12,7 @@ import { Condition } from '../components/ScriptBlockTypes/Condition';
 import { ScriptTypeDropdown } from '../components/ScriptTypeDropdown';
 import { PausedCondition } from '../components/ScriptBlockTypes/PausedCondition';
 import { Move } from '../components/ScriptBlockTypes/Move';
+import { SetQuestState } from '../components/ScriptBlockTypes/SetQuestState';
 import { Dialog } from '../components/ScriptBlockTypes/Dialog';
 import { LargeTextArea } from '../components/LargeTextArea';
 import { ItemData } from '../../items/itemData';
@@ -33,7 +34,8 @@ export interface QuestEditorState {
 		id: string;
 	}[];
 	questName: string;
-	questGiver: string;
+	questGiverId: string;
+	questGiverName: string;
 	questDescription: string;
 	questPreconditions: string;
 	scriptBlocks: (Partial<ScriptEntry> | { type: undefined })[];
@@ -52,7 +54,8 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 		knownQuests: [],
 		npcs: [],
 		questName: '',
-		questGiver: '',
+		questGiverId: '',
+		questGiverName: '',
 		questDescription: '',
 		questPreconditions: '',
 		scriptBlocks: [],
@@ -261,6 +264,21 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 					/>
 				);
 			}
+			case 'setQuestState': {
+				return (
+					<SetQuestState
+						currentData={{
+							type: 'setQuestState',
+							questId: '',
+							questState: 'new',
+							...scriptBlock,
+						}}
+						availableQuests={this.state.knownQuests}
+						updateData={(newData) => this.replaceScriptBlockData(index, newData)}
+						removeData={() => this.removeScriptBlockData(index)}
+					/>
+				);
+			}
 			default: {
 				return <></>;
 			}
@@ -386,8 +404,8 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 
 	saveQuest() {
 		const quest: Quest = {
-			questGiverId: this.state.questGiver,
-			questGiverName: '',
+			questGiverId: this.state.questGiverId,
+			questGiverName: this.state.questGiverName,
 			preconditions: this.state.preconditionBlocks,
 			name: this.state.questName,
 			goal: this.state.questDescription,
@@ -414,7 +432,8 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 		const quest: Quest = questDoc.data() as Quest;
 
 		const questState = {
-			questGiver: quest.questGiverId!,
+			questGiverId: quest.questGiverId!,
+			questGiverName: quest.questGiverName!,
 			preconditionBlocks: {
 				previousQuests: quest.preconditions?.previousQuests || [],
 				requiredItems: quest.preconditions?.requiredItems || [],
@@ -483,13 +502,25 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 								/>
 							</InputWrapper>
 							<InputWrapper>
-								<div>Quest Giver</div>
+								<div>Quest Giver Id</div>
 								<LargeInput
-									id="questGiver"
-									value={this.state.questGiver}
+									id="questGiverId"
+									value={this.state.questGiverId}
 									onChange={(e: any) =>
 										this.setState({
-											questGiver: e.target.value,
+											questGiverId: e.target.value,
+										})
+									}
+								/>
+							</InputWrapper>
+							<InputWrapper>
+								<div>Quest Giver Name</div>
+								<LargeInput
+									id="questGiverName"
+									value={this.state.questGiverName}
+									onChange={(e: any) =>
+										this.setState({
+											questGiverName: e.target.value,
 										})
 									}
 								/>
