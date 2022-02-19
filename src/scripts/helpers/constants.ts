@@ -124,9 +124,9 @@ export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingR
 };
 
 export const npcToAespriteMap: { [name: string]: { png: string; json: string } } = {
-	rich: { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
-	jacques: { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
-	pierre: { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
+	'rich': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
+	'jacques': { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
+	'pierre': { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
 	'lich-king': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
 };
 
@@ -264,9 +264,9 @@ export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
 };
 
 export const enemyBudgetCost = {
-	rich: 1,
-	jacques: 1,
-	pierre: 1,
+	'rich': 1,
+	'jacques': 1,
+	'pierre': 1,	
 	'redling-boss': 10,
 };
 

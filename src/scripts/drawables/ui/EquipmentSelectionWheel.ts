@@ -1,6 +1,6 @@
 import { EquippedItemData } from '../../worldstate/Inventory';
 import { EquipmentSlot, UiDepths, UI_SCALE } from '../../helpers/constants';
-import { EquipmentKey, getItemDataForName } from '../../../items/itemData';
+import { EquipmentKey, getItemDataForName, getItemTexture } from '../../../items/itemData';
 import {
 	equipItem,
 	getFullDataForEquipmentSlot,
@@ -151,22 +151,22 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.selection.setVisible(false);
 		this.selection.setScale(UI_SCALE);
 
-		const images: Phaser.GameObjects.Sprite[] = [];
+		const images: Phaser.GameObjects.Image[] = [];
 		const levelTexts: Phaser.GameObjects.Image[] = [];
 		Object.entries(itemMap).map(([itemKey, equipmentData], itemIndex) => {
 			const itemData = getItemDataForName(itemKey);
+			const frame = getItemTexture(itemKey) === 'test-items-spritesheet' ? itemData.iconFrame : 0;
 			const [xOffset, yOffset] = useEightImages
 				? EIGHT_ITEMS_OFFSETS[itemIndex]
 				: FOUR_ITEMS_OFFSETS[itemIndex];
-			const itemImage = new Phaser.GameObjects.Sprite(
+			const itemImage = new Phaser.GameObjects.Image(
 				this.scene,
 				(centerX + xOffset) * UI_SCALE,
 				(centerY + yOffset) * UI_SCALE,
-				equipmentData.level ? 'test-items-spritesheet' : 'empty-tile',
-				equipmentData.level ? itemData.iconFrame : 0
+				equipmentData.level ? getItemTexture(itemKey) : 'empty-tile',
+				equipmentData.level ? frame : 0
 			);
 			itemImage.setScale(UI_SCALE);
-			this.playItemAnimation(itemImage, itemKey);
 			if (equipmentData.level) {
 				itemImage.on('pointerdown', () => {
 					equipItem(equipmentSlot, itemKey);

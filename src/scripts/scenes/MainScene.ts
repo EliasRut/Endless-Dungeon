@@ -33,7 +33,7 @@ import DoorToken from '../drawables/tokens/DoorToken';
 import fixedItems from '../../items/fixedItems.json';
 import { DungeonRunData } from '../models/DungeonRunData';
 import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
-import { Catalyst, Source, getItemDataForName } from '../../items/itemData';
+import { Catalyst, Source, getItemDataForName, getItemTexture } from '../../items/itemData';
 import Minimap from '../drawables/ui/Minimap';
 import { AbilityType } from '../abilities/abilityData';
 import LevelName from '../drawables/ui/LevelName';
@@ -669,8 +669,9 @@ export default class MainScene extends Phaser.Scene {
 			return;
 		}
 		let itemToken;
-		if(itemKey == 'source-fire') itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0, 'icon_source_fire1');
-		else itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0);
+		// if(itemKey == 'source-fire') itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0, 'icon_source_fire1');
+		// else itemToken = new WorldItemToken(this, x, y, itemKey, item, getItemTexture(itemKey), level || 0);
+		itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0, getItemTexture(itemKey));
 		itemToken.setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.worldItems.push(itemToken);
 	}

@@ -29,7 +29,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		level: number,
 		texture: string = 'test-items-spritesheet'
 	) {
-		super(scene, x, y, texture, item.iconFrame);
+		super(scene, x, y, texture, texture === 'test-items-spritesheet' ? item.iconFrame : 0);
 		this.loadIcon();
 		const tileX = Math.round(x / TILE_WIDTH);
 		const tileY = Math.round(y / TILE_HEIGHT);
