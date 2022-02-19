@@ -8,7 +8,7 @@ import CharacterToken from '../drawables/tokens/CharacterToken';
 import fixedItems from '../../items/fixedItems.json';
 import Item from '../worldstate/Item';
 import { generateRandomItem } from './item';
-import { Faction } from './constants';
+import { Faction, SCALE } from './constants';
 import { ItemData, UneqippableItem } from '../../items/itemData';
 
 const DIALOG_TEXT_TIME_MS = 5000;
@@ -35,10 +35,10 @@ export default class ScriptHelper {
 		const rooms = globalState.dungeon.levels[globalState.currentLevel]?.rooms;
 		const currentRoom = rooms?.find((room) => {
 			return (
-				room.x * TILE_WIDTH < token.x &&
-				(room.x + room.width) * TILE_WIDTH > token.x &&
-				room.y * TILE_HEIGHT < token.y &&
-				(room.y + room.height) * TILE_HEIGHT > token.y
+				room.x * TILE_WIDTH < token.x / SCALE &&
+				(room.x + room.width) * TILE_WIDTH > token.x / SCALE &&
+				room.y * TILE_HEIGHT < token.y / SCALE &&
+				(room.y + room.height) * TILE_HEIGHT > token.y / SCALE
 			);
 		});
 		return currentRoom;
@@ -152,8 +152,10 @@ export default class ScriptHelper {
 			case 'move': {
 				cleanUpStep = true;
 				if (currentStep.target === 'player') {
-					this.scene.mainCharacter.x = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH;
-					this.scene.mainCharacter.y = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT;
+					this.scene.mainCharacter.x =
+						(this.currentRoom!.x + currentStep.posX) * TILE_WIDTH * SCALE;
+					this.scene.mainCharacter.y =
+						(this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT * SCALE;
 					const facing = getFacing8Dir(currentStep.facingX, currentStep.facingY);
 					const playerAnimation = updateMovingState(
 						globalState.playerCharacter,
@@ -172,8 +174,10 @@ export default class ScriptHelper {
 								`Known npcs are ${Object.keys(this.scene.npcMap)}`
 						);
 					}
-					this.scene.npcMap[npcId].x = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH;
-					this.scene.npcMap[npcId].y = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT;
+					this.scene.npcMap[npcId].x =
+						(this.currentRoom!.x + currentStep.posX) * TILE_WIDTH * SCALE;
+					this.scene.npcMap[npcId].y =
+						(this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT * SCALE;
 					const facing = getFacing8Dir(currentStep.facingX, currentStep.facingY);
 					const animation = updateMovingState(globalState.npcs[npcId], false, facing, true);
 					if (animation) {
@@ -201,13 +205,13 @@ export default class ScriptHelper {
 					const mainCharacter = this.scene.mainCharacter;
 					const totalDistance =
 						Math.abs(targetX - mainCharacter.x) + Math.abs(targetY - mainCharacter.y);
-					const atTarget = totalDistance < TILE_HEIGHT / 2;
+					const atTarget = totalDistance / SCALE < TILE_HEIGHT / 2;
 					if (!atTarget) {
 						const xFactor = (targetX - mainCharacter.x) / totalDistance;
 						const yFactor = (targetY - mainCharacter.y) / totalDistance;
 						const speed = getCharacterSpeed(globalState.playerCharacter);
-						mainCharacter.setVelocity(speed * xFactor, speed * yFactor);
-						mainCharacter.body.velocity.normalize().scale(speed);
+						mainCharacter.setVelocity(speed * xFactor * SCALE, speed * yFactor * SCALE);
+						mainCharacter.body.velocity.normalize().scale(speed * SCALE);
 						const newFacing = getFacing8Dir(xFactor, yFactor);
 						const playerAnimation = updateMovingState(globalState.playerCharacter, true, newFacing);
 						if (playerAnimation) {
@@ -222,8 +226,8 @@ export default class ScriptHelper {
 			}
 			case 'spawn': {
 				cleanUpStep = true;
-				const targetX = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH;
-				const targetY = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT;
+				const targetX = (this.currentRoom!.x + currentStep.posX) * TILE_WIDTH * SCALE;
+				const targetY = (this.currentRoom!.y + currentStep.posY) * TILE_HEIGHT * SCALE;
 				this.scene.addNpc(
 					`${this.currentRoom!.roomName}${currentStep.npcId}`,
 					currentStep.npcType,
@@ -338,11 +342,11 @@ export default class ScriptHelper {
 				let targetX: number;
 				let targetY: number;
 				if (currentStep.atPlayerPosition) {
-					targetX = globalState.playerCharacter.x;
-					targetY = globalState.playerCharacter.y;
+					targetX = globalState.playerCharacter.x * SCALE;
+					targetY = globalState.playerCharacter.y * SCALE;
 				} else {
-					targetX = (this.currentRoom!.x + currentStep.posX!) * TILE_WIDTH;
-					targetY = (this.currentRoom!.y + currentStep.posY!) * TILE_HEIGHT;
+					targetX = (this.currentRoom!.x + currentStep.posX!) * TILE_WIDTH * SCALE;
+					targetY = (this.currentRoom!.y + currentStep.posY!) * TILE_HEIGHT * SCALE;
 				}
 				if (currentStep.fixedId) {
 					this.scene.dropItem(targetX, targetY, currentStep.fixedId);
@@ -406,8 +410,8 @@ export default class ScriptHelper {
 					cleanUpStep = true;
 					break;
 				}
-				token.x = (tokenRoom!.x + currentStep.posX) * TILE_WIDTH;
-				token.y = (tokenRoom!.y + currentStep.posY) * TILE_HEIGHT;
+				token.x = (tokenRoom!.x + currentStep.posX) * TILE_WIDTH * SCALE;
+				token.y = (tokenRoom!.y + currentStep.posY) * TILE_HEIGHT * SCALE;
 				const facing = getFacing8Dir(currentStep.facingX, currentStep.facingY);
 				const animation = updateMovingState(globalState.npcs[token.id], false, facing, true);
 				if (animation) {
@@ -425,10 +429,10 @@ export default class ScriptHelper {
 					cleanUpStep = true;
 					break;
 				}
-				const targetX = (tokenRoom!.x + currentStep.posX) * TILE_WIDTH;
-				const targetY = (tokenRoom!.y + currentStep.posY) * TILE_HEIGHT;
+				const targetX = (tokenRoom!.x + currentStep.posX) * TILE_WIDTH * SCALE;
+				const targetY = (tokenRoom!.y + currentStep.posY) * TILE_HEIGHT * SCALE;
 				const totalDistance = Math.abs(targetX - token.x) + Math.abs(targetY - token.y);
-				const atTarget = totalDistance < TILE_HEIGHT / 2;
+				const atTarget = totalDistance / SCALE < TILE_HEIGHT / 2;
 				if (atTarget) {
 					cleanUpStep = true;
 					token.isBeingMoved = false;
@@ -438,8 +442,8 @@ export default class ScriptHelper {
 					const yFactor = (targetY - token.y) / totalDistance;
 					const speed = getCharacterSpeed(globalState.npcs[token.id]);
 					token.isBeingMoved = true;
-					token.setVelocity(speed * xFactor, speed * yFactor);
-					token.body.velocity.normalize().scale(speed);
+					token.setVelocity(speed * xFactor * SCALE, speed * yFactor * SCALE);
+					token.body.velocity.normalize().scale(speed * SCALE);
 					const newFacing = getFacing8Dir(xFactor, yFactor);
 					const animation = updateMovingState(globalState.npcs[token.id], true, newFacing);
 					if (animation) {
