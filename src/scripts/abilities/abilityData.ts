@@ -574,7 +574,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
 		cooldownMs: 400,
-		damageMultiplier: 0.0,
+		damageMultiplier: 0.5,
 		abilityName: 'Angry Bat',
 		flavorText: `An angry bat.`,
 		icon: ['icon-abilities', 1],
