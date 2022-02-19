@@ -53,7 +53,11 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');
 
 		// death
-		this.load.aseprite('death_anim_small', 'assets/sprites/enemy_explosion_small.png', 'assets/sprites/enemy_explosion_small.json')
+		this.load.aseprite(
+			'death_anim_small',
+			'assets/sprites/enemy_explosion_small.png',
+			'assets/sprites/enemy_explosion_small.json'
+		);
 
 		// Overlay screens
 		this.load.spritesheet('screen-background', 'assets/img/screen-background.png', {
@@ -177,17 +181,19 @@ export default class PreloadScene extends Phaser.Scene {
 			this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
 		});
 
+		// Load all default enemies.
+		NpcTypeList.forEach((type) => {
+			if (!requiredNpcs.has(type)) {
+				requiredNpcs.add(type);
+			}
+		});
+
 		// If we are in map editor mode, also load the library background tilesets
 		if (activeMode === MODE.MAP_EDITOR) {
 			this.load.image('base-background', 'assets/tilesets/base-background.png');
 			this.load.image('decoration-background', 'assets/tilesets/decoration-background.png');
 			this.load.image('overlay-background', 'assets/tilesets/overlay-background.png');
 			this.load.image('map-editor-highlighting', 'assets/img/map-editor-highlighting.png');
-
-			NpcTypeList.forEach((type) => {
-				console.log(`Preparing ${type}.`);
-				requiredNpcs.add(type);
-			});
 		}
 
 		// NPCs
@@ -222,6 +228,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 		this.neededAnimations.forEach((token) => {
 			if (npcToAespriteMap[token.name]) {
+				console.log(`Loading animation from aseprite for ${token.name}`);
 				this.anims.createFromAseprite(token.name);
 				return;
 			}
