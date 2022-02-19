@@ -383,11 +383,11 @@ export default class MainScene extends Phaser.Scene {
 		// )
 
 		doors.forEach((door) => {
-			this.addDoor(door.id, door.type, door.x, door.y, door.open);
+			this.addDoor(door.id, door.type, door.x * SCALE, door.y * SCALE, door.open);
 		});
 
 		items.forEach((item) => {
-			this.addFixedItem(item.id, item.x, item.y);
+			this.addFixedItem(item.id, item.x * SCALE, item.y * SCALE);
 		});
 
 		// console.log(`Dropping item at ${startPositionX}, ${startPositionY}`);
@@ -671,8 +671,8 @@ export default class MainScene extends Phaser.Scene {
 
 	dropItem(x: number, y: number, itemKey: string, level?: number) {
 		const item = getItemDataForName(itemKey);
-		if(item === undefined) {
-			console.log("ITEM UNDEFINED: ", itemKey);
+		if (item === undefined) {
+			console.log('ITEM UNDEFINED: ', itemKey);
 			return;
 		}
 		const itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0);

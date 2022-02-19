@@ -160,7 +160,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		projectileData: {
 			spread: [-0.07, 0.07, (num) => Math.sin(num * Math.PI * 0.95)],
 			delay: 50,
-			velocity: 350,
+			velocity: 150,
 			effectScale: 0.8,
 			xOffset: 0,
 			yOffset: 0,

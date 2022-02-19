@@ -1,7 +1,7 @@
 import { UiDepths, UI_SCALE } from '../../helpers/constants';
 import globalState from '../../worldstate/index';
 
-const X_POSITION = 10;
+const X_POSITION = 12;
 const Y_POSITION = 146;
 
 const isTileVisible = (tile: Phaser.Tilemaps.Tile) => {
@@ -20,6 +20,6 @@ export default class Minimap extends Phaser.GameObjects.Text {
 		scene.add.existing(this);
 		this.setOrigin(0);
 		this.setText(globalState.roomAssignment[globalState.currentLevel]?.title || '');
-		this.setDepth(UiDepths.UI_STICK_LAYER);
+		this.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 	}
 }

@@ -20,7 +20,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 		this.setScrollFactor(0);
 		scene.add.existing(this);
 		this.setOrigin(0);
-		this.setDepth(UiDepths.UI_STICK_LAYER);
+		this.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 	}
 
 	public update() {
