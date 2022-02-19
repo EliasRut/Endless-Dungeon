@@ -52,6 +52,9 @@ export default class PreloadScene extends Phaser.Scene {
 		// Player
 		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');
 
+		// death
+		this.load.aseprite('death_anim_small', 'assets/sprites/enemy_explosion_small.png', 'assets/sprites/enemy_explosion_small.json')
+
 		// Overlay screens
 		this.load.spritesheet('screen-background', 'assets/img/screen-background.png', {
 			frameWidth: 64,
@@ -204,6 +207,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Create character animations
 		this.anims.createFromAseprite('player');
+		this.anims.createFromAseprite('death_anim_small');
 
 		this.neededAnimations.forEach((token) => {
 			if (npcToAespriteMap[token.name]) {
