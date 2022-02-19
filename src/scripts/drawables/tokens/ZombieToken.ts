@@ -19,6 +19,7 @@ const HEALTH_DROP_CHANCE = 0.06;
 export default class ZombieToken extends EnemyToken {
 	attackExecuted: boolean;
 	startingHealth: number;	
+	dead: boolean = false;
 
 	constructor(
 		scene: MainScene,
@@ -48,12 +49,13 @@ export default class ZombieToken extends EnemyToken {
 		);
 
 		// check death
-		if (this.stateObject.health <= 0) {
+		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
 				this.dropRandomItem(this.level);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
 				this.dropFixedItem('health');
 			}
+			this.dead = true;
 			this.die();
 			return;
 		}
