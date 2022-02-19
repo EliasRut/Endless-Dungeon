@@ -5,7 +5,7 @@ import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 
-const BASE_ATTACK_DAMAGE = 0.1;
+const BASE_ATTACK_DAMAGE = 4;
 const REGULAR_ATTACK_RANGE = 25;
 const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
@@ -18,7 +18,8 @@ const HEALTH_DROP_CHANCE = 0.06;
 
 export default class ZombieToken extends EnemyToken {
 	attackExecuted: boolean;
-	startingHealth: number;
+	startingHealth: number;	
+	dead: boolean = false;
 
 	constructor(
 		scene: MainScene,
@@ -48,17 +49,31 @@ export default class ZombieToken extends EnemyToken {
 		);
 
 		// check death
-		if (this.stateObject.health <= 0) {
+		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
 				this.dropRandomItem(this.level);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
 				this.dropFixedItem('health');
 			}
-			this.destroy();
+			this.dead = true;
+			this.die();
 			return;
 		}
+
 		updateStatus(time, this.stateObject);
 		if (this.stateObject.stunned) return;
+		if (this.scene.isPaused) {
+			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
+			if (animation) {
+				if (this.scene.game.anims.exists(animation)) {
+					this.play(animation);
+				} else {
+					console.log(`Animation ${animation} does not exist.`);
+					this.play(animation);
+				}
+			}
+			return;
+		}
 
 		if (this.lastMovedTimestamp + KNOCKBACK_TIME > time) {
 			return;
@@ -127,10 +142,6 @@ export default class ZombieToken extends EnemyToken {
 		}
 		this.stateObject.x = this.body.x / SCALE;
 		this.stateObject.y = this.body.y / SCALE;
-	}
-
-	destroy() {
-		super.destroy();
 	}
 
 	attack(time: number) {

@@ -99,12 +99,17 @@ export default abstract class EnemyToken extends CharacterToken {
 		}
 	}
 
+	die() {
+		this.play('death_anim_small');
+		this.body.destroy();
+		this.on('animationcomplete', () => this.destroy())
+	}
+
 	// destroy the enemy
 	destroy() {
 		if (this.scene?.npcMap) {
 			delete this.scene.npcMap[this.id];
 		}
-
 		super.destroy();
 	}
 

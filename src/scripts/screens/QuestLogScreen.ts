@@ -1,6 +1,6 @@
 import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
 import { UiDepths, UI_SCALE } from '../helpers/constants';
-import { Quests } from '../helpers/quests';
+import { getQuest } from '../helpers/quests';
 import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import OverlayScreen from './OverlayScreen';
@@ -90,7 +90,7 @@ export default class QuestLogScreen extends OverlayScreen {
 				(QUEST_SCREEN_X + 36) * UI_SCALE,
 				(QUEST_SCREEN_Y + HEADER_FIRST_QUEST_TEXT_OFFSET + OFFSET_BETWEEN_QUESTS * index) *
 					UI_SCALE,
-				Quests[quest[1]].name,
+				getQuest(quest[1])?.name || '',
 				{
 					color: 'white',
 					wordWrap: { width: (SCREEN_WIDTH - 40) * UI_SCALE, useAdvancedWrap: true },

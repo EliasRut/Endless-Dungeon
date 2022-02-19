@@ -106,7 +106,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		abilityName: 'Fireball',
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
-		castOnEnemyDestroyed: AbilityType.EXPLODING_CORPSE,
+		//castOnEnemyDestroyed: AbilityType.EXPLODING_CORPSE,
 	},
 	[AbilityType.ARCANE_BOLT]: {
 		projectiles: 1,

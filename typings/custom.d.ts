@@ -170,7 +170,7 @@ export interface ScriptSetScriptState {
 	scriptState: 'new' | 'finished';
 }
 
-export interface ScriptQuestState {
+export interface ScriptSetQuestState {
 	type: 'setQuestState';
 	questId: string;
 	questState: 'new' | 'ongoing' | 'finished';
@@ -193,7 +193,7 @@ export type ScriptEntry =
 	| ScriptCast
 	| ScriptPlaceItem
 	| ScriptPausedCondition
-	| ScriptQuestState
+	| ScriptSetQuestState
 	| ScriptSpawnItem;
 
 export interface Scripting {

@@ -1,23 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
 import { LargeDropdown } from '../LargeDropdown';
-import { LargeInput } from '../LargeInput';
-import { LargeTextArea } from '../LargeTextArea';
 import { ScriptBlockContainer } from '../ScriptBlockContainer';
 import { ScriptTypeDropdown } from '../ScriptTypeDropdown';
 
-export interface DialogProps {
+export interface SetQuestStateProps {
 	currentData: {
-		type: 'dialog';
-		speaker: string;
-		portrait?: string;
-		text: string[];
+		type: 'setQuestState';
+		questId: string;
+		questState: 'new' | 'ongoing' | 'finished';
 	};
+	availableQuests: {
+		id: string;
+		name: string;
+	}[];
 	updateData: (newData: any) => void;
 	removeData: () => void;
 }
 
-export const Dialog = (props: DialogProps) => {
+export const SetQuestState = (props: SetQuestStateProps) => {
 	return (
 		<ScriptBlockContainer>
 			<ScriptTypeDropdown
@@ -30,43 +31,40 @@ export const Dialog = (props: DialogProps) => {
 				onRemove={() => props.removeData()}
 			/>
 			<Wrapper>
-				<TextWrapper>Speaker</TextWrapper>
-				<LargeInput
-					id="dialogSpeaker"
-					value={props.currentData.speaker}
+				<TextWrapper>Quest</TextWrapper>
+				<LargeDropdown
+					id="questId"
+					value={props.currentData.questId}
 					onChange={(e: any) =>
 						props.updateData({
 							...props.currentData,
-							speaker: e.target.value,
+							questId: e.target.value,
 						})
 					}
-				/>
+				>
+					<option value="none"></option>
+					{props.availableQuests.map(({ id, name }) => (
+						<option value={id}>{name}</option>
+					))}
+				</LargeDropdown>
 			</Wrapper>
 			<Wrapper>
-				<TextWrapper>Portrait</TextWrapper>
-				<LargeInput
-					id="dialogPortrait"
-					value={props.currentData.portrait}
+				<TextWrapper>State</TextWrapper>
+				<LargeDropdown
+					id="questState"
+					value={props.currentData.questState}
 					onChange={(e: any) =>
 						props.updateData({
 							...props.currentData,
-							portrait: e.target.value,
+							questState: e.target.value,
 						})
 					}
-				/>
-			</Wrapper>
-			<Wrapper>
-				<TextWrapper>Text</TextWrapper>
-				<LargeTextArea
-					id="dialogText"
-					value={props.currentData.text.join('\n')}
-					onChange={(e: any) =>
-						props.updateData({
-							...props.currentData,
-							text: e.target.value.split('\n'),
-						})
-					}
-				/>
+				>
+					<option value="none"></option>
+					<option value="new">New</option>
+					<option value="ongoing">Ongoing</option>
+					<option value="finished">Finished</option>
+				</LargeDropdown>
 			</Wrapper>
 		</ScriptBlockContainer>
 	);
