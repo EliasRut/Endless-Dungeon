@@ -671,6 +671,10 @@ export default class MainScene extends Phaser.Scene {
 
 	dropItem(x: number, y: number, itemKey: string, level?: number) {
 		const item = getItemDataForName(itemKey);
+		if(item === undefined) {
+			console.log("ITEM UNDEFINED: ", itemKey);
+			return;
+		}
 		const itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0);
 		itemToken.setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.worldItems.push(itemToken);

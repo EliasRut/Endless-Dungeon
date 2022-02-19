@@ -298,6 +298,7 @@ export const enum UneqippableItem {
 	GOLD_KEY = 'goldKey',
 	SILVER_KEY = 'silverKey',
 	MYSTIC_BOOK = 'mysticBook',
+	POTION = 'health',
 }
 
 export const UneqippableItemData = {
@@ -315,6 +316,11 @@ export const UneqippableItemData = {
 		name: 'Mystic Book',
 		description: 'A book full of ancient runes. Smells like old bones.',
 		iconFrame: 5,
+	} as ItemData,
+	[UneqippableItem.POTION]: {
+		name: 'Health Potion',
+		description: 'A health potion. Tastes like blood...',
+		iconFrame: 0,
 	} as ItemData,
 };
 

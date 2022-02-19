@@ -73,10 +73,6 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		return false;
 	}
 
-	public die() {
-		this.play('die');
-	}
-
 	public getDistanceToWorldStatePosition(px: number, py: number) {
 		const x = this.x - px * SCALE;
 		const y = this.y - py * SCALE;

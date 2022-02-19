@@ -100,10 +100,11 @@ export default abstract class EnemyToken extends CharacterToken {
 	}
 
 	die() {
-		this.destroy();
-		super.die();
+		this.play('die');
+		this.body.destroy();
+		this.on('animationcomplete', () => this.destroy())
 	}
-	
+
 	// destroy the enemy
 	destroy() {
 		if (this.scene?.npcMap) {

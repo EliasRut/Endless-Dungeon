@@ -1,5 +1,5 @@
 { "frames": {
-   "enemy_explosion_small 0.aseprite": {
+   "0": {
     "frame": { "x": 1, "y": 52, "w": 12, "h": 8 },
     "rotated": false,
     "trimmed": true,
@@ -7,7 +7,7 @@
     "sourceSize": { "w": 48, "h": 48 },
     "duration": 100
    },
-   "enemy_explosion_small 1.aseprite": {
+   "1": {
     "frame": { "x": 46, "y": 45, "w": 14, "h": 14 },
     "rotated": false,
     "trimmed": true,
@@ -15,7 +15,7 @@
     "sourceSize": { "w": 48, "h": 48 },
     "duration": 75
    },
-   "enemy_explosion_small 2.aseprite": {
+   "2": {
     "frame": { "x": 27, "y": 45, "w": 18, "h": 21 },
     "rotated": false,
     "trimmed": true,
@@ -23,7 +23,7 @@
     "sourceSize": { "w": 48, "h": 48 },
     "duration": 75
    },
-   "enemy_explosion_small 3.aseprite": {
+   "3": {
     "frame": { "x": 1, "y": 28, "w": 25, "h": 23 },
     "rotated": false,
     "trimmed": true,
@@ -31,7 +31,7 @@
     "sourceSize": { "w": 48, "h": 48 },
     "duration": 50
    },
-   "enemy_explosion_small 4.aseprite": {
+   "4": {
     "frame": { "x": 1, "y": 1, "w": 31, "h": 26 },
     "rotated": false,
     "trimmed": true,
@@ -39,7 +39,7 @@
     "sourceSize": { "w": 48, "h": 48 },
     "duration": 50
    },
-   "enemy_explosion_small 5.aseprite": {
+   "5": {
     "frame": { "x": 33, "y": 1, "w": 33, "h": 23 },
     "rotated": false,
     "trimmed": true,
@@ -47,7 +47,7 @@
     "sourceSize": { "w": 48, "h": 48 },
     "duration": 75
    },
-   "enemy_explosion_small 6.aseprite": {
+   "6": {
     "frame": { "x": 67, "y": 1, "w": 35, "h": 21 },
     "rotated": false,
     "trimmed": true,
@@ -55,7 +55,7 @@
     "sourceSize": { "w": 48, "h": 48 },
     "duration": 100
    },
-   "enemy_explosion_small 7.aseprite": {
+   "7": {
     "frame": { "x": 67, "y": 23, "w": 34, "h": 21 },
     "rotated": false,
     "trimmed": true,
@@ -63,7 +63,7 @@
     "sourceSize": { "w": 48, "h": 48 },
     "duration": 100
    },
-   "enemy_explosion_small 8.aseprite": {
+   "8": {
     "frame": { "x": 33, "y": 25, "w": 34, "h": 19 },
     "rotated": false,
     "trimmed": true,
@@ -71,7 +71,7 @@
     "sourceSize": { "w": 48, "h": 48 },
     "duration": 100
    },
-   "enemy_explosion_small 9.aseprite": {
+   "9": {
     "frame": { "x": 80, "y": 45, "w": 14, "h": 8 },
     "rotated": false,
     "trimmed": true,
@@ -79,7 +79,7 @@
     "sourceSize": { "w": 48, "h": 48 },
     "duration": 100
    },
-   "enemy_explosion_small 10.aseprite": {
+   "10": {
     "frame": { "x": 61, "y": 45, "w": 18, "h": 7 },
     "rotated": false,
     "trimmed": true,
@@ -96,6 +96,7 @@
   "size": { "w": 102, "h": 66 },
   "scale": "1",
   "frameTags": [
+    { "name": "die", "from": 0, "to": 10, "direction": "forward" }
   ]
  }
 }

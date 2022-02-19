@@ -27,8 +27,8 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		itemKey: string,
 		item: ItemData,
 		level: number
-	) {
-		super(scene, x * SCALE, y * SCALE, 'test-items-spritesheet', item.iconFrame);
+	) {		
+		super(scene, x, y, 'test-items-spritesheet', item.iconFrame);
 		const tileX = Math.round(x / TILE_WIDTH);
 		const tileY = Math.round(y / TILE_HEIGHT);
 		this.itemKey = itemKey;
@@ -36,6 +36,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		this.tile = (this.scene as MainScene).tileLayer.getTileAt(tileX, tileY);
 		this.tileY = Math.round(y / TILE_HEIGHT);
 		this.tileX = Math.round(x / TILE_WIDTH);
+		this.setScale(SCALE);
 		scene.add.existing(this);
 	}
 
