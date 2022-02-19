@@ -447,6 +447,29 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 		this.setState(questState);
 	}
 
+	clearFields() {
+		if (!this.state.id) {
+			return;
+		}
+
+		const clearedQuestState = {
+			id: undefined,
+			questGiverId: '',
+			questGiverName: '',
+			preconditionBlocks: {
+				previousQuests: [],
+				requiredItems: [],
+				dungeonLevelReached: 0,
+			},
+			questName: '',
+			questDescription: '',
+			rewardBlocks: [],
+			scriptBlocks: [],
+		};
+
+		this.setState(clearedQuestState);
+	}
+
 	render() {
 		return (
 			<PageContainer>
@@ -458,13 +481,21 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 				</NavigationWrapper>
 				<PageWrapper>
 					<MenueWrapper id="questEditorMenu">
+						<MenueElementWrapper>
+							<div>New Quest</div>
+							<NotPaddedButtonWrapper>
+								<StyledButton id="newQuestButton" onClick={() => this.clearFields()}>
+									Create
+								</StyledButton>
+							</NotPaddedButtonWrapper>
+						</MenueElementWrapper>
 						<div>
 							<div>Load Quest</div>
 							<Dropdown
 								id="questDropdown"
 								onChange={(e: any) => this.setState({ id: e.target.value })}
 							>
-								<option value="">New quest</option>
+								<option value="">-</option>
 
 								{this.state.knownQuests.map(({ id, name }) => (
 									<option value={id}>{name}</option>
@@ -480,6 +511,7 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 									id="saveQuestButton"
 									onClick={() => {
 										this.saveQuest();
+										this.componentDidMount();
 									}}
 								>
 									Save
@@ -690,6 +722,15 @@ const MenueWrapper = styled.div`
 	padding: 24px;
 `;
 
+const MenueElementWrapper = styled.div`
+	color: white;
+	padding-bottom: 12px;
+`;
+
+const NotPaddedButtonWrapper = styled.div`
+	margin-top: 4px;
+`;
+
 const ButtonWrapper = styled.div`
 	margin-top: 18px;
 `;
@@ -698,6 +739,7 @@ const StyledButton = styled.button`
 	width: 100%;
 	font-family: 'endlessDungeon';
 	font-size: 1.8rem;
+	cursor: pointer;
 `;
 
 const QuestWrapper = styled.div`
