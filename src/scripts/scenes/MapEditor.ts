@@ -51,6 +51,11 @@ type LevelHistory = MultiLevelLayout[];
 
 const npcKeys = ['hilda-base', 'vanya-base', 'agnes', 'erwin', 'rich'];
 
+export interface MapEditorReactBridge {
+	setActiveNpc: (npc: NpcPositioning) => void;
+	setNpcDialogVisible: (visible: boolean) => void;
+}
+
 export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
 	backupDatabase: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
@@ -170,6 +175,8 @@ export default class MapEditor extends Phaser.Scene {
 
 	zoomFactor: number = 1;
 
+	reactBridge?: MapEditorReactBridge;
+
 	constructor() {
 		super({ key: 'MapEditor' });
 		this.database = firebase.firestore().collection('rooms');
@@ -229,6 +236,10 @@ export default class MapEditor extends Phaser.Scene {
 		this.itemDeleteButton = document.getElementById('itemDeleteButton') as HTMLButtonElement;
 		this.itemDeleteButton.onclick = () => this.deleteItemToken();
 	}
+
+	public registerReactBridge = (bridge: MapEditorReactBridge) => {
+		this.reactBridge = bridge;
+	};
 
 	populateFromDatabase(databaseSelectedRoom: DatabaseRoom) {
 		const selectedRoom = deserializeRoom(databaseSelectedRoom);
@@ -667,20 +678,24 @@ export default class MapEditor extends Phaser.Scene {
 	}
 
 	hideNpcDetailsDialog() {
-		const dialog = document.getElementById('npcDetailsDialog')!;
-		dialog.style.display = 'none';
+		// const dialog = document.getElementById('npcDetailsDialog')!;
+		// dialog.style.display = 'none';
+		this.reactBridge!.setNpcDialogVisible(false);
 		this.selectedNpcTokenIndex = -1;
 	}
 
 	showNpcDetailsDialog(npcPosition: NpcPositioning) {
-		const dialog = document.getElementById('npcDetailsDialog')!;
-		dialog.style.display = 'flex';
+		// const dialog = document.getElementById('npcDetailsDialog')!;
+		// dialog.style.display = 'flex';
 
-		this.npcTypeDropdownElement.value = npcPosition.type;
-		this.npcIdElement.value = npcPosition.id;
-		this.npcLevelElement.value = npcPosition.level || '+0';
-		this.npcXElement.value = `${npcPosition.x}`;
-		this.npcYElement.value = `${npcPosition.y}`;
+		// this.npcTypeDropdownElement.value = npcPosition.type;
+		// this.npcIdElement.value = npcPosition.id;
+		// this.npcLevelElement.value = npcPosition.level || '+0';
+		// this.npcXElement.value = `${npcPosition.x}`;
+		// this.npcYElement.value = `${npcPosition.y}`;
+
+		this.reactBridge!.setActiveNpc(npcPosition);
+		this.reactBridge!.setNpcDialogVisible(true);
 	}
 
 	deleteNpcToken() {
@@ -754,6 +769,7 @@ export default class MapEditor extends Phaser.Scene {
 			npcPosition.y * TILE_HEIGHT - this.heightInPixels / 2,
 			1
 		);
+
 		this.add.existing(npc);
 		npc.setAlpha(1);
 		npc.setDepth(DEPTHS.npcLayer);
