@@ -278,14 +278,6 @@
     "spriteSourceSize": { "x": 49, "y": 35, "w": 30, "h": 39 },
     "sourceSize": { "w": 128, "h": 96 },
     "duration": 50
-   },
-   "35": {
-    "frame": { "x": 166, "y": 1, "w": 3, "h": 3 },
-    "rotated": false,
-    "trimmed": true,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 1, "h": 1 },
-    "sourceSize": { "w": 128, "h": 96 },
-    "duration": 1000
    }
  },
  "meta": {
@@ -293,10 +285,10 @@
   "version": "1.2.34.1-x64",
   "image": "iron_door.png",
   "format": "RGBA8888",
-  "size": { "w": 169, "h": 237 },
+  "size": { "w": 165, "h": 237 },
   "scale": "1",
   "frameTags": [
-   { "name": "open", "from": 1, "to": 35, "direction": "forward" }
+   { "name": "open_ironDoor", "from": 1, "to": 34, "direction": "forward" }
   ]
  }
 }
