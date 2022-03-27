@@ -7,7 +7,7 @@ import MapEditor from './scenes/MapEditor';
 import PreloadScene from './scenes/PreloadScene';
 import RoomPreloaderScene from './scenes/RoomPreloaderScene';
 import NpcEditor from './scenes/NpcEditor';
-import { activeMode, MODE } from './helpers/constants';
+import { MODE } from './helpers/constants';
 import NpcGenerationScene from './scenes/NpcGenerationScene';
 
 const firebaseConfig = {
@@ -16,7 +16,7 @@ const firebaseConfig = {
 	projectId: 'project-endless-dungeon',
 	storageBucket: 'project-endless-dungeon.appspot.com',
 	messagingSenderId: '300065738789',
-	appId: '1:300065738789:web:e0a00f15878d7679226fcc'
+	appId: '1:300065738789:web:e0a00f15878d7679226fcc',
 };
 
 // Initialize Firebase
@@ -28,46 +28,53 @@ const DEFAULT_HEIGHT = 360;
 const NPC_EDITOR_WIDTH = 320;
 const NPC_EDITOR_HEIGHT = 240;
 
+const getEditorScenes: (mode: MODE) => typeof Phaser.Scene[] = (mode) => {
+	switch (mode) {
+		case MODE.MAP_EDITOR:
+			return [RoomPreloaderScene, NpcGenerationScene, PreloadScene, MapEditor];
+		case MODE.NPC_EDITOR:
+			return [NpcEditor];
+		default:
+			return [];
+	}
+};
+
 // This is the configuration for Phaser
 export const getGameConfig = (parent: HTMLElement, mode: MODE) => ({
 	type: Phaser.AUTO,
 	backgroundColor: '#020202',
 	scale: {
 		parent,
-		mode: Phaser.Scale.FIT,
+		mode: Phaser.Scale.RESIZE,
 		autoCenter: Phaser.Scale.CENTER_BOTH,
-		// zoom: Phaser.Scale.ZOOM_4X,
+		zoom: Phaser.Scale.ZOOM_4X,
 		width: mode === MODE.NPC_EDITOR ? NPC_EDITOR_WIDTH : DEFAULT_WIDTH,
-		height: mode === MODE.NPC_EDITOR ? NPC_EDITOR_HEIGHT : DEFAULT_HEIGHT
+		height: mode === MODE.NPC_EDITOR ? NPC_EDITOR_HEIGHT : DEFAULT_HEIGHT,
 	},
 	input: {
-			gamepad: true
+		gamepad: true,
 	},
-	scene: mode === MODE.GAME ? [
-		RoomPreloaderScene,
-		NpcGenerationScene,
-		PreloadScene,
-		MainScene,
-		DungeonDoorPreloadScene,
-		DungeonDoorScene
-	] : (mode === MODE.MAP_EDITOR ? [
-		RoomPreloaderScene,
-		NpcGenerationScene,
-		PreloadScene,
-		MapEditor
-	] : [
-		NpcEditor
-	]),
+	scene:
+		mode === MODE.GAME
+			? [
+					RoomPreloaderScene,
+					NpcGenerationScene,
+					PreloadScene,
+					MainScene,
+					DungeonDoorPreloadScene,
+					DungeonDoorScene,
+			  ]
+			: getEditorScenes(mode),
 	// We are using Phasers arcade physics library
 	physics: {
 		default: 'arcade',
 		arcade: {
-			debug: true,
-		}
+			debug: false,
+		},
 	},
 	render: {
 		antialias: false,
 		pixelArt: true,
-		roundPixels: false
-	}
+		roundPixels: false,
+	},
 });

@@ -1,12 +1,13 @@
-import { AbilityType } from "../src/scripts/abilities/abilityData";
-import { ColorsOfMagic } from "../src/scripts/helpers/constants";
-import { RandomItemOptions } from "../src/scripts/helpers/item";
+import { AbilityType } from '../src/scripts/abilities/abilityData';
+import { ColorsOfMagic } from '../src/scripts/helpers/constants';
+import { RandomItemOptions } from '../src/scripts/helpers/item';
+import { QuestScripts } from '../src/scripts/helpers/quests';
 
 export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
 
 export interface NpcScript {
 	repeat: number;
-	steps: NpcScriptStep [];
+	steps: NpcScriptStep[];
 }
 
 export interface NpcOptions {
@@ -26,13 +27,13 @@ export interface NpcPositioning extends NpcOptions {
 }
 
 export interface MapConnection {
-  x: number;
-  y: number;
+	x: number;
+	y: number;
 	targetScene?: string;
-  targetMap?: string;
-  targetRoom?: string;
-  targetX?: number;
-  targetY?: number;
+	targetMap?: string;
+	targetRoom?: string;
+	targetX?: number;
+	targetY?: number;
 }
 
 export interface ItemsPositioning {
@@ -49,51 +50,54 @@ export interface Door {
 	open: boolean;
 }
 
-export type OpeningDirection = "top" | "left" | "right" | "bottom";
+export type OpeningDirection = 'top' | 'left' | 'right' | 'bottom';
 export type Opening = [number, number, OpeningDirection];
 
 export interface ScriptWait {
-	type: "wait";
-	time: number
+	type: 'wait';
+	time: number;
 }
 
 export interface ScriptCondition {
-	type: "condition";
-	conditionType: "hasItem" | "scriptState";
+	type: 'condition';
+	conditionType: 'hasItem' | 'scriptState';
 	itemId?: string;
 	scriptId?: string;
-	scriptState?: "new" | "ongoing" | "finished";
+	scriptState?: 'new' | 'ongoing' | 'finished';
 }
 
 export interface ScriptPausedCondition {
-	type: "pauseUntilCondition";
+	type: 'pauseUntilCondition';
 	itemIds?: string[];
 	itemQuantities?: number[];
 	questIds?: string[];
 	questStates?: ('started' | 'notStarted' | 'startedOrFinished' | 'finished' | 'notFinished')[];
+	scriptIds?: string[];
+	scriptStates?: ('new' | 'ongoing' | 'finished')[];
 	roomName?: string;
 }
 
 export interface ScriptDialog {
-	type: "dialog";
-	portrait: string;
+	type: 'dialog';
+	speaker: string;
+	portrait?: string;
 	text: string[];
 }
 
 export interface ScriptAnimation {
-	type: "animation";
+	type: 'animation';
 	target?: string;
 	animation: string;
 	duration: number;
 }
 
 export interface ScriptCast {
-	type: "cast";
+	type: 'cast';
 	ability: AbilityType;
 }
 
 export interface ScriptMove {
-	type: "move";
+	type: 'move';
 	target?: string;
 	posX: number;
 	posY: number;
@@ -102,7 +106,7 @@ export interface ScriptMove {
 }
 
 export interface ScriptWalk {
-	type: "walk";
+	type: 'walk';
 	target?: string;
 	posX: number;
 	posY: number;
@@ -111,7 +115,7 @@ export interface ScriptWalk {
 export interface ScriptSpawn {
 	facingX?: number;
 	facingY?: number;
-	type: "spawn";
+	type: 'spawn';
 	npcId: string;
 	npcType: string;
 	posX: number;
@@ -119,7 +123,7 @@ export interface ScriptSpawn {
 }
 
 export interface ScriptSpawnItem {
-	type: "spawnItem";
+	type: 'spawnItem';
 	fixedId?: string;
 	itemOptions?: Partial<RandomItemOptions>;
 	posX?: number;
@@ -128,54 +132,69 @@ export interface ScriptSpawnItem {
 }
 
 export interface ScriptOpenDoor {
-	type: "openDoor";
+	type: 'openDoor';
 	doorId: string;
 }
 
 export interface ScriptSceneChange {
-	type: "sceneChange";
+	type: 'sceneChange';
 	target: string;
 }
 
 export interface ScriptFadeIn {
-	type: "fadeIn";
+	type: 'fadeIn';
 	time: number;
 }
 
 export interface ScriptFadeOut {
-	type: "fadeOut";
+	type: 'fadeOut';
 	time: number;
 }
 
 export interface ScriptTakeItem {
-	type: "takeItem";
+	type: 'takeItem';
 	itemId: string;
 	amount: number;
 }
 
 export interface ScriptPlaceItem {
-	type: "placeItem";
+	type: 'placeItem';
 	itemId: string;
 	posX: number;
 	posY: number;
 }
 
 export interface ScriptSetScriptState {
-	type: "setScriptState";
+	type: 'setScriptState';
 	scriptId: string;
-	scriptState: "new" | "finished";
+	scriptState: 'new' | 'finished';
 }
 
-export interface ScriptQuestState {
-	type: "setQuestState";
+export interface ScriptSetQuestState {
+	type: 'setQuestState';
 	questId: string;
-	questState: "new" | "ongoing" | "finished";
+	questState: 'new' | 'ongoing' | 'finished';
 }
 
-export type ScriptEntry = ScriptWait | ScriptDialog | ScriptAnimation | ScriptSceneChange |
-	ScriptFadeIn | ScriptFadeOut | ScriptMove | ScriptWalk | ScriptSpawn | ScriptOpenDoor |
-	ScriptCondition | ScriptSetScriptState | ScriptTakeItem | ScriptCast | ScriptPlaceItem |
-	ScriptPausedCondition | ScriptQuestState | ScriptSpawnItem;
+export type ScriptEntry =
+	| ScriptWait
+	| ScriptDialog
+	| ScriptAnimation
+	| ScriptSceneChange
+	| ScriptFadeIn
+	| ScriptFadeOut
+	| ScriptMove
+	| ScriptWalk
+	| ScriptSpawn
+	| ScriptOpenDoor
+	| ScriptCondition
+	| ScriptSetScriptState
+	| ScriptTakeItem
+	| ScriptCast
+	| ScriptPlaceItem
+	| ScriptPausedCondition
+	| ScriptSetQuestState
+	| ScriptSpawnItem;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];
@@ -186,17 +205,17 @@ export interface Scripting {
 		y: number;
 		radius: number;
 		steps: ScriptEntry[];
-	}
+	};
 }
 
 export interface DatabaseRoom {
 	startRoom?: boolean;
-	tileset: string; 
-	decorationTileset?: string; 
-	overlayTileset?: string; 
-	layout: string; //The first 32 (0-31) tiles of the tileset are colliding; 
-	decorations: string; //The first 32 (0-31) tiles of the tileset are colliding; 
-	overlays: string; //The first 32 (0-31) tiles of the tileset are colliding; 
+	tileset: string;
+	decorationTileset?: string;
+	overlayTileset?: string;
+	layout: string; //The first 32 (0-31) tiles of the tileset are colliding;
+	decorations: string; //The first 32 (0-31) tiles of the tileset are colliding;
+	overlays: string; //The first 32 (0-31) tiles of the tileset are colliding;
 	overlay?: string;
 	npcs?: NpcPositioning[]; //place npcs in room
 	connections?: MapConnection[];
@@ -208,15 +227,14 @@ export interface DatabaseRoom {
 	doors?: Door[];
 }
 
-
 export interface Room {
 	startRoom?: boolean;
-	tileset: string; 
-	decorationTileset?: string; 
-	overlayTileset?: string; 
-	layout: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
-	decorations?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
-	overlays?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding; 
+	tileset: string;
+	decorationTileset?: string;
+	overlayTileset?: string;
+	layout: number[][]; //The first 32 (0-31) tiles of the tileset are colliding;
+	decorations?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding;
+	overlays?: number[][]; //The first 32 (0-31) tiles of the tileset are colliding;
 	npcs?: NpcPositioning[]; //place npcs in room
 	connections?: MapConnection[];
 	items?: ItemsPositioning[];
@@ -236,8 +254,25 @@ export interface Weapon {
 	tile: number[][];
 }
 
-export type HexValue = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f';
+export type HexValue =
+	| '0'
+	| '1'
+	| '2'
+	| '3'
+	| '4'
+	| '5'
+	| '6'
+	| '7'
+	| '8'
+	| '9'
+	| 'a'
+	| 'b'
+	| 'c'
+	| 'd'
+	| 'e'
+	| 'f';
 export type HashtagHexColor = string;
+
 export interface NpcData {
 	name: string;
 	bodyTemplate: string;
@@ -251,4 +286,28 @@ export interface NpcData {
 	pantsTemplate: string;
 	pantsColor: HashtagHexColor;
 	shoesColor: HashtagHexColor;
+}
+
+export interface Quest {
+	questGiverId?: string;
+	questGiverName: string;
+	preconditions?: {
+		previousQuests?: string[];
+		requiredItems?: ItemWithCount[];
+		dungeonLevelReached?: number;
+	};
+	completionCriterias?: {
+		previousQuests?: string[];
+		hasItems?: string[];
+		dungeonLevelReached?: number;
+	};
+	name: string;
+	goal: string;
+	rewards?: ItemWithCount[];
+	scripts?: QuestScripts;
+}
+
+export interface ItemWithCount {
+	id: string;
+	count: number;
 }

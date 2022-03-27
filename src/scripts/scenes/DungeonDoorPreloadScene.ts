@@ -8,13 +8,17 @@ export default class DungeonDoorPreloadScene extends Phaser.Scene {
 	}
 
 	init() {
-		const text = new Phaser.GameObjects.Text(this,
+		const text = new Phaser.GameObjects.Text(
+			this,
 			this.cameras.main.centerX,
-			this.cameras.main.centerY, 'Loading ...', {
-				fontFamily: 'munro',
+			this.cameras.main.centerY,
+			'Loading ...',
+			{
+				fontFamily: 'endlessDungeon',
 				color: 'white',
-				fontSize: '26px'
-			});
+				fontSize: '26px',
+			}
+		);
 		this.add.existing(text);
 	}
 
@@ -22,10 +26,11 @@ export default class DungeonDoorPreloadScene extends Phaser.Scene {
 		// Dungeon Door
 		this.load.image('dungeon-door', 'assets/img/dungeon-door.png');
 		this.load.image('doorknob', 'assets/img/doorknob.png');
-		this.load.spritesheet('runeSocket', `assets/img/socket-animation.png`,
-			{ frameWidth: 32, frameHeight: 32 });
-		this.load.spritesheet('runes', `assets/img/runes.png`,
-		{ frameWidth: 32, frameHeight: 32 });
+		this.load.spritesheet('runeSocket', `assets/img/socket-animation.png`, {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
+		this.load.spritesheet('runes', `assets/img/runes.png`, { frameWidth: 32, frameHeight: 32 });
 
 		// load music score
 		this.load.audio('score-mage-tower', 'assets/sounds/score-mage-tower.mp3');
@@ -36,10 +41,10 @@ export default class DungeonDoorPreloadScene extends Phaser.Scene {
 			key: `runeSocket-anim`,
 			frames: this.anims.generateFrameNumbers('runeSocket', {
 				start: 0,
-				end: 5 /* Currently only 1 drawn */
+				end: 5 /* Currently only 1 drawn */,
 			}),
 			frameRate: 6,
-			repeat: -1
+			repeat: -1,
 		});
 
 		this.scene.start('DungeonDoorScene');

@@ -1,0 +1,19 @@
+{
+	"title": "The Rescue",
+	"lowerBoundOfSecondaryContentBlocks": 0,
+	"upperBoundOfSecondaryContentBlocks": 0,
+	"requiredQuests": [["theRescue", "not-finished"]],
+	"dungeonLevels": [
+		{
+			"specialStartRoom": true,
+			"title": "Zombie Tomb",
+			"style": "death",
+			"rooms": ["chapter-1-start-room", "chapter-1-zombie-room"],
+			"width": 8,
+			"height": 8,
+			"numberOfRooms": 2,
+			"enemyBudget": 0
+		}
+	],
+	"themes": ["death"]
+}

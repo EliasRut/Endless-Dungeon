@@ -1,0 +1,30 @@
+{
+	"title": "Burrow of the dead",
+	"lowerBoundOfSecondaryContentBlocks": 0,
+	"upperBoundOfSecondaryContentBlocks": 0,
+	"requiredQuests": [
+		["theRescue", "finished"],
+		["vanyaWantsBooks", "open"]
+	],
+	"dungeonLevels": [
+		{
+			"title": "The Burrow - Level 1",
+			"style": "death",
+			"rooms": ["COM-death-key"],
+			"width": 12,
+			"height": 12,
+			"numberOfRooms": 4,
+			"enemyBudget": 15
+		},
+		{
+			"title": "The Burrow - Level 2",
+			"style": "death",
+			"rooms": [],
+			"width": 10,
+			"height": 10,
+			"numberOfRooms": 3,
+			"enemyBudget": 10
+		}
+	],
+	"themes": ["death"]
+}

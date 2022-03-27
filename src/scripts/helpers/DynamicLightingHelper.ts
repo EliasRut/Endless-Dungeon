@@ -99,7 +99,11 @@ export default class DynamicLightingHelper {
 	reducedLightingArray: number[][] = [];
 
 	updateDynamicLighting() {
-		const { width, height } = this.getCurrentLevel();
+		const currentLevel = this.getCurrentLevel();
+		if (!currentLevel) {
+			return;
+		}
+		const { width, height } = currentLevel;
 		const dungeonWidth = width * TILE_WIDTH;
 		const dungeonHeight = height * TILE_HEIGHT;
 		// Take time for benchmarking

@@ -12,7 +12,7 @@ const createLayer: (
 	const map = scene.make.tilemap({
 		data: layout,
 		tileWidth: TILE_WIDTH,
-		tileHeight: TILE_HEIGHT
+		tileHeight: TILE_HEIGHT,
 	});
 
 	const tileSets = tilesets.map((tileSetName, index) => {
@@ -33,30 +33,36 @@ const createLayer: (
 	return tileLayer;
 };
 
-export const generateTilemap: (scene: Phaser.Scene, dungeonLevel: DungeonLevel) =>
-	[
-		Phaser.Tilemaps.TilemapLayer,
-		Phaser.Tilemaps.TilemapLayer,
-		Phaser.Tilemaps.TilemapLayer,
-		// Phaser.Tilemaps.TilemapLayer
-	] = (scene, dungeonLevel) => {
-
+export const generateTilemap: (
+	scene: Phaser.Scene,
+	dungeonLevel: DungeonLevel
+) => [
+	Phaser.Tilemaps.TilemapLayer,
+	Phaser.Tilemaps.TilemapLayer,
+	Phaser.Tilemaps.TilemapLayer
+	// Phaser.Tilemaps.TilemapLayer
+] = (scene, dungeonLevel) => {
 	const tileLayer = createLayer(scene, dungeonLevel.layout, dungeonLevel.tilesets, 0);
 
 	tileLayer.setCollisionBetween(0, (dungeonLevel.tilesets.length + 1) * GID_MULTIPLE, false);
 	tileLayer.setCollisionBetween(-1, 0, true);
 
-	const decorationTileLayer =
-		createLayer(scene, dungeonLevel.decorationLayout, dungeonLevel.tilesets, 1);
+	const decorationTileLayer = createLayer(
+		scene,
+		dungeonLevel.decorationLayout,
+		dungeonLevel.tilesets,
+		1
+	);
 
 	decorationTileLayer.setCollisionBetween(
-		0, (dungeonLevel.tilesets.length + 1) * GID_MULTIPLE, false);
+		0,
+		(dungeonLevel.tilesets.length + 1) * GID_MULTIPLE,
+		false
+	);
 
-	const overlayTileLayer =
-		createLayer(scene, dungeonLevel.overlayLayout, dungeonLevel.tilesets, 2);
+	const overlayTileLayer = createLayer(scene, dungeonLevel.overlayLayout, dungeonLevel.tilesets, 2);
 
-	overlayTileLayer.setCollisionBetween(
-		0, (dungeonLevel.tilesets.length + 1) * GID_MULTIPLE, false);
+	overlayTileLayer.setCollisionBetween(0, (dungeonLevel.tilesets.length + 1) * GID_MULTIPLE, false);
 
 	dungeonLevel.tilesets.map((tileSetName, index) => {
 		const gid = index * GID_MULTIPLE;
@@ -71,5 +77,5 @@ export const generateTilemap: (scene: Phaser.Scene, dungeonLevel: DungeonLevel) 
 	// 	createLayer(scene, dungeonLevel.topLayout, dungeonLevel.tilesets, 3);
 	// topTileLayer.setDepth(UiDepths.TOP_TILE_LAYER);
 
-	return [tileLayer, decorationTileLayer, overlayTileLayer];//, topTileLayer];
+	return [tileLayer, decorationTileLayer, overlayTileLayer];
 };

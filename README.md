@@ -1,4 +1,4 @@
-# Vector Monkeys Coding Dojo Game Dev Session 2020-10-03 + 04
+# Vector Monkeys Coding Dojo - Project Endless Dungeon
 Welcome to the GitHub repo for our game dev session.
 
 Please

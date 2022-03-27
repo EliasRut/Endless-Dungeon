@@ -18,12 +18,13 @@ export interface SingleScriptState {
 }
 
 export default interface ScriptState {
+	runningScriptId?: string;
 	runningScript?: ScriptEntry[];
 	scriptStep?: number;
 	scriptSubStep?: number;
 	scriptStepStartMs?: number;
 	scriptAnimationFallback?: string;
-	npcScriptStates?: {[npcId: string]: NpcScriptState};
+	npcScriptStates?: { [npcId: string]: NpcScriptState };
 	pausedScripts?: PausedScriptState[];
-	states?: {[id: string]: SingleScriptState};
+	states?: { [id: string]: SingleScriptState };
 }

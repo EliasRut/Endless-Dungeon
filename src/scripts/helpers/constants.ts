@@ -6,19 +6,10 @@ export const enum Facings {
 	NORTH,
 	NORTH_WEST,
 	WEST,
-	SOUTH_WEST
+	SOUTH_WEST,
 }
 
-export const spriteDirectionList = [
-	's',
-	'se',
-	'e',
-	'ne',
-	'n',
-	'nw',
-	'w',
-	'sw'
-];
+export const spriteDirectionList = ['s', 'se', 'e', 'ne', 'n', 'nw', 'w', 'sw'];
 
 export const facingToSpriteNameMap = {
 	[Facings.SOUTH]: 's',
@@ -37,7 +28,7 @@ export const ANIMATION_WALK = 'walk';
 export const enum Faction {
 	PLAYER,
 	NPCS,
-	ENEMIES
+	ENEMIES,
 }
 
 export const enum AbilityKey {
@@ -50,7 +41,7 @@ export const enum AbilityKey {
 
 export const enum UiDepths {
 	BASE_TILE_LAYER = 0,
-	DECORATION_TILE_LAYER= 1,
+	DECORATION_TILE_LAYER = 1,
 
 	TOKEN_BACKGROUND_LAYER = 2,
 	TOKEN_MAIN_LAYER = 3,
@@ -63,8 +54,9 @@ export const enum UiDepths {
 	UI_BACKGROUND_LAYER = 8,
 	UI_MAIN_LAYER = 9,
 	UI_FOREGROUND_LAYER = 10,
+	UI_ABOVE_FOREGROUND_LAYER = 11,
 
-	UI_STICK_LAYER = 11
+	UI_STICK_LAYER = 12,
 }
 
 export const TARGETABLE_TILE_TINT = 0x888888;
@@ -76,12 +68,12 @@ export const NUM_ITEM_ICONS = 64;
 export const NUM_DIRECTIONS = 8;
 
 export const enum EquipmentSlot {
-	MAIN_HAND = 'mainhand',
-	OFF_HAND = 'offhand',
+	SOURCE = 'source',
+	CATALYST = 'catalyst',
 	CHESTPIECE = 'chestpiece',
-	NECKLACE = 'necklace',
+	AMULET = 'amulet',
 	RIGHT_RING = 'rightRing',
-	LEFT_RING = 'leftRing'
+	LEFT_RING = 'leftRing',
 }
 
 export const enum ColorsOfMagic {
@@ -92,7 +84,7 @@ export const enum ColorsOfMagic {
 	DEATH = 'death',
 	PASSION = 'passion',
 	WILD = 'wild',
-	ROYAL = 'royal'
+	ROYAL = 'royal',
 }
 
 export const ColorsArray = [
@@ -121,69 +113,96 @@ export const BAG_BOXES_Y = 4;
 
 export const enum FacingRange {
 	ALL_DIRECTIONS = 1,
-	ONLY_NESW = 2
+	ONLY_NESW = 2,
 }
 
-export const npcTypeToFileMap: {[name: string]:{file: string, facing: FacingRange}} =  {
-	'red-ball'     : {file: 'assets/sprites/red-ball.png',facing: FacingRange.ALL_DIRECTIONS},
-	'redling-boss' : {file: 'assets/sprites/red-ball.png',facing: FacingRange.ALL_DIRECTIONS},
-	'red-link'     : {file: 'assets/sprites/red-link.png',facing: FacingRange.ALL_DIRECTIONS},
-	'naked-guy'    : {file: 'assets/sprites/naked-guy.png',facing: FacingRange.ALL_DIRECTIONS},
-	'enemy-zombie' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW},
-	'enemy-vampire' : {file: 'assets/sprites/enemy-vampire.png',facing: FacingRange.ONLY_NESW},
-	'lich-king' : {file: 'assets/sprites/enemy-zombie.png',facing: FacingRange.ONLY_NESW}
+export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingRange } } = {
+	'red-ball': { file: 'assets/sprites/red-ball.png', facing: FacingRange.ALL_DIRECTIONS },
+	'redling-boss': { file: 'assets/sprites/red-ball.png', facing: FacingRange.ALL_DIRECTIONS },
+	'red-link': { file: 'assets/sprites/red-link.png', facing: FacingRange.ALL_DIRECTIONS },
+	'naked-guy': { file: 'assets/sprites/naked-guy.png', facing: FacingRange.ALL_DIRECTIONS },
 };
 
-export const npcTypeToAttackFileMap: {
-	[name: string]: {[attackName: string]: {
-		file: string,
-		framesPerDirection: number,
-		frameOffset?: number,
-		animationFrames?: number
-	}}
-} =  {
-	'enemy-zombie': {
-		'slash': {
-			file: 'assets/sprites/enemy-zombie-slash.png',
-			framesPerDirection: 16
-		}
-	},
-	'enemy-vampire': {
-		'prepare': {
-			file: 'assets/sprites/enemy-vampire-charge.png',
-			framesPerDirection: 16,
-			frameOffset: 0,
-			animationFrames: 9
-		},
-		'fly': {
-			file: 'assets/sprites/enemy-vampire-charge.png',
-			framesPerDirection: 16,
-			frameOffset: 9,
-			animationFrames: 1
-		},
-		'stun': {
-			file: 'assets/sprites/enemy-vampire-charge.png',
-			framesPerDirection: 16,
-			frameOffset: 10,
-			animationFrames: 4
-		},
-		'recover': {
-			file: 'assets/sprites/enemy-vampire-charge.png',
-			framesPerDirection: 16,
-			frameOffset: 14,
-			animationFrames: 2
-		}
-	}
+export const npcToAespriteMap: { [name: string]: { png: string; json: string } } = {
+	'rich': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
+	'jacques': { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
+	'pierre': { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
+	'lich-king': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
+};
+
+export const characterToSubAnimationFileMap: {
+	[name: string]: {
+		[subAnimation: string]: {
+			file: string;
+			framesPerDirection: number;
+			frameOffset?: number;
+			animationFrames?: number;
+		};
+	};
+} = {
+	// 'rich': {
+	// 	slash: {
+	// 		file: 'assets/sprites/rich-slash.png',
+	// 		framesPerDirection: 16,
+	// 	},
+	// },
+	// 'jacques': {
+	// 	prepare: {
+	// 		file: 'assets/sprites/jacques-charge.png',
+	// 		framesPerDirection: 16,
+	// 		frameOffset: 0,
+	// 		animationFrames: 9,
+	// 	},
+	// 	fly: {
+	// 		file: 'assets/sprites/jacques-charge.png',
+	// 		framesPerDirection: 16,
+	// 		frameOffset: 9,
+	// 		animationFrames: 1,
+	// 	},
+	// 	stun: {
+	// 		file: 'assets/sprites/jacques-charge.png',
+	// 		framesPerDirection: 16,
+	// 		frameOffset: 10,
+	// 		animationFrames: 4,
+	// 	},
+	// 	recover: {
+	// 		file: 'assets/sprites/jacques-charge.png',
+	// 		framesPerDirection: 16,
+	// 		frameOffset: 14,
+	// 		animationFrames: 2,
+	// 	},
+	// },
+	// player: {
+	// 	damage: {
+	// 		file: 'assets/sprites/main-character-damagestun.png',
+	// 		framesPerDirection: 12,
+	// 		frameOffset: 0,
+	// 		animationFrames: 4,
+	// 	},
+	// 	stun: {
+	// 		file: 'assets/sprites/main-character-damagestun.png',
+	// 		framesPerDirection: 12,
+	// 		frameOffset: 4,
+	// 		animationFrames: 8,
+	// 	},
+	// },
 };
 
 export const essenceNames = [
-	'wild', 'royal', 'metal', 'passion', 'flux', 'death', 'change', 'blood'
+	'wild',
+	'royal',
+	'metal',
+	'passion',
+	'flux',
+	'death',
+	'change',
+	'blood',
 ];
 
 export const enum PossibleTargets {
 	NONE = 0,
 	PLAYER = 1,
-	ENEMIES = 2
+	ENEMIES = 2,
 }
 
 export const KNOCKBACK_TIME = 250;
@@ -199,16 +218,63 @@ export const colorOfMagicToTilesetMap = {
 	[ColorsOfMagic.ROYAL]: 'COM-death-B',
 };
 
+export const NpcTypeList = ['rich', 'jacques', 'pierre'];
+
+export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
+	[ColorsOfMagic.FLUX]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.METAL]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.CHANGE]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.BLOOD]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.DEATH]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.PASSION]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.WILD]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.ROYAL]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+};
+
 export const enemyBudgetCost = {
-	'enemy-zombie': 1,
-	'enemy-vampire': 1,
-	'redling-boss': 10
+	'rich': 1,
+	'jacques': 1,
+	'pierre': 1,	
+	'redling-boss': 10,
 };
 
 export const enum MODE {
 	GAME = 'game',
 	MAP_EDITOR = 'mapEditor',
-	NPC_EDITOR = 'npcEditor'
+	NPC_EDITOR = 'npcEditor',
+	QUEST_EDITOR = 'questEditor',
 }
 
 export let activeMode = MODE.GAME;
@@ -219,3 +285,6 @@ export const setActiveMode = (mode: MODE) => {
 
 export const CHARACTER_SPRITE_WIDTH = 320;
 export const CHARACTER_SPRITE_HEIGHT = 240;
+
+export const SCALE = 3;
+export const UI_SCALE = (window.innerWidth >= 1900 && window.innerHeight) >= 840 ? 3 : 2;

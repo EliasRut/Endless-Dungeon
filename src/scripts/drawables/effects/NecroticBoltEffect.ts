@@ -1,4 +1,4 @@
-import { Facings, UiDepths } from '../../helpers/constants';
+import { Facings, SCALE, UiDepths } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
 import MainScene from '../../scenes/MainScene';
@@ -26,6 +26,7 @@ export default class NecroticBoltEffect extends TargetingEffect {
 		scene.add.existing(this);
 		this.setRotation(getRotationInRadiansForFacing(facing));
 		this.setDepth(1);
+		this.setScale(SCALE);
 		scene.physics.add.existing(this);
 		this.body.setCircle(BODY_RADIUS, 0, 0);
 		this.body.setMass(1);
@@ -33,8 +34,8 @@ export default class NecroticBoltEffect extends TargetingEffect {
 		const particles = scene.add.particles('fire');
 		this.emitter = particles.createEmitter({
 			alpha: { start: 1, end: 0 },
-			scale: { start: 0.2 * this.effectScale, end: 0.05 },
-			speed: 10,
+			scale: { start: 0.2 * this.effectScale * SCALE, end: 0.05 * SCALE },
+			speed: 10 * SCALE,
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 500, max: 1000 },
 			blendMode: Phaser.BlendModes.ADD,
@@ -56,13 +57,13 @@ export default class NecroticBoltEffect extends TargetingEffect {
 		this.emitter.stopFollow();
 		if (this.body && this.explodeOnDestruction) {
 			this.emitter.setEmitterAngle({ min: -180, max: 180 });
-			this.emitter.setSpeed(70);
+			this.emitter.setSpeed(70 * SCALE);
 			this.emitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
-			this.emitter.setScale({ start: 0.4 * this.effectScale, end: 0.05 });
-			this.emitter.explode(20, this.body.x + 6, this.body.y + 6);
-			this.emitter.setSpeed({ min: 5, max: 55 });
-			this.emitter.setScale({ start: 0.3 * this.effectScale, end: 0.01 });
-			this.emitter.explode(10, this.body.x + 6, this.body.y + 6);
+			this.emitter.setScale({ start: 0.4 * this.effectScale * SCALE, end: 0.05 * SCALE });
+			this.emitter.explode(20, this.body.x + 6 * SCALE, this.body.y + 6 * SCALE);
+			this.emitter.setSpeed({ min: 5 * SCALE, max: 55 * SCALE });
+			this.emitter.setScale({ start: 0.3 * this.effectScale * SCALE, end: 0.01 * SCALE });
+			this.emitter.explode(10, this.body.x + 6 * SCALE, this.body.y + 6 * SCALE);
 		}
 
 		super.destroy();

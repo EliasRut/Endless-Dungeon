@@ -1,8 +1,4 @@
-import {
-	Facings,
-	Faction
-} from '../helpers/constants';
-import EquippableItem from './EquippableItem';
+import { Facings, Faction } from '../helpers/constants';
 
 export default class Character {
 	public animationBase: string;
@@ -22,17 +18,15 @@ export default class Character {
 	public x = 0;
 	public y = 0;
 	public vision = 0;
-	
-	public items: EquippableItem[] = [];
 
 	public faction: Faction;
 
 	constructor(
-			animationBase: string,
-			health: number = 100,
-			damage: number = 10,
-			movementSpeed: number = 100
-		) {
+		animationBase: string,
+		health: number = 100,
+		damage: number = 10,
+		movementSpeed: number = 100
+	) {
 		this.animationBase = animationBase;
 		this.maxHealth = health;
 		this.health = health;
@@ -45,6 +39,6 @@ export const updateStatus = (globalTime: number, character: Character) => {
 	if (character.stunned) {
 		if (globalTime > character.stunnedAt + character.stunDuration) {
 			character.stunned = false;
-		}		
+		}
 	}
-}
+};

@@ -55,37 +55,37 @@
   "npcs": [
     {
       "id": "zom-1",
-      "type": "enemy-zombie",
+      "type": "rich",
       "x": 3,
       "y": 5
     },
     {
       "id": "zom-2",
-      "type": "enemy-zombie",
+      "type": "rich",
       "x": 22,
       "y": 5
     },
     {
       "id": "zom-3",
-      "type": "enemy-zombie",
+      "type": "rich",
       "x": 3,
       "y": 21
     },
     {
       "id": "zom-4",
-      "type": "enemy-zombie",
+      "type": "rich",
       "x": 22,
       "y": 21
     },
     {
       "id": "zom-5",
-      "type": "enemy-zombie",
+      "type": "rich",
       "x": 3,
       "y": 37
     },
     {
       "id": "zom-6",
-      "type": "enemy-zombie",
+      "type": "rich",
       "x": 22,
       "y": 37
     }

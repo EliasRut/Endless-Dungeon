@@ -3,16 +3,20 @@ import {
 	NUM_DIRECTIONS,
 	npcTypeToFileMap,
 	FacingRange,
-	npcTypeToAttackFileMap,
 	essenceNames,
 	ColorsOfMagic,
 	activeMode,
 	MODE,
 	NUM_COLORS_OF_MAGIC,
+	npcToAespriteMap,
+	NpcTypeList,
 } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 import { BLOCK_SIZE } from '../helpers/generateRoom';
+import firebase from 'firebase';
+import { Quest } from '../../../typings/custom';
+import { fillLoadedQuestFromDb, fillQuestScriptsFromDb, QuestScripts } from '../helpers/quests';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -23,7 +27,7 @@ export default class PreloadScene extends Phaser.Scene {
 		super({ key: 'PreloadScene' });
 	}
 
-	neededAnimations = [{ name: 'player', facingRange: FacingRange.ALL_DIRECTIONS }];
+	neededAnimations = new Array<{ name: string; facingRange: FacingRange }>();
 
 	init() {
 		const text = new Phaser.GameObjects.Text(
@@ -32,7 +36,7 @@ export default class PreloadScene extends Phaser.Scene {
 			this.cameras.main.centerY,
 			'Loading ...',
 			{
-				fontFamily: 'munro',
+				fontFamily: 'endlessDungeon',
 				color: 'white',
 				fontSize: '26px',
 			}
@@ -46,10 +50,19 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('search-icon', 'assets/img/search-icon.png');
 
 		// Player
-		this.load.spritesheet('player', 'assets/sprites/main-character.png', {
-			frameWidth: 40,
-			frameHeight: 40,
-		});
+		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');
+
+		// Prepare aseprite listings for enemies
+		this.load.aseprite('rich', 'assets/sprites/rich.png', 'assets/sprites/rich.json');
+		this.load.aseprite('jacques', 'assets/sprites/jacques.png', 'assets/sprites/jacques.json');
+		this.load.aseprite('pierre', 'assets/sprites/pierre.png', 'assets/sprites/pierre.json');
+
+		// death
+		this.load.aseprite(
+			'death_anim_small',
+			'assets/sprites/enemy_explosion_small.png',
+			'assets/sprites/enemy_explosion_small.json'
+		);
 
 		// Overlay screens
 		this.load.spritesheet('screen-background', 'assets/img/screen-background.png', {
@@ -69,18 +82,38 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('quest', 'assets/img/quest.png');
 
 		// GUI
+		this.load.image('quickselect-wheel', 'assets/img/quickselect-wheel.png');
+		this.load.image(
+			'quickselect-wheel-selection-large',
+			'assets/img/quickselect-wheel-selection-large.png'
+		);
+		this.load.image(
+			'quickselect-wheel-selection-small',
+			'assets/img/quickselect-wheel-selection-small.png'
+		);
 		this.load.image('pad-background', 'assets/img/pad-background.png');
 		this.load.image('pad-stick', 'assets/img/pad-stick.png');
 		this.load.image('icon-backpack', 'assets/img/backpack-icon.png');
+		this.load.image('icon-quests', 'assets/img/quest-icon.png');
 		this.load.image('icon-settings', 'assets/img/settings-icon.png');
 		this.load.image('icon-hero', 'assets/img/hero-icon.png');
 		this.load.image('icon-healthbar-background', 'assets/img/gui-healthbar.png');
 		this.load.image('ability-background-desktop', 'assets/img/ability-icon-background-desktop.png');
 		this.load.image('ability-background-mobile', 'assets/img/ability-icon-background-mobile.png');
+		this.load.image('gui-text-equipment', 'assets/img/gui-text-equipment.png');
+		this.load.image('gui-text-info', 'assets/img/gui-text-info.png');
+		this.load.image('gui-text-stats', 'assets/img/gui-text-stats.png');
+		this.load.image('ability-background-p', 'assets/img/ability-icon-background-p.png');
+		this.load.image('ability-background-1', 'assets/img/ability-icon-background-1.png');
+		this.load.image('ability-background-2', 'assets/img/ability-icon-background-2.png');
+		this.load.image('ability-background-3', 'assets/img/ability-icon-background-3.png');
+		this.load.image('ability-background-4', 'assets/img/ability-icon-background-4.png');
 		this.load.image('icon-guibase', 'assets/img/gui-base.png');
 		this.load.image('icon-healthbar', 'assets/img/gui-life.png');
 		this.load.image('inventory-borders', 'assets/img/inventory-borders-tall.png');
 		this.load.image('inventory-selection', 'assets/img/inventory-selection.png');
+		this.load.image('checkbox-empty', 'assets/img/checkbox-empty.png');
+		this.load.image('checkbox-filled', 'assets/img/checkbox-filled.png');
 		this.load.spritesheet('icon-abilities', 'assets/img/abilities-sheet.png', {
 			frameWidth: 20,
 			frameHeight: 20,
@@ -97,6 +130,10 @@ export default class PreloadScene extends Phaser.Scene {
 			frameWidth: 16,
 			frameHeight: 16,
 		});
+		this.load.aseprite('source-fire1', 'assets/sprites/source_flame01.png', 'assets/sprites/source_flame01.json');
+		this.load.aseprite('source-force1', 'assets/sprites/source_force01.png', 'assets/sprites/source_force01.json');
+		this.load.image('icon-source-fire1', 'assets/img/source_icon_flame01.png');
+		this.load.image('icon-source-force1', 'assets/img/source_icon_force01.png');
 
 		// Doors
 		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png', {
@@ -125,8 +162,6 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Find out which files we need by going through all rendered rooms
 		const requiredNpcs = new Set<string>();
-		requiredNpcs.add('enemy-zombie');
-		requiredNpcs.add('enemy-vampire');
 		Object.values(globalState.availableRooms).forEach((room) => {
 			if (!globalState.availableTilesets.includes(room.tileset)) {
 				globalState.availableTilesets.push(room.tileset);
@@ -153,6 +188,13 @@ export default class PreloadScene extends Phaser.Scene {
 			this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
 		});
 
+		// Load all default enemies.
+		NpcTypeList.forEach((type) => {
+			if (!requiredNpcs.has(type)) {
+				requiredNpcs.add(type);
+			}
+		});
+
 		// If we are in map editor mode, also load the library background tilesets
 		if (activeMode === MODE.MAP_EDITOR) {
 			this.load.image('base-background', 'assets/tilesets/base-background.png');
@@ -168,9 +210,11 @@ export default class PreloadScene extends Phaser.Scene {
 				facingRange: npcTypeToFileMap[npc]?.facing || FacingRange.ONLY_NESW,
 			});
 		});
+
+		// Quests
 	}
 
-	create() {
+	async create() {
 		if (activeMode === MODE.NPC_EDITOR) {
 			this.scene.start('NpcEditor');
 			return;
@@ -181,18 +225,30 @@ export default class PreloadScene extends Phaser.Scene {
 			return;
 		}
 
+		// Item animation
+
+		this.anims.createFromAseprite('source-fire1');
+		this.anims.createFromAseprite('source-force1');
+
 		// Create character animations
-		for (let directionIndex = 0; directionIndex < NUM_DIRECTIONS; directionIndex++) {
-			const numIdleFrames = 4;
-			const numWalkFrames = 8;
+		this.anims.createFromAseprite('player');
+		this.anims.createFromAseprite('death_anim_small');
 
-			const idleFrameOffset = numIdleFrames * directionIndex;
-			const firstWalkFrame = numIdleFrames * spriteDirectionList.length;
-			const walkFrameOffset = firstWalkFrame + numWalkFrames * directionIndex;
+		this.neededAnimations.forEach((token) => {
+			if (npcToAespriteMap[token.name]) {
+				this.anims.createFromAseprite(token.name);
+				return;
+			}
+			for (let directionIndex = 0; directionIndex < NUM_DIRECTIONS; directionIndex++) {
+				const numIdleFrames = 4;
+				const numWalkFrames = 8;
 
-			const directionName = spriteDirectionList[directionIndex];
+				const idleFrameOffset = numIdleFrames * directionIndex;
+				const firstWalkFrame = numIdleFrames * spriteDirectionList.length;
+				const walkFrameOffset = firstWalkFrame + numWalkFrames * directionIndex;
 
-			this.neededAnimations.forEach((token) => {
+				const directionName = spriteDirectionList[directionIndex];
+
 				if (directionIndex % token.facingRange === 0) {
 					this.anims.create({
 						key: `${token.name}-idle-${directionName}`,
@@ -212,31 +268,32 @@ export default class PreloadScene extends Phaser.Scene {
 						frameRate: 12,
 						repeat: -1,
 					});
-					const attackNames = Object.keys(npcTypeToAttackFileMap[token.name] || {});
-					const directionFrameMultiplier = Math.floor(directionIndex / token.facingRange);
-					attackNames.forEach((attackName) => {
-						const attackData = npcTypeToAttackFileMap[token.name][attackName];
-						const startFrame =
-							directionFrameMultiplier * attackData.framesPerDirection +
-							(attackData.frameOffset || 0);
-						this.anims.create({
-							key: `${token.name}-${attackName}-${directionName}`,
-							frames: this.anims.generateFrameNumbers(`${token.name}-${attackName}`, {
-								start: startFrame,
-								end:
-									startFrame +
-									(attackData.animationFrames
-										? attackData.animationFrames
-										: attackData.framesPerDirection) -
-									1,
-							}),
-							frameRate: 16,
-							repeat: 0,
-						});
-					});
+					// const subAnimationNames = Object.keys(characterToSubAnimationFileMap[token.name] || {});
+					// const directionFrameMultiplier = Math.floor(directionIndex / token.facingRange);
+					// subAnimationNames.forEach((subAnimation) => {
+					// 	const attackData = characterToSubAnimationFileMap[token.name][subAnimation];
+					// 	const startFrame =
+					// 		directionFrameMultiplier * attackData.framesPerDirection +
+					// 		(attackData.frameOffset || 0);
+
+					// 	this.anims.create({
+					// 		key: `${token.name}-${subAnimation}-${directionName}`,
+					// 		frames: this.anims.generateFrameNumbers(`${token.name}-${subAnimation}`, {
+					// 			start: startFrame,
+					// 			end:
+					// 				startFrame +
+					// 				(attackData.animationFrames
+					// 					? attackData.animationFrames
+					// 					: attackData.framesPerDirection) -
+					// 				1,
+					// 		}),
+					// 		// frameRate: 16,
+					// 		repeat: 0,
+					// 	});
+					// });
 				}
-			});
-		}
+			}
+		});
 
 		// Prepare essence animations
 		essenceNames.forEach((name, index) => {
@@ -307,6 +364,24 @@ export default class PreloadScene extends Phaser.Scene {
 
 			globalState.dungeon.levels[globalState.currentLevel] = roomLevelData;
 		}
+
+		// Load quests from database
+		const questDb = firebase.firestore().collection('quests');
+		const questQuery = await questDb.get();
+		const quests = questQuery.docs.map((doc) => [doc.id, doc.data() as Quest]) as [string, Quest][];
+		const loadedQuestScripts = quests.reduce((obj, [id, quest]) => {
+			if (quest.scripts) {
+				obj[id] = quest.scripts;
+			}
+			return obj;
+		}, {} as { [name: string]: QuestScripts });
+		fillQuestScriptsFromDb(loadedQuestScripts);
+
+		const loadedQuests = quests.reduce((obj, [id, quest]) => {
+			obj[id] = quest;
+			return obj;
+		}, {} as { [name: string]: Quest });
+		fillLoadedQuestFromDb(loadedQuests);
 
 		this.scene.start('MainScene');
 	}

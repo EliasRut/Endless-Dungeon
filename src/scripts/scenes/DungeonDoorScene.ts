@@ -4,6 +4,7 @@ import globalState from '../worldstate/index';
 import { RuneAssignment } from '../helpers/constants';
 import { generateDungeonRun } from '../helpers/generateDungeonRun';
 import KeyboardHelper from '../helpers/KeyboardHelper';
+import { SingleScriptState } from '../worldstate/ScriptState';
 
 export default class DungeonDoorScene extends Phaser.Scene {
 	dungeonDoor: DungeonDoor;
@@ -12,25 +13,40 @@ export default class DungeonDoorScene extends Phaser.Scene {
 	keyCD: number = 350;
 
 	constructor() {
-		super({ key: 'DungeonDoorScene' });		
+		super({ key: 'DungeonDoorScene' });
 	}
 
 	create() {
 		this.keyboardHelper = new KeyboardHelper(this);
 		this.dungeonDoor = new DungeonDoor(this);
 		this.sound.stopAll();
-		this.sound.play('score-mage-tower', {volume: 0.04});		
+		this.sound.play('score-mage-tower', { volume: 0.04 });
 	}
 
 	enterDungeon(runeAssignment: RuneAssignment) {
-		console.log("entering dungeon");
+		// tslint:disable-next-line: no-console
+		console.log('entering dungeon');
 		const dungeonRun = generateDungeonRun(runeAssignment);
+		globalState.dungeon.levels = {};
+		globalState.doors = {};
+		const newScriptState: { [id: string]: SingleScriptState } = {};
+		Object.entries(globalState.scripts.states || {}).forEach(([scriptId, scriptState]) => {
+			if (!scriptId.startsWith('dungeonLevel')) {
+				newScriptState[scriptId] = scriptState;
+			}
+		});
+		globalState.scripts.states = newScriptState;
+		globalState.playerCharacter.x = 0;
+		globalState.playerCharacter.y = 0;
 
 		dungeonRun.levels.forEach((levelData, level) => {
-			const rooms = ['COM-death-connection-up'];
-				if (level < dungeonRun.levels.length - 1) {
-					rooms.push('COM-death-connection-down');
-				}
+			const rooms = [];
+			if (!levelData.specialStartRoom) {
+				rooms.push('COM-death-connection-up');
+			}
+			if (level < dungeonRun.levels.length - 1) {
+				rooms.push('COM-death-connection-down');
+			}
 			globalState.roomAssignment['dungeonLevel' + (level + 1)] = {
 				dynamicLighting: true,
 				rooms: rooms.concat(levelData.rooms),
@@ -39,7 +55,7 @@ export default class DungeonDoorScene extends Phaser.Scene {
 				numberOfRooms: levelData.numberOfRooms,
 				title: levelData.title,
 				style: levelData.style,
-				enemyBudget: levelData.enemyBudget
+				enemyBudget: levelData.enemyBudget,
 			};
 		});
 
@@ -47,10 +63,10 @@ export default class DungeonDoorScene extends Phaser.Scene {
 		this.scene.start('RoomPreloaderScene');
 	}
 	update(globalTime: number, _delta: number) {
-		this.keyboardHelper.updateGamepad();		
-		if (this.keyboardHelper.isEnterPressed()) {	
+		this.keyboardHelper.updateGamepad();
+		if (this.keyboardHelper.isEnterPressed()) {
 			if (globalTime - this.keyLastPressed > this.keyCD) this.keyLastPressed = globalTime;
-			else return;		
+			else return;
 			this.dungeonDoor.openDoor();
 		}
 	}

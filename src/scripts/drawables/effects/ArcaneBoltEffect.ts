@@ -1,4 +1,4 @@
-import { Facings, Faction, PossibleTargets, UiDepths } from '../../helpers/constants';
+import { Facings, Faction, PossibleTargets, SCALE, UiDepths } from '../../helpers/constants';
 import AbilityEffect from './AbilityEffect';
 import MainScene from '../../scenes/MainScene';
 import CharacterToken from '../tokens/CharacterToken';
@@ -29,7 +29,7 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 		projectileData: ProjectileData
 	) {
 		super(scene, x, y, 'empty-tile', facing, projectileData);
-		this.setScale(0.025);
+		this.setScale(0.025 * SCALE);
 		this.setOrigin(0.5, 0.5);
 		scene.add.existing(this);
 		this.setDepth(1);
@@ -44,8 +44,8 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 
 		this.trailEmitter = particles.createEmitter({
 			alpha: { start: 1, end: 0 },
-			scale: { start: 0.01 * this.effectScale, end: 0 },
-			speed: 70,
+			scale: { start: 0.01 * this.effectScale * SCALE, end: 0 },
+			speed: 70 * SCALE,
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 500, max: 800 }, // used to be: { min: 200, max: 400 },
 			blendMode: Phaser.BlendModes.ADD,
@@ -66,9 +66,9 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 		this.coreEmitter = particles.createEmitter({
 			alpha: { start: 1, end: 0, ease: 'ease-out' },
 			// scale: { start: 0.033, end: 0.2 },
-			scale: 0.033 * this.effectScale,
+			scale: 0.033 * this.effectScale * SCALE,
 			angle: { min: 0, max: 360 },
-			speed: { min: 0, max: 70 },
+			speed: { min: 0 * SCALE, max: 70 * SCALE },
 			rotate: { min: -180, max: 180 },
 			lifespan: 800, // used to be: 300,
 			blendMode: Phaser.BlendModes.ADD,
@@ -101,16 +101,16 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 		if (this.body && this.explodeOnDestruction) {
 			// this.trailEmitter.setEmitterAngle({min: 120, max: 240});
 			this.trailEmitter.setSpeed({
-				min: 0.1 * EXPLOSION_PARTICLE_SPEED,
-				max: 1 * EXPLOSION_PARTICLE_SPEED,
+				min: 0.1 * EXPLOSION_PARTICLE_SPEED * SCALE,
+				max: 1 * EXPLOSION_PARTICLE_SPEED * SCALE,
 			});
 			this.trailEmitter.setLifespan({ min: 200, max: 400 });
-			this.trailEmitter.setScale({ start: 0.03 * this.effectScale, end: 0 });
+			this.trailEmitter.setScale({ start: 0.03 * this.effectScale * SCALE, end: 0 * SCALE });
 			this.trailEmitter.explode(40, this.body.x, this.body.y);
 
 			this.coreEmitter.setSpeed({
-				min: 0.4 * EXPLOSION_PARTICLE_SPEED,
-				max: EXPLOSION_PARTICLE_SPEED,
+				min: 0.4 * EXPLOSION_PARTICLE_SPEED * SCALE,
+				max: EXPLOSION_PARTICLE_SPEED * SCALE,
 			});
 			this.coreEmitter.setLifespan({ min: 200, max: 700 });
 			this.coreEmitter.setAlpha({ start: 1, end: 0 });

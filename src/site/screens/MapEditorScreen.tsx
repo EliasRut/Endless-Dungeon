@@ -2,13 +2,19 @@ import 'phaser';
 import React, { useEffect, useRef } from 'react';
 import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import firebase from 'firebase';
+import { Dropdown } from '../components/Dropdown';
 import '../App.css';
+
+export interface MapEditorScreenProps {
+	user: firebase.User;
+}
 
 const showGame = true;
 
-export const MapEditorScreen = () => {
+export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 	const phaserRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -22,12 +28,16 @@ export const MapEditorScreen = () => {
 			<NavigationWrapper>
 				<StyledLink to="/mapEditor">Map Editor</StyledLink>
 				<StyledLink to="/npcEditor">NPC Editor</StyledLink>
+				<StyledLink to="/questEditor">Quest Editor</StyledLink>
 				<StyledLink to="/game">Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>
 				<MenueWrapper id="mapEditorMenu">
 					<div>
-						<div>Load Room:</div>
+						<ButtonWrapper>
+							<StyledButton id="createNewButton">Create New</StyledButton>
+						</ButtonWrapper>
+						<LoadRoomHeader>Load Room</LoadRoomHeader>
 						<Dropdown id="roomDropdown">
 							<option>Loading...</option>
 						</Dropdown>
@@ -39,51 +49,22 @@ export const MapEditorScreen = () => {
 						</ButtonWrapper>
 					</div>
 					<SelectionWrapper>
-						<InputWrapper>
-							<div>Room Name</div>
-							<Input id="roomName" />
-						</InputWrapper>
-						<InputWrapper>
-							<div>Room Width</div>
-							<Input id="roomWidth" width={4} />
-						</InputWrapper>
-						<InputWrapper>
-							<div>Room Height</div>
-							<Input id="roomHeight" width={4} />
-						</InputWrapper>
-						<InputWrapper>
-							<div>Base TileSet</div>
-							<Dropdown id="tilesetDropdown">
-								<option>Loading...</option>
-							</Dropdown>
-						</InputWrapper>
-						<InputWrapper>
-							<div>Decoration TileSet</div>
-							<Dropdown id="tilesetDecorationDropdown">
-								<option>Loading...</option>
-							</Dropdown>
-						</InputWrapper>
-						<InputWrapper>
-							<div>Overlay TileSet</div>
-							<Dropdown id="tilesetOverlayDropdown">
-								<option>Loading...</option>
-							</Dropdown>
-						</InputWrapper>
 						<ButtonWrapper>
-							<StyledButton id="goButton">Go</StyledButton>
+							<StyledButton id="showDetailsButton">Show Details</StyledButton>
 						</ButtonWrapper>
 					</SelectionWrapper>
 					<SelectionWrapper>
 						<div>Selected Layer</div>
 						<Dropdown id="activeLayerDropdown">
-							<option value="base">Base Layer</option>
-							<option value="decoration">Decoration Layer</option>
-							<option value="overlay">Overlay Layer</option>
-							<option value="npcs">NPC Placement</option>
+							<option value="base">1 - Base Layer</option>
+							<option value="decoration">2 - Decoration Layer</option>
+							<option value="overlay">3 - Overlay Layer</option>
+							<option value="npcs">4 - NPC Placement</option>
+							<option value="items">5 - Item Placement</option>
 						</Dropdown>
 					</SelectionWrapper>
 					<ExportButtonWrapper>
-						<StyledButton id="exportButton">Export</StyledButton>
+						<StyledButton id="exportButton">Save</StyledButton>
 					</ExportButtonWrapper>
 				</MenueWrapper>
 				<GameWrapper ref={phaserRef}></GameWrapper>
@@ -120,10 +101,10 @@ export const MapEditorScreen = () => {
 				</ButtonWrapper>
 			</NpcDetailsDialog>
 			<ItemDetailsDialog id="itemDetailsDialog">
-				<DialogTitle>NPC Details</DialogTitle>
+				<DialogTitle>Item Details</DialogTitle>
 				<InputWrapper>
 					<div>Type</div>
-					<Dropdown id="itemType">
+					<Dropdown id="itemId">
 						<option>Loading...</option>
 					</Dropdown>
 				</InputWrapper>
@@ -142,6 +123,51 @@ export const MapEditorScreen = () => {
 					<StyledRedButton id="itemDeleteButton">Delete</StyledRedButton>
 				</ButtonWrapper>
 			</ItemDetailsDialog>
+			<MapDetailsDialog id="mapDetailsDialog">
+				<DialogTitle>Map Details</DialogTitle>
+				<TwoColumnLayout>
+					<Column>
+						<InputWrapper>
+							<div>Room Name</div>
+							<Input id="roomName" />
+						</InputWrapper>
+						<InputWrapper>
+							<div>Room Width</div>
+							<Input id="roomWidth" width={4} />
+						</InputWrapper>
+						<InputWrapper>
+							<div>Room Height</div>
+							<Input id="roomHeight" width={4} />
+						</InputWrapper>
+						<ButtonWrapper>
+							<StyledButton id="detailsCancelButton">Cancel</StyledButton>
+						</ButtonWrapper>
+					</Column>
+					<Column>
+						<InputWrapper>
+							<div>Base TileSet</div>
+							<Dropdown id="tilesetDropdown">
+								<option>Loading...</option>
+							</Dropdown>
+						</InputWrapper>
+						<InputWrapper>
+							<div>Decoration TileSet</div>
+							<Dropdown id="tilesetDecorationDropdown">
+								<option>Loading...</option>
+							</Dropdown>
+						</InputWrapper>
+						<InputWrapper>
+							<div>Overlay TileSet</div>
+							<Dropdown id="tilesetOverlayDropdown">
+								<option>Loading...</option>
+							</Dropdown>
+						</InputWrapper>
+						<ButtonWrapper>
+							<StyledButton id="detailsSaveButton">Create</StyledButton>
+						</ButtonWrapper>
+					</Column>
+				</TwoColumnLayout>
+			</MapDetailsDialog>
 			<DownloadAnker id="downloadAnchorElem"></DownloadAnker>
 		</PageContainer>
 	);
@@ -154,17 +180,26 @@ const PageContainer = styled.div`
 	flex-direction: column;
 `;
 
-const StyledLink = styled(Link)`
-	font-family: 'munro';
-	font-size: 2rem;
-	padding: 6px 24px;
-	cursor: pointer;
-	text-decoration: none;
-	color: black;
-	background-color: white;
-	border-style: solid;
-	border-radius: 0.5rem;
-	margin: 0 24px;
+const LoadRoomHeader = styled.div`
+	margin-top: 16px;
+`;
+
+const StyledLink = styled(NavLink)`
+	& {
+		font-family: 'endlessDungeon';
+		font-size: 2rem;
+		padding: 6px 24px;
+		cursor: pointer;
+		text-decoration: none;
+		color: black;
+		background-color: #ffffff;
+		border-style: solid;
+		border-radius: 0.5rem;
+		margin: 0 24px;
+	}
+	&.active {
+		background-color: #a09f9f;
+	}
 `;
 
 const NavigationWrapper = styled.div`
@@ -183,21 +218,15 @@ const PageWrapper = styled.div`
 `;
 
 const MenueWrapper = styled.div`
+	width: 245px;
 	background-color: black;
 	color: white;
 	display: flex;
 	flex-direction: column;
-	font-family: 'munro';
-	font-size: 1.2rem;
+	font-family: 'endlessDungeon';
+	font-size: 2rem;
 	padding: 24px;
 	padding-top: 0;
-`;
-
-const Dropdown = styled.select`
-	width: 148px;
-	height: 24px;
-	font-family: 'munro';
-	font-size: 1rem;
 `;
 
 const ButtonWrapper = styled.div`
@@ -205,11 +234,10 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled.button`
-	width: 120px;
-	font-family: 'munro';
-	font-size: 1rem;
-	margin: 0 10px;
-	padding: 8px;
+	width: 100%;
+	font-family: 'endlessDungeon';
+	font-size: 1.8rem;
+	/* padding: 8px; */
 `;
 
 const StyledRedButton = styled(StyledButton)`
@@ -234,9 +262,9 @@ const InputWrapper = styled.div`
 `;
 
 const Input = styled.input`
-	width: 140px;
-	font-family: 'munro';
-	font-size: 1rem;
+	width: 100%;
+	font-family: 'endlessDungeon';
+	font-size: 2rem;
 `;
 
 const ExportButtonWrapper = styled.div`
@@ -257,8 +285,24 @@ const NpcDetailsDialog = styled.div`
 	top: 50%;
 	right: 5%;
 	width: 148px;
-	height: 400px;
-	margin-top: -200px;
+	height: 500px;
+	margin-top: -250px;
+	background-color: #333c;
+	border: 2px solid #cccccc;
+	box-shadow: 4px 4px 4px 4px #0009;
+	flex-direction: column;
+	padding: 24px;
+`;
+
+const MapDetailsDialog = styled.div`
+	display: none;
+	position: fixed;
+	top: 50%;
+	right: 50%;
+	width: 420px;
+	height: 300px;
+	margin-top: -150px;
+	margin-left: -210px;
 	background-color: #333c;
 	border: 2px solid #cccccc;
 	box-shadow: 4px 4px 4px 4px #0009;
@@ -283,7 +327,17 @@ const ItemDetailsDialog = styled.div`
 
 const DialogTitle = styled.h2`
 	color: #fff;
-	font-family: 'munro';
-	font-size: 1.2rem;
+	font-family: 'endlessDungeon';
+	font-size: 2rem;
 	margin: 0;
+`;
+
+const TwoColumnLayout = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+`;
+const Column = styled.div`
+	display: flex;
+	flex-direction: column;
 `;

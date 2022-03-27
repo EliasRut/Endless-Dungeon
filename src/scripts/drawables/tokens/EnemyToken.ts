@@ -1,4 +1,4 @@
-import { Faction, VISITED_TILE_TINT } from '../../helpers/constants';
+import { facingToSpriteNameMap, Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
 import FireBallEffect from '../effects/FireBallEffect';
@@ -16,10 +16,11 @@ const ENEMY_DAMAGE = 5;
 const ENEMY_HEALTH = 4;
 const ENEMY_SPEED = 35;
 
+const GREEN_DIFF = 0x003300;
+
 export default abstract class EnemyToken extends CharacterToken {
 	fireballEffect: FireBallEffect | undefined;
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	scene: MainScene;
 	tokenName: string;
 	attackRange: number;
 	attackedAt: number = -Infinity;
@@ -54,39 +55,40 @@ export default abstract class EnemyToken extends CharacterToken {
 			return;
 		}
 
-		this.scene.dropItem(this.x, this.y, generateRandomItem({ level }));
+		const itemData = generateRandomItem({ level });
+		this.scene.dropItem(this.x, this.y, itemData.itemKey, itemData.level);
 	}
 
 	dropFixedItem(id: string) {
 		if (this.scene === undefined) {
-			//???
+			// ???
 			return;
 		}
 		this.scene.addFixedItem(id, this.x, this.y);
 	}
 
-	private getOccupiedTile() {
-		if (this.body) {
-			const x = Math.round(this.body.x / TILE_WIDTH);
-			const y = Math.round(this.body.y / TILE_HEIGHT);
-			return this.scene.tileLayer.getTileAt(x, y);
-		}
-		return null;
+	protected receiveDotDamage(deltaTime: number) {
+		// dot = damage over time, deltatime is in ms so we have to devide it by 1000
+		const dot =
+			(globalState.playerCharacter.damage * this.necroticEffectStacks * deltaTime) / 1000 / 4;
+		this.stateObject.health = this.stateObject.health - dot;
+	}
+
+	protected setSlowFactor() {
+		this.stateObject.slowFactor = Math.max(1 - this.iceEffectStacks / 4, 0.01);
 	}
 
 	// update from main Scene
-	public update(time: number) {
-		const tile = this.getOccupiedTile();
-		if (tile) {
-			this.tint = tile.tint;
-			const isVisible = tile.tint > VISITED_TILE_TINT;
-			this.setVisible(isVisible);
-		}
-
+	public update(time: number, deltaTime: number) {
+		super.update(time, deltaTime);
+		this.setSlowFactor();
 		// set aggro boolean, use a linger time for aggro
 		if (this.lastUpdate <= time) {
 			const player = globalState.playerCharacter;
-			if (this.checkLoS() && this.getDistance(player.x, player.y) < this.stateObject.vision) {
+			if (
+				this.checkLoS() &&
+				this.getDistanceToWorldStatePosition(player.x, player.y) < this.stateObject.vision * SCALE
+			) {
 				this.aggro = true;
 				this.lastUpdate = time;
 				this.target.x = player.x;
@@ -97,12 +99,20 @@ export default abstract class EnemyToken extends CharacterToken {
 		}
 	}
 
+	die() {
+		this.play('death_anim_small');
+		// 925 ms
+		// new Promise(r => setTimeout(r, 925)).then(result => {
+		// 	this.destroy();
+		// })
+		this.on('animationcomplete', () => this.destroy())
+	}
+
 	// destroy the enemy
 	destroy() {
 		if (this.scene?.npcMap) {
 			delete this.scene.npcMap[this.id];
 		}
-
 		super.destroy();
 	}
 

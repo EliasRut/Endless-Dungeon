@@ -2,37 +2,24 @@ import 'phaser';
 import {
 	bodyPalleteColors,
 	hexRegex,
-	hexToSourceRgb,
-	hexToTargetRgb,
 	hairPalleteColors,
 	shirtPalleteColors,
 	pantsPalleteColors,
-	replaceColors,
-	hexToRgb,
-	rgbToTargetRgb,
-	darkenColor,
-	brightenColor,
-	ColorPallete,
 	generatePalleteLookup,
 	PalleteLookup,
-	generateColorConversionTable
+	generateColorConversionTable,
 } from '../helpers/colors';
 import firebase from 'firebase';
 import { NpcData } from '../../../typings/custom';
 import { generateColorReplacedTextures } from '../helpers/colors';
+
+const SCALE = 2;
 
 const LAYER_WIDTH = 320;
 const LAYER_HEIGHT = 240;
 
 const LAYER_X_OFFSET = LAYER_WIDTH / 2;
 const LAYER_Y_OFFSET = LAYER_HEIGHT / 2;
-
-const DEPTHS = {
-	figureLayer: 1,
-	trouserLayer: 2,
-	shirtLayer: 3,
-	hairLayer: 4,
-};
 
 export default class NpcEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
@@ -151,7 +138,7 @@ export default class NpcEditor extends Phaser.Scene {
 			this.bodyDropdownElement.value! as any,
 			this.hairDropdownElement.value! as any,
 			this.shirtDropdownElement.value! as any,
-			this.pantsDropdownElement.value! as any,
+			this.pantsDropdownElement.value! as any
 		);
 	}
 
@@ -245,26 +232,21 @@ export default class NpcEditor extends Phaser.Scene {
 
 		this.loadNpcList();
 
-		this.bodyLayer = this.add.image(
-			LAYER_X_OFFSET,
-			LAYER_Y_OFFSET,
-			'body-1'
-		);
-		this.pantsLayer = this.add.image(
-			LAYER_X_OFFSET,
-			LAYER_Y_OFFSET,
-			'pants-1'
-		);
-		this.shirtLayer = this.add.image(
-			LAYER_X_OFFSET,
-			LAYER_Y_OFFSET,
-			'shirt-1'
-		);
-		this.hairLayer = this.add.image(
-			LAYER_X_OFFSET,
-			LAYER_Y_OFFSET,
-			'hair-1'
-		);
+		this.bodyLayer = this.add.image(LAYER_X_OFFSET, LAYER_Y_OFFSET, 'body-1');
+		this.bodyLayer.setScale(SCALE);
+		this.bodyLayer.setOrigin(0);
+
+		this.pantsLayer = this.add.image(LAYER_X_OFFSET, LAYER_Y_OFFSET, 'pants-1');
+		this.pantsLayer.setScale(SCALE);
+		this.pantsLayer.setOrigin(0);
+
+		this.shirtLayer = this.add.image(LAYER_X_OFFSET, LAYER_Y_OFFSET, 'shirt-1');
+		this.shirtLayer.setScale(SCALE);
+		this.shirtLayer.setOrigin(0);
+
+		this.hairLayer = this.add.image(LAYER_X_OFFSET, LAYER_Y_OFFSET, 'hair-1');
+		this.hairLayer.setScale(SCALE);
+		this.hairLayer.setOrigin(0);
 
 		this.updateImage();
 	}
@@ -282,22 +264,18 @@ export default class NpcEditor extends Phaser.Scene {
 			shirtColor1: this.shirtColor1InputElement.value.substr(1),
 			shirtColor2: this.shirtColor2InputElement.value.substr(1),
 			pantsColor: this.pantsColorInputElement.value.substr(1),
-			shoesColor: this.shoesColorInputElement.value.substr(1)
+			shoesColor: this.shoesColorInputElement.value.substr(1),
 		};
 
 		this.palleteLookup = generateColorConversionTable(this.palleteLookup, colorConfig);
 
-		generateColorReplacedTextures(
-			this.textures,
-			this.palleteLookup,
-			{
-				...colorConfig,
-				bodyTemplate: this.bodyDropdownElement.value!,
-				hairTemplate: this.hairDropdownElement.value!,
-				shirtTemplate: this.shirtDropdownElement.value!,
-				pantsTemplate: this.pantsDropdownElement.value!
-			}
-		);
+		generateColorReplacedTextures(this.textures, this.palleteLookup, {
+			...colorConfig,
+			bodyTemplate: this.bodyDropdownElement.value!,
+			hairTemplate: this.hairDropdownElement.value!,
+			shirtTemplate: this.shirtDropdownElement.value!,
+			pantsTemplate: this.pantsDropdownElement.value!,
+		});
 
 		this.bodyLayer.setTexture('body-temp');
 		this.hairLayer.setTexture('hair-temp');
