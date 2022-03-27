@@ -296,7 +296,9 @@
   "size": { "w": 210, "h": 230 },
   "scale": "1",
   "frameTags": [
-   { "name": "open_ironDoor", "from": 2, "to": 35, "direction": "forward" }
+   { "name": "iron_door_o", "from": 0, "to": 0, "direction": "forward" },
+   { "name": "iron_door_c", "from": 1, "to": 1, "direction": "forward" },
+   { "name": "iron_door_open", "from": 2, "to": 35, "direction": "forward" }
   ]
  }
 }

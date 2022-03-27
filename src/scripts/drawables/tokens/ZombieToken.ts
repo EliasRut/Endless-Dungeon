@@ -14,7 +14,7 @@ const BASE_HEALTH = 4;
 const ATTACK_DAMAGE_DELAY = 250;
 
 const ITEM_DROP_CHANCE = 0.65;
-const HEALTH_DROP_CHANCE = 0.06;
+const HEALTH_DROP_CHANCE = 0.06 * globalState.playerCharacter.luck;
 
 export default class ZombieToken extends EnemyToken {
 	attackExecuted: boolean;
