@@ -22,7 +22,13 @@ export default class AbilityHelper {
 
 	triggerAbility(
 		caster: Character,
-		pointOfOrigin: { currentFacing: Facings; x: number; y: number },
+		pointOfOrigin: {
+			currentFacing: Facings;
+			x: number;
+			y: number;
+			exactTargetXFactor?: number;
+			exactTargetYFactor?: number;
+		},
 		type: AbilityType,
 		abilityLevel: number,
 		globalTime: number
@@ -48,9 +54,11 @@ export default class AbilityHelper {
 			// We want to combine the arc position with the characters facing to allow cone-like effects
 			let yMultiplier = -Math.cos(currentSpread * Math.PI + facingRotation);
 			let xMultiplier = Math.sin(currentSpread * Math.PI + facingRotation);
-			if (caster.faction === Faction.ENEMIES) {
-				xMultiplier = (caster as Enemy).exactTargetXFactor;
-				yMultiplier = (caster as Enemy).exactTargetYFactor;
+			if (pointOfOrigin.exactTargetXFactor !== undefined) {
+				xMultiplier = pointOfOrigin.exactTargetXFactor;
+			}
+			if (pointOfOrigin.exactTargetYFactor !== undefined) {
+				yMultiplier = pointOfOrigin.exactTargetYFactor;
 			}
 			const effect = new projectileData!.effect(
 				this.scene,

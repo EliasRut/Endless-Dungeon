@@ -5,7 +5,7 @@ import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 
-const BASE_ATTACK_DAMAGE = 4;
+const BASE_ATTACK_DAMAGE = 3;
 const REGULAR_ATTACK_RANGE = 25;
 const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
@@ -18,7 +18,7 @@ const HEALTH_DROP_CHANCE = 0.06;
 
 export default class ZombieToken extends EnemyToken {
 	attackExecuted: boolean;
-	startingHealth: number;	
+	startingHealth: number;
 	dead: boolean = false;
 
 	constructor(
@@ -55,10 +55,11 @@ export default class ZombieToken extends EnemyToken {
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
 				this.dropFixedItem('health');
 			}
+			//this.dropFixedItem('source-fire');
 			this.dead = true;
 			this.die();
 			return;
-		}
+		} else if (this.dead) return;
 
 		updateStatus(time, this.stateObject);
 		if (this.stateObject.stunned) return;
@@ -118,10 +119,10 @@ export default class ZombieToken extends EnemyToken {
 			const animation = updateMovingState(this.stateObject, true, newFacing);
 			if (animation) {
 				if (this.scene.game.anims.exists(animation)) {
-					this.play({key: animation, repeat: -1});
+					this.play({ key: animation, repeat: -1 });
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
-					this.play({key: animation, repeat: -1});
+					this.play({ key: animation, repeat: -1 });
 				}
 			}
 		} else {

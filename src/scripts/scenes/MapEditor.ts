@@ -13,6 +13,8 @@ import fixedItems from '../../items/fixedItems.json';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import { getItemDataForName, UneqippableItem } from '../../items/itemData';
 
+const SCALE = 2;
+
 const MIN_ZOOM_LEVEL = 0.125;
 
 const TILE_SPACING = 2;
@@ -47,7 +49,7 @@ interface MultiLevelLayout {
 
 type LevelHistory = MultiLevelLayout[];
 
-const npcKeys = ['hilda-base', 'vanya-base', 'agnes', 'erwin'];
+const npcKeys = ['hilda-base', 'vanya-base', 'agnes', 'erwin', 'rich'];
 
 export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
@@ -294,6 +296,7 @@ export default class MapEditor extends Phaser.Scene {
 	}
 
 	create() {
+		this.zoomFactor = SCALE;
 		this.positionText = new PositionText(this);
 		this.mapEditorMenuElement.style.display = 'flex';
 
@@ -306,6 +309,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.mapEditorHighlighting.setDepth(DEPTHS.libraryHighlighting);
 		this.mapEditorHighlighting.setScrollFactor(0, 0);
 		this.mapEditorHighlighting.setOrigin(0);
+		this.mapEditorHighlighting.setScale(SCALE);
 		this.mapEditorHighlighting.alpha = 0.5;
 		this.add.existing(this.mapEditorHighlighting);
 
@@ -445,26 +449,35 @@ export default class MapEditor extends Phaser.Scene {
 		this.npcs = [];
 		this.npcLibraryTokens = [];
 		const npcCursorToken = new Phaser.GameObjects.Image(this, 0, 0, 'search-icon');
-		npcCursorToken.setPosition(8, 8);
+		npcCursorToken.setPosition(8 * SCALE, 8 * SCALE);
 		npcCursorToken.setOrigin(0);
 		npcCursorToken.setScrollFactor(0);
 		npcCursorToken.setDepth(100);
+		npcCursorToken.setScale(SCALE);
 		npcCursorToken.addListener('pointerdown', () => {
 			this.selectedLibraryNpcIndex = 0;
-			this.mapEditorHighlighting.setPosition(0, 0);
+			this.highlightingX = 0;
+			this.highlightingY = 0;
+			this.mapEditorHighlighting.setPosition(
+				npcCursorToken.x - 4 * SCALE,
+				npcCursorToken.y - 4 * SCALE
+			);
 		});
 		npcCursorToken.setInteractive();
 		this.npcLibraryTokens.push(npcCursorToken);
 		this.npcLibraryLayer.add(npcCursorToken, true);
 		npcKeys.forEach((key, index) => {
 			const token = new Phaser.GameObjects.Image(this, 0, 0, key);
-			token.setPosition((index + 1) * 40, 0);
+			token.setPosition((index + 1) * 40 * SCALE, 0);
+			token.setScale(SCALE);
 			token.setOrigin(0);
 			token.setScrollFactor(0);
 			token.setDepth(100);
 			token.addListener('pointerdown', () => {
 				this.selectedLibraryNpcIndex = index + 1;
-				this.mapEditorHighlighting.setPosition((index + 1) * 40, 0);
+				this.highlightingX = (index + 1) * 40 * SCALE;
+				this.highlightingY = 0;
+				this.mapEditorHighlighting.setPosition(token.x, token.y);
 			});
 			token.setInteractive();
 			this.npcLibraryTokens.push(token);
@@ -478,14 +491,21 @@ export default class MapEditor extends Phaser.Scene {
 		this.items = [];
 		this.itemLibraryTokens = [];
 		const itemCursorToken = new Phaser.GameObjects.Sprite(this, 0, 0, 'search-icon', 0);
-		itemCursorToken.setPosition(8, 8);
+		itemCursorToken.setPosition(8 * SCALE, 8 * SCALE);
 		itemCursorToken.setOrigin(0);
+		itemCursorToken.setScale(SCALE);
 		itemCursorToken.setScrollFactor(0);
 		itemCursorToken.setDepth(100);
 		itemCursorToken.addListener('pointerdown', () => {
 			this.selectedLibraryItemIndex = 0;
-			this.mapEditorHighlighting.setPosition(0, 0);
+			this.highlightingX = 0;
+			this.highlightingY = 0;
+			this.mapEditorHighlighting.setPosition(
+				itemCursorToken.x - 4 * SCALE,
+				itemCursorToken.y - 4 * SCALE
+			);
 		});
+		itemCursorToken.setScale(SCALE);
 		itemCursorToken.setInteractive();
 		this.itemLibraryTokens.push(itemCursorToken);
 		this.itemLibraryLayer.add(itemCursorToken, true);
@@ -497,13 +517,16 @@ export default class MapEditor extends Phaser.Scene {
 				'test-items-spritesheet',
 				item.iconFrame
 			);
-			token.setPosition((index + 1) * 40 + 12, 10);
+			token.setPosition((index + 1) * 40 * SCALE + 12, 10 * SCALE);
 			token.setOrigin(0);
+			token.setScale(SCALE);
 			token.setScrollFactor(0);
 			token.setDepth(100);
 			token.addListener('pointerdown', () => {
 				this.selectedLibraryItemIndex = index + 1;
-				this.mapEditorHighlighting.setPosition((index + 1) * 40, 0);
+				this.highlightingX = (index + 1) * 40 * SCALE;
+				this.highlightingY = 0;
+				this.mapEditorHighlighting.setPosition(token.x - 4 * SCALE, token.y - 4 * SCALE);
 			});
 			token.setInteractive();
 			this.itemLibraryTokens.push(token);
@@ -513,6 +536,7 @@ export default class MapEditor extends Phaser.Scene {
 		this.add.existing(this.itemLibraryLayer);
 
 		this.addToHistory(true);
+		this.updateUiForZoomLevel();
 	}
 
 	showMapDetailsDialog(wasNewClicked: boolean) {
@@ -573,7 +597,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.tileLayer.setInteractive();
 			this.decorationTileLayer.removeInteractive();
 			this.overlayTileLayer.removeInteractive();
-			this.mapEditorHighlighting.setScale(1);
+			this.mapEditorHighlighting.setScale(SCALE);
 			this.npcLibraryLayer.setVisible(false);
 			this.itemLibraryLayer.setVisible(false);
 			this.hideNpcDetailsDialog();
@@ -582,7 +606,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.tileLayer.removeInteractive();
 			this.decorationTileLayer.setInteractive();
 			this.overlayTileLayer.removeInteractive();
-			this.mapEditorHighlighting.setScale(1);
+			this.mapEditorHighlighting.setScale(SCALE);
 			this.npcLibraryLayer.setVisible(false);
 			this.itemLibraryLayer.setVisible(false);
 			this.hideNpcDetailsDialog();
@@ -591,7 +615,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.tileLayer.removeInteractive();
 			this.decorationTileLayer.removeInteractive();
 			this.overlayTileLayer.setInteractive();
-			this.mapEditorHighlighting.setScale(1);
+			this.mapEditorHighlighting.setScale(SCALE);
 			this.npcLibraryLayer.setVisible(false);
 			this.itemLibraryLayer.setVisible(false);
 			this.hideNpcDetailsDialog();
@@ -600,19 +624,22 @@ export default class MapEditor extends Phaser.Scene {
 			this.tileLayer.setInteractive();
 			this.decorationTileLayer.removeInteractive();
 			this.overlayTileLayer.removeInteractive();
-			this.mapEditorHighlighting.setScale(2.5);
+			this.mapEditorHighlighting.setScale(SCALE * 2.5);
 			this.itemLibraryLayer.setVisible(false);
 			this.npcLibraryLayer.setVisible(true);
 		} else if (activeLayerValue === 'items') {
 			this.tileLayer.setInteractive();
 			this.decorationTileLayer.removeInteractive();
 			this.overlayTileLayer.removeInteractive();
-			this.mapEditorHighlighting.setScale(2.5);
+			this.mapEditorHighlighting.setScale(SCALE * 2.5);
 			this.npcLibraryLayer.setVisible(false);
 			this.itemLibraryLayer.setVisible(true);
 		}
 		this.updateNpcTokens();
 		this.updateItemTokens();
+		this.updateUiForZoomLevel();
+		this.hideNpcDetailsDialog();
+		this.hideItemDetailsDialog();
 	}
 
 	updateNpcTokens() {
@@ -966,6 +993,7 @@ export default class MapEditor extends Phaser.Scene {
 		);
 		this.libraryLayer = map.createLayer(0, tileSet, 0, 0).setInteractive();
 		this.libraryLayer.setDepth(DEPTHS.libraryTileLayer);
+		this.libraryLayer.setScale(SCALE);
 		this.libraryLayer.on('pointerdown', (pointer: { downX: number; downY: number }) => {
 			this.selectedTileValues = undefined;
 			this.libraryLayer.forEachTile((tile) => {
@@ -973,13 +1001,13 @@ export default class MapEditor extends Phaser.Scene {
 			});
 			const clickX = pointer.downX; // - this.libraryLayer.x;
 			const clickY = pointer.downY; // - this.libraryLayer.y;
-			const tileX = Math.floor(clickX / TILE_WIDTH);
-			const tileY = Math.floor(clickY / TILE_HEIGHT);
+			const tileX = Math.floor(clickX / TILE_WIDTH / SCALE);
+			const tileY = Math.floor(clickY / TILE_HEIGHT / SCALE);
 			const clickedTile = this.libraryLayer.getTileAt(tileX, tileY);
 			if (clickedTile) {
 				this.selectedId = clickedTile.index;
-				this.highlightingX = clickedTile.x * TILE_WIDTH;
-				this.highlightingY = clickedTile.y * TILE_HEIGHT;
+				this.highlightingX = clickedTile.x * TILE_WIDTH * SCALE;
+				this.highlightingY = clickedTile.y * TILE_HEIGHT * SCALE;
 				const zoomedWidth = this.cameras.main.width * (1 / this.zoomFactor);
 				const zoomedHeight = this.cameras.main.height * (1 / this.zoomFactor);
 				const zoomedZeroX = (this.cameras.main.width - zoomedWidth) / 2;
@@ -1339,14 +1367,15 @@ export default class MapEditor extends Phaser.Scene {
 				this as any,
 				npcPosition.type,
 				npcPosition.id,
-				npcPosition.x * TILE_WIDTH - map.widthInPixels / 2,
-				npcPosition.y * TILE_HEIGHT - map.heightInPixels / 2,
+				(npcPosition.x * TILE_WIDTH - map.widthInPixels / 2) / 3,
+				(npcPosition.y * TILE_HEIGHT - map.heightInPixels / 2) / 3,
 				1
 			);
 			this.npcTokens.push(npc);
 			this.add.existing(npc);
 			npc.setAlpha(this.activeLayerDropdownElement.value === 'npcs' ? 1 : 0.7);
 			npc.setDepth(DEPTHS.npcLayer);
+			npc.setScale(1); // Reset scale from Enemy Token
 			if (index === this.selectedNpcTokenIndex) {
 				npc.tint = 0xffcccc;
 			}
@@ -1364,8 +1393,8 @@ export default class MapEditor extends Phaser.Scene {
 			const itemData = getItemDataForName(id);
 			const itemToken = new WorldItemToken(
 				this as any,
-				x * TILE_WIDTH - this.widthInPixels / 2,
-				y * TILE_HEIGHT - this.heightInPixels / 2,
+				(x * TILE_WIDTH - this.widthInPixels / 2) / 3,
+				(y * TILE_HEIGHT - this.heightInPixels / 2) / 3,
 				id as UneqippableItem,
 				itemData,
 				0
@@ -1375,6 +1404,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.add.existing(itemToken);
 			itemToken.setAlpha(this.activeLayerDropdownElement.value === 'items' ? 1 : 0.7);
 			itemToken.setDepth(DEPTHS.itemLayer);
+			itemToken.setScale(1); // Reset scale from Item Token
 			if (index === this.selectedItemTokenIndex) {
 				itemToken.tint = 0xffcccc;
 			}
@@ -1391,6 +1421,54 @@ export default class MapEditor extends Phaser.Scene {
 			faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Color of colliding face edges
 		});
 		// tslint:enable
+	}
+
+	getBaseScaleForMapEditorHighliting() {
+		const activeLayerValue = this.activeLayerDropdownElement.value;
+
+		if (activeLayerValue === 'base') return 1;
+		else if (activeLayerValue === 'decoration') return 1;
+		else if (activeLayerValue === 'overlay') return 1;
+		else if (activeLayerValue === 'npcs') return 2.5;
+		else if (activeLayerValue === 'items') return 2.5;
+		return 1;
+	}
+
+	updateUiForZoomLevel() {
+		this.cameras.main.setZoom(this.zoomFactor);
+		this.libraryLayer.setScale((1 / this.zoomFactor) * SCALE);
+		this.backgroundLibraryLayer.setScale((1 / this.zoomFactor) * SCALE);
+		this.mapEditorHighlighting.setScale(
+			(1 / this.zoomFactor) * SCALE * this.getBaseScaleForMapEditorHighliting()
+		);
+		const newWidth = this.cameras.main.width * (1 / this.zoomFactor);
+		const newHeight = this.cameras.main.height * (1 / this.zoomFactor);
+		const newX = (this.cameras.main.width - newWidth) / 2;
+		const newY = (this.cameras.main.height - newHeight) / 2;
+		this.libraryLayer.setPosition(newX, newY);
+		this.backgroundLibraryLayer.setPosition(newX, newY);
+		this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
+		this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
+		this.positionText.setScale(1 / this.zoomFactor);
+		this.positionText.setPosition(
+			newX + POSITION_TEXT_X_OFFSET * (1 / this.zoomFactor) * SCALE,
+			this.cameras.main.height - POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor) * SCALE - newY
+		);
+
+		this.npcLibraryTokens.forEach((token, index) => {
+			token.setScale((1 / this.zoomFactor) * SCALE);
+			token.setPosition(
+				newX + index * 40 * (1 / this.zoomFactor) * SCALE + (index === 0 ? 4 * SCALE : 0),
+				newY + (index === 0 ? 4 * SCALE : 0)
+			);
+		});
+		this.itemLibraryTokens.forEach((token, index) => {
+			token.setScale((1 / this.zoomFactor) * SCALE * (index === 0 ? 1 : 1.5));
+			token.setPosition(
+				newX + index * 40 * (1 / this.zoomFactor) * SCALE + (index === 0 ? 4 * SCALE : 4),
+				newY + (index === 0 ? 4 * SCALE : 4)
+			);
+		});
 	}
 
 	update(globalTime: number, delta: number) {
@@ -1464,47 +1542,15 @@ export default class MapEditor extends Phaser.Scene {
 
 		if (this.zoomIn.isDown && !this.wasZoomInDown) {
 			this.wasZoomInDown = true;
-			this.zoomFactor = Math.min(1, this.zoomFactor * 2);
-			this.cameras.main.setZoom(this.zoomFactor);
-			this.libraryLayer.setScale(1 / this.zoomFactor);
-			this.backgroundLibraryLayer.setScale(1 / this.zoomFactor);
-			this.mapEditorHighlighting.setScale(1 / this.zoomFactor);
-			const newWidth = this.cameras.main.width * (1 / this.zoomFactor);
-			const newHeight = this.cameras.main.height * (1 / this.zoomFactor);
-			const newX = (this.cameras.main.width - newWidth) / 2;
-			const newY = (this.cameras.main.height - newHeight) / 2;
-			this.libraryLayer.setPosition(newX, newY);
-			this.backgroundLibraryLayer.setPosition(newX, newY);
-			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
-			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
-			this.positionText.setScale(1 / this.zoomFactor);
-			this.positionText.setPosition(
-				newX + POSITION_TEXT_X_OFFSET * (1 / this.zoomFactor),
-				this.cameras.main.height - POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor) - newY
-			);
+			this.zoomFactor = Math.min(SCALE, this.zoomFactor * 2);
+			this.updateUiForZoomLevel();
 		}
 		this.wasZoomInDown = this.zoomIn.isDown;
 
 		if (this.zoomOut.isDown && !this.wasZoomOutDown) {
 			this.wasZoomOutDown = true;
-			this.zoomFactor = Math.max(MIN_ZOOM_LEVEL, this.zoomFactor / 2);
-			this.cameras.main.setZoom(this.zoomFactor);
-			this.libraryLayer.setScale(1 / this.zoomFactor);
-			this.backgroundLibraryLayer.setScale(1 / this.zoomFactor);
-			this.mapEditorHighlighting.setScale(1 / this.zoomFactor);
-			const newWidth = this.cameras.main.width * (1 / this.zoomFactor);
-			const newHeight = this.cameras.main.height * (1 / this.zoomFactor);
-			const newX = (this.cameras.main.width - newWidth) / 2;
-			const newY = (this.cameras.main.height - newHeight) / 2;
-			this.libraryLayer.setPosition(newX, newY);
-			this.backgroundLibraryLayer.setPosition(newX, newY);
-			this.mapEditorHighlighting.x = newX + this.highlightingX * (1 / this.zoomFactor);
-			this.mapEditorHighlighting.y = newY + this.highlightingY * (1 / this.zoomFactor);
-			this.positionText.setScale(1 / this.zoomFactor);
-			this.positionText.setPosition(
-				newX + POSITION_TEXT_X_OFFSET * (1 / this.zoomFactor),
-				this.cameras.main.height - POSITION_TEXT_Y_OFFSET * (1 / this.zoomFactor) - newY
-			);
+			this.zoomFactor = Math.max(MIN_ZOOM_LEVEL * SCALE, this.zoomFactor / 2);
+			this.updateUiForZoomLevel();
 		}
 		this.wasZoomOutDown = this.zoomOut.isDown;
 

@@ -8,6 +8,8 @@ import ArcaneBoltEffect from '../drawables/effects/ArcaneBoltEffect';
 import ConeEffect from '../drawables/effects/ConeEffect';
 import NecroticBoltEffect from '../drawables/effects/NecroticBoltEffect';
 import BatEffect from '../drawables/effects/BatEffect';
+import CircelingEffect from '../drawables/effects/CircelingEffect';
+import SummoningEffect from '../drawables/effects/SummoningEffect';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -75,6 +77,7 @@ export const enum AbilityType {
 	EXPLODING_CORPSE = 'explodingCorpse',
 	BAT = 'bat',
 	FIRE_SUMMON = 'fireSummon',
+	FIRE_SUMMON_2 = 'fireSummon2',
 }
 
 export const Abilities: { [type: string]: AbilityData } = {
@@ -107,7 +110,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		abilityName: 'Fireball',
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
-		//castOnEnemyDestroyed: AbilityType.EXPLODING_CORPSE,
+		castOnEnemyDestroyed: AbilityType.EXPLODING_CORPSE,
 	},
 	[AbilityType.ARCANE_BOLT]: {
 		projectiles: 1,
@@ -161,7 +164,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		projectileData: {
 			spread: [-0.07, 0.07, (num) => Math.sin(num * Math.PI * 0.95)],
 			delay: 50,
-			velocity: 350,
+			velocity: 150,
 			effectScale: 0.8,
 			xOffset: 0,
 			yOffset: 0,
@@ -558,9 +561,9 @@ export const Abilities: { [type: string]: AbilityData } = {
 	[AbilityType.BAT]: {
 		projectiles: 1,
 		projectileData: {
-			velocity: 100,
 			xOffset: 16,
 			yOffset: 16,
+			velocity: 100,
 			effect: BatEffect,
 			collisionSound: 'sound-icespike-hit',
 			sfxVolume: 0.2,
@@ -571,19 +574,19 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sound: 'sound-icespike',
 		sfxVolume: 0.3,
 		cooldownMs: 400,
-		damageMultiplier: 0.0,
+		damageMultiplier: 0.5,
 		abilityName: 'Angry Bat',
 		flavorText: `An angry bat.`,
 		icon: ['icon-abilities', 1],
 		spriteName: 'bat',
 	},
 	[AbilityType.FIRE_SUMMON]: {
-		// projectiles: 1,
+		projectiles: 1,
 		projectileData: {
-			velocity: 100,
-			xOffset: 16,
-			yOffset: 16,
-			effect: BatEffect,
+			xOffset: 36,
+			yOffset: 36,
+			velocity: 0,
+			effect: CircelingEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
@@ -596,7 +599,27 @@ export const Abilities: { [type: string]: AbilityData } = {
 		damageMultiplier: 0.0,
 		abilityName: 'Summon Fire Elemental',
 		flavorText: `Raise an fiery elemental.`,
-		icon: ['icon-abilities', 1],
-		spriteName: 'bat',
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.FIRE_SUMMON_2]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 36,
+			yOffset: 36,
+			velocity: 0,
+			effect: SummoningEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.3,
+		cooldownMs: 400,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an fiery elemental.`,
+		icon: ['icon-abilities', 0],
 	},
 };

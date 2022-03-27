@@ -1,9 +1,15 @@
-import { ItemsPositioning, MapConnection, NpcPositioning, OpeningDirection, Room } from '../../../typings/custom';
+import {
+	ItemsPositioning,
+	MapConnection,
+	NpcPositioning,
+	OpeningDirection,
+	Room,
+} from '../../../typings/custom';
 import { DungeonLevelData } from '../models/DungeonRunData';
 import globalState from '../worldstate';
 import Door from '../worldstate/Door';
 import DungeonLevel from '../worldstate/DungeonLevel';
-import { colorOfMagicToTilesetMap, enemyBudgetCost } from './constants';
+import { colorOfMagicToTilesetMap, enemyBudgetCost, EnemyByColorOfMagicMap } from './constants';
 import RoomGenerator from './generateRoom';
 
 export const BLOCK_SIZE = 8;
@@ -21,173 +27,173 @@ const BIT_WEST = 8;
 
 // tslint:disable: no-magic-numbers
 const CAP_NORTH = [
-	[164,201,201,201,201,201,201,163],
-	[162,  1,  8,  2,  2,  8,  3,160],
-	[162, 41, 48, 42, 42, 48, 43,160],
-	[162, 32, 38, 32, 32, 38, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
+	[164, 201, 201, 201, 201, 201, 201, 163],
+	[162, 1, 8, 2, 2, 8, 3, 160],
+	[162, 41, 48, 42, 42, 48, 43, 160],
+	[162, 32, 38, 32, 32, 38, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
 ];
 const CAP_SOUTH = [
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[124,121,121,121,121,121,121,123],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[124, 121, 121, 121, 121, 121, 121, 123],
 ];
 const CAP_EAST = [
-	[201,201,201,201,201,201,201,163],
-	[  2,  8,  2,  2,  8,  2,  3,160],
-	[ 42, 48, 42, 42, 48, 42, 43,160],
-	[ 32, 38, 32, 32, 38, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[121,121,121,121,121,121,121,123],
+	[201, 201, 201, 201, 201, 201, 201, 163],
+	[2, 8, 2, 2, 8, 2, 3, 160],
+	[42, 48, 42, 42, 48, 42, 43, 160],
+	[32, 38, 32, 32, 38, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[121, 121, 121, 121, 121, 121, 121, 123],
 ];
 const CAP_WEST = [
-	[164,201,201,201,201,201,201,201],
-	[162,  1,  2,  8,  2,  2,  8,  2],
+	[164, 201, 201, 201, 201, 201, 201, 201],
+	[162, 1, 2, 8, 2, 2, 8, 2],
 	[162, 41, 42, 48, 42, 42, 48, 42],
 	[162, 32, 32, 38, 32, 32, 38, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
-	[124,121,121,121,121,121,121,121],
+	[124, 121, 121, 121, 121, 121, 121, 121],
 ];
 const CORRIDOR_UP = [
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
-	[162, 32, 32, 32, 32, 32, 32,160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
+	[162, 32, 32, 32, 32, 32, 32, 160],
 ];
 const CORRIDOR_LEFT = [
-	[201,201,201,201,201,201,201,201],
-	[  2,  2,  8,  2,  2,  8,  2,  2],
-	[ 42, 42, 48, 42, 42, 48, 42, 42],
-	[ 32, 32, 38, 32, 32, 38, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[121,121,121,121,121,121,121,121],
+	[201, 201, 201, 201, 201, 201, 201, 201],
+	[2, 2, 8, 2, 2, 8, 2, 2],
+	[42, 42, 48, 42, 42, 48, 42, 42],
+	[32, 32, 38, 32, 32, 38, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[121, 121, 121, 121, 121, 121, 121, 121],
 ];
 const CORRIDOR_UP_RIGHT = [
-	[164,201,201,201,201,201,201,201],
-	[162,  1,  8,  2,  2,  8,  2,  2],
+	[164, 201, 201, 201, 201, 201, 201, 201],
+	[162, 1, 8, 2, 2, 8, 2, 2],
 	[162, 41, 48, 42, 42, 48, 42, 42],
 	[162, 32, 38, 32, 32, 38, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
-	[162, 32, 32, 32, 32, 32, 32,120],
+	[162, 32, 32, 32, 32, 32, 32, 120],
 ];
 const CORRIDOR_UP_LEFT = [
-	[201,201,201,201,201,201,201,163],
-	[  2,  8,  2,  2,  8,  2,  3,160],
-	[ 42, 48, 42, 42, 48, 42, 43,160],
-	[ 32, 38, 32, 32, 38, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[122, 32, 32, 32, 32, 32, 32,160],
+	[201, 201, 201, 201, 201, 201, 201, 163],
+	[2, 8, 2, 2, 8, 2, 3, 160],
+	[42, 48, 42, 42, 48, 42, 43, 160],
+	[32, 38, 32, 32, 38, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[122, 32, 32, 32, 32, 32, 32, 160],
 ];
 const CORRIDOR_DOWN_RIGHT = [
-	[162, 32, 32, 32, 32, 32, 32,200],
-	[162, 32, 32, 32, 32, 32, 32,  1],
+	[162, 32, 32, 32, 32, 32, 32, 200],
+	[162, 32, 32, 32, 32, 32, 32, 1],
 	[162, 32, 32, 32, 32, 32, 32, 41],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
-	[124,121,121,121,121,121,121,121],
+	[124, 121, 121, 121, 121, 121, 121, 121],
 ];
 const CORRIDOR_DOWN_LEFT = [
-	[202, 32, 32, 32, 32, 32, 32,160],
-	[  3, 32, 32, 32, 32, 32, 32,160],
-	[ 43, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[121,121,121,121,121,121,121,123],
+	[202, 32, 32, 32, 32, 32, 32, 160],
+	[3, 32, 32, 32, 32, 32, 32, 160],
+	[43, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[121, 121, 121, 121, 121, 121, 121, 123],
 ];
 const T_CROSSING_TOP_LEFT_BOTTOM = [
-	[202, 32, 32, 32, 32, 32, 32,160],
-	[  3, 32, 32, 32, 32, 32, 32,160],
-	[ 43, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[ 32, 32, 32, 32, 32, 32, 32,160],
-	[122, 32, 32, 32, 32, 32, 32,160],
+	[202, 32, 32, 32, 32, 32, 32, 160],
+	[3, 32, 32, 32, 32, 32, 32, 160],
+	[43, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[32, 32, 32, 32, 32, 32, 32, 160],
+	[122, 32, 32, 32, 32, 32, 32, 160],
 ];
 const T_CROSSING_TOP_LEFT_RIGHT = [
-	[202, 32, 32, 32, 32, 32, 32,200],
-	[  3, 32, 32, 32, 32, 32, 32,  1],
-	[ 43, 32, 32, 32, 32, 32, 32, 41],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[121,121,121,121,121,121,121,121],
+	[202, 32, 32, 32, 32, 32, 32, 200],
+	[3, 32, 32, 32, 32, 32, 32, 1],
+	[43, 32, 32, 32, 32, 32, 32, 41],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[121, 121, 121, 121, 121, 121, 121, 121],
 ];
 const T_CROSSING_TOP_RIGHT_BOTTOM = [
-	[162, 32, 32, 32, 32, 32, 32,200],
-	[162, 32, 32, 32, 32, 32, 32,  1],
+	[162, 32, 32, 32, 32, 32, 32, 200],
+	[162, 32, 32, 32, 32, 32, 32, 1],
 	[162, 32, 32, 32, 32, 32, 32, 41],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
 	[162, 32, 32, 32, 32, 32, 32, 32],
-	[162, 32, 32, 32, 32, 32, 32,120],
+	[162, 32, 32, 32, 32, 32, 32, 120],
 ];
 const T_CROSSING_LEFT_RIGHT_BOTTOM = [
-	[201,201,201,201,201,201,201,201],
-	[  2,  2,  8,  2,  2,  8,  2,  2],
-	[ 42, 42, 48, 42, 42, 48, 42, 42],
-	[ 32, 32, 38, 32, 32, 38, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[122, 32, 32, 32, 32, 32, 32,120],
+	[201, 201, 201, 201, 201, 201, 201, 201],
+	[2, 2, 8, 2, 2, 8, 2, 2],
+	[42, 42, 48, 42, 42, 48, 42, 42],
+	[32, 32, 38, 32, 32, 38, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[122, 32, 32, 32, 32, 32, 32, 120],
 ];
 const CROSSWAY = [
-	[202, 32, 32, 32, 32, 32, 32,200],
-	[  3, 32, 32, 32, 32, 32, 32,  1],
-	[ 43, 32, 32, 32, 32, 32, 32, 41],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[ 32, 32, 32, 32, 32, 32, 32, 32],
-	[122, 32, 32, 32, 32, 32, 32,120],
+	[202, 32, 32, 32, 32, 32, 32, 200],
+	[3, 32, 32, 32, 32, 32, 32, 1],
+	[43, 32, 32, 32, 32, 32, 32, 41],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[32, 32, 32, 32, 32, 32, 32, 32],
+	[122, 32, 32, 32, 32, 32, 32, 120],
 ];
 // tslint:disable: no-magic-numbers
 
 const CORRIDOR_LAYOUTS = {
-	[BIT_NORTH																		]:				CAP_NORTH,
-	[							BIT_EAST												]:				CAP_EAST,
-	[BIT_NORTH +	BIT_EAST												]:				CORRIDOR_DOWN_LEFT,
-	[													BIT_SOUTH						]:				CAP_SOUTH,
-	[BIT_NORTH +							BIT_SOUTH						]:				CORRIDOR_UP,
-	[							BIT_EAST + 	BIT_SOUTH						]:				CORRIDOR_UP_LEFT,
-	[BIT_NORTH +	BIT_EAST + 	BIT_SOUTH						]:				T_CROSSING_TOP_LEFT_BOTTOM,
-	[																			BIT_WEST]:				CAP_WEST,
-	[BIT_NORTH +													BIT_WEST]:				CORRIDOR_DOWN_RIGHT,
-	[							BIT_EAST + 							BIT_WEST]:				CORRIDOR_LEFT,
-	[BIT_NORTH +	BIT_EAST + 							BIT_WEST]:				T_CROSSING_TOP_LEFT_RIGHT,
-	[													BIT_SOUTH + BIT_WEST]:				CORRIDOR_UP_RIGHT,
-	[BIT_NORTH +							BIT_SOUTH + BIT_WEST]:				T_CROSSING_TOP_RIGHT_BOTTOM,
-	[							BIT_EAST + 	BIT_SOUTH + BIT_WEST]:				T_CROSSING_LEFT_RIGHT_BOTTOM,
-	[BIT_NORTH +	BIT_EAST + 	BIT_SOUTH + BIT_WEST]:				CROSSWAY,
+	[BIT_NORTH]: CAP_NORTH,
+	[BIT_EAST]: CAP_EAST,
+	[BIT_NORTH + BIT_EAST]: CORRIDOR_DOWN_LEFT,
+	[BIT_SOUTH]: CAP_SOUTH,
+	[BIT_NORTH + BIT_SOUTH]: CORRIDOR_UP,
+	[BIT_EAST + BIT_SOUTH]: CORRIDOR_UP_LEFT,
+	[BIT_NORTH + BIT_EAST + BIT_SOUTH]: T_CROSSING_TOP_LEFT_BOTTOM,
+	[BIT_WEST]: CAP_WEST,
+	[BIT_NORTH + BIT_WEST]: CORRIDOR_DOWN_RIGHT,
+	[BIT_EAST + BIT_WEST]: CORRIDOR_LEFT,
+	[BIT_NORTH + BIT_EAST + BIT_WEST]: T_CROSSING_TOP_LEFT_RIGHT,
+	[BIT_SOUTH + BIT_WEST]: CORRIDOR_UP_RIGHT,
+	[BIT_NORTH + BIT_SOUTH + BIT_WEST]: T_CROSSING_TOP_RIGHT_BOTTOM,
+	[BIT_EAST + BIT_SOUTH + BIT_WEST]: T_CROSSING_LEFT_RIGHT_BOTTOM,
+	[BIT_NORTH + BIT_EAST + BIT_SOUTH + BIT_WEST]: CROSSWAY,
 };
 
 export default class DungeonGenerator {
@@ -195,8 +201,8 @@ export default class DungeonGenerator {
 	rooms: Room[];
 	startRoomIndex: number;
 	roomOffsets: [number, number][];
-	tileSetCollections: {[name: string]: number[]};
-	tileSetGid: {[name: string]: number};
+	tileSetCollections: { [name: string]: number[] };
+	tileSetGid: { [name: string]: number };
 	maxGenerationResets = 100;
 	maxRoomPlacementTries = 1000;
 	npcs: NpcPositioning[];
@@ -216,14 +222,13 @@ export default class DungeonGenerator {
 	dungeonBlocksY: number;
 	enemyBudget: number;
 
-	potentialEnemyFields: {x: number, y: number}[];
+	potentialEnemyFields: { x: number; y: number }[];
 
 	public generateLevel: (
-			id: string,
-			dungeonLevel: number,
-			levelData: DungeonLevelData
-		) => DungeonLevel =
-			(id, dungeonLevel, levelData) => {
+		id: string,
+		dungeonLevel: number,
+		levelData: DungeonLevelData
+	) => DungeonLevel = (id, dungeonLevel, levelData) => {
 		this.rooms = levelData.rooms.map((roomName) => globalState.availableRooms[roomName]);
 		this.dungeonLevel = dungeonLevel;
 
@@ -232,7 +237,7 @@ export default class DungeonGenerator {
 		this.dungeonBlocksX = levelData.width;
 		this.dungeonBlocksY = levelData.height;
 		this.dungeonWidth = this.dungeonBlocksX * BLOCK_SIZE;
-		this.dungeonHeight =  this.dungeonBlocksY * BLOCK_SIZE;
+		this.dungeonHeight = this.dungeonBlocksY * BLOCK_SIZE;
 
 		this.fillerTilest = colorOfMagicToTilesetMap[levelData.style];
 
@@ -245,13 +250,16 @@ export default class DungeonGenerator {
 			globalState.availableRooms[genericRoom.name] = genericRoom;
 		}
 
-		this.startRoomIndex = Math.max(0, this.rooms.findIndex((room) => room.startRoom));
+		this.startRoomIndex = Math.max(
+			0,
+			this.rooms.findIndex((room) => room.startRoom)
+		);
 		this.roomOffsets = [];
 		this.tileSetCollections = {
-			[this.fillerTilest]: []
+			[this.fillerTilest]: [],
 		};
 		this.tileSetGid = {
-			[this.fillerTilest]: 0
+			[this.fillerTilest]: 0,
 		};
 
 		this.maxGenerationResets = MAX_RETRIES;
@@ -267,7 +275,8 @@ export default class DungeonGenerator {
 			if (room.decorationTileset) {
 				if (!this.tileSetCollections[room.decorationTileset]) {
 					this.tileSetCollections[room.decorationTileset] = [];
-					this.tileSetGid[room.decorationTileset] = Object.keys(this.tileSetGid).length * GID_MULTIPLE;
+					this.tileSetGid[room.decorationTileset] =
+						Object.keys(this.tileSetGid).length * GID_MULTIPLE;
 				}
 				this.tileSetCollections[room.decorationTileset].push(roomIndex);
 			}
@@ -283,7 +292,7 @@ export default class DungeonGenerator {
 
 		// This will set the class variables and return true if everything worked, false otherwise
 		if (!this.findRoomPlacement()) {
-			throw new Error ('Failed to generate a dungeon. Too many tries.');
+			throw new Error('Failed to generate a dungeon. Too many tries.');
 		}
 
 		// At this point, we have a valid room placement
@@ -316,8 +325,9 @@ export default class DungeonGenerator {
 
 		const [cameraOffsetX, cameraOffsetY] = this.getStartRoomCameraOffsets();
 
-		const tilesets = Object.keys(this.tileSetGid)
-			.sort((keyA, keyB) => this.tileSetGid[keyA] - this.tileSetGid[keyB]);
+		const tilesets = Object.keys(this.tileSetGid).sort(
+			(keyA, keyB) => this.tileSetGid[keyA] - this.tileSetGid[keyB]
+		);
 
 		const roomPositions = this.rooms.map((room, index) => {
 			return {
@@ -325,7 +335,7 @@ export default class DungeonGenerator {
 				y: this.roomOffsets[index][0] * BLOCK_SIZE,
 				x: this.roomOffsets[index][1] * BLOCK_SIZE,
 				width: room.layout[0].length,
-				height: room.layout.length
+				height: room.layout.length,
 			};
 		});
 
@@ -365,7 +375,7 @@ export default class DungeonGenerator {
 					targetY,
 					targetRoom,
 					targetMap,
-					targetScene: connection.targetScene
+					targetScene: connection.targetScene,
 				});
 			});
 		});
@@ -381,7 +391,7 @@ export default class DungeonGenerator {
 					y: y * TILE_HEIGHT,
 					open: door.open,
 					type: door.type,
-					id: `${id}_${room.name}_${door.id}`
+					id: `${id}_${room.name}_${door.id}`,
 				});
 			});
 		});
@@ -395,7 +405,7 @@ export default class DungeonGenerator {
 				items.push({
 					x: x * TILE_WIDTH,
 					y: y * TILE_HEIGHT,
-					id: item.id
+					id: item.id,
 				});
 			});
 		});
@@ -405,15 +415,15 @@ export default class DungeonGenerator {
 				return;
 			}
 
-			const startY =this.roomOffsets[index][0] * BLOCK_SIZE;
-			const startX =this.roomOffsets[index][1] * BLOCK_SIZE;
+			const startY = this.roomOffsets[index][0] * BLOCK_SIZE;
+			const startX = this.roomOffsets[index][1] * BLOCK_SIZE;
 			const roomWidth = room.layout[0].length;
 			const roomHeight = room.layout.length;
 
 			for (let y = 0; y < roomHeight; y++) {
 				for (let x = 0; x < roomWidth; x++) {
 					if (room.layout[y][x] === 32) {
-						this.potentialEnemyFields.push({x: startX + x, y: y + startY});
+						this.potentialEnemyFields.push({ x: startX + x, y: y + startY });
 					}
 				}
 			}
@@ -429,17 +439,32 @@ export default class DungeonGenerator {
 			// 		}
 			// 	}
 			// }
+
+			const spawnableEnemies = EnemyByColorOfMagicMap[levelData.style];
 			while (this.enemyBudget > 0 && this.potentialEnemyFields.length > 0) {
 				const randomIndex = Math.floor(this.potentialEnemyFields.length * Math.random());
-				const {x, y} = this.potentialEnemyFields[randomIndex];
-				this.enemyBudget--;
+				const { x, y } = this.potentialEnemyFields[randomIndex];
+
+				const randomEnemyIndex = Math.random();
+				const potentialEnemy = spawnableEnemies.find(([likelihood]) => {
+					return randomEnemyIndex <= likelihood;
+				});
+
+				const potentialEnemyName = potentialEnemy![1];
+
+				const enemyCost = enemyBudgetCost[potentialEnemyName as keyof typeof enemyBudgetCost];
+				if (enemyCost > this.enemyBudget) {
+					continue;
+				}
+
+				this.enemyBudget -= enemyCost;
 				this.npcs.push({
 					facingX: 0,
 					facingY: 0,
-					type: 'pierre',
+					type: potentialEnemyName,
 					id: `filler-${lastId++}`,
 					x: x * TILE_WIDTH,
-					y: y * TILE_HEIGHT
+					y: y * TILE_HEIGHT,
 				});
 
 				this.potentialEnemyFields.splice(randomIndex, 1);
@@ -494,9 +519,9 @@ export default class DungeonGenerator {
 			items,
 			enemyLevel: dungeonLevel,
 			name: levelData.title,
-			dynamicLighting: levelData.isDungeon
+			dynamicLighting: levelData.isDungeon,
 		};
-	}
+	};
 
 	private findRoomPlacement() {
 		this.tilesUsed = [];
@@ -570,7 +595,7 @@ export default class DungeonGenerator {
 				roomXBlockOffset = 1 + Math.floor(Math.random() * (this.dungeonBlocksX - roomWidth - 2));
 				roomYBlockOffset = 1 + Math.floor(Math.random() * (this.dungeonBlocksY - roomHeight - 2));
 
-				for (let y = -1; y <= roomHeight; y ++) {
+				for (let y = -1; y <= roomHeight; y++) {
 					const rowIndex = y + roomYBlockOffset;
 					for (let x = -1; x <= roomWidth; x++) {
 						const columnIndex = x + roomXBlockOffset;
@@ -590,10 +615,7 @@ export default class DungeonGenerator {
 			} while (isRoomOverlappingOtherRoom);
 
 			// We have found a position for this room.
-			this.roomOffsets.push([
-				roomYBlockOffset,
-				roomXBlockOffset
-			]);
+			this.roomOffsets.push([roomYBlockOffset, roomXBlockOffset]);
 			for (let y = 0; y < roomHeight; y++) {
 				const rowIndex = y + roomYBlockOffset;
 				for (let x = 0; x < roomWidth; x++) {
@@ -613,7 +635,7 @@ export default class DungeonGenerator {
 			const room = this.rooms[roomIndex];
 			room.npcs?.forEach((npc) => {
 				const [roomYBlockOffset, roomXBlockOffset] = this.roomOffsets[roomIndex];
-				const budgetCost = (enemyBudgetCost as {[name: string]: number})[npc.type] || 1;
+				const budgetCost = (enemyBudgetCost as { [name: string]: number })[npc.type] || 1;
 				this.enemyBudget -= budgetCost;
 				this.npcs.push({
 					facingX: 0,
@@ -621,7 +643,7 @@ export default class DungeonGenerator {
 					...npc,
 					id: `${room.name}-${npc.id}`,
 					x: (npc.x + roomXBlockOffset * BLOCK_SIZE) * TILE_WIDTH,
-					y: (npc.y + roomYBlockOffset * BLOCK_SIZE) * TILE_HEIGHT
+					y: (npc.y + roomYBlockOffset * BLOCK_SIZE) * TILE_HEIGHT,
 				});
 			});
 		}
@@ -718,8 +740,9 @@ export default class DungeonGenerator {
 
 		// Construct path.
 		let numOpenings = 1;
-		const visitedOpenings: [number, number, number, OpeningDirection][] =
-			[[this.startRoomIndex, ...this.rooms[this.startRoomIndex].openings[0]]];
+		const visitedOpenings: [number, number, number, OpeningDirection][] = [
+			[this.startRoomIndex, ...this.rooms[this.startRoomIndex].openings[0]],
+		];
 		const targetOpenings: [number, number, number, OpeningDirection][] = [];
 
 		this.rooms[this.startRoomIndex].openings.slice(1).forEach((opening) => {
@@ -743,14 +766,14 @@ export default class DungeonGenerator {
 			const opening = this.rooms[this.startRoomIndex].openings[0];
 			const targetCoordinates = [
 				this.roomOffsets[this.startRoomIndex][0] + opening[0],
-				this.roomOffsets[this.startRoomIndex][1] + opening[1]
+				this.roomOffsets[this.startRoomIndex][1] + opening[1],
 			];
 
 			this.blocksUsed[targetCoordinates[0]][targetCoordinates[1]] =
-				(opening[2] === 'top'     ? BIT_NORTH : 0) +
-				(opening[2] === 'right'   ? BIT_EAST  : 0) +
-				(opening[2] === 'bottom'  ? BIT_SOUTH : 0) +
-				(opening[2] === 'left'    ? BIT_WEST  : 0);
+				(opening[2] === 'top' ? BIT_NORTH : 0) +
+				(opening[2] === 'right' ? BIT_EAST : 0) +
+				(opening[2] === 'bottom' ? BIT_SOUTH : 0) +
+				(opening[2] === 'left' ? BIT_WEST : 0);
 			return;
 		}
 
@@ -767,17 +790,23 @@ export default class DungeonGenerator {
 			const targetOpening = target.slice(1) as [number, number, OpeningDirection];
 			const targetCoordinates = [
 				this.roomOffsets[targetRoomIndex][0] + targetOpening[0],
-				this.roomOffsets[targetRoomIndex][1] + targetOpening[1]
+				this.roomOffsets[targetRoomIndex][1] + targetOpening[1],
 			];
 
 			const currentBlockY = this.roomOffsets[sourceRoomIndex][0] + sourceOpening[0];
 			const currentBlockX = this.roomOffsets[sourceRoomIndex][1] + sourceOpening[1];
 			// We need to know from where we went into the corridor to get the right corridor shape
-			const [zeroStepY, zeroStepX] =
-				this.getExtraStepForOpening(currentBlockY, currentBlockX, sourceOpening[2]);
+			const [zeroStepY, zeroStepX] = this.getExtraStepForOpening(
+				currentBlockY,
+				currentBlockX,
+				sourceOpening[2]
+			);
 			// We also need how we exited the corridor into the room
-			const [lastStepY, lastStepX] =
-				this.getExtraStepForOpening(targetCoordinates[0], targetCoordinates[1], targetOpening[2]);
+			const [lastStepY, lastStepX] = this.getExtraStepForOpening(
+				targetCoordinates[0],
+				targetCoordinates[1],
+				targetOpening[2]
+			);
 
 			/*
 				We are doing an iterative Breath-First-Search with a Taboo list.
@@ -796,10 +825,12 @@ export default class DungeonGenerator {
 				If we find the target position, we set foundPath to the history of this exploration.
 			*/
 			let foundPath: [number, number][] | undefined;
-			const nextExplorations: [number, number][][] = [[
-				[zeroStepY, zeroStepX],
-				[currentBlockY, currentBlockX]
-			]];
+			const nextExplorations: [number, number][][] = [
+				[
+					[zeroStepY, zeroStepX],
+					[currentBlockY, currentBlockX],
+				],
+			];
 			const exploredBlocks: boolean[][] = [];
 			for (let y = 0; y < this.dungeonHeight / BLOCK_SIZE; y++) {
 				exploredBlocks[y] = [];
@@ -810,8 +841,10 @@ export default class DungeonGenerator {
 
 			const makeStep = () => {
 				if (nextExplorations.length === 0) {
-					throw new Error(`Failed to build a way from ${sourceRoom.name} to ${targetRoom.name}. ` +
-						`This should not have happened.`);
+					throw new Error(
+						`Failed to build a way from ${sourceRoom.name} to ${targetRoom.name}. ` +
+							`This should not have happened.`
+					);
 				}
 				const history = nextExplorations.splice(0, 1)[0];
 				if (foundPath) {
@@ -847,8 +880,9 @@ export default class DungeonGenerator {
 			foundPath = [...foundPath, [lastStepY, lastStepX]];
 
 			// tslint:disable-next-line: no-console
-			console.log(`Build a way from ${sourceRoom.name} to ${targetRoom.name}: ` +
-				JSON.stringify(foundPath));
+			console.log(
+				`Build a way from ${sourceRoom.name} to ${targetRoom.name}: ` + JSON.stringify(foundPath)
+			);
 
 			// The first step is the origin room, the last step is the target room. We ignore those two.
 			for (let pathStep = 1; pathStep < foundPath.length - 1; pathStep++) {
@@ -861,10 +895,10 @@ export default class DungeonGenerator {
 				// We are using a good binary encounted value. 1, 2, 4 and 8 each are a single 1 in a binary
 				// encoded number, so 0001 = 1, 0010 = 2, 0011 = 3, ..., 1000 = 8, ..., 1111 = 15
 				const newValue =
-					((prevStepY < curStepY || nextStepY < curStepY) ? BIT_NORTH : 0) +
-					((prevStepX < curStepX || nextStepX < curStepX) ? BIT_EAST  : 0) +
-					((prevStepY > curStepY || nextStepY > curStepY) ? BIT_SOUTH : 0) +
-					((prevStepX > curStepX || nextStepX > curStepX) ? BIT_WEST  : 0);
+					(prevStepY < curStepY || nextStepY < curStepY ? BIT_NORTH : 0) +
+					(prevStepX < curStepX || nextStepX < curStepX ? BIT_EAST : 0) +
+					(prevStepY > curStepY || nextStepY > curStepY ? BIT_SOUTH : 0) +
+					(prevStepX > curStepX || nextStepX > curStepX ? BIT_WEST : 0);
 				// Since we use binary values, we can now use the binary OR to only add "directions" to the
 				// corridor block we are looking at. So, if there already was a corridor going
 				// left <-> right from a previous path, and now we are going top <-> left, we want the
@@ -902,7 +936,7 @@ export default class DungeonGenerator {
 							this.combinedLayout[tileY][tileX] = blockLayout[y][x];
 							this.topLayout[tileY][tileX] = blockLayout[y][x] >= 120 ? blockLayout[y][x] : -1;
 							if (blockLayout[y][x] === 32) {
-								this.potentialEnemyFields.push({x: tileX, y: tileY});
+								this.potentialEnemyFields.push({ x: tileX, y: tileY });
 							}
 						}
 					}
@@ -916,8 +950,8 @@ export default class DungeonGenerator {
 		const startRoomHeight = this.rooms[this.startRoomIndex].layout.length * TILE_HEIGHT;
 		const startRoomWidth = this.rooms[this.startRoomIndex].layout[0].length * TILE_WIDTH;
 		return [
-			startRoomBlockX * BLOCK_SIZE * TILE_WIDTH + (startRoomWidth / 2),
-			startRoomBlockY * BLOCK_SIZE * TILE_HEIGHT + (startRoomHeight / 2)
+			startRoomBlockX * BLOCK_SIZE * TILE_WIDTH + startRoomWidth / 2,
+			startRoomBlockY * BLOCK_SIZE * TILE_HEIGHT + startRoomHeight / 2,
 		];
 	}
 }

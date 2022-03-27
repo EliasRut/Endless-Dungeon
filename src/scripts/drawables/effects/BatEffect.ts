@@ -1,11 +1,10 @@
 import { Facings, facingToSpriteNameMap, SCALE, UiDepths } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
-import { getRotationInRadiansForFacing, isCollidingTile } from '../../helpers/movement';
 
 const BODY_RADIUS = 6;
 const OFFSET = 14;
-const VISIBILITY_DELAY = 50;
+const VISIBILITY_DELAY = 0;
 
 export default class BatEffect extends TargetingEffect {
 	constructor(

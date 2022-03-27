@@ -216,8 +216,8 @@ export default class ScriptHelper {
 						const xFactor = (targetX - mainCharacter.x) / totalDistance;
 						const yFactor = (targetY - mainCharacter.y) / totalDistance;
 						const speed = getCharacterSpeed(globalState.playerCharacter);
-						mainCharacter.setVelocity(speed * xFactor * SCALE, speed * yFactor * SCALE);
-						mainCharacter.body.velocity.normalize().scale(speed * SCALE);
+						mainCharacter.setVelocity(speed * xFactor, speed * yFactor);
+						mainCharacter.body.velocity.normalize().scale(speed);
 						const newFacing = getFacing8Dir(xFactor, yFactor);
 						const playerAnimation = updateMovingState(globalState.playerCharacter, true, newFacing);
 						if (playerAnimation) {
@@ -435,8 +435,8 @@ export default class ScriptHelper {
 					cleanUpStep = true;
 					break;
 				}
-				const targetX = (tokenRoom!.x + currentStep.posX) * TILE_WIDTH * SCALE;
-				const targetY = (tokenRoom!.y + currentStep.posY) * TILE_HEIGHT * SCALE;
+				const targetX = (tokenRoom!.x + currentStep.posX + 0.5) * TILE_WIDTH * SCALE;
+				const targetY = (tokenRoom!.y + currentStep.posY + 0.5) * TILE_HEIGHT * SCALE;
 				const totalDistance = Math.abs(targetX - token.x) + Math.abs(targetY - token.y);
 				const atTarget = totalDistance / SCALE < TILE_HEIGHT / 2;
 				if (atTarget) {
@@ -448,8 +448,8 @@ export default class ScriptHelper {
 					const yFactor = (targetY - token.y) / totalDistance;
 					const speed = getCharacterSpeed(globalState.npcs[token.id]);
 					token.isBeingMoved = true;
-					token.setVelocity(speed * xFactor * SCALE, speed * yFactor * SCALE);
-					token.body.velocity.normalize().scale(speed * SCALE);
+					token.setVelocity(speed * xFactor, speed * yFactor);
+					token.body.velocity.normalize().scale(speed);
 					const newFacing = getFacing8Dir(xFactor, yFactor);
 					const animation = updateMovingState(globalState.npcs[token.id], true, newFacing);
 					if (animation) {

@@ -1,9 +1,7 @@
 import {
-	Facings,
 	facingToSpriteNameMap,
 	Faction,
 	PossibleTargets,
-	TARGETABLE_TILE_TINT,
 	VISITED_TILE_TINT,
 } from '../../helpers/constants';
 import { getFacing4Dir } from '../../helpers/movement';
@@ -17,7 +15,7 @@ export default class TargetingEffect extends AbilityEffect {
 	acquisitionSpeed: number = 100 * SCALE;
 	acquisitionDistance: number = 30 * SCALE;
 	seekingSpeed: number = 500 * SCALE;
-	seekingTimeOffset: number = 150;
+	seekingTimeOffset: number = 50;
 	animationName: string = '';
 
 	update(time: number) {

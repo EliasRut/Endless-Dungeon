@@ -33,7 +33,7 @@ import DoorToken from '../drawables/tokens/DoorToken';
 import fixedItems from '../../items/fixedItems.json';
 import { DungeonRunData } from '../models/DungeonRunData';
 import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
-import { Catalyst, Source, getItemDataForName } from '../../items/itemData';
+import { Catalyst, Source, getItemDataForName, getItemTexture } from '../../items/itemData';
 import Minimap from '../drawables/ui/Minimap';
 import { AbilityType } from '../abilities/abilityData';
 import LevelName from '../drawables/ui/LevelName';
@@ -112,8 +112,6 @@ export default class MainScene extends Phaser.Scene {
 	lastStepLeft: number | undefined;
 
 	lastScriptUnpausing: number = Date.now();
-
-	wasStunned: boolean = false;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -383,11 +381,11 @@ export default class MainScene extends Phaser.Scene {
 		// )
 
 		doors.forEach((door) => {
-			this.addDoor(door.id, door.type, door.x, door.y, door.open);
+			this.addDoor(door.id, door.type, door.x * SCALE, door.y * SCALE, door.open);
 		});
 
 		items.forEach((item) => {
-			this.addFixedItem(item.id, item.x, item.y);
+			this.addFixedItem(item.id, item.x * SCALE, item.y * SCALE);
 		});
 
 		// console.log(`Dropping item at ${startPositionX}, ${startPositionY}`);
@@ -502,7 +500,6 @@ export default class MainScene extends Phaser.Scene {
 		if (!this.blockUserInteraction) {
 			if (globalState.playerCharacter.stunned === true) {
 				this.mainCharacter.setVelocity(0, 0);
-				this.wasStunned = true;
 				return;
 			}
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
@@ -517,10 +514,6 @@ export default class MainScene extends Phaser.Scene {
 			// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
 			const hasMoved = xFacing !== 0 || yFacing !== 0;
 			let playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
-			if (this.wasStunned) {
-				playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing, true);
-				this.wasStunned = false;
-			}
 			const isWalking =
 				isCasting ||
 				(this.mobilePadStick
@@ -676,7 +669,10 @@ export default class MainScene extends Phaser.Scene {
 			console.log('ITEM UNDEFINED: ', itemKey);
 			return;
 		}
-		const itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0);
+		let itemToken;
+		// if(itemKey == 'source-fire') itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0, 'icon_source_fire1');
+		// else itemToken = new WorldItemToken(this, x, y, itemKey, item, getItemTexture(itemKey), level || 0);
+		itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0, getItemTexture(itemKey));
 		itemToken.setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.worldItems.push(itemToken);
 	}

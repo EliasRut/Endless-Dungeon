@@ -1,12 +1,14 @@
 import { EquippedItemData } from '../../worldstate/Inventory';
 import { EquipmentSlot, UiDepths, UI_SCALE } from '../../helpers/constants';
-import { EquipmentKey, getItemDataForName } from '../../../items/itemData';
+import { EquipmentKey, getItemDataForName, getItemTexture } from '../../../items/itemData';
 import {
 	equipItem,
 	getFullDataForEquipmentSlot,
 	getFullDataForItemKey,
 } from '../../helpers/inventory';
 import MainScene from '../../scenes/MainScene';
+import ItemToken from '../tokens/WorldItemToken';
+import { ScriptPlaceItem } from '../../../../typings/custom';
 
 const EIGHT_ITEMS_OFFSETS = [
 	[0, -40],
@@ -48,6 +50,12 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.toggleVisible();
 		this.visiblity = !this.visiblity;
 		this.selection?.setVisible(false);
+	}
+
+	setVisible(value: boolean, index?: number, direction?: number): this {
+		super.setVisible(value, index, direction);
+		this.visiblity = false;
+		return this;
 	}
 
 	updateSelection(xAxis: -1 | 0 | 1, yAxis: -1 | 0 | 1) {
@@ -109,6 +117,12 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.selection?.setVisible(false);
 	}
 
+	playItemAnimation( itemToken: Phaser.GameObjects.Sprite, itemName?: string) {
+		if(itemName === 'source-fire'){
+			itemToken.play({ key: 'source_fire1', repeat : -1});
+		}
+	}
+
 	update(
 		centerX: number,
 		centerY: number,
@@ -147,6 +161,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		const levelTexts: Phaser.GameObjects.Image[] = [];
 		Object.entries(itemMap).map(([itemKey, equipmentData], itemIndex) => {
 			const itemData = getItemDataForName(itemKey);
+			const frame = getItemTexture(itemKey) === 'test-items-spritesheet' ? itemData.iconFrame : 0;
 			const [xOffset, yOffset] = useEightImages
 				? EIGHT_ITEMS_OFFSETS[itemIndex]
 				: FOUR_ITEMS_OFFSETS[itemIndex];
@@ -154,8 +169,8 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 				this.scene,
 				(centerX + xOffset) * UI_SCALE,
 				(centerY + yOffset) * UI_SCALE,
-				equipmentData.level ? 'test-items-spritesheet' : 'empty-tile',
-				equipmentData.level ? itemData.iconFrame : 0
+				equipmentData.level ? getItemTexture(itemKey) : 'empty-tile',
+				equipmentData.level ? frame : 0
 			);
 			itemImage.setScale(UI_SCALE);
 			if (equipmentData.level) {

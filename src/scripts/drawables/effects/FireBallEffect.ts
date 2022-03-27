@@ -1,8 +1,6 @@
 import { Facings, SCALE, UiDepths } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
-import MainScene from '../../scenes/MainScene';
-import { isCollidingTile } from '../../helpers/movement';
 
 const BODY_RADIUS = 6;
 const EXPLOSION_PARTICLE_SPEED = 100;
@@ -14,6 +12,7 @@ const GREEN_DIFF = 0x000100;
 
 export default class FireBallEffect extends TargetingEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
+	particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
 	constructor(
 		scene: Phaser.Scene,
 		x: number,
@@ -30,8 +29,8 @@ export default class FireBallEffect extends TargetingEffect {
 		this.body.setCircle(BODY_RADIUS, 0, 0);
 		this.body.setMass(1);
 
-		const particles = scene.add.particles('fire');
-		this.emitter = particles.createEmitter({
+		this.particles = scene.add.particles('fire');
+		this.emitter = this.particles.createEmitter({
 			alpha: { start: 1, end: 0 },
 			scale: { start: 0.2 * this.effectScale * SCALE, end: 0.05 * SCALE },
 			speed: 20 * SCALE,
@@ -53,7 +52,7 @@ export default class FireBallEffect extends TargetingEffect {
 			maxParticles: 100,
 		});
 
-		particles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.particles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		if (projectileData?.timeToLive) {
 			setTimeout(() => {
 				this.destroy();
@@ -74,6 +73,9 @@ export default class FireBallEffect extends TargetingEffect {
 			this.emitter.explode(10, this.body.x + 6 * SCALE, this.body.y + 6 * SCALE);
 		}
 
+		setTimeout(() => {
+			this.particles.destroy();
+		}, 1000);
 		super.destroy();
 	}
 

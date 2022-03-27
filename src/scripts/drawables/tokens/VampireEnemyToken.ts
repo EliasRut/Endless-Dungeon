@@ -19,7 +19,7 @@ const ATTACK_DURATION = 2500;
 const WALL_COLLISION_STUN = 2000;
 const PLAYER_STUN = 800;
 const COLLISION_STUN = 1000;
-const LAUNCH_SPEED = 100;
+const LAUNCH_SPEED = 150;
 export default class VampireToken extends EnemyToken {
 	attacking: boolean;
 	chargeTime: number = CHARGE_TIME;
@@ -28,6 +28,7 @@ export default class VampireToken extends EnemyToken {
 	damaged: boolean = false;
 	launchX: number;
 	launchY: number;
+	dead: boolean = false;
 
 	constructor(
 		scene: MainScene,
@@ -58,13 +59,17 @@ export default class VampireToken extends EnemyToken {
 		);
 
 		// check death
-		if (this.stateObject.health <= 0) {
+		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
 				this.dropRandomItem(this.level);
-			} else if (Math.random() < HEALTH_DROP_CHANCE) this.dropFixedItem('health');
-			this.destroy();
+			} else if (Math.random() < HEALTH_DROP_CHANCE) {
+				this.dropFixedItem('health');
+			}
+			this.dead = true;
+			this.die();
 			return;
-		}
+		} else if (this.dead) return;
+
 		updateStatus(time, this.stateObject);
 		if (this.stateObject.stunned) {
 			this.setVelocityX(0);
@@ -96,29 +101,29 @@ export default class VampireToken extends EnemyToken {
 		if (!this.attacking) {
 			const tx = this.target.x;
 			const ty = this.target.y;
-			const px = globalState.playerCharacter.x;
-			const py = globalState.playerCharacter.y;
+			const px = globalState.playerCharacter.x * SCALE;
+			const py = globalState.playerCharacter.y * SCALE;
 			if (this.aggro) {
 				if (
-					px !== tx ||
-					py !== ty ||
+					px !== tx * SCALE ||
+					py !== ty * SCALE ||
 					this.attackRange < this.getDistanceToWorldStatePosition(tx, ty)
 				) {
-					const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
+					const totalDistance = Math.abs(tx * SCALE - this.x) + Math.abs(ty * SCALE - this.y);
 					const xSpeed =
-						((tx - this.x) / totalDistance) *
+						((tx * SCALE - this.x) / totalDistance) *
 						this.stateObject.movementSpeed *
 						this.stateObject.slowFactor;
 					const ySpeed =
-						((ty - this.y) / totalDistance) *
+						((ty * SCALE - this.y) / totalDistance) *
 						this.stateObject.movementSpeed *
 						this.stateObject.slowFactor;
-					this.setVelocityX(xSpeed);
-					this.setVelocityY(ySpeed);
+					this.setVelocityX(xSpeed * SCALE);
+					this.setVelocityY(ySpeed * SCALE);
 					const newFacing = getFacing4Dir(xSpeed, ySpeed);
 					const animation = updateMovingState(this.stateObject, true, newFacing);
 					if (animation) {
-						this.play({key: animation, repeat: -1});
+						this.play({ key: animation, repeat: -1 });
 					}
 				} else {
 					this.attack(time);
@@ -163,10 +168,10 @@ export default class VampireToken extends EnemyToken {
 			this.setVelocityY(0);
 		}
 		if (this.attackedAt + this.chargeTime > time) {
-			const tx = this.target.x;
-			const ty = this.target.y;
-			const xSpeed = tx * SCALE - this.x;
-			const ySpeed = ty * SCALE - this.y;
+			const tx = this.target.x * SCALE;
+			const ty = this.target.y * SCALE;
+			const xSpeed = tx - this.x;
+			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			// 9 frames, so 9 frame rate for 1s.
 			if (this.attackedAt === time || this.stateObject.currentFacing !== newFacing) {
@@ -177,11 +182,11 @@ export default class VampireToken extends EnemyToken {
 			}
 		} else if (this.attackedAt + this.chargeTime <= time && !this.launched) {
 			this.launched = true;
-			const tx = this.target.x;
-			const ty = this.target.y;
+			const tx = this.target.x * SCALE;
+			const ty = this.target.y * SCALE;
 			const speeds = getXYfromTotalSpeed(this.y - ty, this.x - tx);
-			const xSpeed = speeds[0] * LAUNCH_SPEED * this.stateObject.slowFactor;
-			const ySpeed = speeds[1] * LAUNCH_SPEED * this.stateObject.slowFactor;
+			const xSpeed = speeds[0] * LAUNCH_SPEED * this.stateObject.slowFactor * SCALE;
+			const ySpeed = speeds[1] * LAUNCH_SPEED * this.stateObject.slowFactor * SCALE;
 
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const attackAnimationName = `jacques-attack-${facingToSpriteNameMap[newFacing]}`;

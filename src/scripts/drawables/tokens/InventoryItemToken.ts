@@ -1,6 +1,6 @@
 import MainScene from '../../scenes/MainScene';
 
-export default class InventoryItemToken extends Phaser.GameObjects.Image {
+export default class InventoryItemToken extends Phaser.GameObjects.Sprite {
 	constructor(scene: Phaser.Scene, x: number, y: number, frame: number) {
 		super(
 			scene,

@@ -8,6 +8,7 @@ import RedlingBossToken from '../drawables/tokens/RedlingBoss';
 import LichKingToken from '../drawables/tokens/LichKing';
 import VampireToken from '../drawables/tokens/VampireEnemyToken';
 import PierreToken from '../drawables/tokens/PierreEnemyToken';
+import ElementalToken from '../drawables/tokens/ElementalToken';
 
 export const spawnNpc = (
 	scene: MainScene,
@@ -39,6 +40,9 @@ export const spawnNpc = (
 		}
 		case 'lich-king': {
 			return new LichKingToken(scene, posX, posY, 'rich', level, id);
+		}
+		case 'fire-elemental': {
+			return new ElementalToken(scene, posX, posY, 'rich', level, id);
 		}
 		default: {
 			return new NpcToken(scene, posX, posY, type, id, options);

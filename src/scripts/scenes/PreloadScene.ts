@@ -9,6 +9,7 @@ import {
 	MODE,
 	NUM_COLORS_OF_MAGIC,
 	npcToAespriteMap,
+	NpcTypeList,
 } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
@@ -26,7 +27,6 @@ export default class PreloadScene extends Phaser.Scene {
 		super({ key: 'PreloadScene' });
 	}
 
-	//neededAnimations = [{ name: 'player', facingRange: FacingRange.ALL_DIRECTIONS }];
 	neededAnimations = new Array<{ name: string; facingRange: FacingRange }>();
 
 	init() {
@@ -52,8 +52,17 @@ export default class PreloadScene extends Phaser.Scene {
 		// Player
 		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');
 
+		// Prepare aseprite listings for enemies
+		this.load.aseprite('rich', 'assets/sprites/rich.png', 'assets/sprites/rich.json');
+		this.load.aseprite('jacques', 'assets/sprites/jacques.png', 'assets/sprites/jacques.json');
+		this.load.aseprite('pierre', 'assets/sprites/pierre.png', 'assets/sprites/pierre.json');
+
 		// death
-		this.load.aseprite('death_anim_small', 'assets/sprites/enemy_explosion_small.png', 'assets/sprites/enemy_explosion_small.json')
+		this.load.aseprite(
+			'death_anim_small',
+			'assets/sprites/enemy_explosion_small.png',
+			'assets/sprites/enemy_explosion_small.json'
+		);
 
 		// Overlay screens
 		this.load.spritesheet('screen-background', 'assets/img/screen-background.png', {
@@ -121,6 +130,10 @@ export default class PreloadScene extends Phaser.Scene {
 			frameWidth: 16,
 			frameHeight: 16,
 		});
+		this.load.aseprite('source-fire1', 'assets/sprites/source_flame01.png', 'assets/sprites/source_flame01.json');
+		this.load.aseprite('source-force1', 'assets/sprites/source_force01.png', 'assets/sprites/source_force01.json');
+		this.load.image('icon-source-fire1', 'assets/img/source_icon_flame01.png');
+		this.load.image('icon-source-force1', 'assets/img/source_icon_force01.png');
 
 		// Doors
 		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png', {
@@ -175,6 +188,13 @@ export default class PreloadScene extends Phaser.Scene {
 			this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
 		});
 
+		// Load all default enemies.
+		NpcTypeList.forEach((type) => {
+			if (!requiredNpcs.has(type)) {
+				requiredNpcs.add(type);
+			}
+		});
+
 		// If we are in map editor mode, also load the library background tilesets
 		if (activeMode === MODE.MAP_EDITOR) {
 			this.load.image('base-background', 'assets/tilesets/base-background.png');
@@ -204,6 +224,11 @@ export default class PreloadScene extends Phaser.Scene {
 			this.scene.start('MapEditor');
 			return;
 		}
+
+		// Item animation
+
+		this.anims.createFromAseprite('source-fire1');
+		this.anims.createFromAseprite('source-force1');
 
 		// Create character animations
 		this.anims.createFromAseprite('player');

@@ -218,6 +218,51 @@ export const colorOfMagicToTilesetMap = {
 	[ColorsOfMagic.ROYAL]: 'COM-death-B',
 };
 
+export const NpcTypeList = ['rich', 'jacques', 'pierre'];
+
+export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
+	[ColorsOfMagic.FLUX]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.METAL]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.CHANGE]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.BLOOD]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.DEATH]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.PASSION]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.WILD]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+	[ColorsOfMagic.ROYAL]: [
+		[0.5, 'rich'],
+		[0.85, 'jacques'],
+		[1, 'pierre'],
+	],
+};
+
 export const enemyBudgetCost = {
 	'rich': 1,
 	'jacques': 1,

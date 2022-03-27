@@ -285,8 +285,8 @@ const NpcDetailsDialog = styled.div`
 	top: 50%;
 	right: 5%;
 	width: 148px;
-	height: 400px;
-	margin-top: -200px;
+	height: 500px;
+	margin-top: -250px;
 	background-color: #333c;
 	border: 2px solid #cccccc;
 	box-shadow: 4px 4px 4px 4px #0009;
@@ -299,10 +299,10 @@ const MapDetailsDialog = styled.div`
 	position: fixed;
 	top: 50%;
 	right: 50%;
-	width: 360px;
-	height: 240px;
-	margin-top: -120px;
-	margin-left: -180px;
+	width: 420px;
+	height: 300px;
+	margin-top: -150px;
+	margin-left: -210px;
 	background-color: #333c;
 	border: 2px solid #cccccc;
 	box-shadow: 4px 4px 4px 4px #0009;

@@ -147,7 +147,7 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			}
 			case AbilityType.FIREBALL:
 			default: {
-				return AbilityType.FIRE_NOVA;
+				return AbilityType.FIRE_SUMMON;
 			}
 		}
 	}
