@@ -125,12 +125,12 @@ export default class AbilityHelper {
 						);
 					}
 				}
-				//enemy.stateObject.health = newEnemyHealth;
-				enemy.receiveHit(caster.damage * Abilities[type].damageMultiplier);
-
 				if (Abilities[type].stun) {
 					enemy.receiveStun(Abilities[type].stun!);
 				}
+				//enemy.stateObject.health = newEnemyHealth;
+				enemy.receiveHit(caster.damage * Abilities[type].damageMultiplier);
+
 				if (Abilities[type].necroticStacks) {
 					enemy.lastNecroticEffectTimestamp = globalTime;
 					enemy.necroticEffectStacks += Abilities[type].necroticStacks!;

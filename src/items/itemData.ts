@@ -115,7 +115,7 @@ export const RingData: Record<Ring, AbilityLinkedItem> = {
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.ROYAL]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.CONDEMN,
 		name: 'Ring of Royal',
 		description: 'A ring giving you power associated with the color of magic: Royal',
 		iconFrame: 56,
@@ -328,7 +328,7 @@ export const getItemTexture = (name?: string) => {
 	if (name === 'source-fire') return 'icon-source-fire1';
 	if (name === 'source-force') return 'icon-source-force1';
 	return 'test-items-spritesheet';
-}
+};
 
 export const getItemDataForName = (name: string) => {
 	if (name.startsWith('source-')) {
