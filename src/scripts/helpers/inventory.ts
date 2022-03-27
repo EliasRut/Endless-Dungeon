@@ -18,6 +18,8 @@ import { EquippedItemData, EquippedItemRecords, EquippedItems } from '../worldst
 import Item from '../worldstate/Item';
 import { EquipmentSlot, BAG_BOXES_X, BAG_BOXES_Y } from './constants';
 import { ItemData, CatalystKey, AmuletKey } from '../../items/itemData';
+import { EnchantmentName } from '../../items/enchantmentData';
+import { enchantmentModifiers } from '../worldstate/PlayerCharacter';
 
 const BASE_HEALTH = 100;
 const BASE_MOVEMENT_SPEED = 200;
@@ -103,6 +105,26 @@ export const getEquipmentDataForItemKey: (itemKey: EquipmentKey) => EquippedItem
 	}
 	throw new Error(`Unknown equipment type ${itemKey}.`);
 };
+
+ export const attachEnchantmentItem: (itemKey: EquipmentKey, enchantment: EnchantmentName) => void = (
+	 itemKey,
+	 enchantment
+	 ) => {
+	const prefix = itemKey.split('-')[0];
+	switch (prefix) {
+		case 'source':
+			return globalState.inventory.sources[itemKey as Source].enchantment = enchantment;
+		case 'catalyst':
+			return globalState.inventory.catalysts[itemKey as Catalyst].enchantment = enchantment;
+		case 'chestpiece':
+			return globalState.inventory.chestPieces[itemKey as ChestPiece].enchantment = enchantment;
+		case 'amulet':
+			return globalState.inventory.amulets[itemKey as Amulet].enchantment = enchantment;
+		case 'ring':
+			return globalState.inventory.rings[itemKey as Ring].enchantment = enchantment;
+	}
+	throw new Error(`Unknown equipment type ${itemKey}.`);
+ };
 
 export const getEquipmentDataRecordForEquipmentSlot: (slot: EquipmentSlot) => EquippedItemRecords =
 	(slot) => {

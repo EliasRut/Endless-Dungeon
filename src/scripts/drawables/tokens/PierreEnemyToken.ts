@@ -14,7 +14,7 @@ const MIN_MOVEMENT_SPEED = 25;
 const BASE_HEALTH = 4;
 
 const ITEM_DROP_CHANCE = 0.65;
-const HEALTH_DROP_CHANCE = 0.06;
+const HEALTH_DROP_CHANCE = 0.06 * globalState.playerCharacter.luck;
 
 const CHARGE_TIME = 1000;
 const ATTACK_DURATION = 2000;

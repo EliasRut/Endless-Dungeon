@@ -159,8 +159,8 @@ export default class ItemScreen extends OverlayScreen {
 		if (itemData !== undefined) {
 			if (equipmentData) {
 				this.lableLevel.setText(`Level ${equipmentData.level}`);
-				this.lableEnchantment.setText(Enchantment[equipmentData.enchantment].name);
-				this.lableEnchantmentValue.setText(Enchantment[equipmentData.enchantment].description);
+				this.lableEnchantment.setText(Enchantment[equipmentData.enchantment]!.name);
+				this.lableEnchantmentValue.setText(Enchantment[equipmentData.enchantment]!.description);
 				// 	const eItem = item as EquippableItem;
 				// 	this.lableHealthValue.setText(`${eItem.maxHealth.toFixed(2)}`);
 				// 	this.lableDamageValue.setText(`${eItem.damage.toFixed(2)}`);

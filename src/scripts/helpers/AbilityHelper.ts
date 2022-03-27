@@ -109,9 +109,8 @@ export default class AbilityHelper {
 					collidingEffect.destroy();
 				}
 				effect.hitEnemyTokens.push(enemy);
-				const newEnemyHealth =
-					enemy.stateObject.health -
-					caster.damage * Abilities[type].damageMultiplier * abilityLevel;
+				const damage = caster.damage * Abilities[type].damageMultiplier * abilityLevel;
+				const newEnemyHealth = enemy.stateObject.health - damage;
 				if (enemy.stateObject.health > 0 && newEnemyHealth <= 0) {
 					console.log(`Enemy died`);
 					// Enemy died from this attack
@@ -128,9 +127,8 @@ export default class AbilityHelper {
 				if (Abilities[type].stun) {
 					enemy.receiveStun(Abilities[type].stun!);
 				}
-				//enemy.stateObject.health = newEnemyHealth;
-				enemy.receiveHit(caster.damage * Abilities[type].damageMultiplier);
-
+				
+				enemy.receiveHit(damage);				
 				if (Abilities[type].necroticStacks) {
 					enemy.lastNecroticEffectTimestamp = globalTime;
 					enemy.necroticEffectStacks += Abilities[type].necroticStacks!;
