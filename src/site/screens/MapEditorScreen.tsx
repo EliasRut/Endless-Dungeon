@@ -7,7 +7,17 @@ import styled from 'styled-components';
 import firebase from 'firebase';
 import { Dropdown } from '../components/Dropdown';
 import MapEditor from '../../scripts/scenes/MapEditor';
-import { DatabaseRoom, ItemsPositioning, NpcPositioning, Room } from '../../../typings/custom';
+import {
+	DatabaseRoom,
+	ItemsPositioning,
+	NpcPositioning,
+	NpcScriptStep,
+	ScriptWait,
+	ScriptMove,
+	ScriptWalk,
+	ScriptAnimation,
+	Room,
+} from '../../../typings/custom';
 import '../App.css';
 
 export interface MapEditorScreenProps {
@@ -16,9 +26,38 @@ export interface MapEditorScreenProps {
 
 const showGame = true;
 
-// const renderScriptStep: () => {
-
-// };
+const renderScriptStep: (props: { step: NpcScriptStep }) => JSX.Element = ({ step }) => {
+	switch (step.type) {
+		case 'wait': {
+			return (
+				<div>
+					Wait <input value={step.time} /> ms
+				</div>
+			);
+		}
+		case 'move': {
+			return (
+				<div>
+					Move to <input value={step.posX} />, <input value={step.posY} />
+				</div>
+			);
+		}
+		case 'walk': {
+			return (
+				<div>
+					Walk to <input value={step.posX} />, <input value={step.posY} />
+				</div>
+			);
+		}
+		case 'animation': {
+			return (
+				<div>
+					Play Animation <input value={step.animation} /> for <input value={step.duration} /> ms
+				</div>
+			);
+		}
+	}
+};
 
 export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 	const phaserRef = useRef<HTMLDivElement>(null);
@@ -142,9 +181,7 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 					<Column>
 						<NpcScriptsContainer>
 							<div>Scripts</div>
-							{(activeNpc?.script?.steps || []).map((step) => (
-								<div>{step.type}</div>
-							))}
+							{(activeNpc?.script?.steps || []).map((step) => renderScriptStep({ step }))}
 						</NpcScriptsContainer>
 					</Column>
 				</TwoColumnLayout>
