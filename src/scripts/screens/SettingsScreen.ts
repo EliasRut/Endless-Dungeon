@@ -91,6 +91,9 @@ export default class SettingsScreen extends OverlayScreen {
 	}
 
 	save() {
+		globalState.storeState();
+
+		/* tslint:disable: max-line-length */
 		let jsonData: string = '{';
 		jsonData += '"'+WorldState.PLAYERCHARACTER+'": '      + JSON.stringify(globalState.playerCharacter) +',\n';
 		jsonData += '"'+WorldState.GAMETIME+'": '             + `${globalState.gameTime}` + ',\n';
@@ -106,8 +109,9 @@ export default class SettingsScreen extends OverlayScreen {
 		jsonData += '"'+WorldState.CURRENTLEVEL+'": '         + JSON.stringify(globalState.currentLevel) +',\n';
 		jsonData += '"'+WorldState.ROOMASSIGNMENT+'": '       + JSON.stringify(globalState.roomAssignment) +',\n';
 		jsonData += '"'+WorldState.INVENTORY+'": '            + JSON.stringify(globalState.inventory) +',\n';
-		jsonData += '"'+WorldState.SAVEGAMENAME+'": '			+ '"test-save+"';
+		jsonData += '"'+WorldState.SAVEGAMENAME+'": '			+ '"savegame-'+`${globalState.gameTime}`+'"';
 		jsonData += '}';
+		/* tslint:enable: max-line-length */
 
 		console.log(this.scene.scene);
 
