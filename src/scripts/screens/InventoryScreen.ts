@@ -11,7 +11,10 @@ import {
 	CatalystData,
 	getItemTexture,
 } from '../../items/itemData';
-import { updateAbility } from '../worldstate/PlayerCharacter';
+import PlayerCharacter, {
+	enchantmentModifiers,
+	updateAbility,
+} from '../worldstate/PlayerCharacter';
 import { getCatalystAbility } from '../helpers/item';
 import EquipmentSelectionWheel from '../drawables/ui/EquipmentSelectionWheel';
 import {
@@ -20,9 +23,12 @@ import {
 	getItemDataForEquipmentSlot,
 	getFullDataForEquipmentSlot,
 	getEquipmentDataRecordForEquipmentSlot,
+	getEquipmentDataForItemKey,
+	attachEnchantmentItem,
 } from '../helpers/inventory';
 import { STAT_SCREEN_RIGHT_BORDER } from './StatScreen';
 import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
+import { Enchantment, EnchantmentName } from '../../items/enchantmentData';
 
 const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
 
@@ -207,7 +213,7 @@ export default class InventoryScreen extends OverlayScreen {
 		this.equipmentSelectionWheel = new EquipmentSelectionWheel(scene);
 		this.equipmentSelectionWheel.toggleVisibility();
 
-		this.updateAbilities(true);
+		this.applyEquipped();
 
 		this.currentXY = [0, 0];
 	}
@@ -235,10 +241,9 @@ export default class InventoryScreen extends OverlayScreen {
 		return itemToken;
 	}
 
-	playItemAnimation( itemToken: InventoryItemToken, itemName?: string) {
+	playItemAnimation(itemToken: InventoryItemToken, itemName?: string) {
 		const animation = itemName + '1';
-		if (this.scene.game.anims.exists(animation))
-			itemToken.play({ key: animation, repeat : -1});
+		if (this.scene.game.anims.exists(animation)) itemToken.play({ key: animation, repeat: -1 });
 
 		// if('test-items-spritesheet' !== getItemTexture(itemName)){
 		// 	itemToken.play({ key: getItemTexture(itemName), repeat : -1});
@@ -333,11 +338,14 @@ export default class InventoryScreen extends OverlayScreen {
 		return false;
 	}
 
-	// updates all abilities and icons at once.
-	updateAbilities(constructor: boolean) {
+	// Cycles through all equipped items. Updates all abilities, icons and stats at once.
+	applyEquipped() {
+		this.applyEnchantment();
 		const equippedItems = getEquippedItems();
 		Object.keys(equippedItems).forEach((key) => {
 			const slotKey = key as EquipmentSlot;
+			const stats = getEquipmentDataForItemKey(equippedItems[slotKey]!);
+			this.applyEnchantment(stats.enchantment);
 			if (slotKey === EquipmentSlot.CHESTPIECE) return;
 			// TODO: NECKLACE
 			if (slotKey === EquipmentSlot.AMULET) return;
@@ -349,7 +357,7 @@ export default class InventoryScreen extends OverlayScreen {
 				if (slotKey === EquipmentSlot.SOURCE) {
 					updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
 					const newAbilityIcon = this.createAbilityIcon();
-					this.handleIconOptions(constructor, newAbilityIcon, AbilityType.FIREBALL);
+					this.handleIconOptions(newAbilityIcon, AbilityType.FIREBALL);
 					this.abilityIconMap[EquipmentSlot.SOURCE] = newAbilityIcon;
 					const newAbilityText = this.createAbilityText();
 					this.abilityTextMap[slotKey] = newAbilityText;
@@ -395,7 +403,7 @@ export default class InventoryScreen extends OverlayScreen {
 				EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
 				ability
 			);
-			this.handleIconOptions(constructor, abilityIcon, ability);
+			this.handleIconOptions(abilityIcon, ability);
 		});
 	}
 
@@ -448,17 +456,37 @@ export default class InventoryScreen extends OverlayScreen {
 		return abilityText;
 	}
 
-	handleIconOptions(
-		constructor: boolean,
-		abilityIcon: Phaser.GameObjects.Image,
-		ability: AbilityType
-	) {
+	handleIconOptions(abilityIcon: Phaser.GameObjects.Image, ability: AbilityType) {
 		abilityIcon.setVisible(this.visiblity);
 
 		abilityIcon.on('pointerdown', () => {
 			if (this.focusedSlot !== undefined) this.focusedSlot = undefined;
 			this.scene.overlayScreens.itemScreen.updateAbility(ability);
 		});
+	}
+
+	applyEnchantment(enchantment?: EnchantmentName) {
+		if (enchantment === undefined) {
+			Object.entries(enchantmentModifiers).forEach((mod) => {
+				let stat = mod[0] as keyof typeof enchantmentModifiers;
+				globalState.playerCharacter[stat] -= mod[1];
+				enchantmentModifiers[stat] -= mod[1];
+				if (stat === 'maxHealth') {
+					if (globalState.playerCharacter.health > mod[1])
+						globalState.playerCharacter.health -= mod[1];
+					else globalState.playerCharacter.health = 1;
+				}
+			});
+		} else {
+			if (enchantment === 'None') return;
+			let stat = Enchantment[enchantment]?.affectedStat?.stat! as keyof typeof enchantmentModifiers;
+			let value = Enchantment[enchantment]?.affectedStat?.value!;
+			globalState.playerCharacter[stat] += value!;
+			enchantmentModifiers[stat] += value!;
+			if (stat === 'maxHealth') {
+				globalState.playerCharacter.health += value!;
+			}
+		}
 	}
 
 	update() {
@@ -471,7 +499,7 @@ export default class InventoryScreen extends OverlayScreen {
 			);
 		});
 
-		this.updateAbilities(false);
+		this.applyEquipped();
 		const [itemData, equipmentData] = this.focusedSlot
 			? getFullDataForEquipmentSlot(this.focusedSlot)
 			: [undefined, undefined];
