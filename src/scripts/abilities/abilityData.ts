@@ -8,6 +8,7 @@ import ArcaneBoltEffect from '../drawables/effects/ArcaneBoltEffect';
 import ConeEffect from '../drawables/effects/ConeEffect';
 import NecroticBoltEffect from '../drawables/effects/NecroticBoltEffect';
 import BatEffect from '../drawables/effects/BatEffect';
+import CondemnEffect from '../drawables/effects/CondemnEffect';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -74,6 +75,7 @@ export const enum AbilityType {
 	NECROTIC_NOVA = 'necroticNova',
 	EXPLODING_CORPSE = 'explodingCorpse',
 	BAT = 'bat',
+	CONDEMN = 'Condemn',
 }
 
 export const Abilities: { [type: string]: AbilityData } = {
@@ -579,5 +581,27 @@ export const Abilities: { [type: string]: AbilityData } = {
 		flavorText: `An angry bat.`,
 		icon: ['icon-abilities', 1],
 		spriteName: 'bat',
+	},
+	[AbilityType.CONDEMN]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 0,
+			yOffset: 0,
+			velocity: 300,
+			effect: CondemnEffect,
+			collisionSound: 'sound-icespike-hit',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-icespike',
+		sfxVolume: 0.3,
+		cooldownMs: 8000,
+		damageMultiplier: 0.5,
+		stun: 4000,
+		abilityName: 'Condemn',
+		flavorText: `An angry shout against your enemy.`,
+		icon: ['icon-abilities', 1],
 	},
 };
