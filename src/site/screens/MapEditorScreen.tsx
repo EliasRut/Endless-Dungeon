@@ -31,28 +31,29 @@ const renderScriptStep: (props: { step: NpcScriptStep }) => JSX.Element = ({ ste
 		case 'wait': {
 			return (
 				<div>
-					Wait <input value={step.time} /> ms
+					Wait <InlineInput value={step.time} /> ms
 				</div>
 			);
 		}
 		case 'move': {
 			return (
 				<div>
-					Move to <input value={step.posX} />, <input value={step.posY} />
+					Move to <InlineInput value={step.posX} />, <InlineInput value={step.posY} />
 				</div>
 			);
 		}
 		case 'walk': {
 			return (
 				<div>
-					Walk to <input value={step.posX} />, <input value={step.posY} />
+					Walk to <InlineInput value={step.posX} />, <InlineInput value={step.posY} />
 				</div>
 			);
 		}
 		case 'animation': {
 			return (
 				<div>
-					Play Animation <input value={step.animation} /> for <input value={step.duration} /> ms
+					Play Animation <InlineInput value={step.animation} /> for{' '}
+					<InlineInput value={step.duration} /> ms
 				</div>
 			);
 		}
@@ -264,6 +265,11 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 		</PageContainer>
 	);
 };
+
+const InlineInput = styled.input`
+	display: inline-block;
+	width: 60px;
+`;
 
 const PageContainer = styled.div`
 	height: 100%;

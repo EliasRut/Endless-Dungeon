@@ -11,7 +11,7 @@ const LIGHTRAY_PRECISION = 10000;
 
 const lightPassingTileIds = [
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52,
-	53, 54, 84, 85, 86, 90, 91, 92,
+	53, 54, 55, 56, 57, 58, 84, 85, 86, 90, 91, 92, 95, 96, 97, 98,
 ];
 
 export default class DynamicLightingHelper {
