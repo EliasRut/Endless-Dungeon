@@ -21,9 +21,10 @@ import { QuestReward } from '../components/QuestReward';
 import { Dropdown } from '../components/Dropdown';
 import { QuestItemPrecondition } from '../components/QuestItemPrecondition';
 import { PreviousQuestPrecondition } from '../components/PreviousQuestPrecondition';
+import { UserInformation } from '../../scripts/helpers/UserInformation';
 
 export interface QuestEditorScreenProps {
-	user: firebase.User;
+	user: UserInformation;
 }
 
 export interface QuestEditorState {

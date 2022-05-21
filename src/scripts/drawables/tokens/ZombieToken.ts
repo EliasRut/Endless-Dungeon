@@ -1,4 +1,9 @@
-import { facingToSpriteNameMap, KNOCKBACK_TIME, SCALE } from '../../helpers/constants';
+import {
+	facingToSpriteNameMap,
+	KNOCKBACK_TIME,
+	NORMAL_ANIMATION_FRAME_RATE,
+	SCALE,
+} from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -67,10 +72,10 @@ export default class ZombieToken extends EnemyToken {
 			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
 			if (animation) {
 				if (this.scene.game.anims.exists(animation)) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 			}
 			return;
@@ -119,10 +124,10 @@ export default class ZombieToken extends EnemyToken {
 			const animation = updateMovingState(this.stateObject, true, newFacing);
 			if (animation) {
 				if (this.scene.game.anims.exists(animation)) {
-					this.play({ key: animation, repeat: -1 });
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
-					this.play({ key: animation, repeat: -1 });
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
 				}
 			}
 		} else {
@@ -131,10 +136,10 @@ export default class ZombieToken extends EnemyToken {
 			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
 			if (animation) {
 				if (this.scene.game.anims.exists(animation)) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 			}
 		}
@@ -154,7 +159,7 @@ export default class ZombieToken extends EnemyToken {
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 
 			const attackAnimationName = `${this.tokenName}-attack-${facingToSpriteNameMap[newFacing]}`;
-			this.play(attackAnimationName);
+			this.play({ key: attackAnimationName, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 
 			this.setVelocityX(0);
 			this.setVelocityY(0);

@@ -12,6 +12,7 @@ import { spawnNpc } from '../helpers/spawn';
 import fixedItems from '../../items/fixedItems.json';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import { getItemDataForName, UneqippableItem } from '../../items/itemData';
+import { getCachedUserData } from '../helpers/userHelpers';
 
 const SCALE = 2;
 
@@ -328,14 +329,20 @@ export default class MapEditor extends Phaser.Scene {
 			this.roomsDropdownElement.remove(0);
 		}
 
-		this.database.get().then((query) => {
-			query.forEach((roomDoc) => {
-				const newOption = document.createElement('option');
-				newOption.value = roomDoc.id;
-				newOption.innerText = roomDoc.id;
-				this.roomsDropdownElement.appendChild(newOption);
-			});
-		});
+		const userTeam = getCachedUserData()?.team;
+		if (userTeam) {
+			this.database
+				.where('team', '==', userTeam)
+				.get()
+				.then((query) => {
+					query.forEach((roomDoc) => {
+						const newOption = document.createElement('option');
+						newOption.value = roomDoc.id;
+						newOption.innerText = roomDoc.id;
+						this.roomsDropdownElement.appendChild(newOption);
+					});
+				});
+		}
 
 		// Prepare Base Tileset dropdown
 		while (this.tilesetDropdownElement.firstChild) {

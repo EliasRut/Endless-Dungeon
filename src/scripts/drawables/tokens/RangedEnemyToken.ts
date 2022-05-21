@@ -4,6 +4,7 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
+import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 const ATTACK_RANGE = 100;
 
@@ -46,7 +47,7 @@ export default class RangedEnemyToken extends EnemyToken {
 				const animation = updateMovingState(this.stateObject, true, newFacing);
 
 				if (animation) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 			} else {
 				this.setVelocityX(0);
@@ -58,7 +59,7 @@ export default class RangedEnemyToken extends EnemyToken {
 				);
 
 				if (animation) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 				this.stateObject.currentFacing = newFacing;
 			}

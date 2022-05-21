@@ -8,7 +8,7 @@ import CharacterToken from '../drawables/tokens/CharacterToken';
 import fixedItems from '../../items/fixedItems.json';
 import Item from '../worldstate/Item';
 import { generateRandomItem } from './item';
-import { Faction, SCALE } from './constants';
+import { Faction, SCALE, NORMAL_ANIMATION_FRAME_RATE } from './constants';
 import { ItemData, UneqippableItem } from '../../items/itemData';
 
 const DIALOG_TEXT_TIME_MS = 5000;
@@ -108,7 +108,10 @@ export default class ScriptHelper {
 						currentStep.text[globalState.scripts.scriptSubStep!]
 					);
 					this.scene.overlayScreens.dialogScreen.setVisible(true);
-				} else if (globalState.scripts.scriptStepStartMs + DIALOG_TEXT_TIME_MS < globalTime || userCancelled) {
+				} else if (
+					globalState.scripts.scriptStepStartMs + DIALOG_TEXT_TIME_MS < globalTime ||
+					userCancelled
+				) {
 					globalState.scripts.scriptSubStep = globalState.scripts.scriptSubStep! + 1;
 					if (currentStep.text.length <= globalState.scripts.scriptSubStep) {
 						this.scene.overlayScreens.dialogScreen.setVisible(false);
@@ -130,12 +133,18 @@ export default class ScriptHelper {
 					if (currentStep.target === 'player') {
 						globalState.scripts.scriptAnimationFallback =
 							this.scene.mainCharacter.anims.currentAnim.key;
-						this.scene.mainCharacter.play(currentStep.animation);
+						this.scene.mainCharacter.play({
+							key: currentStep.animation,
+							frameRate: NORMAL_ANIMATION_FRAME_RATE,
+						});
 					}
 				} else if (globalState.scripts.scriptStepStartMs + currentStep.duration < globalTime) {
 					cleanUpStep = true;
 					this.scene.resume();
-					this.scene.mainCharacter.play(globalState.scripts.scriptAnimationFallback!);
+					this.scene.mainCharacter.play({
+						key: globalState.scripts.scriptAnimationFallback!,
+						frameRate: NORMAL_ANIMATION_FRAME_RATE,
+					});
 				}
 				break;
 			}
@@ -164,7 +173,10 @@ export default class ScriptHelper {
 						true
 					);
 					if (playerAnimation) {
-						this.scene.mainCharacter.play(playerAnimation);
+						this.scene.mainCharacter.play({
+							key: playerAnimation,
+							frameRate: NORMAL_ANIMATION_FRAME_RATE,
+						});
 					}
 				} else {
 					const npcId = `${this.currentRoom!.roomName}-${currentStep.target}`;
@@ -181,7 +193,10 @@ export default class ScriptHelper {
 					const facing = getFacing8Dir(currentStep.facingX, currentStep.facingY);
 					const animation = updateMovingState(globalState.npcs[npcId], false, facing, true);
 					if (animation) {
-						this.scene.npcMap[npcId].play(animation);
+						this.scene.npcMap[npcId].play({
+							key: animation,
+							frameRate: NORMAL_ANIMATION_FRAME_RATE,
+						});
 					}
 				}
 				break;
@@ -215,7 +230,7 @@ export default class ScriptHelper {
 						const newFacing = getFacing8Dir(xFactor, yFactor);
 						const playerAnimation = updateMovingState(globalState.playerCharacter, true, newFacing);
 						if (playerAnimation) {
-							mainCharacter.play(playerAnimation);
+							mainCharacter.play({ key: playerAnimation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 						}
 					} else {
 						cleanUpStep = true;
@@ -392,14 +407,17 @@ export default class ScriptHelper {
 					if (!scriptState.stepStartMs) {
 						scriptState.stepStartMs = globalTime;
 						scriptState.animationFallback = token.anims.currentAnim.key;
-						token.play(currentStep.animation);
+						token.play({ key: currentStep.animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 					} else if (scriptState.stepStartMs + currentStep.duration < globalTime) {
 						cleanUpStep = true;
-						token.play(globalState.scripts.scriptAnimationFallback!);
+						token.play({
+							key: globalState.scripts.scriptAnimationFallback!,
+							frameRate: NORMAL_ANIMATION_FRAME_RATE,
+						});
 					}
 				} else {
 					cleanUpStep = true;
-					token.play(currentStep.animation);
+					token.play({ key: currentStep.animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 				break;
 			}
@@ -415,7 +433,7 @@ export default class ScriptHelper {
 				const facing = getFacing8Dir(currentStep.facingX, currentStep.facingY);
 				const animation = updateMovingState(globalState.npcs[token.id], false, facing, true);
 				if (animation) {
-					token.play(animation);
+					token.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 				break;
 			}
@@ -447,7 +465,7 @@ export default class ScriptHelper {
 					const newFacing = getFacing8Dir(xFactor, yFactor);
 					const animation = updateMovingState(globalState.npcs[token.id], true, newFacing);
 					if (animation) {
-						token.play(animation);
+						token.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 					}
 				}
 				break;

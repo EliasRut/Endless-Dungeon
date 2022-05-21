@@ -124,9 +124,9 @@ export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingR
 };
 
 export const npcToAespriteMap: { [name: string]: { png: string; json: string } } = {
-	'rich': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
-	'jacques': { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
-	'pierre': { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
+	rich: { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
+	jacques: { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
+	pierre: { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
 	'lich-king': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
 };
 
@@ -264,9 +264,9 @@ export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
 };
 
 export const enemyBudgetCost = {
-	'rich': 1,
-	'jacques': 1,
-	'pierre': 1,	
+	rich: 1,
+	jacques: 1,
+	pierre: 1,
 	'redling-boss': 10,
 };
 
@@ -276,6 +276,14 @@ export const enum MODE {
 	NPC_EDITOR = 'npcEditor',
 	QUEST_EDITOR = 'questEditor',
 }
+
+export const enum DOOR_TYPE {
+	IRON_DOOR = 'iron_door',
+}
+
+export const DOOR_OFFSETS = {
+	[DOOR_TYPE.IRON_DOOR]: { x: 0, y: 3.33 },
+};
 
 export let activeMode = MODE.GAME;
 
@@ -288,3 +296,5 @@ export const CHARACTER_SPRITE_HEIGHT = 240;
 
 export const SCALE = 3;
 export const UI_SCALE = (window.innerWidth >= 1900 && window.innerHeight) >= 840 ? 3 : 2;
+
+export const NORMAL_ANIMATION_FRAME_RATE = 60;

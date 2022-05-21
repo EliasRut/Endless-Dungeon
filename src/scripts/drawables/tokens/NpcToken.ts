@@ -1,5 +1,5 @@
 import { NpcOptions } from '../../../../typings/custom';
-import { Faction, SCALE, UiDepths } from '../../helpers/constants';
+import { Faction, SCALE, UiDepths, NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 import globalState from '../../worldstate';
 import Character from '../../worldstate/Character';
 import CharacterToken from './CharacterToken';
@@ -38,7 +38,7 @@ export default class NpcToken extends CharacterToken {
 
 		globalState.npcs[id] = new Character(type, NPC_DAMAGE, NPC_HEALTH, NPC_SPEED);
 
-		this.play(`${type}-idle-s`);
+		this.play({ key: `${type}-idle-s`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.faction = Faction.NPCS;
 	}
 

@@ -1,4 +1,10 @@
-import { Facings, facingToSpriteNameMap, KNOCKBACK_TIME, SCALE } from '../../helpers/constants';
+import {
+	Facings,
+	facingToSpriteNameMap,
+	KNOCKBACK_TIME,
+	SCALE,
+	NORMAL_ANIMATION_FRAME_RATE,
+} from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -80,10 +86,10 @@ export default class VampireToken extends EnemyToken {
 			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
 			if (animation && !this.launched) {
 				if (this.scene.game.anims.exists(animation)) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 			}
 			return;
@@ -123,7 +129,7 @@ export default class VampireToken extends EnemyToken {
 					const newFacing = getFacing4Dir(xSpeed, ySpeed);
 					const animation = updateMovingState(this.stateObject, true, newFacing);
 					if (animation) {
-						this.play({ key: animation, repeat: -1 });
+						this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
 					}
 				} else {
 					this.attack(time);
@@ -137,7 +143,7 @@ export default class VampireToken extends EnemyToken {
 					this.stateObject.currentFacing
 				);
 				if (animation) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 			}
 		} else {
@@ -176,7 +182,7 @@ export default class VampireToken extends EnemyToken {
 			// 9 frames, so 9 frame rate for 1s.
 			if (this.attackedAt === time || this.stateObject.currentFacing !== newFacing) {
 				const attackAnimationName = `jacques-attack-${facingToSpriteNameMap[newFacing]}`;
-				this.play({ key: attackAnimationName, frameRate: 9 });
+				this.play({ key: attackAnimationName, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				this.anims.setProgress((time - this.attackedAt) / this.chargeTime);
 				this.stateObject.currentFacing = newFacing;
 			}
@@ -190,7 +196,11 @@ export default class VampireToken extends EnemyToken {
 
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const attackAnimationName = `jacques-attack-${facingToSpriteNameMap[newFacing]}`;
-			this.play({ key: attackAnimationName, startFrame: 8 });
+			this.play({
+				key: attackAnimationName,
+				frameRate: NORMAL_ANIMATION_FRAME_RATE,
+				startFrame: 8,
+			});
 			this.launchX = xSpeed;
 			this.launchY = ySpeed;
 		}
@@ -218,6 +228,7 @@ export default class VampireToken extends EnemyToken {
 			// 4 repeats per second, at currently 16 fps.
 			this.play({
 				key: stunAnimation,
+				frameRate: NORMAL_ANIMATION_FRAME_RATE,
 				repeat: Math.floor((4 * (stunDuration - 500)) / 1000),
 			}).chain({ key: recoverAnimation, repeat: 3 });
 		}

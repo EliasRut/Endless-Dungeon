@@ -13,7 +13,7 @@ import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
-import { essenceNames, Faction, NUM_ITEM_ICONS, SCALE, UiDepths } from '../helpers/constants';
+import { Faction, NORMAL_ANIMATION_FRAME_RATE, SCALE, UiDepths } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
@@ -23,30 +23,22 @@ import BackpackIcon from '../drawables/ui/BackpackIcon';
 import SettingsIcon from '../drawables/ui/SettingsIcon';
 import { spawnNpc } from '../helpers/spawn';
 import CharacterToken from '../drawables/tokens/CharacterToken';
-import { NpcOptions, NpcScript } from '../../../typings/custom';
+import { NpcOptions } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
-import Item from '../worldstate/Item';
-import { EquippableDroppedItemData, generateRandomItem } from '../helpers/item';
 import SettingsScreen from '../screens/SettingsScreen';
 import DoorToken from '../drawables/tokens/DoorToken';
 
-import fixedItems from '../../items/fixedItems.json';
 import { DungeonRunData } from '../models/DungeonRunData';
 import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
-import { Catalyst, Source, getItemDataForName, getItemTexture } from '../../items/itemData';
+import { getItemDataForName, getItemTexture } from '../../items/itemData';
 import Minimap from '../drawables/ui/Minimap';
-import { AbilityType } from '../abilities/abilityData';
 import LevelName from '../drawables/ui/LevelName';
 import QuestsIcon from '../drawables/ui/QuestsIcon';
 import QuestLogScreen from '../screens/QuestLogScreen';
 import QuestDetailsScreen from '../screens/QuestDetailsScreen';
-import { Scale } from 'phaser';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
-
-const DEBUG__ITEM_OFFSET_X = 30;
-const DEBUG__ITEM_OFFSET_Y = 30;
 
 const CASTING_SPEED_MS = 250;
 
@@ -277,7 +269,7 @@ export default class MainScene extends Phaser.Scene {
 			const animation = updateMovingState(globalState.npcs[id], false, facing, true);
 			if (animation) {
 				// npc.play({ key: 'DashR', repeat: -1 });
-				npc.play(animation);
+				npc.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 			}
 		}
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
@@ -457,7 +449,7 @@ export default class MainScene extends Phaser.Scene {
 				return;
 			}
 		}
-		if ((this, this.keyboardHelper.isEnterPressed())) {
+		if (this.keyboardHelper.isEnterPressed()) {
 			if (this.scriptHelper.isScriptRunning()) {
 				this.scriptHelper.handleScriptStep(globalState.gameTime, true);
 				return;
@@ -514,7 +506,7 @@ export default class MainScene extends Phaser.Scene {
 
 			// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
 			const hasMoved = xFacing !== 0 || yFacing !== 0;
-			let playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
+			const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
 			const isWalking =
 				isCasting ||
 				(this.mobilePadStick
@@ -524,7 +516,8 @@ export default class MainScene extends Phaser.Scene {
 			if (playerAnimation) {
 				this.mainCharacter.play({
 					key: playerAnimation,
-					frameRate: globalState.playerCharacter.movementSpeed / (isWalking ? 20 : 10),
+					// duration: 5,
+					frameRate: isWalking ? NORMAL_ANIMATION_FRAME_RATE / 2 : NORMAL_ANIMATION_FRAME_RATE,
 					repeat: -1,
 				});
 			}
@@ -540,7 +533,7 @@ export default class MainScene extends Phaser.Scene {
 				this.lastStepLeft = undefined;
 			}
 
-			let speed =
+			const speed =
 				isCasting || isWalking
 					? getCharacterSpeed(globalState.playerCharacter) / 2
 					: getCharacterSpeed(globalState.playerCharacter);
@@ -648,7 +641,9 @@ export default class MainScene extends Phaser.Scene {
 			false,
 			globalState.playerCharacter.currentFacing
 		);
-		if (playerAnimation) this.mainCharacter.play(playerAnimation);
+		if (playerAnimation) {
+			this.mainCharacter.play({ key: playerAnimation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+		}
 		Object.values(this.npcMap).forEach((curNpc) => {
 			curNpc.update(globalState.gameTime, 0);
 		});

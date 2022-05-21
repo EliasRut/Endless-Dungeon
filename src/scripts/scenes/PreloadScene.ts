@@ -17,7 +17,7 @@ import { BLOCK_SIZE } from '../helpers/generateRoom';
 import firebase from 'firebase';
 import { Quest } from '../../../typings/custom';
 import { fillLoadedQuestFromDb, fillQuestScriptsFromDb, QuestScripts } from '../helpers/quests';
-
+import GetValue from 'phaser';
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
 	scene.
@@ -228,6 +228,69 @@ export default class PreloadScene extends Phaser.Scene {
 		// Quests
 	}
 
+	createAnimFromAseprite(tokenName: string) {
+		const data = this.game.cache.json.get(tokenName);
+		if (!data) {
+			return;
+		}
+
+		const meta = data.meta;
+		const frames = data.frames;
+
+		if (meta && frames) {
+			const frameTags = meta.frameTags || [];
+
+			frameTags.forEach((tag: any) => {
+				let animFrames = [];
+
+				const name = tag.name;
+				const from = tag.from || 0;
+				const to = tag.to || 0;
+				const direction = tag.direction || 'forward';
+
+				if (!name) {
+					//  Skip if no name
+					return;
+				}
+				let totalDuration = 0;
+
+				//  Get all the frames for this tag and calculate the total duration in milliseconds.
+				for (let i = from; i <= to; i++) {
+					const frameKey = i.toString();
+					const frame = frames[frameKey];
+
+					if (frame) {
+						const frameDuration = frame.duration || Number.MAX_SAFE_INTEGER;
+						animFrames.push({ key: tokenName, frame: frameKey, duration: frameDuration });
+						totalDuration += frameDuration;
+					}
+				}
+
+				// Fix duration to play nice with how the next tick is calculated.
+				// var msPerFrame = totalDuration / animFrames.length;
+
+				// animFrames.forEach(function (entry)
+				// {
+				//     entry.duration -= msPerFrame;
+				// });
+
+				if (direction === 'reverse') {
+					animFrames = animFrames.reverse();
+				}
+
+				//  Create the animation
+				const createConfig = {
+					key: name,
+					frames: animFrames,
+					duration: totalDuration,
+					yoyo: direction === 'pingpong',
+				};
+
+				this.anims.create(createConfig);
+			});
+		}
+	}
+
 	async create() {
 		if (activeMode === MODE.NPC_EDITOR) {
 			this.scene.start('NpcEditor');
@@ -240,19 +303,19 @@ export default class PreloadScene extends Phaser.Scene {
 		}
 
 		// Door animation
-		this.anims.createFromAseprite('iron_door');
+		this.createAnimFromAseprite('iron_door');
 
 		// Item animation
-		this.anims.createFromAseprite('source-fire1');
-		this.anims.createFromAseprite('source-force1');
+		this.createAnimFromAseprite('source-fire1');
+		this.createAnimFromAseprite('source-force1');
 
 		// Create character animations
-		this.anims.createFromAseprite('player');
-		this.anims.createFromAseprite('death_anim_small');
+		this.createAnimFromAseprite('player');
+		this.createAnimFromAseprite('death_anim_small');
 
 		this.neededAnimations.forEach((token) => {
 			if (npcToAespriteMap[token.name]) {
-				this.anims.createFromAseprite(token.name);
+				this.createAnimFromAseprite(token.name);
 				return;
 			}
 			for (let directionIndex = 0; directionIndex < NUM_DIRECTIONS; directionIndex++) {

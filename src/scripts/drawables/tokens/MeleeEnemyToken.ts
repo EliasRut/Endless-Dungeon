@@ -1,3 +1,4 @@
+import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 import { getFacing8Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -82,7 +83,7 @@ export default class MeleeEnemyToken extends EnemyToken {
 			const newFacing = getFacing8Dir(xSpeed, ySpeed);
 			const animation = updateMovingState(this.stateObject, true, newFacing);
 			if (animation) {
-				this.play(animation);
+				this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 			}
 		} else {
 			this.setVelocityX(0);
@@ -91,7 +92,7 @@ export default class MeleeEnemyToken extends EnemyToken {
 			this.emitter.setSpeedY(0);
 			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
 			if (animation) {
-				this.play(animation);
+				this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 			}
 		}
 		if (distance <= this.attackRange) {

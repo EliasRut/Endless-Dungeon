@@ -1,6 +1,12 @@
 import { Game } from 'phaser';
 import { NpcScript } from '../../../../typings/custom';
-import { facingToSpriteNameMap, Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
+import {
+	facingToSpriteNameMap,
+	Faction,
+	SCALE,
+	VISITED_TILE_TINT,
+	NORMAL_ANIMATION_FRAME_RATE,
+} from '../../helpers/constants';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -47,12 +53,16 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 
 	public receiveHit(damage: number) {
 		this.stateObject.health -= damage;
-		if (!this.receiveStun(250)) {
-			this.play({
-				key: `${this.type}-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
-			}).chain({
-				key: `${this.type}-idle-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
-			});
+		if (this.stateObject.health > 0) {
+			if (!this.receiveStun(250)) {
+				this.play({
+					key: `${this.type}-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+				}).chain({
+					key: `${this.type}-idle-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+				});
+			}
 		}
 	}
 	public receiveStun(duration: number) {
@@ -68,6 +78,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		if (duration >= 500 && this.scene.game.anims.exists(animation)) {
 			this.play({
 				key: animation,
+				frameRate: NORMAL_ANIMATION_FRAME_RATE,
 				// 1 run = 500ms
 				repeat: Math.floor((2 * duration) / 1000),
 			});

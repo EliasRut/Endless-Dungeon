@@ -1,5 +1,10 @@
 import { EquippedItemData } from '../../worldstate/Inventory';
-import { EquipmentSlot, UiDepths, UI_SCALE } from '../../helpers/constants';
+import {
+	EquipmentSlot,
+	UiDepths,
+	UI_SCALE,
+	NORMAL_ANIMATION_FRAME_RATE,
+} from '../../helpers/constants';
 import { EquipmentKey, getItemDataForName, getItemTexture } from '../../../items/itemData';
 import {
 	equipItem,
@@ -117,9 +122,9 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.selection?.setVisible(false);
 	}
 
-	playItemAnimation( itemToken: Phaser.GameObjects.Sprite, itemName?: string) {
-		if(itemName === 'source-fire'){
-			itemToken.play({ key: 'source_fire1', repeat : -1});
+	playItemAnimation(itemToken: Phaser.GameObjects.Sprite, itemName?: string) {
+		if (itemName === 'source-fire') {
+			itemToken.play({ key: 'source_fire1', frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
 		}
 	}
 

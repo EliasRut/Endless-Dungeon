@@ -8,11 +8,12 @@ import firebase from 'firebase';
 import { Input } from '../components/Input';
 import { Dropdown } from '../components/Dropdown';
 import '../App.css';
+import { UserInformation } from '../../scripts/helpers/UserInformation';
 
 const showGame = true;
 
 export interface NPCEditorScreenProps {
-	user: firebase.User;
+	user: UserInformation;
 }
 
 export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
