@@ -19,6 +19,7 @@ export default class IceCircelingEffect extends CircelingEffect {
 			facing,
 			projectileData,
 			SUMMONING_TYPE.ICE_ELEMENTAL,
+			AbilityType.ICE_SUMMON_CIRCELING,
 			AbilityType.ICE_SUMMON_ELEMENTAL,
 			AbilityType.ICESPIKE
 		);

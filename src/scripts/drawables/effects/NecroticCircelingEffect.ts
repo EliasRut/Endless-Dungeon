@@ -19,6 +19,7 @@ export default class NecroticCircelingEffect extends CircelingEffect {
 			facing,
 			projectileData,
 			SUMMONING_TYPE.NECROTIC_ELEMENTAL,
+			AbilityType.NECROTIC_SUMMON_CIRCELING,
 			AbilityType.NECROTIC_SUMMON_ELEMENTAL,
 			AbilityType.NECROTIC_BOLT
 		);

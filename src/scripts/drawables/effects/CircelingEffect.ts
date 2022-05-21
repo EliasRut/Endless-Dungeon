@@ -22,6 +22,7 @@ export default class CircelingEffect extends AbilityEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	allowedTargets: PossibleTargets = PossibleTargets.NONE;
 	summoningType: SUMMONING_TYPE;
+	circelingAbility: AbilityType;
 	summoningAbility: AbilityType;
 	attackAbility: AbilityType;
 	id: string;
@@ -33,11 +34,13 @@ export default class CircelingEffect extends AbilityEffect {
 		facing: Facings,
 		projectileData: ProjectileData,
 		summoningType: SUMMONING_TYPE,
+		circelingAbility: AbilityType,
 		summoningAbility: AbilityType,
 		attackAbility: AbilityType
 	) {
 		super(scene, x, y, spriteName, facing, projectileData);
 		this.summoningType = summoningType;
+		this.circelingAbility = circelingAbility;
 		this.attackAbility = attackAbility;
 		this.summoningAbility = summoningAbility;
 		this.id = `${Math.round((Math.random() * 2) ^ 16)}`;
@@ -80,9 +83,19 @@ export default class CircelingEffect extends AbilityEffect {
 	}
 
 	update(time: number) {
-		if (globalState.playerCharacter.abilityKeyMapping[AbilityKey.TWO] !== this.summoningAbility) {
-			this.destroy();
-			return;
+		const activeAbilityTwo = globalState.playerCharacter.abilityKeyMapping[AbilityKey.TWO];
+		if (activeAbilityTwo !== this.summoningAbility) {
+			if (activeAbilityTwo === this.circelingAbility) {
+				updateAbility(
+					this.scene as MainScene,
+					globalState.playerCharacter,
+					AbilityKey.TWO,
+					this.summoningAbility
+				);
+			} else {
+				this.destroy();
+				return;
+			}
 		}
 
 		const xOffset = Math.sin(time / CIRCELING_TIME_MS) * 36;

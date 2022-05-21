@@ -29,6 +29,7 @@ export default class ElementalToken extends CharacterToken {
 	allowedTargets: PossibleTargets = PossibleTargets.ENEMIES;
 	destroyed: boolean = false;
 	elementalAbility: AbilityType;
+	spawnTime: number;
 
 	constructor(
 		scene: MainScene,
@@ -59,12 +60,6 @@ export default class ElementalToken extends CharacterToken {
 		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
 		this.level = level;
 		this.elementalAbility = elementalAbility;
-
-		setTimeout(() => {
-			if (this) {
-				this.destroy();
-			}
-		}, 5000);
 	}
 
 	public checkLoS() {
@@ -77,6 +72,13 @@ export default class ElementalToken extends CharacterToken {
 	// update from main Scene
 	public update(time: number, deltaTime: number) {
 		super.update(time, deltaTime);
+		if (!this.spawnTime) {
+			this.spawnTime = time;
+		}
+		if (time - this.spawnTime > 5000) {
+			this.destroy();
+			return;
+		}
 		if (this.destroyed) {
 			return;
 		}
@@ -85,7 +87,7 @@ export default class ElementalToken extends CharacterToken {
 			let nearestEnemy: CharacterToken | undefined;
 			let closestDistance = Infinity;
 			if (this.allowedTargets === PossibleTargets.ENEMIES) {
-				const potentialEnemies = Object.values((this.scene as MainScene).npcMap).filter(
+				const potentialEnemies = Object.values((this.scene as MainScene)?.npcMap || {}).filter(
 					(npc) =>
 						npc.faction === Faction.ENEMIES &&
 						npc.tintBottomLeft >= VISITED_TILE_TINT &&

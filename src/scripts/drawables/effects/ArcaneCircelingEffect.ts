@@ -19,6 +19,7 @@ export default class ArcaneCircelingEffect extends CircelingEffect {
 			facing,
 			projectileData,
 			SUMMONING_TYPE.ARCANE_ELEMENTAL,
+			AbilityType.ARCANE_SUMMON_CIRCELING,
 			AbilityType.ARCANE_SUMMON_ELEMENTAL,
 			AbilityType.ARCANE_BOLT
 		);

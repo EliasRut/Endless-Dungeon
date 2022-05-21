@@ -19,6 +19,7 @@ export default class FireCircelingEffect extends CircelingEffect {
 			facing,
 			projectileData,
 			SUMMONING_TYPE.FIRE_ELEMENTAL,
+			AbilityType.FIRE_SUMMON_CIRCELING,
 			AbilityType.FIRE_SUMMON_ELEMENTAL,
 			AbilityType.FIREBALL
 		);
