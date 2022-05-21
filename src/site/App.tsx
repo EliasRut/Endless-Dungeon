@@ -5,13 +5,11 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { StartScreen } from './screens/StartScreen';
 import { MapEditorScreen } from './screens/MapEditorScreen';
 import { NPCEditorScreen } from './screens/NPCEditorScreen';
-import { Login } from './screens/Login';
 import firebase from 'firebase';
 import './App.css';
 import { QuestEditorScreen } from './screens/QuestEditorScreen';
 import { loadUserData } from '../scripts/helpers/userHelpers';
 import { UserInformation } from '../scripts/helpers/UserInformation';
-import { loadContentFromDatabase } from '../scripts/helpers/ContentDataLibrary';
 
 const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -19,7 +17,6 @@ export default function App() {
 	const [user, setUser] = useState<UserInformation | undefined>(undefined);
 
 	useEffect(() => {
-		loadContentFromDatabase();
 		firebase.auth().onAuthStateChanged((authData) => {
 			if (authData) {
 				loadUserData(authData.uid).then((userData) => setUser(userData));

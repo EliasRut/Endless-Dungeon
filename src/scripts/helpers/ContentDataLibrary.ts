@@ -4,25 +4,42 @@ import { PrimaryContentBlock, PrimaryContentDungeonLevelData } from '../models/P
 import secondaryContentList from '../../assets/secondaryContentBlocks/index.json';
 import { getCachedUserData } from './userHelpers';
 import globalState from '../worldstate/index';
+import { ContentPackage } from '../models/ContentPackage';
 
 const PRIMARY_CONTENT_BLOCK_PATH = 'assets/primaryContentBlocks';
 const SECONDARY_CONTENT_BLOCK_PATH = 'assets/secondaryContentBlocks';
 
 export interface ContentDataLibrary {
+	contentPackages: ContentPackage[];
 	primaryContent: PrimaryContentBlock[];
 	secondaryContent: SecondaryContentBlock[];
 }
 
 const contentDataLibrary: ContentDataLibrary = {
+	contentPackages: [],
 	primaryContent: [],
 	secondaryContent: [],
 };
 
-export const loadContentFromDatabase = () => {
+export const loadContentPackagesFromDatabase = () => {
+	const contentPackages: ContentPackage[] = [];
+	const db = firebase.firestore().collection('contentPackages');
+	return db
+		.where('published', '==', true)
+		.get()
+		.then((queryResult) => {
+			queryResult.docs.forEach((doc) => {
+				contentPackages.push({ id: doc.id, ...doc.data() } as ContentPackage);
+			});
+			contentDataLibrary.contentPackages = contentPackages;
+		});
+};
+
+export const loadContentBlocksFromDatabase = () => {
 	const primaryContentBlocks: PrimaryContentBlock[] = [];
 	const db = firebase.firestore().collection('primaryContentBlocks');
 	const promises: Promise<any>[] = [];
-	for (let contentPackage of globalState.contentPackages) {
+	for (const contentPackage of globalState.contentPackages) {
 		promises.push(
 			db
 				.where('contentPackage', '==', contentPackage)

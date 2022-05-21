@@ -17,7 +17,8 @@ import { BLOCK_SIZE } from '../helpers/generateRoom';
 import firebase from 'firebase';
 import { Quest } from '../../../typings/custom';
 import { fillLoadedQuestFromDb, fillQuestScriptsFromDb, QuestScripts } from '../helpers/quests';
-import GetValue from 'phaser';
+import { loadContentBlocksFromDatabase } from '../helpers/ContentDataLibrary';
+
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
 	scene.

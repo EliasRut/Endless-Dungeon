@@ -5,12 +5,14 @@ import { RuneAssignment } from '../helpers/constants';
 import { generateDungeonRun } from '../helpers/generateDungeonRun';
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { SingleScriptState } from '../worldstate/ScriptState';
+import { loadContentBlocksFromDatabase } from '../helpers/ContentDataLibrary';
 
 export default class DungeonDoorScene extends Phaser.Scene {
 	dungeonDoor: DungeonDoor;
 	keyboardHelper: KeyboardHelper;
 	keyLastPressed: number = 0;
 	keyCD: number = 350;
+	contentDataLibraryUpdatePromise: Promise<any>;
 
 	constructor() {
 		super({ key: 'DungeonDoorScene' });
@@ -21,11 +23,13 @@ export default class DungeonDoorScene extends Phaser.Scene {
 		this.dungeonDoor = new DungeonDoor(this);
 		this.sound.stopAll();
 		this.sound.play('score-mage-tower', { volume: 0.04 });
+		this.contentDataLibraryUpdatePromise = loadContentBlocksFromDatabase();
 	}
 
-	enterDungeon(runeAssignment: RuneAssignment) {
+	async enterDungeon(runeAssignment: RuneAssignment) {
 		// tslint:disable-next-line: no-console
 		console.log('entering dungeon');
+		await this.contentDataLibraryUpdatePromise;
 		const dungeonRun = generateDungeonRun(runeAssignment);
 		globalState.dungeon.levels = {};
 		globalState.doors = {};

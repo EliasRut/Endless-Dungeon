@@ -107,6 +107,7 @@ export default abstract class EnemyToken extends CharacterToken {
 
 	die() {
 		this.play({ key: 'death_anim_small', frameRate: NORMAL_ANIMATION_FRAME_RATE });
+		this.body.destroy();
 		// 925 ms
 		// new Promise(r => setTimeout(r, 925)).then(result => {
 		// 	this.destroy();

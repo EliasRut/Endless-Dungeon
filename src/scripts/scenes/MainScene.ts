@@ -36,6 +36,7 @@ import LevelName from '../drawables/ui/LevelName';
 import QuestsIcon from '../drawables/ui/QuestsIcon';
 import QuestLogScreen from '../screens/QuestLogScreen';
 import QuestDetailsScreen from '../screens/QuestDetailsScreen';
+import ContentManagementScreen from '../screens/ContentManagementScreen';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -74,6 +75,7 @@ export default class MainScene extends Phaser.Scene {
 		questLogScreen: QuestLogScreen;
 		questDetailsScreen: QuestDetailsScreen;
 		itemScreen: ItemScreen;
+		contentManagementScreen: ContentManagementScreen;
 	};
 	alive: number;
 	isPaused = false;
@@ -233,6 +235,7 @@ export default class MainScene extends Phaser.Scene {
 			settingsScreen: new SettingsScreen(this),
 			questLogScreen: new QuestLogScreen(this),
 			questDetailsScreen: new QuestDetailsScreen(this),
+			contentManagementScreen: new ContentManagementScreen(this),
 		};
 
 		this.icons.backpackIcon.setScreens();
