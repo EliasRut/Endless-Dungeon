@@ -2,6 +2,7 @@ import { AbilityType } from '../abilities/abilityData';
 import { AbilityKey, Faction } from '../helpers/constants';
 import Character from './Character';
 import MainScene from '../scenes/MainScene';
+import CircelingEffect from '../drawables/effects/CircelingEffect';
 
 // Stats are increased by this amount, given by enchantments
 export const enchantmentModifiers = {
@@ -17,6 +18,8 @@ export default class PlayerCharacter extends Character {
 	public y = 0;
 
 	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity];
+
+	public activeSummons: Array<{ id: string; summoningType: string }> = [];
 
 	constructor() {
 		// tslint:disable-next-line: no-magic-numbers

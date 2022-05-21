@@ -1,9 +1,7 @@
 import {
-	Facings,
 	facingToSpriteNameMap,
 	Faction,
 	PossibleTargets,
-	TARGETABLE_TILE_TINT,
 	VISITED_TILE_TINT,
 } from '../../helpers/constants';
 import { getFacing4Dir } from '../../helpers/movement';

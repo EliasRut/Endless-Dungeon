@@ -161,6 +161,9 @@ export default class ScriptHelper {
 			case 'move': {
 				cleanUpStep = true;
 				if (currentStep.target === 'player') {
+					if (!this.currentRoom) {
+						this.currentRoom = this.findRoomForToken(this.scene.mainCharacter);
+					}
 					this.scene.mainCharacter.x =
 						(this.currentRoom!.x + currentStep.posX) * TILE_WIDTH * SCALE;
 					this.scene.mainCharacter.y =

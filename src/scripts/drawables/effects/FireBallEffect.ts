@@ -1,8 +1,6 @@
 import { Facings, SCALE, UiDepths } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
-import MainScene from '../../scenes/MainScene';
-import { isCollidingTile } from '../../helpers/movement';
 
 const BODY_RADIUS = 6;
 const EXPLOSION_PARTICLE_SPEED = 100;

@@ -7,7 +7,6 @@ import {
 } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
-import { getRotationInRadiansForFacing, isCollidingTile } from '../../helpers/movement';
 
 const BODY_RADIUS = 6;
 const OFFSET = 14;

@@ -1,14 +1,18 @@
 import AbilityEffect from '../drawables/effects/AbilityEffect';
 import FireBallEffect from '../drawables/effects/FireBallEffect';
 import IceSpikeEffect from '../drawables/effects/IceSpikeEffect';
-import DustNovaEffect from '../drawables/effects/DustNovaEffect';
-import RoundHouseKickEffect from '../drawables/effects/RoundHouseKickEffect';
-import HealingLightEffect from '../drawables/effects/HealingLightEffect';
 import ArcaneBoltEffect from '../drawables/effects/ArcaneBoltEffect';
-import ConeEffect from '../drawables/effects/ConeEffect';
 import NecroticBoltEffect from '../drawables/effects/NecroticBoltEffect';
 import BatEffect from '../drawables/effects/BatEffect';
 import CondemnEffect from '../drawables/effects/CondemnEffect';
+import FireCircelingEffect from '../drawables/effects/FireCircelingEffect';
+import IceCircelingEffect from '../drawables/effects/IceCircelingEffect';
+import ArcaneCircelingEffect from '../drawables/effects/ArcaneCircelingEffect';
+import NecroticCircelingEffect from '../drawables/effects/NecroticCircelingEffect';
+import FireSummoningEffect from '../drawables/effects/FireSummoningEffect';
+import IceSummoningEffect from '../drawables/effects/IceSummoningEffect';
+import ArcaneSummoningEffect from '../drawables/effects/ArcaneSummoningEffect';
+import NecroticSummoningEffect from '../drawables/effects/NecroticSummoningEffect';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -76,6 +80,14 @@ export const enum AbilityType {
 	EXPLODING_CORPSE = 'explodingCorpse',
 	BAT = 'bat',
 	CONDEMN = 'Condemn',
+	FIRE_SUMMON_CIRCELING = 'fireSummonCirceling',
+	FIRE_SUMMON_ELEMENTAL = 'fireSummonElemental',
+	ICE_SUMMON_CIRCELING = 'iceSummonCirceling',
+	ICE_SUMMON_ELEMENTAL = 'iceSummonElemental',
+	ARCANE_SUMMON_CIRCELING = 'arcaneSummonCirceling',
+	ARCANE_SUMMON_ELEMENTAL = 'arcaneSummonElemental',
+	NECROTIC_SUMMON_CIRCELING = 'necroticSummonCirceling',
+	NECROTIC_SUMMON_ELEMENTAL = 'necroticSummonElemental',
 }
 
 export const Abilities: { [type: string]: AbilityData } = {
@@ -559,14 +571,10 @@ export const Abilities: { [type: string]: AbilityData } = {
 	[AbilityType.BAT]: {
 		projectiles: 1,
 		projectileData: {
-			// velocity: 0,
 			xOffset: 16,
 			yOffset: 16,
 			velocity: 100,
-			// xOffset: 16,
-			// yOffset: 16,
 			effect: BatEffect,
-			// effect: FireBallEffect,
 			collisionSound: 'sound-icespike-hit',
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
@@ -603,5 +611,173 @@ export const Abilities: { [type: string]: AbilityData } = {
 		abilityName: 'Condemn',
 		flavorText: `An angry shout against your enemy.`,
 		icon: ['icon-abilities', 1],
+	},
+	[AbilityType.FIRE_SUMMON_CIRCELING]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 36,
+			yOffset: 36,
+			velocity: 0,
+			effect: FireCircelingEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.3,
+		cooldownMs: 1500,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an fiery elemental.`,
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.FIRE_SUMMON_ELEMENTAL]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 0,
+			yOffset: 0,
+			velocity: 0,
+			effect: FireSummoningEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.3,
+		cooldownMs: 1500,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an fiery elemental.`,
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.ICE_SUMMON_CIRCELING]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 36,
+			yOffset: 36,
+			velocity: 0,
+			effect: IceCircelingEffect,
+			collisionSound: 'sound-icespike-hit',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-icespike',
+		sfxVolume: 0.3,
+		cooldownMs: 1500,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an icy elemental.`,
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.ICE_SUMMON_ELEMENTAL]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 0,
+			yOffset: 0,
+			velocity: 0,
+			effect: IceSummoningEffect,
+			collisionSound: 'sound-icespike-hit',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-icespike',
+		sfxVolume: 0.3,
+		cooldownMs: 1500,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an icy elemental.`,
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.ARCANE_SUMMON_CIRCELING]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 36,
+			yOffset: 36,
+			velocity: 0,
+			effect: ArcaneCircelingEffect,
+			collisionSound: 'sound-fireball-hit',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.3,
+		cooldownMs: 1500,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an icy elemental.`,
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.ARCANE_SUMMON_ELEMENTAL]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 0,
+			yOffset: 0,
+			velocity: 0,
+			effect: ArcaneSummoningEffect,
+			collisionSound: 'sound-fireball-hit',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.3,
+		cooldownMs: 1500,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an icy elemental.`,
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.NECROTIC_SUMMON_CIRCELING]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 36,
+			yOffset: 36,
+			velocity: 0,
+			effect: NecroticCircelingEffect,
+			collisionSound: 'sound-fireball-hit',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.3,
+		cooldownMs: 1500,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an icy elemental.`,
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.NECROTIC_SUMMON_ELEMENTAL]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 0,
+			yOffset: 0,
+			velocity: 0,
+			effect: NecroticSummoningEffect,
+			collisionSound: 'sound-fireball-hit',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			targeting: true,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.3,
+		cooldownMs: 1500,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an icy elemental.`,
+		icon: ['icon-abilities', 0],
 	},
 };

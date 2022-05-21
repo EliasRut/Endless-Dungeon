@@ -480,11 +480,10 @@ export default class MainScene extends Phaser.Scene {
 			return;
 		}
 
-		this.scriptHelper.handleScripts(globalState.gameTime);
-
 		this.overlayScreens.statScreen.update();
 
 		if (this.isPaused) {
+			this.scriptHelper.handleScripts(globalState.gameTime);
 			if (this.icons.backpackIcon.screens[0].visiblity)
 				this.overlayScreens.inventory.interactInventory(
 					this.keyboardHelper.getInventoryKeyPress(),
@@ -623,6 +622,8 @@ export default class MainScene extends Phaser.Scene {
 				}
 			}
 		}
+
+		this.scriptHelper.handleScripts(globalState.gameTime);
 
 		// tslint:disable-next-line: no-magic-numbers
 		if (Date.now() - this.lastSave > 10 * 1000) {

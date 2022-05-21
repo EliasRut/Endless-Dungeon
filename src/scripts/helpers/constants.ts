@@ -297,4 +297,11 @@ export const CHARACTER_SPRITE_HEIGHT = 240;
 export const SCALE = 3;
 export const UI_SCALE = (window.innerWidth >= 1900 && window.innerHeight) >= 840 ? 3 : 2;
 
+export enum SUMMONING_TYPE {
+	FIRE_ELEMENTAL = 'fire_elemental',
+	ICE_ELEMENTAL = 'ice_elemental',
+	ARCANE_ELEMENTAL = 'arcane_elemental',
+	NECROTIC_ELEMENTAL = 'necrotic_elemental',
+}
+
 export const NORMAL_ANIMATION_FRAME_RATE = 60;
