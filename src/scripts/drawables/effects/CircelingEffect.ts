@@ -5,6 +5,7 @@ import {
 	Faction,
 	PossibleTargets,
 	SCALE,
+	SUMMONING_TYPE,
 	VISITED_TILE_TINT,
 } from '../../helpers/constants';
 import MainScene from '../../scenes/MainScene';
@@ -20,7 +21,8 @@ export default class CircelingEffect extends AbilityEffect {
 	lastCast: number;
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	allowedTargets: PossibleTargets = PossibleTargets.NONE;
-	summoningType: 'FIRE_ELEMENTAL' = 'FIRE_ELEMENTAL';
+	summoningType: SUMMONING_TYPE;
+	attackAbility: AbilityType;
 	id: string;
 	constructor(
 		scene: Phaser.Scene,
@@ -28,9 +30,14 @@ export default class CircelingEffect extends AbilityEffect {
 		y: number,
 		spriteName: string,
 		facing: Facings,
-		projectileData: ProjectileData
+		projectileData: ProjectileData,
+		summoningType: SUMMONING_TYPE,
+		summoningAbility: AbilityType,
+		attackAbility: AbilityType
 	) {
-		super(scene, x, y, 'fire', facing, projectileData);
+		super(scene, x, y, spriteName, facing, projectileData);
+		this.summoningType = summoningType;
+		this.attackAbility = attackAbility;
 		this.id = `${Math.round((Math.random() * 2) ^ 16)}`;
 		this.lastCast = -Infinity;
 		scene.add.existing(this);
@@ -38,15 +45,19 @@ export default class CircelingEffect extends AbilityEffect {
 		scene.physics.add.existing(this);
 		this.body.checkCollision.none = true;
 		this.setScale(SCALE * SPRITE_SCALE);
+
 		// Clean up players active summons
-		globalState.playerCharacter.activeSummons = globalState.playerCharacter.activeSummons.filter(
-			(summon) => {
-				const effect = (this.scene as MainScene).abilityHelper.abilityEffects.find((ability) => {
-					(ability as any).id === summon.id;
-				});
-				return effect;
+		const identicalSummons = globalState.playerCharacter.activeSummons.map((summon) => {
+			const effect = (this.scene as MainScene).abilityHelper.abilityEffects.find((ability) => {
+				(ability as any).id === summon.id;
+			});
+			return effect;
+		});
+		identicalSummons.forEach((summon) => {
+			if (summon) {
+				summon.destroy();
 			}
-		);
+		});
 		globalState.playerCharacter.activeSummons.push({
 			summoningType: this.summoningType,
 			id: this.id,
@@ -55,7 +66,7 @@ export default class CircelingEffect extends AbilityEffect {
 			scene as MainScene,
 			globalState.playerCharacter,
 			AbilityKey.TWO,
-			AbilityType.FIRE_SUMMON_2
+			summoningAbility
 		);
 	}
 
@@ -80,7 +91,7 @@ export default class CircelingEffect extends AbilityEffect {
 				const potentialEnemies = Object.values((this.scene as MainScene).npcMap).filter(
 					(npc) =>
 						npc.faction === Faction.ENEMIES &&
-						npc.tintBottomLeft >= VISITED_TILE_TINT &&
+						npc.tintBottomLeft > VISITED_TILE_TINT &&
 						npc.stateObject?.health > 0
 				);
 				closestDistance = Infinity;
@@ -112,7 +123,7 @@ export default class CircelingEffect extends AbilityEffect {
 						exactTargetXFactor: xFactor,
 						exactTargetYFactor: yFactor,
 					},
-					AbilityType.FIREBALL,
+					this.attackAbility,
 					1,
 					time
 				);

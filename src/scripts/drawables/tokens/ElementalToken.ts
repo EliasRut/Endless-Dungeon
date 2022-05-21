@@ -12,9 +12,9 @@ const BODY_Y_OFFSET = 16;
 
 const ELEMENTAL_DAMAGE = 5;
 const ELEMENTAL_HEALTH = 4;
-const ELEMENTAL_SPEED = 35;
+const ELEMENTAL_SPEED = 5;
 
-const REGULAR_ATTACK_RANGE = 25;
+const REGULAR_ATTACK_RANGE = 10;
 
 export default class ElementalToken extends CharacterToken {
 	id: string;
@@ -27,6 +27,7 @@ export default class ElementalToken extends CharacterToken {
 	target: Phaser.Geom.Point;
 	level: number;
 	allowedTargets: PossibleTargets = PossibleTargets.ENEMIES;
+	destroyed: boolean = false;
 
 	constructor(
 		scene: MainScene,
@@ -44,11 +45,19 @@ export default class ElementalToken extends CharacterToken {
 
 		globalState.npcs[id] = this.stateObject;
 		this.stateObject = new Character('rich', ELEMENTAL_HEALTH, ELEMENTAL_DAMAGE, ELEMENTAL_SPEED);
+		this.stateObject.vision = 150;
+		this.stateObject.movementSpeed = 100;
 		this.tokenName = tokenName;
 		this.target = new Phaser.Geom.Point(0, 0);
 		this.faction = Faction.NPCS;
 		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
 		this.level = level;
+
+		setTimeout(() => {
+			if (this) {
+				this.destroy();
+			}
+		}, 5000);
 	}
 
 	public checkLoS() {
@@ -61,6 +70,9 @@ export default class ElementalToken extends CharacterToken {
 	// update from main Scene
 	public update(time: number, deltaTime: number) {
 		super.update(time, deltaTime);
+		if (this.destroyed) {
+			return;
+		}
 		// set aggro boolean, use a linger time for aggro
 		if (this.lastUpdate <= time) {
 			let nearestEnemy: CharacterToken | undefined;
@@ -85,26 +97,8 @@ export default class ElementalToken extends CharacterToken {
 			}
 
 			if (nearestEnemy) {
-				if (
-					this.checkLoS() &&
-					this.getDistanceToWorldStatePosition(nearestEnemy.x, nearestEnemy.y) >
-						this.attackRange * SCALE
-				) {
-					const time = this.scene.time;
-					(this.scene as MainScene).abilityHelper.triggerAbility(
-						this.stateObject,
-						this.stateObject,
-						AbilityType.FIRE_NOVA,
-						1,
-						time.now
-					);
-
-					this.destroy();
-				} else if (
-					this.checkLoS() &&
-					this.getDistanceToWorldStatePosition(nearestEnemy.x, nearestEnemy.y) <
-						this.stateObject.vision * SCALE
-				) {
+				console.log(`Closest distance: ${closestDistance}`);
+				if (this.checkLoS() && closestDistance < this.stateObject.vision * SCALE) {
 					this.aggro = true;
 					this.lastUpdate = time;
 					this.target.x = nearestEnemy.x;
@@ -113,21 +107,42 @@ export default class ElementalToken extends CharacterToken {
 					this.aggro = false;
 				}
 			}
+		}
 
-			if (this.aggro) {
-				const tx = this.target.x;
-				const ty = this.target.y;
-				const totalDistance = Math.abs(tx * SCALE - this.x) + Math.abs(ty * SCALE - this.y);
+		if (this.aggro) {
+			const tx = this.target.x;
+			const ty = this.target.y;
+			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
+
+			if (totalDistance < this.attackRange * SCALE) {
+				const time = this.scene.time;
+				(this.scene as MainScene).abilityHelper.triggerAbility(
+					this.stateObject,
+					{
+						...this.stateObject,
+						x: this.x / SCALE,
+						y: this.y / SCALE,
+					},
+					AbilityType.FIRE_NOVA,
+					1,
+					time.now
+				);
+
+				this.destroyed = true;
+				setTimeout(() => {
+					this.destroy();
+				}, 100);
+			} else {
 				const xSpeed =
-					((tx * SCALE - this.x) / totalDistance) *
+					((tx - this.x) / totalDistance) *
 					this.stateObject.movementSpeed *
 					this.stateObject.slowFactor;
 				const ySpeed =
-					((ty * SCALE - this.y) / totalDistance) *
+					((ty - this.y) / totalDistance) *
 					this.stateObject.movementSpeed *
 					this.stateObject.slowFactor;
-				this.setVelocityX(xSpeed);
-				this.setVelocityY(ySpeed);
+				this.setVelocityX(xSpeed * SCALE);
+				this.setVelocityY(ySpeed * SCALE);
 				const newFacing = getFacing4Dir(xSpeed, ySpeed);
 				const animation = updateMovingState(this.stateObject, true, newFacing);
 				if (animation) {
@@ -138,21 +153,17 @@ export default class ElementalToken extends CharacterToken {
 						this.play({ key: animation, repeat: -1 });
 					}
 				}
-			} else {
-				this.setVelocityX(0);
-				this.setVelocityY(0);
-				const animation = updateMovingState(
-					this.stateObject,
-					false,
-					this.stateObject.currentFacing
-				);
-				if (animation) {
-					if (this.scene.game.anims.exists(animation)) {
-						this.play(animation);
-					} else {
-						console.log(`Animation ${animation} does not exist.`);
-						this.play(animation);
-					}
+			}
+		} else {
+			this.setVelocityX(0);
+			this.setVelocityY(0);
+			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
+			if (animation) {
+				if (this.scene.game.anims.exists(animation)) {
+					this.play(animation);
+				} else {
+					console.log(`Animation ${animation} does not exist.`);
+					this.play(animation);
 				}
 			}
 		}

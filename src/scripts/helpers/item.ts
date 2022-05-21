@@ -147,7 +147,24 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			}
 			case AbilityType.FIREBALL:
 			default: {
-				return AbilityType.FIRE_SUMMON;
+				return AbilityType.FIRE_NOVA;
+			}
+		}
+	}
+	if (offHand.catalystType === Catalyst.SUMMON) {
+		switch (baseAbility) {
+			case AbilityType.ARCANE_BOLT: {
+				return AbilityType.ARCANE_SUMMON_CIRCELING;
+			}
+			case AbilityType.NECROTIC_BOLT: {
+				return AbilityType.NECROTIC_SUMMON_CIRCELING;
+			}
+			case AbilityType.ICESPIKE: {
+				return AbilityType.ICE_SUMMON_CIRCELING;
+			}
+			case AbilityType.FIREBALL:
+			default: {
+				return AbilityType.FIRE_SUMMON_CIRCELING;
 			}
 		}
 	}

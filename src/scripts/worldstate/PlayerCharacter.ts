@@ -4,6 +4,14 @@ import Character from './Character';
 import MainScene from '../scenes/MainScene';
 import CircelingEffect from '../drawables/effects/CircelingEffect';
 
+// Stats are increased by this amount, given by enchantments
+export const enchantmentModifiers = {
+	damage: 0,
+	luck: 0,
+	maxHealth: 0,
+	movementSpeed: 0
+}
+
 // This class handles the players character and all mechanical events associated with it.
 export default class PlayerCharacter extends Character {
 	public x = 0;
@@ -15,7 +23,7 @@ export default class PlayerCharacter extends Character {
 
 	constructor() {
 		// tslint:disable-next-line: no-magic-numbers
-		super('player', 100, 1, 200);
+		super('player');
 		this.faction = Faction.PLAYER;
 	}
 

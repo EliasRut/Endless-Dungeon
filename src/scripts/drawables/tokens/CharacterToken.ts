@@ -29,7 +29,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	tokenName: string;
 
 	constructor(scene: MainScene, x: number, y: number, tileName: string, type: string, id: string) {
-		super(scene, x * SCALE, y * SCALE, 'empty-tile');
+		super(scene, x * SCALE, y * SCALE, tileName);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.setScale(SCALE);

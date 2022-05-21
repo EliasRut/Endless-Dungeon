@@ -309,7 +309,7 @@ export default class MainScene extends Phaser.Scene {
 			};
 		}
 		this.doorMap[id] = new DoorToken(this, x, y, type, id);
-		this.doorMap[id].setDepth(UiDepths.DECORATION_TILE_LAYER);
+		this.doorMap[id].setDepth(UiDepths.TOP_TILE_LAYER);
 		this.physics.add.collider(this.doorMap[id], this.mainCharacter);
 		Object.values(this.npcMap).forEach((npc) => {
 			this.physics.add.collider(this.doorMap[id], npc);

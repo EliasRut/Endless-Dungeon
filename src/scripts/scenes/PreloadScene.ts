@@ -77,6 +77,10 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('rock', 'assets/img/rock.png');
 		this.load.image('wind', 'assets/img/wind-gust.png');
 		this.load.image('skull', 'assets/img/necrotic-skull.png');
+		this.load.image('arcaneAura', 'assets/img/arcane-aura.png');
+		this.load.image('fireAura', 'assets/img/fire-aura.png');
+		this.load.image('iceAura', 'assets/img/ice-aura.png');
+		this.load.image('necroticAura', 'assets/img/necrotic-aura.png');
 
 		// Other elements
 		this.load.image('quest', 'assets/img/quest.png');
@@ -130,8 +134,16 @@ export default class PreloadScene extends Phaser.Scene {
 			frameWidth: 16,
 			frameHeight: 16,
 		});
-		this.load.aseprite('source-fire1', 'assets/sprites/source_flame01.png', 'assets/sprites/source_flame01.json');
-		this.load.aseprite('source-force1', 'assets/sprites/source_force01.png', 'assets/sprites/source_force01.json');
+		this.load.aseprite(
+			'source-fire1',
+			'assets/sprites/source_flame01.png',
+			'assets/sprites/source_flame01.json'
+		);
+		this.load.aseprite(
+			'source-force1',
+			'assets/sprites/source_force01.png',
+			'assets/sprites/source_force01.json'
+		);
 		this.load.image('icon-source-fire1', 'assets/img/source_icon_flame01.png');
 		this.load.image('icon-source-force1', 'assets/img/source_icon_force01.png');
 
@@ -140,6 +152,12 @@ export default class PreloadScene extends Phaser.Scene {
 			frameWidth: 48,
 			frameHeight: 32,
 		});
+		this.load.image('iron_door_idle', 'assets/img/iron_door_idle.png');
+		this.load.aseprite(
+			'iron_door',
+			'assets/sprites/iron_door.png',
+			'assets/sprites/iron_door.json'
+		);
 
 		// Dungeon Door
 		this.load.image('dungeon-door', 'assets/img/dungeon-door.png');
@@ -225,8 +243,10 @@ export default class PreloadScene extends Phaser.Scene {
 			return;
 		}
 
-		// Item animation
+		// Door animation
+		this.anims.createFromAseprite('iron_door');
 
+		// Item animation
 		this.anims.createFromAseprite('source-fire1');
 		this.anims.createFromAseprite('source-force1');
 
