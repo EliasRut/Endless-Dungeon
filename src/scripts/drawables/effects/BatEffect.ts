@@ -1,4 +1,10 @@
-import { Facings, facingToSpriteNameMap, SCALE, UiDepths } from '../../helpers/constants';
+import {
+	Facings,
+	facingToSpriteNameMap,
+	SCALE,
+	UiDepths,
+	NORMAL_ANIMATION_FRAME_RATE,
+} from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
 
@@ -26,7 +32,10 @@ export default class BatEffect extends TargetingEffect {
 		if (projectileData.targeting) this.animationName = `${spriteName}-fly`;
 		const spawnAnimation = `${spriteName}-spawn-${facingToSpriteNameMap[facing]}`;
 		const animation = `${this.animationName}-${facingToSpriteNameMap[facing]}`;
-		this.play({ key: spawnAnimation }).chain({ key: animation, repeat: -1 });
+		this.play({ key: spawnAnimation, frameRate: NORMAL_ANIMATION_FRAME_RATE }).chain({
+			key: animation,
+			repeat: -1,
+		});
 
 		if (projectileData?.timeToLive) {
 			setTimeout(() => {

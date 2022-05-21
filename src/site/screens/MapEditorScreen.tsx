@@ -19,9 +19,10 @@ import {
 	Room,
 } from '../../../typings/custom';
 import '../App.css';
+import { UserInformation } from '../../scripts/helpers/UserInformation';
 
 export interface MapEditorScreenProps {
-	user: firebase.User;
+	user: UserInformation;
 }
 
 const showGame = true;

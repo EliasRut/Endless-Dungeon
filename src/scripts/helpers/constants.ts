@@ -277,6 +277,14 @@ export const enum MODE {
 	QUEST_EDITOR = 'questEditor',
 }
 
+export const enum DOOR_TYPE {
+	IRON_DOOR = 'iron_door',
+}
+
+export const DOOR_OFFSETS = {
+	[DOOR_TYPE.IRON_DOOR]: { x: 0, y: 3.33 },
+};
+
 export let activeMode = MODE.GAME;
 
 export const setActiveMode = (mode: MODE) => {

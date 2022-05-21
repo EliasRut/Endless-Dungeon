@@ -1,5 +1,12 @@
 import { NpcScript } from '../../../../typings/custom';
-import { Faction, SCALE, UiDepths } from '../../helpers/constants';
+import {
+	Faction,
+	SCALE,
+	UiDepths,
+	NORMAL_ANIMATION_FRAME_RATE,
+	DOOR_OFFSETS,
+	DOOR_TYPE,
+} from '../../helpers/constants';
 import Door from '../../worldstate/Door';
 import globalState from '../../worldstate/index';
 import MainScene from '../../scenes/MainScene';
@@ -18,6 +25,16 @@ export default class DoorToken extends Phaser.Physics.Arcade.Sprite {
 		const tileX = Math.round(x / TILE_WIDTH / SCALE);
 		const tileY = Math.round(y / TILE_HEIGHT / SCALE);
 		this.tile = (this.scene as MainScene).tileLayer.getTileAt(tileX, tileY);
+		const lastFrameTextureKey = this.anims.animationManager
+			.get(`${doorName}_open`)
+			.getLastFrame().textureKey;
+		const lastFrameTexture = this.texture.get(lastFrameTextureKey);
+		const textureWidth = lastFrameTexture.width;
+		const textureHeight = lastFrameTexture.height;
+		const doorOffset = DOOR_OFFSETS[doorName as DOOR_TYPE];
+		this.x = x - (textureWidth * SCALE) / 2 + doorOffset.x * SCALE;
+		this.y = y - (textureHeight * SCALE) / 2 + doorOffset.y * SCALE;
+		this.setOrigin(0, 0);
 		this.setScale(SCALE);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
@@ -26,14 +43,16 @@ export default class DoorToken extends Phaser.Physics.Arcade.Sprite {
 		const door = globalState.doors[id];
 		this.body.checkCollision.none = door.open as any;
 		if (door.open) {
-			this.play(`${doorName}_o`);
+			this.play({ key: `${doorName}_o`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+		} else {
+			this.play({ key: `${doorName}_c`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		}
 	}
 
 	open() {
 		const door = globalState.doors[this.id];
 		door.open = true;
-		this.play({ key: `${this.doorName}_open`, frameRate: 8 });
+		this.play({ key: `${this.doorName}_open`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.on('animationcomplete', () => {
 			this.body.checkCollision.none = true as any;
 		});
@@ -42,7 +61,7 @@ export default class DoorToken extends Phaser.Physics.Arcade.Sprite {
 	close() {
 		const door = globalState.doors[this.id];
 		door.open = false;
-		this.play(`${this.doorName}_c`);
+		this.play({ key: `${this.doorName}_c`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.body.checkCollision.none = false as any;
 	}
 

@@ -1,4 +1,10 @@
-import { UiDepths, RuneAssignment, ColorsArray, SCALE } from '../../helpers/constants';
+import {
+	UiDepths,
+	RuneAssignment,
+	ColorsArray,
+	SCALE,
+	NORMAL_ANIMATION_FRAME_RATE,
+} from '../../helpers/constants';
 import DungeonDoorScene from '../../scenes/DungeonDoorScene';
 
 // const socketPositions = [
@@ -58,7 +64,7 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 			runeSocket.setScrollFactor(0);
 			runeSocket.setScale(SCALE);
 			runeSocket.setDepth(UiDepths.UI_MAIN_LAYER);
-			runeSocket.play('runeSocket-anim');
+			runeSocket.play({ key: 'runeSocket-anim', frameRate: NORMAL_ANIMATION_FRAME_RATE });
 			this.runeSockets.push(runeSocket);
 		}
 

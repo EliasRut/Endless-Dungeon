@@ -1,4 +1,11 @@
-import { AbilityKey, BAG_BOXES_X, EquipmentSlot, UiDepths, UI_SCALE } from '../helpers/constants';
+import {
+	AbilityKey,
+	BAG_BOXES_X,
+	EquipmentSlot,
+	UiDepths,
+	UI_SCALE,
+	NORMAL_ANIMATION_FRAME_RATE,
+} from '../helpers/constants';
 import { AbilityType, Abilities } from '../abilities/abilityData';
 import OverlayScreen from './OverlayScreen';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
@@ -243,11 +250,9 @@ export default class InventoryScreen extends OverlayScreen {
 
 	playItemAnimation(itemToken: InventoryItemToken, itemName?: string) {
 		const animation = itemName + '1';
-		if (this.scene.game.anims.exists(animation)) itemToken.play({ key: animation, repeat: -1 });
-
-		// if('test-items-spritesheet' !== getItemTexture(itemName)){
-		// 	itemToken.play({ key: getItemTexture(itemName), repeat : -1});
-		// }
+		if (this.scene.game.anims.exists(animation)) {
+			itemToken.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
+		}
 	}
 
 	showEquipmentSelectionWheel() {
