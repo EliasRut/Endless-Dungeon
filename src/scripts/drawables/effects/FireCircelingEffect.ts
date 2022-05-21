@@ -15,7 +15,7 @@ export default class FireCircelingEffect extends CircelingEffect {
 			scene,
 			x,
 			y,
-			'fireAura',
+			'firesprite',
 			facing,
 			projectileData,
 			SUMMONING_TYPE.FIRE_ELEMENTAL,

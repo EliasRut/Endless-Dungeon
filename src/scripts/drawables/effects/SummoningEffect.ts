@@ -7,11 +7,13 @@ import {
 	SUMMONING_TYPE,
 } from '../../helpers/constants';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
-import { isCollidingTile } from '../../helpers/movement';
+import { getOneLetterFacingName, isCollidingTile } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import { updateAbility } from '../../worldstate/PlayerCharacter';
 import AbilityEffect from './AbilityEffect';
+import CircelingEffect from './CircelingEffect';
+import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 export default class SummoningEffect extends AbilityEffect {
 	allowedTargets: PossibleTargets = PossibleTargets.NONE;
@@ -56,7 +58,23 @@ export default class SummoningEffect extends AbilityEffect {
 				const tileY = Math.round(targetY / TILE_HEIGHT / SCALE);
 				const tile = (this.scene as MainScene).tileLayer.getTileAt(tileX, tileY);
 				if (tile && !isCollidingTile(tile.index)) {
-					(this.scene as MainScene).addNpc(summon.id, summoningType, unscaledX, unscaledY, 1, 1, 0);
+					const npc = (this.scene as MainScene).addNpc(
+						summon.id,
+						summoningType,
+						unscaledX,
+						unscaledY,
+						1,
+						1,
+						0
+					);
+
+					if (this.summoningType === SUMMONING_TYPE.FIRE_ELEMENTAL) {
+						npc.play({
+							key: `firesprite-walk-${getOneLetterFacingName(effect.facing)}`,
+							frameRate: NORMAL_ANIMATION_FRAME_RATE,
+							repeat: -1,
+						});
+					}
 				}
 				this.drawSummoningAnimation(targetX, targetY);
 			}

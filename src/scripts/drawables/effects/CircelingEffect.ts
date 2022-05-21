@@ -13,6 +13,12 @@ import globalState from '../../worldstate';
 import { updateAbility } from '../../worldstate/PlayerCharacter';
 import CharacterToken from '../tokens/CharacterToken';
 import AbilityEffect from './AbilityEffect';
+import {
+	getFacing4Dir,
+	getOneLetterFacingName,
+	shiftFacingByOneClockwise,
+} from '../../helpers/movement';
+import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 const CIRCELING_TIME_MS = 500;
 const SPRITE_SCALE = 0.3;
@@ -49,7 +55,7 @@ export default class CircelingEffect extends AbilityEffect {
 		this.setDepth(1);
 		scene.physics.add.existing(this);
 		this.body.checkCollision.none = true;
-		this.setScale(SCALE * SPRITE_SCALE);
+		this.setScale(SCALE * (summoningType === SUMMONING_TYPE.FIRE_ELEMENTAL ? 1 : SPRITE_SCALE));
 
 		// Clean up players active summons
 		const identicalSummons = globalState.playerCharacter.activeSummons.map((summon) => {
@@ -102,37 +108,42 @@ export default class CircelingEffect extends AbilityEffect {
 		const yOffset = Math.cos(time / CIRCELING_TIME_MS) * 36;
 		this.x = globalState.playerCharacter.x * SCALE + xOffset * SCALE;
 		this.y = globalState.playerCharacter.y * SCALE + yOffset * SCALE;
-		this.setScale(SCALE * 0.3 * (0.9 + Math.sin(time / 200) * 0.1));
 
-		if (time - this.lastCast > 1000) {
-			let nearestEnemy: CharacterToken | undefined;
-			let closestDistance = Infinity;
-			if (this.allowedTargets === PossibleTargets.ENEMIES) {
-				const potentialEnemies = Object.values((this.scene as MainScene).npcMap).filter(
-					(npc) =>
-						npc.faction === Faction.ENEMIES &&
-						npc.tintBottomLeft > VISITED_TILE_TINT &&
-						npc.stateObject?.health > 0
-				);
-				closestDistance = Infinity;
-				nearestEnemy = potentialEnemies.reduce((nearest, token) => {
-					if (Math.hypot(token.x - this.x, token.y - this.y) < closestDistance) {
-						closestDistance = Math.hypot(token.x - this.x, token.y - this.y);
-						return token;
-					}
-					return nearest;
-				}, undefined as CharacterToken | undefined);
-			} else if (this.allowedTargets === PossibleTargets.PLAYER) {
-				nearestEnemy = (this.scene as MainScene).mainCharacter;
-			}
+		let nearestEnemy: CharacterToken | undefined;
+		let closestDistance = Infinity;
+		if (this.allowedTargets === PossibleTargets.ENEMIES) {
+			const potentialEnemies = Object.values((this.scene as MainScene).npcMap).filter(
+				(npc) =>
+					npc.faction === Faction.ENEMIES &&
+					npc.tintBottomLeft > VISITED_TILE_TINT &&
+					npc.stateObject?.health > 0
+			);
+			closestDistance = Infinity;
+			nearestEnemy = potentialEnemies.reduce((nearest, token) => {
+				if (Math.hypot(token.x - this.x, token.y - this.y) < closestDistance) {
+					closestDistance = Math.hypot(token.x - this.x, token.y - this.y);
+					return token;
+				}
+				return nearest;
+			}, undefined as CharacterToken | undefined);
+		} else if (this.allowedTargets === PossibleTargets.PLAYER) {
+			nearestEnemy = (this.scene as MainScene).mainCharacter;
+		}
 
-			if (nearestEnemy) {
-				const tx = nearestEnemy.x;
-				const ty = nearestEnemy.y;
+		let facingX = xOffset;
+		let facingY = yOffset;
 
-				const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
-				const xFactor = (tx - this.x) / totalDistance;
-				const yFactor = (ty - this.y) / totalDistance;
+		if (nearestEnemy) {
+			const tx = nearestEnemy.x;
+			const ty = nearestEnemy.y;
+
+			const totalDistance = Math.abs(tx - this.x) + Math.abs(ty - this.y);
+			const xFactor = (tx - this.x) / totalDistance;
+			const yFactor = (ty - this.y) / totalDistance;
+			facingX = tx - this.x;
+			facingY = ty - this.y;
+
+			if (time - this.lastCast > 1000) {
 				this.lastCast = time;
 				(this.scene as MainScene).abilityHelper.triggerAbility(
 					globalState.playerCharacter,
@@ -148,6 +159,23 @@ export default class CircelingEffect extends AbilityEffect {
 					time
 				);
 			}
+		}
+		let newFacing = getFacing4Dir(facingX, facingY);
+		// If there is no enemy, the elemental should follow it's clockwise path around the player
+		if (!nearestEnemy) {
+			newFacing = shiftFacingByOneClockwise(newFacing);
+		}
+		if (newFacing !== this.facing) {
+			if (this.summoningType === SUMMONING_TYPE.FIRE_ELEMENTAL) {
+				this.play({
+					key: `firesprite-walk-${getOneLetterFacingName(newFacing)}`,
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+					repeat: -1,
+				});
+			} else {
+				this.setScale(SCALE * 0.3 * (0.9 + Math.sin(time / 200) * 0.1));
+			}
+			this.facing = newFacing;
 		}
 	}
 }

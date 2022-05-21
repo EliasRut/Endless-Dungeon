@@ -10,6 +10,7 @@ import {
 	NUM_COLORS_OF_MAGIC,
 	npcToAespriteMap,
 	NpcTypeList,
+	SummonsTypeList,
 } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
@@ -50,13 +51,10 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
 		this.load.image('search-icon', 'assets/img/search-icon.png');
 
-		// Player
-		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');
-
-		// Prepare aseprite listings for enemies
-		this.load.aseprite('rich', 'assets/sprites/rich.png', 'assets/sprites/rich.json');
-		this.load.aseprite('jacques', 'assets/sprites/jacques.png', 'assets/sprites/jacques.json');
-		this.load.aseprite('pierre', 'assets/sprites/pierre.png', 'assets/sprites/pierre.json');
+		// Prepare aseprite data for player, npcs, enemies
+		Object.entries(npcToAespriteMap).forEach(([npcKey, { png, json }]) => {
+			this.load.aseprite(npcKey, png, json);
+		});
 
 		// death
 		this.load.aseprite(
@@ -209,6 +207,13 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Load all default enemies.
 		NpcTypeList.forEach((type) => {
+			if (!requiredNpcs.has(type)) {
+				requiredNpcs.add(type);
+			}
+		});
+
+		// Load all default summons.
+		SummonsTypeList.forEach((type) => {
 			if (!requiredNpcs.has(type)) {
 				requiredNpcs.add(type);
 			}

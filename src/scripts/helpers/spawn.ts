@@ -46,7 +46,7 @@ export const spawnNpc = (
 			return new LichKingToken(scene, posX, posY, 'rich', level, id);
 		}
 		case 'fire_elemental': {
-			return new FireElementalToken(scene, posX, posY, 'rich', level, id);
+			return new FireElementalToken(scene, posX, posY, level, id);
 		}
 		case 'ice_elemental': {
 			return new IceElementalToken(scene, posX, posY, 'rich', level, id);

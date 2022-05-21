@@ -54,7 +54,7 @@ export default class ElementalToken extends CharacterToken {
 			ELEMENTAL_SPEED
 		);
 		this.stateObject.vision = 150;
-		this.stateObject.movementSpeed = 100;
+		this.stateObject.movementSpeed = 200;
 		this.target = new Phaser.Geom.Point(0, 0);
 		this.faction = Faction.NPCS;
 		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;

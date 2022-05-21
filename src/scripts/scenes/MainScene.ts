@@ -271,7 +271,6 @@ export default class MainScene extends Phaser.Scene {
 			const facing = getFacing8Dir(facingX, facingY);
 			const animation = updateMovingState(globalState.npcs[id], false, facing, true);
 			if (animation) {
-				// npc.play({ key: 'DashR', repeat: -1 });
 				npc.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 			}
 		}
@@ -291,6 +290,7 @@ export default class MainScene extends Phaser.Scene {
 			});
 		}
 		this.npcMap[id].script = options?.script;
+		return npc;
 	}
 
 	addDoor(id: string, type: string, x: number, y: number, open: boolean) {

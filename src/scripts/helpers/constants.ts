@@ -124,10 +124,12 @@ export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingR
 };
 
 export const npcToAespriteMap: { [name: string]: { png: string; json: string } } = {
+	player: { png: 'assets/sprites/player.png', json: 'assets/sprites/player.json' },
 	rich: { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
 	jacques: { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
 	pierre: { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
 	'lich-king': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
+	firesprite: { png: 'assets/sprites/firesprite.png', json: 'assets/sprites/firesprite.json' },
 };
 
 export const characterToSubAnimationFileMap: {
@@ -219,6 +221,7 @@ export const colorOfMagicToTilesetMap = {
 };
 
 export const NpcTypeList = ['rich', 'jacques', 'pierre'];
+export const SummonsTypeList = ['firesprite'];
 
 export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
 	[ColorsOfMagic.FLUX]: [
