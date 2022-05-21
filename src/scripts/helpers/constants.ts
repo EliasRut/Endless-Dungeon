@@ -303,3 +303,5 @@ export enum SUMMONING_TYPE {
 	ARCANE_ELEMENTAL = 'arcane_elemental',
 	NECROTIC_ELEMENTAL = 'necrotic_elemental',
 }
+
+export const NORMAL_ANIMATION_FRAME_RATE = 60;

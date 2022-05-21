@@ -28,6 +28,7 @@ export default class ElementalToken extends CharacterToken {
 	level: number;
 	allowedTargets: PossibleTargets = PossibleTargets.ENEMIES;
 	destroyed: boolean = false;
+	elementalAbility: AbilityType;
 
 	constructor(
 		scene: MainScene,
@@ -35,23 +36,29 @@ export default class ElementalToken extends CharacterToken {
 		y: number,
 		tokenName: string,
 		level: number,
-		id: string
+		id: string,
+		elementalAbility: AbilityType
 	) {
-		super(scene, x, y, tokenName, tokenName, id);
+		super(scene, x, y, tokenName, id, elementalAbility);
 		this.scene = scene;
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
 		globalState.npcs[id] = this.stateObject;
-		this.stateObject = new Character('rich', ELEMENTAL_HEALTH, ELEMENTAL_DAMAGE, ELEMENTAL_SPEED);
+		this.stateObject = new Character(
+			tokenName,
+			ELEMENTAL_HEALTH,
+			ELEMENTAL_DAMAGE,
+			ELEMENTAL_SPEED
+		);
 		this.stateObject.vision = 150;
 		this.stateObject.movementSpeed = 100;
-		this.tokenName = tokenName;
 		this.target = new Phaser.Geom.Point(0, 0);
 		this.faction = Faction.NPCS;
 		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
 		this.level = level;
+		this.elementalAbility = elementalAbility;
 
 		setTimeout(() => {
 			if (this) {
@@ -123,7 +130,7 @@ export default class ElementalToken extends CharacterToken {
 						x: this.x / SCALE,
 						y: this.y / SCALE,
 					},
-					AbilityType.FIRE_NOVA,
+					this.elementalAbility,
 					1,
 					time.now
 				);
