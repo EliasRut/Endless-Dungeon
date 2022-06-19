@@ -139,7 +139,7 @@ export default class AbilityHelper {
 					enemy.receiveStun(usedAbilityData.stun!);
 				}
 
-				enemy.receiveHit(damage);
+				enemy.receiveHit();
 				if (usedAbilityData.necroticStacks) {
 					enemy.lastNecroticEffectTimestamp = globalTime;
 					enemy.necroticEffectStacks += usedAbilityData.necroticStacks!;
