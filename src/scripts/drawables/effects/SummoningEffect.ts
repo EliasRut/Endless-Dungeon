@@ -12,7 +12,6 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import { updateAbility } from '../../worldstate/PlayerCharacter';
 import AbilityEffect from './AbilityEffect';
-import CircelingEffect from './CircelingEffect';
 import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 export default class SummoningEffect extends AbilityEffect {

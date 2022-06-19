@@ -36,6 +36,10 @@ export default abstract class EnemyToken extends CharacterToken {
 	target: Phaser.Geom.Point;
 	level: number;
 
+	protected showHealthbar() {
+		return true;
+	}
+
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
 		super(scene, x, y, tokenName, tokenName, id);
 		scene.add.existing(this);
@@ -73,17 +77,6 @@ export default abstract class EnemyToken extends CharacterToken {
 		this.scene.addFixedItem(id, this.x, this.y);
 	}
 
-	protected receiveDotDamage(deltaTime: number) {
-		// dot = damage over time, deltatime is in ms so we have to devide it by 1000
-		const dot =
-			(globalState.playerCharacter.damage * this.necroticEffectStacks * deltaTime) / 1000 / 4;
-		this.stateObject.health = this.stateObject.health - dot;
-	}
-
-	protected setSlowFactor() {
-		this.stateObject.slowFactor = Math.max(1 - this.iceEffectStacks / 4, 0.01);
-	}
-
 	// update from main Scene
 	public update(time: number, deltaTime: number) {
 		super.update(time, deltaTime);
@@ -106,6 +99,7 @@ export default abstract class EnemyToken extends CharacterToken {
 	}
 
 	die() {
+		super.die();
 		this.play({ key: 'death_anim_small', frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.body.destroy();
 		// 925 ms
