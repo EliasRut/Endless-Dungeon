@@ -13,7 +13,15 @@ import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
 import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
-import { Faction, NORMAL_ANIMATION_FRAME_RATE, SCALE, UiDepths } from '../helpers/constants';
+import {
+	BaseFadingLabelFontSize,
+	Faction,
+	FadingLabelData,
+	FadingLabelSize,
+	NORMAL_ANIMATION_FRAME_RATE,
+	SCALE,
+	UiDepths,
+} from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
@@ -51,6 +59,9 @@ const MOBILE_PAD_FOREGROUND_X_OFFSET = 96;
 
 const DEATH_RESPAWN_TIME = 3000;
 
+const FADING_LABEL_Y_DISTANCE = 64;
+const FADING_LABEL_X_DISTANCE = 16;
+
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
 	fpsText: Phaser.GameObjects.Text;
@@ -66,6 +77,7 @@ export default class MainScene extends Phaser.Scene {
 	npcMap: { [id: string]: CharacterToken };
 	doorMap: { [id: string]: DoorToken };
 	worldItems: WorldItemToken[];
+	fadingLabels: FadingLabelData[];
 
 	overlayScreens: {
 		inventory: InventoryScreen;
@@ -126,6 +138,7 @@ export default class MainScene extends Phaser.Scene {
 		this.npcMap = {};
 		this.doorMap = {};
 		this.worldItems = [];
+		this.fadingLabels = [];
 		const [startX, startY] = this.drawRoom();
 
 		this.useDynamicLighting = globalState.currentLevel.startsWith('dungeonLevel');
@@ -623,6 +636,22 @@ export default class MainScene extends Phaser.Scene {
 			}
 		}
 
+		for (const fadingLabel of this.fadingLabels) {
+			const timeDelta = globalTime - fadingLabel.timestamp;
+			if (timeDelta > 1000) {
+				fadingLabel.fontElement?.destroy(true);
+				fadingLabel.fontElement = undefined;
+			} else if (fadingLabel.fontElement) {
+				const timeDeltaFraction = timeDelta / 1000;
+				fadingLabel.fontElement.y = fadingLabel.posY - timeDeltaFraction * FADING_LABEL_Y_DISTANCE;
+				fadingLabel.fontElement.x =
+					fadingLabel.posX + Math.sin(timeDeltaFraction * 4) * FADING_LABEL_X_DISTANCE;
+				fadingLabel.fontElement.alpha = 1 - 0.6 * timeDeltaFraction;
+			}
+		}
+
+		this.fadingLabels = this.fadingLabels.filter((label) => label.fontElement);
+
 		this.scriptHelper.handleScripts(globalState.gameTime);
 
 		// tslint:disable-next-line: no-magic-numbers
@@ -635,6 +664,29 @@ export default class MainScene extends Phaser.Scene {
 		if (Date.now() - this.lastScriptUnpausing > 1000) {
 			this.scriptHelper.resumePausedScripts();
 		}
+	}
+
+	addFadingLabel(
+		text: string,
+		fontSize: FadingLabelSize,
+		color: string,
+		posX: number,
+		posY: number
+	) {
+		const fadingLabel = new Phaser.GameObjects.Text(this, posX, posY, text, {
+			fontFamily: 'endlessDungeon',
+			fontSize: `${BaseFadingLabelFontSize[fontSize] * SCALE}pt`,
+			color,
+		});
+		fadingLabel.setDepth(UiDepths.FLOATING_TEXT_LAYER);
+		this.add.existing(fadingLabel);
+		this.fadingLabels.push({
+			fontSize,
+			fontElement: fadingLabel,
+			timestamp: this.game.getTime(),
+			posX,
+			posY,
+		});
 	}
 
 	pause() {

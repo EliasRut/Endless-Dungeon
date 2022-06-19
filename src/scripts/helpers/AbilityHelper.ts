@@ -118,8 +118,9 @@ export default class AbilityHelper {
 				}
 				effect.hitEnemyTokens.push(enemy);
 				const damage = caster.damage * Abilities[type].damageMultiplier * abilityLevel;
-				const newEnemyHealth = enemy.stateObject.health - damage;
-				if (enemy.stateObject.health > 0 && newEnemyHealth <= 0) {
+				const prevHealth = enemy.stateObject.health;
+				enemy.takeDamage(damage);
+				if (prevHealth > 0 && enemy.stateObject.health <= 0) {
 					console.log(`Enemy died`);
 					// Enemy died from this attack
 					if (Abilities[type].castOnEnemyDestroyed) {
@@ -135,8 +136,8 @@ export default class AbilityHelper {
 				if (Abilities[type].stun) {
 					enemy.receiveStun(Abilities[type].stun!);
 				}
-				
-				enemy.receiveHit(damage);				
+
+				enemy.receiveHit(damage);
 				if (Abilities[type].necroticStacks) {
 					enemy.lastNecroticEffectTimestamp = globalTime;
 					enemy.necroticEffectStacks += Abilities[type].necroticStacks!;
