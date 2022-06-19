@@ -227,6 +227,8 @@ export default class PreloadScene extends Phaser.Scene {
 			this.load.image('map-editor-highlighting', 'assets/img/map-editor-highlighting.png');
 		}
 
+		requiredNpcs.add('vanya-base');
+
 		// NPCs
 		requiredNpcs.forEach((npc) => {
 			this.neededAnimations.push({

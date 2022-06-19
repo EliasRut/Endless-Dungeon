@@ -37,6 +37,8 @@ import QuestsIcon from '../drawables/ui/QuestsIcon';
 import QuestLogScreen from '../screens/QuestLogScreen';
 import QuestDetailsScreen from '../screens/QuestDetailsScreen';
 import ContentManagementScreen from '../screens/ContentManagementScreen';
+import FollowerToken from '../drawables/tokens/FollowerToken';
+import { AbilityType } from '../abilities/abilityData';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -63,6 +65,7 @@ export default class MainScene extends Phaser.Scene {
 	abilityHelper: AbilityHelper;
 
 	mainCharacter: PlayerCharacterToken;
+	testFollower: FollowerToken;
 	npcMap: { [id: string]: CharacterToken };
 	doorMap: { [id: string]: DoorToken };
 	worldItems: WorldItemToken[];
@@ -153,6 +156,26 @@ export default class MainScene extends Phaser.Scene {
 		});
 		Object.values(this.npcMap).forEach((npc) => {
 			this.physics.add.collider(this.mainCharacter, npc, () => {
+				npc.onCollide(true);
+			});
+		});
+
+		this.testFollower = new FollowerToken(
+			this,
+			globalState.playerCharacter.x || startX,
+			globalState.playerCharacter.y || startY,
+			'vanya-base',
+			'testFollower',
+			1,
+			AbilityType.FIREBALL
+		);
+		this.testFollower.setScale(SCALE);
+		this.testFollower.setDepth(UiDepths.TOKEN_MAIN_LAYER);
+		this.physics.add.collider(this.testFollower, this.tileLayer);
+		this.physics.add.collider(this.testFollower, this.decorationLayer);
+		this.physics.add.collider(this.testFollower, this.mainCharacter);
+		Object.values(this.npcMap).forEach((npc) => {
+			this.physics.add.collider(this.testFollower, npc, () => {
 				npc.onCollide(true);
 			});
 		});
@@ -562,6 +585,8 @@ export default class MainScene extends Phaser.Scene {
 		Object.values(this.npcMap).forEach((curNpc) => {
 			curNpc.update(globalState.gameTime, delta);
 		});
+
+		this.testFollower.update(globalState.gameTime, delta);
 
 		// TODO: remove items that are picked up
 		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);

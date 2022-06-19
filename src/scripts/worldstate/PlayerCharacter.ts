@@ -2,28 +2,28 @@ import { AbilityType } from '../abilities/abilityData';
 import { AbilityKey, Faction } from '../helpers/constants';
 import Character from './Character';
 import MainScene from '../scenes/MainScene';
-import CircelingEffect from '../drawables/effects/CircelingEffect';
+
+const DEFAULT_HEALTH = 100;
+const DEFAULT_DAMAGE = 1;
+const DEFAULT_MOVEMENTSPEED = 200;
 
 // Stats are increased by this amount, given by enchantments
 export const enchantmentModifiers = {
 	damage: 0,
 	luck: 0,
 	maxHealth: 0,
-	movementSpeed: 0
-}
+	movementSpeed: 0,
+};
 
 // This class handles the players character and all mechanical events associated with it.
 export default class PlayerCharacter extends Character {
-	public x = 0;
-	public y = 0;
-
 	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity];
 
 	public activeSummons: Array<{ id: string; summoningType: string }> = [];
 
 	constructor() {
 		// tslint:disable-next-line: no-magic-numbers
-		super('player');
+		super('player', DEFAULT_HEALTH, DEFAULT_DAMAGE, DEFAULT_MOVEMENTSPEED);
 		this.faction = Faction.PLAYER;
 	}
 
@@ -35,6 +35,7 @@ export default class PlayerCharacter extends Character {
 		[AbilityKey.FIVE]: AbilityType.NOTHING,
 	};
 }
+
 export const updateAbility = (
 	scene: MainScene,
 	player: PlayerCharacter,
