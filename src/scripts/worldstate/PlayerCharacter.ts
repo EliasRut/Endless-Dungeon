@@ -33,7 +33,7 @@ export default class PlayerCharacter extends Character {
 		[AbilityKey.THREE]: AbilityType.DUSTNOVA,
 		[AbilityKey.FOUR]: AbilityType.ROUND_HOUSE_KICK,
 		[AbilityKey.FIVE]: AbilityType.NOTHING,
-		[AbilityKey.SPACE]: AbilityType.FIREBALL,		
+		[AbilityKey.SPACE]: AbilityType.TELEPORT,		
 	};
 }
 export const updateAbility = (

@@ -513,48 +513,50 @@ export default class MainScene extends Phaser.Scene {
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
 			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
 
-			const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
-				this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackgorund!.x : 0,
-				this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackgorund!.y : 0
-			);
-			const newFacing = getFacing8Dir(xFacing, yFacing);
+			if (!globalState.playerCharacter.dashing) {
+				const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
+					this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackgorund!.x : 0,
+					this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackgorund!.y : 0
+				);
+				const newFacing = getFacing8Dir(xFacing, yFacing);
 
-			// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
-			const hasMoved = xFacing !== 0 || yFacing !== 0;
-			const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
-			const isWalking =
-				isCasting ||
-				(this.mobilePadStick
-					? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
-					  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
-					: false);
-			if (playerAnimation) {
-				this.mainCharacter.play({
-					key: playerAnimation,
-					// duration: 5,
-					frameRate: isWalking ? NORMAL_ANIMATION_FRAME_RATE / 2 : NORMAL_ANIMATION_FRAME_RATE,
-					repeat: -1,
-				});
-			}
-			if (hasMoved) {
-				const shouldPlayLeftStepSfx =
-					!this.lastStepLeft || globalState.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
-
-				if (shouldPlayLeftStepSfx) {
-					this.sound.play('sound-step-grass-l', { volume: 0.25 });
-					this.lastStepLeft = globalState.gameTime;
+				// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
+				const hasMoved = xFacing !== 0 || yFacing !== 0;
+				const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
+				const isWalking =
+					isCasting ||
+					(this.mobilePadStick
+						? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
+						Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
+						: false);
+				if (playerAnimation) {
+					this.mainCharacter.play({
+						key: playerAnimation,
+						// duration: 5,
+						frameRate: isWalking ? NORMAL_ANIMATION_FRAME_RATE / 2 : NORMAL_ANIMATION_FRAME_RATE,
+						repeat: -1,
+					});
 				}
-			} else {
-				this.lastStepLeft = undefined;
+				if (hasMoved) {
+					const shouldPlayLeftStepSfx =
+						!this.lastStepLeft || globalState.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
+
+					if (shouldPlayLeftStepSfx) {
+						this.sound.play('sound-step-grass-l', { volume: 0.25 });
+						this.lastStepLeft = globalState.gameTime;
+					}
+				} else {
+					this.lastStepLeft = undefined;
+				}
+
+				const speed =
+					isCasting || isWalking
+						? getCharacterSpeed(globalState.playerCharacter) / 2
+						: getCharacterSpeed(globalState.playerCharacter);
+
+				this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
+				this.mainCharacter.body.velocity.normalize().scale(speed);
 			}
-
-			const speed =
-				isCasting || isWalking
-					? getCharacterSpeed(globalState.playerCharacter) / 2
-					: getCharacterSpeed(globalState.playerCharacter);
-
-			this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
-			this.mainCharacter.body.velocity.normalize().scale(speed);
 		}
 		globalState.playerCharacter.x = Math.round(this.mainCharacter.x / SCALE);
 		globalState.playerCharacter.y = Math.round(this.mainCharacter.y / SCALE);
