@@ -12,7 +12,12 @@ import DialogScreen from '../screens/DialogScreen';
 import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
-import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
+import {
+	getCharacterSpeed,
+	getFacing8Dir,
+	updateMovingState,
+	isCollidingTile,
+} from '../helpers/movement';
 import {
 	BaseFadingLabelFontSize,
 	Faction,
@@ -118,6 +123,7 @@ export default class MainScene extends Phaser.Scene {
 	lastStepLeft: number | undefined;
 
 	lastScriptUnpausing: number = Date.now();
+	lastPlayerPosition: { x: number; y: number } | undefined;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -505,6 +511,28 @@ export default class MainScene extends Phaser.Scene {
 			return;
 		}
 
+		// Reset Player position to last position if they are on a blocking tile now
+		const playerX = globalState.playerCharacter.x;
+		const playerY = globalState.playerCharacter.y;
+		const currentBaseTileIndex = this.tileLayer.getTileAtWorldXY(playerX, playerY)?.index;
+		const currentDecorationTileIndex = this.decorationLayer.getTileAtWorldXY(
+			playerX,
+			playerY
+		)?.index;
+
+		if (
+			isCollidingTile(currentBaseTileIndex || -1) ||
+			isCollidingTile(currentDecorationTileIndex || -1)
+		) {
+			this.mainCharacter.x = this.lastPlayerPosition!.x;
+			this.mainCharacter.y = this.lastPlayerPosition!.y;
+		} else {
+			this.lastPlayerPosition = {
+				x: this.mainCharacter.x,
+				y: this.mainCharacter.y,
+			};
+		}
+
 		if (!this.blockUserInteraction) {
 			if (globalState.playerCharacter.stunned === true) {
 				this.mainCharacter.setVelocity(0, 0);
@@ -590,8 +618,6 @@ export default class MainScene extends Phaser.Scene {
 
 		// Check if the player is close to a connection point and move them if so
 		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections || [];
-		const playerX = globalState.playerCharacter.x;
-		const playerY = globalState.playerCharacter.y;
 		connections.forEach((connection) => {
 			if (
 				Math.hypot(connection.x - playerX, connection.y - playerY) <

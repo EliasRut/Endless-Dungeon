@@ -282,6 +282,7 @@ export const enum MODE {
 	MAP_EDITOR = 'mapEditor',
 	NPC_EDITOR = 'npcEditor',
 	QUEST_EDITOR = 'questEditor',
+	ABILITY_EDITOR = 'abilityEditor',
 }
 
 export const enum DOOR_TYPE {
