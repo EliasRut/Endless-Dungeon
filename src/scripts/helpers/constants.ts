@@ -31,12 +31,14 @@ export const enum Faction {
 	ENEMIES,
 }
 
+
 export const enum AbilityKey {
 	ONE = 0,
 	TWO = 1,
 	THREE = 2,
 	FOUR = 3,
 	FIVE = 4,
+	SPACE = 5
 }
 
 export const enum UiDepths {

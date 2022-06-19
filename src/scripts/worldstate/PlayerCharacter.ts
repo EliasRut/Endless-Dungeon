@@ -17,7 +17,7 @@ export default class PlayerCharacter extends Character {
 	public x = 0;
 	public y = 0;
 
-	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity];
+	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
 
 	public activeSummons: Array<{ id: string; summoningType: string }> = [];
 
@@ -33,6 +33,7 @@ export default class PlayerCharacter extends Character {
 		[AbilityKey.THREE]: AbilityType.DUSTNOVA,
 		[AbilityKey.FOUR]: AbilityType.ROUND_HOUSE_KICK,
 		[AbilityKey.FIVE]: AbilityType.NOTHING,
+		[AbilityKey.SPACE]: AbilityType.FIREBALL,		
 	};
 }
 export const updateAbility = (
