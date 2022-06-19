@@ -225,6 +225,8 @@ export interface DatabaseRoom {
 	scripts: Scripting;
 	usedNpcTypes?: string[];
 	doors?: Door[];
+	team?: string;
+	package?: string;
 }
 
 export interface Room {

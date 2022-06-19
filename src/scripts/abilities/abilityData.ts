@@ -38,7 +38,7 @@ export interface ProjectileData {
 	shape?: 'source' | 'storm' | 'cone' | 'nova';
 }
 
-interface AbilityData {
+export interface AbilityData {
 	projectiles?: number;
 	projectileData?: ProjectileData;
 	sound?: string;
