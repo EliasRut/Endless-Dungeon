@@ -31,6 +31,7 @@ export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
 				<StyledLink to="/mapEditor">Map Editor</StyledLink>
 				<StyledLink to="/npcEditor">NPC Editor</StyledLink>
 				<StyledLink to="/questEditor">Quest Editor</StyledLink>
+				<StyledLink to="/abilityEditor">Ability Editor</StyledLink>
 				<StyledLink to="/game">Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>
