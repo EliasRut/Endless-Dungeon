@@ -150,13 +150,6 @@ export default class PierreToken extends EnemyToken {
 		this.stateObject.y = this.body.y / SCALE;
 	}
 
-	destroy() {
-		super.destroy();
-	}
-
-	receiveHit(damage: number) {
-		super.receiveHit(damage);
-	}
 	// FRAME RATE: 16
 	attack(time: number) {
 		if (!this.attacking) {

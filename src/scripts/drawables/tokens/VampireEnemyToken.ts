@@ -157,13 +157,6 @@ export default class VampireToken extends EnemyToken {
 		this.stateObject.y = this.body.y;
 	}
 
-	destroy() {
-		super.destroy();
-	}
-
-	receiveHit(damage: number) {
-		super.receiveHit(damage);
-	}
 	// FRAME RATE: 16
 	attack(time: number) {
 		if (!this.attacking) {
@@ -213,7 +206,8 @@ export default class VampireToken extends EnemyToken {
 				stunDuration = COLLISION_STUN;
 				if (!this.damaged) {
 					this.scene.mainCharacter.receiveStun(stunDuration);
-					this.scene.mainCharacter.receiveHit(this.stateObject.damage);
+					this.scene.mainCharacter.takeDamage(this.stateObject.damage);
+					this.scene.mainCharacter.receiveHit();
 					this.damaged = true;
 				}
 			}

@@ -176,7 +176,8 @@ export default class ZombieToken extends EnemyToken {
 		const distance = this.getDistanceToWorldStatePosition(tx, ty);
 
 		if (distance < this.attackRange) {
-			this.scene.mainCharacter.receiveHit(this.stateObject.damage);
+			this.scene.mainCharacter.takeDamage(this.stateObject.damage);
+			this.scene.mainCharacter.receiveHit();
 		}
 	}
 }

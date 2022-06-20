@@ -71,8 +71,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 
 	public onCollide(withEnemy: boolean) {}
 
-	public receiveHit(damage: number) {
-		this.stateObject.health -= damage;
+	public receiveHit() {
 		if (this.stateObject.health > 0) {
 			if (!this.receiveStun(250)) {
 				this.play({
