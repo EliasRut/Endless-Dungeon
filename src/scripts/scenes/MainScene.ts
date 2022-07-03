@@ -1,7 +1,7 @@
 import 'phaser';
 
 import globalState from '../worldstate/index';
-import { updateStatus } from '../worldstate/Character';
+import Character, { updateStatus } from '../worldstate/Character';
 
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import FpsText from '../drawables/ui/FpsText';
@@ -29,7 +29,8 @@ import {
 } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
-import Avatar from '../drawables/ui/Avatar';
+import PlayerCharacterAvatar from '../drawables/ui/PlayerCharacterAvatar';
+import NPCAvatar from '../drawables/ui/NPCAvatar';
 import ScriptHelper from '../helpers/ScriptHelper';
 import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
@@ -104,7 +105,8 @@ export default class MainScene extends Phaser.Scene {
 	mobilePadBackgorund?: Phaser.GameObjects.Image;
 	mobilePadStick?: Phaser.GameObjects.Image;
 
-	avatar: Avatar;
+	playerCharacterAvatar: PlayerCharacterAvatar;
+	nPCAvatar: NPCAvatar;
 
 	icons: {
 		backpackIcon: BackpackIcon;
@@ -183,7 +185,7 @@ export default class MainScene extends Phaser.Scene {
 			this,
 			globalState.playerCharacter.x || startX,
 			globalState.playerCharacter.y || startY,
-			'vanya-base',
+			'agnes',
 			'testFollower',
 			1,
 			AbilityType.FIREBALL
@@ -209,7 +211,8 @@ export default class MainScene extends Phaser.Scene {
 			this.levelName = new LevelName(this);
 			this.minimap = new Minimap(this);
 		}
-		this.avatar = new Avatar(this);
+		this.playerCharacterAvatar = new PlayerCharacterAvatar(this);
+		this.nPCAvatar = new NPCAvatar(this, this.testFollower.id, 'icon-agnes');
 		if (this.isMobile) {
 			this.mobilePadBackgorund = this.add.image(
 				this.cameras.main.width - MOBILE_PAD_BACKGROUND_X_OFFSET,
@@ -622,7 +625,7 @@ export default class MainScene extends Phaser.Scene {
 		}
 
 		const cooldowns = this.keyboardHelper.getAbilityCooldowns(globalState.gameTime);
-		this.avatar.update(cooldowns);
+		this.playerCharacterAvatar.update(cooldowns);
 
 		if (this.useDynamicLighting && this.dynamicLightingHelper) {
 			this.dynamicLightingHelper.updateDynamicLighting();
@@ -634,6 +637,7 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		this.testFollower.update(globalState.gameTime, delta);
+		this.nPCAvatar.update();
 
 		// TODO: remove items that are picked up
 		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);
@@ -695,11 +699,11 @@ export default class MainScene extends Phaser.Scene {
 
 		for (const fadingLabel of this.fadingLabels) {
 			const timeDelta = globalTime - fadingLabel.timestamp;
-			if (timeDelta > 1000) {
+			if (timeDelta > fadingLabel.timeToLive) {
 				fadingLabel.fontElement?.destroy(true);
 				fadingLabel.fontElement = undefined;
 			} else if (fadingLabel.fontElement) {
-				const timeDeltaFraction = timeDelta / 1000;
+				const timeDeltaFraction = timeDelta / fadingLabel.timeToLive;
 				fadingLabel.fontElement.y = fadingLabel.posY - timeDeltaFraction * FADING_LABEL_Y_DISTANCE;
 				fadingLabel.fontElement.x =
 					fadingLabel.posX + Math.sin(timeDeltaFraction * 4) * FADING_LABEL_X_DISTANCE;
@@ -728,7 +732,8 @@ export default class MainScene extends Phaser.Scene {
 		fontSize: FadingLabelSize,
 		color: string,
 		posX: number,
-		posY: number
+		posY: number,
+		timeToLive: number
 	) {
 		const fadingLabel = new Phaser.GameObjects.Text(this, posX, posY, text, {
 			fontFamily: 'endlessDungeon',
@@ -741,6 +746,7 @@ export default class MainScene extends Phaser.Scene {
 			fontSize,
 			fontElement: fadingLabel,
 			timestamp: this.game.getTime(),
+			timeToLive,
 			posX,
 			posY,
 		});
@@ -782,5 +788,15 @@ export default class MainScene extends Phaser.Scene {
 		itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0, getItemTexture(itemKey));
 		itemToken.setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.worldItems.push(itemToken);
+	}
+
+	getTokenForStateObject(stateObject: Character) {
+		if (stateObject.faction === Faction.PLAYER) {
+			return this.mainCharacter;
+		} else if (stateObject.faction === Faction.FOLLOWER) {
+			return this.testFollower;
+		} else {
+			return this.npcMap[stateObject.id];
+		}
 	}
 }

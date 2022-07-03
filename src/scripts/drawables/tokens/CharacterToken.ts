@@ -127,7 +127,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			FadingLabelSize.NORMAL,
 			'#FFFF00',
 			this.x,
-			this.y - this.body.height
+			this.y - this.body.height,
+			1000
 		);
 		this.stateObject.health -= damage;
 		if (this.showHealthbar()) {

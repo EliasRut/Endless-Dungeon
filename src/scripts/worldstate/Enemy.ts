@@ -8,12 +8,13 @@ export default class Enemy extends Character {
 	public exactTargetYFactor = 0;
 
 	constructor(
+		id: string,
 		animationBase: string,
 		health: number = 100,
 		damage: number = 10,
 		movementSpeed: number = 100
 	) {
-		super(animationBase, health, damage, movementSpeed);
+		super(id, animationBase, health, damage, movementSpeed);
 
 		this.faction = Faction.ENEMIES;
 	}

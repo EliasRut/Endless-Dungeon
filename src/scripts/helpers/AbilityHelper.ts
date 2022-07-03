@@ -72,7 +72,9 @@ export default class AbilityHelper {
 			);
 			if (projectileData?.targeting) {
 				(effect as TargetingEffect).allowedTargets =
-					caster.faction === Faction.PLAYER ? PossibleTargets.ENEMIES : PossibleTargets.PLAYER;
+					caster.faction === Faction.PLAYER || caster.faction === Faction.FOLLOWER
+						? PossibleTargets.ENEMIES
+						: PossibleTargets.PLAYER;
 			}
 			effect.setVelocity(xMultiplier * SCALE, yMultiplier * SCALE);
 			effect.setMaxVelocity(projectileData!.velocity * SCALE);
@@ -107,9 +109,9 @@ export default class AbilityHelper {
 			});
 
 			const targetTokens =
-				caster.faction === Faction.PLAYER
+				caster.faction === Faction.PLAYER || caster.faction === Faction.FOLLOWER
 					? Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES)
-					: this.scene.mainCharacter;
+					: [this.scene.mainCharacter, this.scene.testFollower];
 			const collidingCallback = (collidingEffect: AbilityEffect, enemy: CharacterToken) => {
 				if (collidingEffect.hitEnemyTokens.includes(enemy)) {
 					return;

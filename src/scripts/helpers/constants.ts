@@ -29,6 +29,7 @@ export const enum Faction {
 	PLAYER,
 	NPCS,
 	ENEMIES,
+	FOLLOWER,
 }
 
 export const enum AbilityKey {
@@ -128,6 +129,7 @@ export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingR
 
 export const npcToAespriteMap: { [name: string]: { png: string; json: string } } = {
 	player: { png: 'assets/sprites/player.png', json: 'assets/sprites/player.json' },
+	agnes: { png: 'assets/sprites/agnes.png', json: 'assets/sprites/agnes.json' },
 	rich: { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
 	jacques: { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
 	pierre: { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
@@ -330,6 +332,7 @@ export interface FadingLabelData {
 	fontSize: FadingLabelSize;
 	fontElement: Phaser.GameObjects.Text | undefined;
 	timestamp: number;
+	timeToLive: number;
 	posX: number;
 	posY: number;
 }

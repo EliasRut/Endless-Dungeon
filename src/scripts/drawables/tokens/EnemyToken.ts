@@ -10,9 +10,8 @@ import Enemy from '../../worldstate/Enemy';
 import FireBallEffect from '../effects/FireBallEffect';
 import globalState from '../../worldstate';
 import MainScene from '../../scenes/MainScene';
-import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 import { generateRandomItem } from '../../helpers/item';
-import Item from '../../worldstate/Item';
+import Character from '../../worldstate/Character';
 
 const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;
@@ -35,6 +34,7 @@ export default abstract class EnemyToken extends CharacterToken {
 	aggro: boolean = false;
 	target: Phaser.Geom.Point;
 	level: number;
+	targetStateObject: Character | undefined;
 
 	protected showHealthbar() {
 		return true;
@@ -44,7 +44,7 @@ export default abstract class EnemyToken extends CharacterToken {
 		super(scene, x, y, tokenName, tokenName, id);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
-		this.stateObject = new Enemy(tokenName, ENEMY_DAMAGE, ENEMY_HEALTH, ENEMY_SPEED);
+		this.stateObject = new Enemy(id, tokenName, ENEMY_DAMAGE, ENEMY_HEALTH, ENEMY_SPEED);
 		globalState.enemies[id] = this.stateObject;
 		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 		this.tokenName = tokenName;
@@ -83,17 +83,30 @@ export default abstract class EnemyToken extends CharacterToken {
 		this.setSlowFactor();
 		// set aggro boolean, use a linger time for aggro
 		if (this.lastUpdate <= time) {
-			const player = globalState.playerCharacter;
+			const possibleTargets = [
+				globalState.playerCharacter,
+				...Object.values(globalState.followers),
+			].filter((character) => character.health > 0);
+			const sortedTargets = possibleTargets.sort((left, right) => {
+				const distanceLeft = this.getDistanceToWorldStatePosition(left.x, left.y);
+				const distanceRight = this.getDistanceToWorldStatePosition(right.x, right.y);
+				return distanceLeft - distanceRight;
+			});
+			const closestTarget = sortedTargets[0];
 			if (
+				closestTarget &&
 				this.checkLoS() &&
-				this.getDistanceToWorldStatePosition(player.x, player.y) < this.stateObject.vision * SCALE
+				this.getDistanceToWorldStatePosition(closestTarget.x, closestTarget.y) <
+					this.stateObject.vision * SCALE
 			) {
 				this.aggro = true;
 				this.lastUpdate = time;
-				this.target.x = player.x;
-				this.target.y = player.y;
+				this.target.x = closestTarget.x;
+				this.target.y = closestTarget.y;
+				this.targetStateObject = closestTarget;
 			} else if (this.aggro && this.lastUpdate + this.aggroLinger < time) {
 				this.aggro = false;
+				this.targetStateObject = undefined;
 			}
 		}
 	}

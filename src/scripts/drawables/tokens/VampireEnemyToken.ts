@@ -1,5 +1,4 @@
 import {
-	Facings,
 	facingToSpriteNameMap,
 	KNOCKBACK_TIME,
 	SCALE,
@@ -23,7 +22,6 @@ const HEALTH_DROP_CHANCE = 0.06 * globalState.playerCharacter.luck;
 const CHARGE_TIME = 650;
 const ATTACK_DURATION = 2500;
 const WALL_COLLISION_STUN = 2000;
-const PLAYER_STUN = 800;
 const COLLISION_STUN = 1000;
 const LAUNCH_SPEED = 150;
 export default class VampireToken extends EnemyToken {
@@ -104,11 +102,11 @@ export default class VampireToken extends EnemyToken {
 
 		// follows you only if you're close enough, then runs straight at you,
 		// stop when close enough (proximity)
-		if (!this.attacking) {
+		if (!this.attacking && this.targetStateObject) {
 			const tx = this.target.x;
 			const ty = this.target.y;
-			const px = globalState.playerCharacter.x * SCALE;
-			const py = globalState.playerCharacter.y * SCALE;
+			const px = this.targetStateObject.x * SCALE;
+			const py = this.targetStateObject.y * SCALE;
 			if (this.aggro) {
 				if (
 					px !== tx * SCALE ||
@@ -204,10 +202,11 @@ export default class VampireToken extends EnemyToken {
 			let stunDuration = WALL_COLLISION_STUN;
 			if (withEnemy) {
 				stunDuration = COLLISION_STUN;
-				if (!this.damaged) {
-					this.scene.mainCharacter.receiveStun(stunDuration);
-					this.scene.mainCharacter.takeDamage(this.stateObject.damage);
-					this.scene.mainCharacter.receiveHit();
+				if (!this.damaged && this.targetStateObject) {
+					const targetToken = this.scene.getTokenForStateObject(this.targetStateObject);
+					targetToken?.receiveStun(stunDuration);
+					targetToken?.takeDamage(this.stateObject.damage);
+					targetToken?.receiveHit();
 					this.damaged = true;
 				}
 			}

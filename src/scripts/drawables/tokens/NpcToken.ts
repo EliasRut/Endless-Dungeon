@@ -36,7 +36,8 @@ export default class NpcToken extends CharacterToken {
 		this.questGiverId = options?.questGiverId;
 		this.traderId = options?.traderId;
 
-		globalState.npcs[id] = new Character(type, NPC_DAMAGE, NPC_HEALTH, NPC_SPEED);
+		this.stateObject = new Character(id, type, NPC_DAMAGE, NPC_HEALTH, NPC_SPEED);
+		globalState.npcs[id] = this.stateObject;
 
 		this.play({ key: `${type}-idle-s`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.faction = Faction.NPCS;

@@ -22,8 +22,16 @@ export default class Character {
 	public vision = 0;
 
 	public faction: Faction;
+	public id: string;
 
-	constructor(animationBase: string, health: number, damage: number, movementSpeed: number) {
+	constructor(
+		id: string,
+		animationBase: string,
+		health: number,
+		damage: number,
+		movementSpeed: number
+	) {
+		this.id = id;
 		this.animationBase = animationBase;
 		this.maxHealth = health;
 		this.health = health;

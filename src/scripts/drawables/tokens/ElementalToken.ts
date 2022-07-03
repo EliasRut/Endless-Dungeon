@@ -48,6 +48,7 @@ export default class ElementalToken extends CharacterToken {
 
 		globalState.npcs[id] = this.stateObject;
 		this.stateObject = new Character(
+			id,
 			tokenName,
 			ELEMENTAL_HEALTH,
 			ELEMENTAL_DAMAGE,
