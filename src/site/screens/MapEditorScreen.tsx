@@ -1,26 +1,86 @@
 import 'phaser';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import firebase from 'firebase';
 import { Dropdown } from '../components/Dropdown';
+import MapEditor from '../../scripts/scenes/MapEditor';
+import {
+	DatabaseRoom,
+	ItemsPositioning,
+	NpcPositioning,
+	NpcScriptStep,
+	ScriptWait,
+	ScriptMove,
+	ScriptWalk,
+	ScriptAnimation,
+	Room,
+} from '../../../typings/custom';
 import '../App.css';
+import { UserInformation } from '../../scripts/helpers/UserInformation';
 
 export interface MapEditorScreenProps {
-	user: firebase.User;
+	user: UserInformation;
 }
 
 const showGame = true;
 
+const renderScriptStep: (props: { step: NpcScriptStep }) => JSX.Element = ({ step }) => {
+	switch (step.type) {
+		case 'wait': {
+			return (
+				<div>
+					Wait <InlineInput value={step.time} /> ms
+				</div>
+			);
+		}
+		case 'move': {
+			return (
+				<div>
+					Move to <InlineInput value={step.posX} />, <InlineInput value={step.posY} />
+				</div>
+			);
+		}
+		case 'walk': {
+			return (
+				<div>
+					Walk to <InlineInput value={step.posX} />, <InlineInput value={step.posY} />
+				</div>
+			);
+		}
+		case 'animation': {
+			return (
+				<div>
+					Play Animation <InlineInput value={step.animation} /> for{' '}
+					<InlineInput value={step.duration} /> ms
+				</div>
+			);
+		}
+	}
+};
+
 export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 	const phaserRef = useRef<HTMLDivElement>(null);
+
+	const [activeNpc, setActiveNpc] = useState<NpcPositioning | undefined>(undefined);
+	const [isNpcDialogVisible, setNpcDialogVisible] = useState<boolean>(false);
 
 	useEffect(() => {
 		setActiveMode(MODE.MAP_EDITOR);
 		const config = getGameConfig(phaserRef.current!, MODE.MAP_EDITOR);
 		const game = new Phaser.Game(config);
+		const callbackIntervalId = setInterval(() => {
+			const mapEditorScene = game.scene.getScene('MapEditor') as MapEditor | null;
+			if (mapEditorScene) {
+				mapEditorScene.registerReactBridge({
+					setActiveNpc,
+					setNpcDialogVisible,
+				});
+				clearInterval(callbackIntervalId);
+			}
+		}, 100);
 	}, [showGame]);
 
 	return (
@@ -29,6 +89,7 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 				<StyledLink to="/mapEditor">Map Editor</StyledLink>
 				<StyledLink to="/npcEditor">NPC Editor</StyledLink>
 				<StyledLink to="/questEditor">Quest Editor</StyledLink>
+				<StyledLink to="/abilityEditor">Ability Editor</StyledLink>
 				<StyledLink to="/game">Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>
@@ -69,30 +130,64 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 				</MenueWrapper>
 				<GameWrapper ref={phaserRef}></GameWrapper>
 			</PageWrapper>
-			<NpcDetailsDialog id="npcDetailsDialog">
+			<NpcDetailsDialog id="npcDetailsDialog" isVisible={isNpcDialogVisible}>
 				<DialogTitle>NPC Details</DialogTitle>
-				<InputWrapper>
-					<div>Id</div>
-					<Input id="npcId" />
-				</InputWrapper>
-				<InputWrapper>
-					<div>Type</div>
-					<Dropdown id="npcType">
-						<option>Loading...</option>
-					</Dropdown>
-				</InputWrapper>
-				<InputWrapper>
-					<div>Level</div>
-					<Input id="npcLevel" />
-				</InputWrapper>
-				<InputWrapper>
-					<div>Tile X Position</div>
-					<Input id="npcX" />
-				</InputWrapper>
-				<InputWrapper>
-					<div>Tile Y Position</div>
-					<Input id="npcY" />
-				</InputWrapper>
+				<TwoColumnLayout>
+					<Column>
+						<InputWrapper>
+							<div>Id</div>
+							<Input
+								id="npcId"
+								value={activeNpc?.id || ''}
+								onChange={(e: any) => setActiveNpc({ ...activeNpc!, id: e.target.value! })}
+							/>
+						</InputWrapper>
+						<InputWrapper>
+							<div>Type</div>
+							<Dropdown
+								id="npcType"
+								value={activeNpc?.type || ''}
+								onChange={(e: any) => setActiveNpc({ ...activeNpc!, type: e.target.value! })}
+							>
+								<option>Loading...</option>
+							</Dropdown>
+						</InputWrapper>
+						<InputWrapper>
+							<div>Level</div>
+							<Input
+								id="npcLevel"
+								value={activeNpc?.level}
+								onChange={(e: any) => setActiveNpc({ ...activeNpc!, level: e.target.value! })}
+							/>
+						</InputWrapper>
+						<InputWrapper>
+							<div>Tile X Position</div>
+							<Input
+								id="npcX"
+								value={activeNpc?.x || 0}
+								onChange={(e: any) =>
+									setActiveNpc({ ...activeNpc!, x: parseInt(e.target.value!, 10) })
+								}
+							/>
+						</InputWrapper>
+						<InputWrapper>
+							<div>Tile Y Position</div>
+							<Input
+								id="npcY"
+								value={activeNpc?.y || 0}
+								onChange={(e: any) =>
+									setActiveNpc({ ...activeNpc!, y: parseInt(e.target.value!, 10) })
+								}
+							/>
+						</InputWrapper>
+					</Column>
+					<Column>
+						<NpcScriptsContainer>
+							<div>Scripts</div>
+							{(activeNpc?.script?.steps || []).map((step) => renderScriptStep({ step }))}
+						</NpcScriptsContainer>
+					</Column>
+				</TwoColumnLayout>
 				<ButtonWrapper>
 					<StyledButton id="npcSaveButton">Save</StyledButton>
 				</ButtonWrapper>
@@ -172,6 +267,11 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 		</PageContainer>
 	);
 };
+
+const InlineInput = styled.input`
+	display: inline-block;
+	width: 60px;
+`;
 
 const PageContainer = styled.div`
 	height: 100%;
@@ -264,7 +364,7 @@ const InputWrapper = styled.div`
 const Input = styled.input`
 	width: 100%;
 	font-family: 'endlessDungeon';
-	font-size: 2rem;
+	font-size: 1.4rem;
 `;
 
 const ExportButtonWrapper = styled.div`
@@ -279,14 +379,14 @@ const DownloadAnker = styled.a`
 	display: none;
 `;
 
-const NpcDetailsDialog = styled.div`
-	display: none;
+const NpcDetailsDialog = styled.div<{ isVisible: boolean }>`
+	display: ${(props) => (props.isVisible ? 'flex' : 'none')};
 	position: fixed;
 	top: 50%;
 	right: 5%;
-	width: 148px;
-	height: 500px;
-	margin-top: -250px;
+	width: 400px;
+	height: 460px;
+	margin-top: -230px;
 	background-color: #333c;
 	border: 2px solid #cccccc;
 	box-shadow: 4px 4px 4px 4px #0009;
@@ -340,4 +440,11 @@ const TwoColumnLayout = styled.div`
 const Column = styled.div`
 	display: flex;
 	flex-direction: column;
+`;
+
+const NpcScriptsContainer = styled.div`
+	width: 200px;
+	flex-grow: 1;
+	margin-left: 16px;
+	max-height: 300px;
 `;

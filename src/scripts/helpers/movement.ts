@@ -162,3 +162,33 @@ export const getXYfromTotalSpeed = (y: number, x: number) => {
 	const ySpeed = Math.sin(phi) * Math.sign(-1 * x);
 	return [xSpeed, ySpeed];
 };
+
+export const shiftFacingByOneClockwise = (facing: Facings) => {
+	switch (facing) {
+		case Facings.EAST:
+			return Facings.NORTH;
+		case Facings.NORTH:
+			return Facings.WEST;
+		case Facings.WEST:
+			return Facings.SOUTH;
+		case Facings.SOUTH:
+			return Facings.EAST;
+		default:
+			return Facings.EAST;
+	}
+};
+
+export const getOneLetterFacingName = (facing: Facings) => {
+	switch (facing) {
+		case Facings.EAST:
+			return 'e';
+		case Facings.WEST:
+			return 'w';
+		case Facings.NORTH:
+			return 'n';
+		case Facings.SOUTH:
+			return 's';
+		default:
+			return 's';
+	}
+};

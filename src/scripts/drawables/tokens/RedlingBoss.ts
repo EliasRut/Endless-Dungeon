@@ -4,6 +4,7 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
+import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 const ATTACK_RANGE = 80;
 
@@ -63,15 +64,15 @@ export default class RedlingBossToken extends EnemyToken {
 			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
 			if (animation) {
 				if (this.scene.game.anims.exists(animation)) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 			}
 			return;
 		}
-		
+
 		const timeSinceAttack = Math.max(
 			1,
 			Math.min(this.stateObject.attackTime, time - this.attackedAt)
@@ -98,7 +99,7 @@ export default class RedlingBossToken extends EnemyToken {
 				const animation = updateMovingState(this.stateObject, true, newFacing);
 
 				if (animation) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 			} else {
 				this.setVelocityX(0);
@@ -110,7 +111,7 @@ export default class RedlingBossToken extends EnemyToken {
 				);
 
 				if (animation) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 				this.stateObject.currentFacing = newFacing;
 			}

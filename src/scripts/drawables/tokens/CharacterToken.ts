@@ -1,6 +1,14 @@
 import { Game } from 'phaser';
 import { NpcScript } from '../../../../typings/custom';
-import { facingToSpriteNameMap, Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
+import {
+	facingToSpriteNameMap,
+	Faction,
+	SCALE,
+	VISITED_TILE_TINT,
+	NORMAL_ANIMATION_FRAME_RATE,
+	FadingLabelSize,
+	UiDepths,
+} from '../../helpers/constants';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -12,6 +20,8 @@ const DOT_TINT = [0xc8e44c, 0xb1db30, 0x98d023, 0x588800];
 // const ICE_TINT = [0xb3f1ff, 0x92d5ff, 0x4a9fff, 0x0085ff];
 const ICE_TINT = [0xdbf3fa, 0xb7e9f7, 0x92dff3, 0x7ad7f0];
 
+const HEALTHBAR_MAX_WIDTH = 16 * SCALE;
+const HEALTHBAR_Y_OFFSET = 2 * SCALE;
 export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	stateObject: Character;
 	scene: MainScene;
@@ -27,9 +37,14 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	lastIceEffectTimestamp: number;
 	iceEffectStacks: number;
 	tokenName: string;
+	healthbar: Phaser.GameObjects.Image;
+
+	protected showHealthbar() {
+		return false;
+	}
 
 	constructor(scene: MainScene, x: number, y: number, tileName: string, type: string, id: string) {
-		super(scene, x * SCALE, y * SCALE, 'empty-tile');
+		super(scene, x * SCALE, y * SCALE, tileName);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.setScale(SCALE);
@@ -41,18 +56,32 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		this.lastIceEffectTimestamp = -Infinity;
 		this.iceEffectStacks = 0;
 		this.tokenName = tileName;
+		if (this.showHealthbar()) {
+			this.healthbar = new Phaser.GameObjects.Image(
+				scene,
+				x * SCALE,
+				y * SCALE - this.height - HEALTHBAR_Y_OFFSET,
+				'icon-healthbar'
+			);
+			this.healthbar.scaleX = HEALTHBAR_MAX_WIDTH;
+			this.healthbar.setDepth(UiDepths.FLOATING_HEALTHBAR_LAYER);
+			scene.add.existing(this.healthbar);
+		}
 	}
 
 	public onCollide(withEnemy: boolean) {}
 
-	public receiveHit(damage: number) {
-		this.stateObject.health -= damage;
-		if (!this.receiveStun(250)) {
-			this.play({
-				key: `${this.type}-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
-			}).chain({
-				key: `${this.type}-idle-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
-			});
+	public receiveHit() {
+		if (this.stateObject.health > 0) {
+			if (!this.receiveStun(250)) {
+				this.play({
+					key: `${this.type}-damage-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+				}).chain({
+					key: `${this.type}-idle-${facingToSpriteNameMap[this.stateObject.currentFacing]}`,
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+				});
+			}
 		}
 	}
 	public receiveStun(duration: number) {
@@ -68,6 +97,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		if (duration >= 500 && this.scene.game.anims.exists(animation)) {
 			this.play({
 				key: animation,
+				frameRate: NORMAL_ANIMATION_FRAME_RATE,
 				// 1 run = 500ms
 				repeat: Math.floor((2 * duration) / 1000),
 			});
@@ -91,13 +121,56 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		return null;
 	}
 
-	protected receiveDotDamage(deltaTime: number) {}
-	protected setSlowFactor() {}
+	public takeDamage(damage: number) {
+		this.scene.addFadingLabel(
+			`${Math.round(damage)}`,
+			FadingLabelSize.NORMAL,
+			'#FFFF00',
+			this.x,
+			this.y - this.body.height
+		);
+		this.stateObject.health -= damage;
+		if (this.showHealthbar()) {
+			this.updateHealthbar();
+		}
+	}
+
+	destroy(fromScene?: boolean) {
+		if (this.showHealthbar()) {
+			this.healthbar.destroy(fromScene);
+		}
+		super.destroy(fromScene);
+	}
+
+	die() {
+		if (this.showHealthbar()) {
+			this.healthbar.scaleX = 0;
+			this.healthbar.setVisible(false);
+		}
+	}
+
+	public updateHealthbar() {
+		this.healthbar.scaleX =
+			(Math.max(0, this.stateObject.health) / this.stateObject.maxHealth) * HEALTHBAR_MAX_WIDTH;
+	}
+
+	protected receiveDotDamage(deltaTime: number) {
+		// dot = damage over time, deltatime is in ms so we have to devide it by 1000
+		const dot =
+			(globalState.playerCharacter.damage * this.necroticEffectStacks * deltaTime) / 1000 / 4;
+		this.stateObject.health = this.stateObject.health - dot;
+		this.updateHealthbar();
+	}
+
+	protected setSlowFactor() {
+		this.stateObject.slowFactor = Math.max(1 - this.iceEffectStacks / 4, 0.01);
+	}
 
 	// update from main Scene
 	public update(time: number, deltaTime: number) {
 		const tile = this.getOccupiedTile();
 		if (tile) {
+			const hasHealthbar = this.showHealthbar();
 			// let the necrotic Effekt disapear after 2 sec
 			if (this.lastNecroticEffectTimestamp <= time - 2000) {
 				this.necroticEffectStacks = 0;
@@ -114,17 +187,31 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			if (this.necroticEffectStacks > 0) {
 				// Color the token green and deal damage over time
 				this.tint = DOT_TINT[this.necroticEffectStacks - 1];
+				if (hasHealthbar) {
+					this.healthbar.tint = DOT_TINT[this.necroticEffectStacks - 1];
+				}
 				// this.tint = Math.min(0x00ff00, 0x006600 + GREEN_DIFF * this.necroticEffectStacks);
 				this.receiveDotDamage(deltaTime);
 			} else if (this.iceEffectStacks > 0) {
 				// Color the token blue and slows down
 				this.tint = ICE_TINT[this.iceEffectStacks - 1];
+				if (hasHealthbar) {
+					this.healthbar.tint = ICE_TINT[this.iceEffectStacks - 1];
+				}
 				// this.tint = Math.min(0x0000ff, 0x000066 + BLUE_DIFF * this.iceEffectStacks);
 				this.setSlowFactor();
 			} else {
 				this.tint = tile.tint;
+				if (hasHealthbar) {
+					this.healthbar.tint = tile.tint;
+				}
 			}
 			this.setVisible(tile.tint > VISITED_TILE_TINT);
+			if (hasHealthbar) {
+				this.healthbar.setVisible(tile.tint > VISITED_TILE_TINT);
+				this.healthbar.x = this.x;
+				this.healthbar.y = this.y - this.height - HEALTHBAR_Y_OFFSET;
+			}
 		}
 	}
 }

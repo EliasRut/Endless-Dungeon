@@ -11,14 +11,15 @@ import * as data from '../../assets/newgame.json';
 const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
 const SCALED_WINDOW_HEIGHT = window.innerHeight / UI_SCALE;
 
-const SETTINGS_WIDTH = 100;
-const SETTINGS_HEIGHT = 114;
+const SETTINGS_WIDTH = 120;
+const SETTINGS_HEIGHT = 144;
 const SETTINGS_START_X = (SCALED_WINDOW_WIDTH - SETTINGS_WIDTH) / 2;
 const SETTINGS_START_Y = (SCALED_WINDOW_HEIGHT - SETTINGS_HEIGHT) / 2;
 export default class SettingsScreen extends OverlayScreen {
-	saveIcon: Phaser.GameObjects.Text;
-	loadIcon: Phaser.GameObjects.Text;
-	newGameIcon: Phaser.GameObjects.Text;
+	saveText: Phaser.GameObjects.Text;
+	loadText: Phaser.GameObjects.Text;
+	newGameText: Phaser.GameObjects.Text;
+	manageContentText: Phaser.GameObjects.Text;
 	scene: MainScene;
 
 	constructor(scene: Phaser.Scene) {
@@ -34,7 +35,7 @@ export default class SettingsScreen extends OverlayScreen {
 
 		this.scene = scene as MainScene;
 
-		this.saveIcon = new Phaser.GameObjects.Text(
+		this.saveText = new Phaser.GameObjects.Text(
 			scene,
 			(SETTINGS_START_X + 12) * UI_SCALE,
 			(SETTINGS_START_Y + 18) * UI_SCALE,
@@ -49,17 +50,17 @@ export default class SettingsScreen extends OverlayScreen {
 			}
 		);
 		// this.dialogText.setOrigin(0, 0);
-		this.saveIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-		this.saveIcon.setScrollFactor(0);
-		this.saveIcon.setInteractive();
-		this.saveIcon.setShadow(0, 1 * UI_SCALE, 'black');
-		this.saveIcon.on('pointerdown', () => {
+		this.saveText.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.saveText.setScrollFactor(0);
+		this.saveText.setInteractive();
+		this.saveText.setShadow(0, 1 * UI_SCALE, 'black');
+		this.saveText.on('pointerdown', () => {
 			// scene.overlayScreens.settingsScreen.save();
 			// tslint:disable-next-line: no-console
 			console.log('save game');
 			this.save();
 		});
-		this.add(this.saveIcon, true);
+		this.add(this.saveText, true);
 
 		const fileInput: HTMLInputElement = document.createElement('input');
 		// const sc: Phaser.Scene = this.scene;
@@ -79,7 +80,7 @@ export default class SettingsScreen extends OverlayScreen {
 		);
 		document.body.appendChild(fileInput);
 
-		this.loadIcon = new Phaser.GameObjects.Text(
+		this.loadText = new Phaser.GameObjects.Text(
 			scene,
 			(SETTINGS_START_X + 12) * UI_SCALE,
 			(SETTINGS_START_Y + 46) * UI_SCALE,
@@ -93,20 +94,20 @@ export default class SettingsScreen extends OverlayScreen {
 			}
 		);
 		// this.dialogText.setOrigin(0, 0);
-		this.loadIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-		this.loadIcon.setScrollFactor(0);
-		this.loadIcon.setInteractive();
-		this.loadIcon.setShadow(0, 1 * UI_SCALE, 'black');
-		this.loadIcon.on('pointerdown', () => {
+		this.loadText.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.loadText.setScrollFactor(0);
+		this.loadText.setInteractive();
+		this.loadText.setShadow(0, 1 * UI_SCALE, 'black');
+		this.loadText.on('pointerdown', () => {
 			// scene.overlayScreens.settingsScreen.save();
 			// tslint:disable-next-line: no-console
 			console.log('load game');
 			// this.load(fileInput);
 			fileInput.click();
 		});
-		this.add(this.loadIcon, true);
+		this.add(this.loadText, true);
 
-		this.newGameIcon = new Phaser.GameObjects.Text(
+		this.newGameText = new Phaser.GameObjects.Text(
 			scene,
 			(SETTINGS_START_X + 12) * UI_SCALE,
 			(SETTINGS_START_Y + 74) * UI_SCALE,
@@ -121,16 +122,40 @@ export default class SettingsScreen extends OverlayScreen {
 			}
 		);
 		// this.dialogText.setOrigin(0, 0);
-		this.newGameIcon.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-		this.newGameIcon.setScrollFactor(0);
-		this.newGameIcon.setInteractive();
-		this.newGameIcon.setShadow(0, 1 * UI_SCALE, 'black');
-		this.newGameIcon.on('pointerdown', () => {
+		this.newGameText.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.newGameText.setScrollFactor(0);
+		this.newGameText.setInteractive();
+		this.newGameText.setShadow(0, 1 * UI_SCALE, 'black');
+		this.newGameText.on('pointerdown', () => {
 			this.load(data);
 			this.scene.scene.start('RoomPreloaderScene');
 			(this.scene as MainScene).resume();
 		});
-		this.add(this.newGameIcon, true);
+		this.add(this.newGameText, true);
+
+		this.manageContentText = new Phaser.GameObjects.Text(
+			scene,
+			(SETTINGS_START_X + 12) * UI_SCALE,
+			(SETTINGS_START_Y + 102) * UI_SCALE,
+			'Manage Content',
+			{
+				color: 'white',
+				fontSize: `${12 * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+				align: 'center',
+				fixedWidth: (SETTINGS_WIDTH - 28) * UI_SCALE,
+			}
+		);
+		// this.dialogText.setOrigin(0, 0);
+		this.manageContentText.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.manageContentText.setScrollFactor(0);
+		this.manageContentText.setInteractive();
+		this.manageContentText.setShadow(0, 1 * UI_SCALE, 'black');
+		this.manageContentText.on('pointerdown', () => {
+			this.setVisible(false);
+			(scene as MainScene).overlayScreens.contentManagementScreen.setVisible(true);
+		});
+		this.add(this.manageContentText, true);
 
 		// tslint:enable
 		scene.add.existing(this);
@@ -279,6 +304,14 @@ export default class SettingsScreen extends OverlayScreen {
 		a.href = URL.createObjectURL(file);
 		a.download = fileName;
 		a.click();
+	}
+
+	setVisible(value: boolean, index?: number | undefined, direction?: number | undefined) {
+		super.setVisible(value, index, direction);
+		if (value) {
+			this.scene.overlayScreens?.contentManagementScreen?.setVisible(false);
+		}
+		return this;
 	}
 }
 

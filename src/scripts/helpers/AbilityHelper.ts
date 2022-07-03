@@ -1,4 +1,4 @@
-import { Abilities, AbilityType, SpreadData } from '../abilities/abilityData';
+import { Abilities, AbilityData, AbilityType, SpreadData } from '../abilities/abilityData';
 import AbilityEffect from '../drawables/effects/AbilityEffect';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import EnemyToken from '../drawables/tokens/EnemyToken';
@@ -22,17 +22,25 @@ export default class AbilityHelper {
 
 	triggerAbility(
 		caster: Character,
-		pointOfOrigin: { currentFacing: Facings; x: number; y: number },
+		pointOfOrigin: {
+			currentFacing: Facings;
+			x: number;
+			y: number;
+			exactTargetXFactor?: number;
+			exactTargetYFactor?: number;
+		},
 		type: AbilityType,
 		abilityLevel: number,
-		globalTime: number
+		globalTime: number,
+		abilityData?: AbilityData
 	) {
 		// We allow for multiple projectiles per ability.
 		// Let's get the data for ability projectiles first.
-		const projectileData = Abilities[type].projectileData;
+		const usedAbilityData = abilityData || Abilities[type];
+		const projectileData = usedAbilityData.projectileData;
 		// Since we're allowing projectiles to have a spread, we'll be using radians for easier math
 		const facingRotation = getRotationInRadiansForFacing(pointOfOrigin.currentFacing);
-		const numProjectiles = Abilities[type].projectiles || 0;
+		const numProjectiles = usedAbilityData.projectiles || 0;
 		const fireProjectile = (projectileIndex: number) => {
 			// Spread multiple projectiles over an arc on a circle
 			const spread: SpreadData = projectileData?.spread ? projectileData!.spread : [0, 0];
@@ -48,15 +56,17 @@ export default class AbilityHelper {
 			// We want to combine the arc position with the characters facing to allow cone-like effects
 			let yMultiplier = -Math.cos(currentSpread * Math.PI + facingRotation);
 			let xMultiplier = Math.sin(currentSpread * Math.PI + facingRotation);
-			if (caster.faction === Faction.ENEMIES) {
-				xMultiplier = (caster as Enemy).exactTargetXFactor;
-				yMultiplier = (caster as Enemy).exactTargetYFactor;
+			if (pointOfOrigin.exactTargetXFactor !== undefined) {
+				xMultiplier = pointOfOrigin.exactTargetXFactor;
+			}
+			if (pointOfOrigin.exactTargetYFactor !== undefined) {
+				yMultiplier = pointOfOrigin.exactTargetYFactor;
 			}
 			const effect = new projectileData!.effect(
 				this.scene,
 				pointOfOrigin.x + xMultiplier * projectileData!.xOffset, //  * SCALE
 				pointOfOrigin.y + yMultiplier * projectileData!.yOffset, //  * SCALE
-				Abilities[type].spriteName || '',
+				usedAbilityData.spriteName || '',
 				getFacing4Dir(xMultiplier, yMultiplier),
 				projectileData
 			);
@@ -109,35 +119,34 @@ export default class AbilityHelper {
 					collidingEffect.destroy();
 				}
 				effect.hitEnemyTokens.push(enemy);
-				const newEnemyHealth =
-					enemy.stateObject.health -
-					caster.damage * Abilities[type].damageMultiplier * abilityLevel;
-				if (enemy.stateObject.health > 0 && newEnemyHealth <= 0) {
+				const damage = caster.damage * usedAbilityData.damageMultiplier * abilityLevel;
+				const prevHealth = enemy.stateObject.health;
+				enemy.takeDamage(damage);
+				if (prevHealth > 0 && enemy.stateObject.health <= 0) {
 					console.log(`Enemy died`);
 					// Enemy died from this attack
-					if (Abilities[type].castOnEnemyDestroyed) {
+					if (usedAbilityData.castOnEnemyDestroyed) {
 						this.triggerAbility(
 							caster,
 							enemy.stateObject,
-							Abilities[type].castOnEnemyDestroyed!,
+							usedAbilityData.castOnEnemyDestroyed!,
 							abilityLevel,
 							globalTime
 						);
 					}
 				}
-				//enemy.stateObject.health = newEnemyHealth;
-				enemy.receiveHit(caster.damage * Abilities[type].damageMultiplier);
+				if (usedAbilityData.stun) {
+					enemy.receiveStun(usedAbilityData.stun!);
+				}
 
-				if (Abilities[type].stun) {
-					enemy.receiveStun(Abilities[type].stun!);
-				}
-				if (Abilities[type].necroticStacks) {
+				enemy.receiveHit();
+				if (usedAbilityData.necroticStacks) {
 					enemy.lastNecroticEffectTimestamp = globalTime;
-					enemy.necroticEffectStacks += Abilities[type].necroticStacks!;
+					enemy.necroticEffectStacks += usedAbilityData.necroticStacks!;
 				}
-				if (Abilities[type].iceStacks) {
+				if (usedAbilityData.iceStacks) {
 					enemy.lastIceEffectTimestamp = globalTime;
-					enemy.iceEffectStacks += Abilities[type].iceStacks!;
+					enemy.iceEffectStacks += usedAbilityData.iceStacks!;
 				}
 				if (projectileData?.knockback) {
 					enemy.lastMovedTimestamp = globalTime;
@@ -171,8 +180,8 @@ export default class AbilityHelper {
 			}
 		}
 		// We just want to play the ability sound once, not once for each projectile
-		if (Abilities[type].sound) {
-			this.scene.sound.play(Abilities[type].sound!, { volume: Abilities[type].sfxVolume! });
+		if (usedAbilityData.sound) {
+			this.scene.sound.play(usedAbilityData.sound!, { volume: usedAbilityData.sfxVolume! });
 		}
 	}
 	update(time: number, castAbilities: [AbilityType, number][]) {

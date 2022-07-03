@@ -31,12 +31,14 @@ export const enum Faction {
 	ENEMIES,
 }
 
+
 export const enum AbilityKey {
 	ONE = 0,
 	TWO = 1,
 	THREE = 2,
 	FOUR = 3,
 	FIVE = 4,
+	SPACE = 5
 }
 
 export const enum UiDepths {
@@ -50,13 +52,15 @@ export const enum UiDepths {
 	OVERLAY_TILE_LAYER = 5,
 	OVERLAY_DECORATION_TILE_LAYER = 6,
 	TOP_TILE_LAYER = 7,
+	FLOATING_HEALTHBAR_LAYER = 8,
+	FLOATING_TEXT_LAYER = 9,
 
-	UI_BACKGROUND_LAYER = 8,
-	UI_MAIN_LAYER = 9,
-	UI_FOREGROUND_LAYER = 10,
-	UI_ABOVE_FOREGROUND_LAYER = 11,
+	UI_BACKGROUND_LAYER = 10,
+	UI_MAIN_LAYER = 11,
+	UI_FOREGROUND_LAYER = 12,
+	UI_ABOVE_FOREGROUND_LAYER = 13,
 
-	UI_STICK_LAYER = 12,
+	UI_STICK_LAYER = 14,
 }
 
 export const TARGETABLE_TILE_TINT = 0x888888;
@@ -124,10 +128,12 @@ export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingR
 };
 
 export const npcToAespriteMap: { [name: string]: { png: string; json: string } } = {
-	'rich': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
-	'jacques': { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
-	'pierre': { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
+	player: { png: 'assets/sprites/player.png', json: 'assets/sprites/player.json' },
+	rich: { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
+	jacques: { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
+	pierre: { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
 	'lich-king': { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
+	firesprite: { png: 'assets/sprites/firesprite.png', json: 'assets/sprites/firesprite.json' },
 };
 
 export const characterToSubAnimationFileMap: {
@@ -219,6 +225,7 @@ export const colorOfMagicToTilesetMap = {
 };
 
 export const NpcTypeList = ['rich', 'jacques', 'pierre'];
+export const SummonsTypeList = ['firesprite'];
 
 export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
 	[ColorsOfMagic.FLUX]: [
@@ -264,9 +271,9 @@ export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
 };
 
 export const enemyBudgetCost = {
-	'rich': 1,
-	'jacques': 1,
-	'pierre': 1,	
+	rich: 1,
+	jacques: 1,
+	pierre: 1,
 	'redling-boss': 10,
 };
 
@@ -275,7 +282,16 @@ export const enum MODE {
 	MAP_EDITOR = 'mapEditor',
 	NPC_EDITOR = 'npcEditor',
 	QUEST_EDITOR = 'questEditor',
+	ABILITY_EDITOR = 'abilityEditor',
 }
+
+export const enum DOOR_TYPE {
+	IRON_DOOR = 'iron_door',
+}
+
+export const DOOR_OFFSETS = {
+	[DOOR_TYPE.IRON_DOOR]: { x: 0, y: 3.33 },
+};
 
 export let activeMode = MODE.GAME;
 
@@ -288,3 +304,32 @@ export const CHARACTER_SPRITE_HEIGHT = 240;
 
 export const SCALE = 3;
 export const UI_SCALE = (window.innerWidth >= 1900 && window.innerHeight) >= 840 ? 3 : 2;
+
+export enum SUMMONING_TYPE {
+	FIRE_ELEMENTAL = 'fire_elemental',
+	ICE_ELEMENTAL = 'ice_elemental',
+	ARCANE_ELEMENTAL = 'arcane_elemental',
+	NECROTIC_ELEMENTAL = 'necrotic_elemental',
+}
+
+export const NORMAL_ANIMATION_FRAME_RATE = 60;
+
+export enum FadingLabelSize {
+	SMALL,
+	NORMAL,
+	LARGE,
+}
+
+export const BaseFadingLabelFontSize = {
+	[FadingLabelSize.SMALL]: 6,
+	[FadingLabelSize.NORMAL]: 8,
+	[FadingLabelSize.LARGE]: 12,
+};
+
+export interface FadingLabelData {
+	fontSize: FadingLabelSize;
+	fontElement: Phaser.GameObjects.Text | undefined;
+	timestamp: number;
+	posX: number;
+	posY: number;
+}

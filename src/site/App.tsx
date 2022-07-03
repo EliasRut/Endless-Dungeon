@@ -5,22 +5,24 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { StartScreen } from './screens/StartScreen';
 import { MapEditorScreen } from './screens/MapEditorScreen';
 import { NPCEditorScreen } from './screens/NPCEditorScreen';
-import { Login } from './screens/Login';
 import firebase from 'firebase';
 import './App.css';
 import { QuestEditorScreen } from './screens/QuestEditorScreen';
+import { loadUserData } from '../scripts/helpers/userHelpers';
+import { UserInformation } from '../scripts/helpers/UserInformation';
+import { AbilityEditorScreen } from './screens/AbilityEditorScreen';
 
 const provider = new firebase.auth.GoogleAuthProvider();
 
 export default function App() {
-	const [user, setUser] = useState<firebase.User | null>();
+	const [user, setUser] = useState<UserInformation | undefined>(undefined);
 
 	useEffect(() => {
 		firebase.auth().onAuthStateChanged((authData) => {
 			if (authData) {
-				setUser(authData);
+				loadUserData(authData.uid).then((userData) => setUser(userData));
 			} else {
-				setUser(null);
+				setUser(undefined);
 			}
 		});
 	}, [setUser]);
@@ -30,7 +32,11 @@ export default function App() {
 			.auth()
 			.signInWithPopup(provider)
 			.then((result) => {
-				setUser(result.user);
+				if (result.user) {
+					loadUserData(result.user.uid).then((userData) => setUser(userData));
+				} else {
+					setUser(undefined);
+				}
 			})
 			.catch((error) => {
 				// Handle Errors here.
@@ -62,6 +68,9 @@ export default function App() {
 					<Route path="/questEditor">
 						<QuestEditorScreen user={user} />
 					</Route>
+					<Route path="/abilityEditor">
+						<AbilityEditorScreen user={user} />
+					</Route>
 					<Route path="/">
 						<StartScreen auth={auth} user={user} />
 					</Route>
@@ -72,7 +81,7 @@ export default function App() {
 						<Game />
 					</Route>
 					<Route path="/">
-						<StartScreen auth={auth} user={null} />
+						<StartScreen auth={auth} user={undefined} />
 					</Route>
 				</Switch>
 			)}

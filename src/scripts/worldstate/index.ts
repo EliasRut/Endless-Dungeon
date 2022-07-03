@@ -19,6 +19,7 @@ import { EmptyInventory } from './Inventory';
 
 // This is the world state typing.
 export class WorldState {
+	public contentPackages: string[] = ['6Bf0lAbliACPrimJtzFr'];
 	public loadGame: boolean = true;
 	public gameTime: number;
 	public playerCharacter: PlayerCharacter;
@@ -36,6 +37,7 @@ export class WorldState {
 	public inventory: Inventory;
 	public itemList: Item[];
 
+	public static readonly CONTENTPACKAGE: string = 'contentPackages';
 	public static readonly PLAYERCHARACTER: string = 'playerCharacter';
 	public static readonly GAMETIME: string = 'gameTime';
 	public static readonly NPCS: string = 'npcs';
@@ -61,6 +63,7 @@ export class WorldState {
 	}
 
 	storeState() {
+		localStorage.setItem(WorldState.CONTENTPACKAGE, JSON.stringify(this.contentPackages));
 		localStorage.setItem(WorldState.PLAYERCHARACTER, JSON.stringify(this.playerCharacter));
 		localStorage.setItem(WorldState.GAMETIME, `${this.gameTime}`);
 		localStorage.setItem(WorldState.NPCS, JSON.stringify(this.npcs));
@@ -87,6 +90,9 @@ export class WorldState {
 			console.log('no savegamename set');
 			return;
 		}
+		this.contentPackages = JSON.parse(
+			localStorage.getItem(WorldState.CONTENTPACKAGE) || '["6Bf0lAbliACPrimJtzFr"]'
+		);
 		this.gameTime = parseInt(localStorage.getItem(WorldState.GAMETIME) || '0', 10);
 		this.playerCharacter = JSON.parse(localStorage.getItem(WorldState.PLAYERCHARACTER) || '{}');
 		this.npcs = JSON.parse(localStorage.getItem(WorldState.NPCS) || '{}');

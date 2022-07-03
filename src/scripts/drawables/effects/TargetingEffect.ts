@@ -1,16 +1,14 @@
 import {
-	Facings,
 	facingToSpriteNameMap,
 	Faction,
 	PossibleTargets,
-	TARGETABLE_TILE_TINT,
 	VISITED_TILE_TINT,
 } from '../../helpers/constants';
 import { getFacing4Dir } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import CharacterToken from '../tokens/CharacterToken';
 import AbilityEffect from './AbilityEffect';
-import { SCALE } from '../../helpers/constants';
+import { SCALE, NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 export default class TargetingEffect extends AbilityEffect {
 	allowedTargets: PossibleTargets = PossibleTargets.NONE;
@@ -71,7 +69,7 @@ export default class TargetingEffect extends AbilityEffect {
 			if (this.facing !== newFacing) {
 				this.facing = newFacing;
 				const animation = `${this.animationName}-${facingToSpriteNameMap[newFacing]}`;
-				this.play({ key: animation, repeat: -1 });
+				this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
 			}
 		}
 	}

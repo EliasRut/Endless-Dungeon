@@ -12,8 +12,21 @@ import DialogScreen from '../screens/DialogScreen';
 import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
-import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
-import { essenceNames, Faction, NUM_ITEM_ICONS, SCALE, UiDepths } from '../helpers/constants';
+import {
+	getCharacterSpeed,
+	getFacing8Dir,
+	updateMovingState,
+	isCollidingTile,
+} from '../helpers/movement';
+import {
+	BaseFadingLabelFontSize,
+	Faction,
+	FadingLabelData,
+	FadingLabelSize,
+	NORMAL_ANIMATION_FRAME_RATE,
+	SCALE,
+	UiDepths,
+} from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
@@ -23,30 +36,23 @@ import BackpackIcon from '../drawables/ui/BackpackIcon';
 import SettingsIcon from '../drawables/ui/SettingsIcon';
 import { spawnNpc } from '../helpers/spawn';
 import CharacterToken from '../drawables/tokens/CharacterToken';
-import { NpcOptions, NpcScript } from '../../../typings/custom';
+import { NpcOptions } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
-import Item from '../worldstate/Item';
-import { EquippableDroppedItemData, generateRandomItem } from '../helpers/item';
 import SettingsScreen from '../screens/SettingsScreen';
 import DoorToken from '../drawables/tokens/DoorToken';
 
-import fixedItems from '../../items/fixedItems.json';
 import { DungeonRunData } from '../models/DungeonRunData';
 import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
-import { Catalyst, Source, getItemDataForName, getItemTexture } from '../../items/itemData';
+import { getItemDataForName, getItemTexture } from '../../items/itemData';
 import Minimap from '../drawables/ui/Minimap';
-import { AbilityType } from '../abilities/abilityData';
 import LevelName from '../drawables/ui/LevelName';
 import QuestsIcon from '../drawables/ui/QuestsIcon';
 import QuestLogScreen from '../screens/QuestLogScreen';
 import QuestDetailsScreen from '../screens/QuestDetailsScreen';
-import { Scale } from 'phaser';
+import ContentManagementScreen from '../screens/ContentManagementScreen';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
-
-const DEBUG__ITEM_OFFSET_X = 30;
-const DEBUG__ITEM_OFFSET_Y = 30;
 
 const CASTING_SPEED_MS = 250;
 
@@ -57,6 +63,9 @@ const MOBILE_PAD_BACKGROUND_X_OFFSET = 96;
 const MOBILE_PAD_FOREGROUND_X_OFFSET = 96;
 
 const DEATH_RESPAWN_TIME = 3000;
+
+const FADING_LABEL_Y_DISTANCE = 64;
+const FADING_LABEL_X_DISTANCE = 16;
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -73,6 +82,7 @@ export default class MainScene extends Phaser.Scene {
 	npcMap: { [id: string]: CharacterToken };
 	doorMap: { [id: string]: DoorToken };
 	worldItems: WorldItemToken[];
+	fadingLabels: FadingLabelData[];
 
 	overlayScreens: {
 		inventory: InventoryScreen;
@@ -82,6 +92,7 @@ export default class MainScene extends Phaser.Scene {
 		questLogScreen: QuestLogScreen;
 		questDetailsScreen: QuestDetailsScreen;
 		itemScreen: ItemScreen;
+		contentManagementScreen: ContentManagementScreen;
 	};
 	alive: number;
 	isPaused = false;
@@ -112,6 +123,7 @@ export default class MainScene extends Phaser.Scene {
 	lastStepLeft: number | undefined;
 
 	lastScriptUnpausing: number = Date.now();
+	lastPlayerPosition: { x: number; y: number } | undefined;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -132,6 +144,7 @@ export default class MainScene extends Phaser.Scene {
 		this.npcMap = {};
 		this.doorMap = {};
 		this.worldItems = [];
+		this.fadingLabels = [];
 		const [startX, startY] = this.drawRoom();
 
 		this.useDynamicLighting = globalState.currentLevel.startsWith('dungeonLevel');
@@ -241,6 +254,7 @@ export default class MainScene extends Phaser.Scene {
 			settingsScreen: new SettingsScreen(this),
 			questLogScreen: new QuestLogScreen(this),
 			questDetailsScreen: new QuestDetailsScreen(this),
+			contentManagementScreen: new ContentManagementScreen(this),
 		};
 
 		this.icons.backpackIcon.setScreens();
@@ -276,8 +290,7 @@ export default class MainScene extends Phaser.Scene {
 			const facing = getFacing8Dir(facingX, facingY);
 			const animation = updateMovingState(globalState.npcs[id], false, facing, true);
 			if (animation) {
-				// npc.play({ key: 'DashR', repeat: -1 });
-				npc.play(animation);
+				npc.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 			}
 		}
 		this.npcMap[id].setDepth(UiDepths.TOKEN_MAIN_LAYER);
@@ -296,6 +309,7 @@ export default class MainScene extends Phaser.Scene {
 			});
 		}
 		this.npcMap[id].script = options?.script;
+		return npc;
 	}
 
 	addDoor(id: string, type: string, x: number, y: number, open: boolean) {
@@ -309,7 +323,7 @@ export default class MainScene extends Phaser.Scene {
 			};
 		}
 		this.doorMap[id] = new DoorToken(this, x, y, type, id);
-		this.doorMap[id].setDepth(UiDepths.DECORATION_TILE_LAYER);
+		this.doorMap[id].setDepth(UiDepths.TOP_TILE_LAYER);
 		this.physics.add.collider(this.doorMap[id], this.mainCharacter);
 		Object.values(this.npcMap).forEach((npc) => {
 			this.physics.add.collider(this.doorMap[id], npc);
@@ -457,7 +471,7 @@ export default class MainScene extends Phaser.Scene {
 				return;
 			}
 		}
-		if ((this, this.keyboardHelper.isEnterPressed())) {
+		if (this.keyboardHelper.isEnterPressed()) {
 			if (this.scriptHelper.isScriptRunning()) {
 				this.scriptHelper.handleScriptStep(globalState.gameTime, true);
 				return;
@@ -485,17 +499,38 @@ export default class MainScene extends Phaser.Scene {
 			return;
 		}
 
-		this.scriptHelper.handleScripts(globalState.gameTime);
-
 		this.overlayScreens.statScreen.update();
 
 		if (this.isPaused) {
+			this.scriptHelper.handleScripts(globalState.gameTime);
 			if (this.icons.backpackIcon.screens[0].visiblity)
 				this.overlayScreens.inventory.interactInventory(
 					this.keyboardHelper.getInventoryKeyPress(),
 					globalState.gameTime
 				);
 			return;
+		}
+
+		// Reset Player position to last position if they are on a blocking tile now
+		const playerX = globalState.playerCharacter.x;
+		const playerY = globalState.playerCharacter.y;
+		const currentBaseTileIndex = this.tileLayer.getTileAtWorldXY(playerX, playerY)?.index;
+		const currentDecorationTileIndex = this.decorationLayer.getTileAtWorldXY(
+			playerX,
+			playerY
+		)?.index;
+
+		if (
+			isCollidingTile(currentBaseTileIndex || -1) ||
+			isCollidingTile(currentDecorationTileIndex || -1)
+		) {
+			this.mainCharacter.x = this.lastPlayerPosition!.x;
+			this.mainCharacter.y = this.lastPlayerPosition!.y;
+		} else {
+			this.lastPlayerPosition = {
+				x: this.mainCharacter.x,
+				y: this.mainCharacter.y,
+			};
 		}
 
 		if (!this.blockUserInteraction) {
@@ -506,47 +541,50 @@ export default class MainScene extends Phaser.Scene {
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
 			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
 
-			const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
-				this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackgorund!.x : 0,
-				this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackgorund!.y : 0
-			);
-			const newFacing = getFacing8Dir(xFacing, yFacing);
+			if (!globalState.playerCharacter.dashing) {
+				const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
+					this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackgorund!.x : 0,
+					this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackgorund!.y : 0
+				);
+				const newFacing = getFacing8Dir(xFacing, yFacing);
 
-			// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
-			const hasMoved = xFacing !== 0 || yFacing !== 0;
-			let playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
-			const isWalking =
-				isCasting ||
-				(this.mobilePadStick
-					? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
-					  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
-					: false);
-			if (playerAnimation) {
-				this.mainCharacter.play({
-					key: playerAnimation,
-					frameRate: globalState.playerCharacter.movementSpeed / (isWalking ? 20 : 10),
-					repeat: -1,
-				});
-			}
-			if (hasMoved) {
-				const shouldPlayLeftStepSfx =
-					!this.lastStepLeft || globalState.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
-
-				if (shouldPlayLeftStepSfx) {
-					this.sound.play('sound-step-grass-l', { volume: 0.25 });
-					this.lastStepLeft = globalState.gameTime;
+				// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
+				const hasMoved = xFacing !== 0 || yFacing !== 0;
+				const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
+				const isWalking =
+					isCasting ||
+					(this.mobilePadStick
+						? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
+						Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
+						: false);
+				if (playerAnimation) {
+					this.mainCharacter.play({
+						key: playerAnimation,
+						// duration: 5,
+						frameRate: isWalking ? NORMAL_ANIMATION_FRAME_RATE / 2 : NORMAL_ANIMATION_FRAME_RATE,
+						repeat: -1,
+					});
 				}
-			} else {
-				this.lastStepLeft = undefined;
+				if (hasMoved) {
+					const shouldPlayLeftStepSfx =
+						!this.lastStepLeft || globalState.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
+
+					if (shouldPlayLeftStepSfx) {
+						this.sound.play('sound-step-grass-l', { volume: 0.25 });
+						this.lastStepLeft = globalState.gameTime;
+					}
+				} else {
+					this.lastStepLeft = undefined;
+				}
+
+				const speed =
+					isCasting || isWalking
+						? getCharacterSpeed(globalState.playerCharacter) / 2
+						: getCharacterSpeed(globalState.playerCharacter);
+
+				this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
+				this.mainCharacter.body.velocity.normalize().scale(speed);
 			}
-
-			let speed =
-				isCasting || isWalking
-					? getCharacterSpeed(globalState.playerCharacter) / 2
-					: getCharacterSpeed(globalState.playerCharacter);
-
-			this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
-			this.mainCharacter.body.velocity.normalize().scale(speed);
 		}
 		globalState.playerCharacter.x = Math.round(this.mainCharacter.x / SCALE);
 		globalState.playerCharacter.y = Math.round(this.mainCharacter.y / SCALE);
@@ -580,8 +618,6 @@ export default class MainScene extends Phaser.Scene {
 
 		// Check if the player is close to a connection point and move them if so
 		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections || [];
-		const playerX = globalState.playerCharacter.x;
-		const playerY = globalState.playerCharacter.y;
 		connections.forEach((connection) => {
 			if (
 				Math.hypot(connection.x - playerX, connection.y - playerY) <
@@ -628,6 +664,24 @@ export default class MainScene extends Phaser.Scene {
 			}
 		}
 
+		for (const fadingLabel of this.fadingLabels) {
+			const timeDelta = globalTime - fadingLabel.timestamp;
+			if (timeDelta > 1000) {
+				fadingLabel.fontElement?.destroy(true);
+				fadingLabel.fontElement = undefined;
+			} else if (fadingLabel.fontElement) {
+				const timeDeltaFraction = timeDelta / 1000;
+				fadingLabel.fontElement.y = fadingLabel.posY - timeDeltaFraction * FADING_LABEL_Y_DISTANCE;
+				fadingLabel.fontElement.x =
+					fadingLabel.posX + Math.sin(timeDeltaFraction * 4) * FADING_LABEL_X_DISTANCE;
+				fadingLabel.fontElement.alpha = 1 - 0.6 * timeDeltaFraction;
+			}
+		}
+
+		this.fadingLabels = this.fadingLabels.filter((label) => label.fontElement);
+
+		this.scriptHelper.handleScripts(globalState.gameTime);
+
 		// tslint:disable-next-line: no-magic-numbers
 		if (Date.now() - this.lastSave > 10 * 1000) {
 			this.lastSave = Date.now();
@@ -640,6 +694,29 @@ export default class MainScene extends Phaser.Scene {
 		}
 	}
 
+	addFadingLabel(
+		text: string,
+		fontSize: FadingLabelSize,
+		color: string,
+		posX: number,
+		posY: number
+	) {
+		const fadingLabel = new Phaser.GameObjects.Text(this, posX, posY, text, {
+			fontFamily: 'endlessDungeon',
+			fontSize: `${BaseFadingLabelFontSize[fontSize] * SCALE}pt`,
+			color,
+		});
+		fadingLabel.setDepth(UiDepths.FLOATING_TEXT_LAYER);
+		this.add.existing(fadingLabel);
+		this.fadingLabels.push({
+			fontSize,
+			fontElement: fadingLabel,
+			timestamp: this.game.getTime(),
+			posX,
+			posY,
+		});
+	}
+
 	pause() {
 		this.isPaused = true;
 		this.physics.pause();
@@ -648,7 +725,9 @@ export default class MainScene extends Phaser.Scene {
 			false,
 			globalState.playerCharacter.currentFacing
 		);
-		if (playerAnimation) this.mainCharacter.play(playerAnimation);
+		if (playerAnimation) {
+			this.mainCharacter.play({ key: playerAnimation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+		}
 		Object.values(this.npcMap).forEach((curNpc) => {
 			curNpc.update(globalState.gameTime, 0);
 		});

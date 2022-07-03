@@ -9,6 +9,7 @@ import RoomPreloaderScene from './scenes/RoomPreloaderScene';
 import NpcEditor from './scenes/NpcEditor';
 import { MODE } from './helpers/constants';
 import NpcGenerationScene from './scenes/NpcGenerationScene';
+import AbilityEditor from './scenes/AbilityEditor';
 
 const firebaseConfig = {
 	apiKey: 'AIzaSyBwHFZ7A9t8rHi4p6r-D2wr5WDrt9O7Yow',
@@ -34,6 +35,8 @@ const getEditorScenes: (mode: MODE) => typeof Phaser.Scene[] = (mode) => {
 			return [RoomPreloaderScene, NpcGenerationScene, PreloadScene, MapEditor];
 		case MODE.NPC_EDITOR:
 			return [NpcEditor];
+		case MODE.ABILITY_EDITOR:
+			return [AbilityEditor];
 		default:
 			return [];
 	}

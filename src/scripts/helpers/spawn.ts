@@ -8,6 +8,11 @@ import RedlingBossToken from '../drawables/tokens/RedlingBoss';
 import LichKingToken from '../drawables/tokens/LichKing';
 import VampireToken from '../drawables/tokens/VampireEnemyToken';
 import PierreToken from '../drawables/tokens/PierreEnemyToken';
+import ElementalToken from '../drawables/tokens/ElementalToken';
+import FireElementalToken from '../drawables/tokens/FireElementalToken';
+import IceElementalToken from '../drawables/tokens/IceElementalToken';
+import ArcaneElementalToken from '../drawables/tokens/ArcaneElementalToken';
+import NecroticElementalToken from '../drawables/tokens/NecroticElementalToken';
 
 export const spawnNpc = (
 	scene: MainScene,
@@ -39,6 +44,18 @@ export const spawnNpc = (
 		}
 		case 'lich-king': {
 			return new LichKingToken(scene, posX, posY, 'rich', level, id);
+		}
+		case 'fire_elemental': {
+			return new FireElementalToken(scene, posX, posY, level, id);
+		}
+		case 'ice_elemental': {
+			return new IceElementalToken(scene, posX, posY, 'rich', level, id);
+		}
+		case 'arcane_elemental': {
+			return new ArcaneElementalToken(scene, posX, posY, 'rich', level, id);
+		}
+		case 'necrotic_elemental': {
+			return new NecroticElementalToken(scene, posX, posY, 'rich', level, id);
 		}
 		default: {
 			return new NpcToken(scene, posX, posY, type, id, options);

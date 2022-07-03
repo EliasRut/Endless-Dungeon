@@ -8,11 +8,12 @@ import firebase from 'firebase';
 import { Input } from '../components/Input';
 import { Dropdown } from '../components/Dropdown';
 import '../App.css';
+import { UserInformation } from '../../scripts/helpers/UserInformation';
 
 const showGame = true;
 
 export interface NPCEditorScreenProps {
-	user: firebase.User;
+	user: UserInformation;
 }
 
 export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
@@ -30,6 +31,7 @@ export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
 				<StyledLink to="/mapEditor">Map Editor</StyledLink>
 				<StyledLink to="/npcEditor">NPC Editor</StyledLink>
 				<StyledLink to="/questEditor">Quest Editor</StyledLink>
+				<StyledLink to="/abilityEditor">Ability Editor</StyledLink>
 				<StyledLink to="/game">Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>

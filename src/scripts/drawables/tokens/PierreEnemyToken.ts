@@ -1,4 +1,10 @@
-import { Facings, facingToSpriteNameMap, KNOCKBACK_TIME, SCALE } from '../../helpers/constants';
+import {
+	Facings,
+	facingToSpriteNameMap,
+	KNOCKBACK_TIME,
+	SCALE,
+	NORMAL_ANIMATION_FRAME_RATE,
+} from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
@@ -14,7 +20,7 @@ const MIN_MOVEMENT_SPEED = 25;
 const BASE_HEALTH = 4;
 
 const ITEM_DROP_CHANCE = 0.65;
-const HEALTH_DROP_CHANCE = 0.06;
+const HEALTH_DROP_CHANCE = 0.06 * globalState.playerCharacter.luck;
 
 const CHARGE_TIME = 1000;
 const ATTACK_DURATION = 2000;
@@ -75,10 +81,10 @@ export default class PierreToken extends EnemyToken {
 			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
 			if (animation) {
 				if (this.scene.game.anims.exists(animation)) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 			}
 			return;
@@ -117,7 +123,7 @@ export default class PierreToken extends EnemyToken {
 					const newFacing = getFacing4Dir(xSpeed, ySpeed);
 					const animation = updateMovingState(this.stateObject, true, newFacing);
 					if (animation) {
-						this.play({ key: animation, repeat: -1 });
+						this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
 					}
 				} else {
 					this.attack(time);
@@ -131,7 +137,7 @@ export default class PierreToken extends EnemyToken {
 					this.stateObject.currentFacing
 				);
 				if (animation) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 			}
 		} else {
@@ -144,13 +150,6 @@ export default class PierreToken extends EnemyToken {
 		this.stateObject.y = this.body.y / SCALE;
 	}
 
-	destroy() {
-		super.destroy();
-	}
-
-	receiveHit(damage: number) {
-		super.receiveHit(damage);
-	}
 	// FRAME RATE: 16
 	attack(time: number) {
 		if (!this.attacking) {
@@ -176,7 +175,7 @@ export default class PierreToken extends EnemyToken {
 			// 9 frames, so 9 frame rate for 1s.
 			if (this.attackedAt === time || this.stateObject.currentFacing !== newFacing) {
 				const attackAnimationName = `pierre-throw-${facingToSpriteNameMap[newFacing]}`;
-				this.play({ key: attackAnimationName, frameRate: 8 });
+				this.play({ key: attackAnimationName, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				this.anims.setProgress((time - this.attackedAt) / this.chargeTime);
 				this.stateObject.currentFacing = newFacing;
 			}

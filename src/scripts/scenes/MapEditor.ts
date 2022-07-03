@@ -12,6 +12,7 @@ import { spawnNpc } from '../helpers/spawn';
 import fixedItems from '../../items/fixedItems.json';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import { getItemDataForName, UneqippableItem } from '../../items/itemData';
+import { getCachedUserData } from '../helpers/userHelpers';
 
 const SCALE = 2;
 
@@ -50,6 +51,11 @@ interface MultiLevelLayout {
 type LevelHistory = MultiLevelLayout[];
 
 const npcKeys = ['hilda-base', 'vanya-base', 'agnes', 'erwin', 'rich'];
+
+export interface MapEditorReactBridge {
+	setActiveNpc: (npc: NpcPositioning) => void;
+	setNpcDialogVisible: (visible: boolean) => void;
+}
 
 export default class MapEditor extends Phaser.Scene {
 	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
@@ -170,6 +176,8 @@ export default class MapEditor extends Phaser.Scene {
 
 	zoomFactor: number = 1;
 
+	reactBridge?: MapEditorReactBridge;
+
 	constructor() {
 		super({ key: 'MapEditor' });
 		this.database = firebase.firestore().collection('rooms');
@@ -229,6 +237,10 @@ export default class MapEditor extends Phaser.Scene {
 		this.itemDeleteButton = document.getElementById('itemDeleteButton') as HTMLButtonElement;
 		this.itemDeleteButton.onclick = () => this.deleteItemToken();
 	}
+
+	public registerReactBridge = (bridge: MapEditorReactBridge) => {
+		this.reactBridge = bridge;
+	};
 
 	populateFromDatabase(databaseSelectedRoom: DatabaseRoom) {
 		const selectedRoom = deserializeRoom(databaseSelectedRoom);
@@ -317,14 +329,20 @@ export default class MapEditor extends Phaser.Scene {
 			this.roomsDropdownElement.remove(0);
 		}
 
-		this.database.get().then((query) => {
-			query.forEach((roomDoc) => {
-				const newOption = document.createElement('option');
-				newOption.value = roomDoc.id;
-				newOption.innerText = roomDoc.id;
-				this.roomsDropdownElement.appendChild(newOption);
-			});
-		});
+		const userTeam = getCachedUserData()?.team;
+		if (userTeam) {
+			this.database
+				.where('team', '==', userTeam)
+				.get()
+				.then((query) => {
+					query.forEach((roomDoc) => {
+						const newOption = document.createElement('option');
+						newOption.value = roomDoc.id;
+						newOption.innerText = roomDoc.id;
+						this.roomsDropdownElement.appendChild(newOption);
+					});
+				});
+		}
 
 		// Prepare Base Tileset dropdown
 		while (this.tilesetDropdownElement.firstChild) {
@@ -667,20 +685,24 @@ export default class MapEditor extends Phaser.Scene {
 	}
 
 	hideNpcDetailsDialog() {
-		const dialog = document.getElementById('npcDetailsDialog')!;
-		dialog.style.display = 'none';
+		// const dialog = document.getElementById('npcDetailsDialog')!;
+		// dialog.style.display = 'none';
+		this.reactBridge!.setNpcDialogVisible(false);
 		this.selectedNpcTokenIndex = -1;
 	}
 
 	showNpcDetailsDialog(npcPosition: NpcPositioning) {
-		const dialog = document.getElementById('npcDetailsDialog')!;
-		dialog.style.display = 'flex';
+		// const dialog = document.getElementById('npcDetailsDialog')!;
+		// dialog.style.display = 'flex';
 
-		this.npcTypeDropdownElement.value = npcPosition.type;
-		this.npcIdElement.value = npcPosition.id;
-		this.npcLevelElement.value = npcPosition.level || '+0';
-		this.npcXElement.value = `${npcPosition.x}`;
-		this.npcYElement.value = `${npcPosition.y}`;
+		// this.npcTypeDropdownElement.value = npcPosition.type;
+		// this.npcIdElement.value = npcPosition.id;
+		// this.npcLevelElement.value = npcPosition.level || '+0';
+		// this.npcXElement.value = `${npcPosition.x}`;
+		// this.npcYElement.value = `${npcPosition.y}`;
+
+		this.reactBridge!.setActiveNpc(npcPosition);
+		this.reactBridge!.setNpcDialogVisible(true);
 	}
 
 	deleteNpcToken() {
@@ -754,6 +776,7 @@ export default class MapEditor extends Phaser.Scene {
 			npcPosition.y * TILE_HEIGHT - this.heightInPixels / 2,
 			1
 		);
+
 		this.add.existing(npc);
 		npc.setAlpha(1);
 		npc.setDepth(DEPTHS.npcLayer);

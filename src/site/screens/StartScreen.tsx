@@ -4,10 +4,11 @@ import CenteredContainer from '../components/CenteredContainer';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import firebase from 'firebase';
+import { UserInformation } from '../../scripts/helpers/UserInformation';
 
 export interface StartScreenProps {
 	auth: () => void;
-	user: firebase.User | null;
+	user: UserInformation | undefined;
 }
 
 export const StartScreen = ({ auth, user }: StartScreenProps) => {

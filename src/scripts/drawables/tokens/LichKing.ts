@@ -5,6 +5,7 @@ import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
 import { isCollidingTile } from '../../helpers/movement';
+import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 const ATTACK_RANGE = 120;
 const SUMMON_SPEED = 500;
@@ -98,7 +99,7 @@ export default class LichtKingToken extends EnemyToken {
 				const animation = updateMovingState(this.stateObject, true, newFacing);
 
 				if (animation) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 			} else {
 				this.setVelocityX(0);
@@ -110,7 +111,7 @@ export default class LichtKingToken extends EnemyToken {
 				);
 
 				if (animation) {
-					this.play(animation);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 				}
 				this.stateObject.currentFacing = newFacing;
 			}
@@ -165,15 +166,7 @@ export default class LichtKingToken extends EnemyToken {
 				this.casting += SUMMON_SPEED;
 			} else {
 				const xy = this.getUncollidingXY(this.stateObject.x, this.stateObject.y);
-				this.scene.addNpc(
-					'LichAdd_' + this.addsCounter.toString(),
-					'rich',
-					xy[0],
-					xy[1],
-					1,
-					0,
-					0
-				);
+				this.scene.addNpc('LichAdd_' + this.addsCounter.toString(), 'rich', xy[0], xy[1], 1, 0, 0);
 				this.addsCounter++;
 				this.casting += SUMMON_SPEED;
 			}

@@ -10,6 +10,7 @@ import {
 	NUM_COLORS_OF_MAGIC,
 	npcToAespriteMap,
 	NpcTypeList,
+	SummonsTypeList,
 } from '../helpers/constants';
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
@@ -17,6 +18,7 @@ import { BLOCK_SIZE } from '../helpers/generateRoom';
 import firebase from 'firebase';
 import { Quest } from '../../../typings/custom';
 import { fillLoadedQuestFromDb, fillQuestScriptsFromDb, QuestScripts } from '../helpers/quests';
+import { loadContentBlocksFromDatabase } from '../helpers/ContentDataLibrary';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -49,13 +51,10 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
 		this.load.image('search-icon', 'assets/img/search-icon.png');
 
-		// Player
-		this.load.aseprite('player', 'assets/sprites/player.png', 'assets/sprites/player.json');
-
-		// Prepare aseprite listings for enemies
-		this.load.aseprite('rich', 'assets/sprites/rich.png', 'assets/sprites/rich.json');
-		this.load.aseprite('jacques', 'assets/sprites/jacques.png', 'assets/sprites/jacques.json');
-		this.load.aseprite('pierre', 'assets/sprites/pierre.png', 'assets/sprites/pierre.json');
+		// Prepare aseprite data for player, npcs, enemies
+		Object.entries(npcToAespriteMap).forEach(([npcKey, { png, json }]) => {
+			this.load.aseprite(npcKey, png, json);
+		});
 
 		// death
 		this.load.aseprite(
@@ -77,6 +76,10 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('rock', 'assets/img/rock.png');
 		this.load.image('wind', 'assets/img/wind-gust.png');
 		this.load.image('skull', 'assets/img/necrotic-skull.png');
+		this.load.image('arcaneAura', 'assets/img/arcane-aura.png');
+		this.load.image('fireAura', 'assets/img/fire-aura.png');
+		this.load.image('iceAura', 'assets/img/ice-aura.png');
+		this.load.image('necroticAura', 'assets/img/necrotic-aura.png');
 
 		// Other elements
 		this.load.image('quest', 'assets/img/quest.png');
@@ -130,8 +133,16 @@ export default class PreloadScene extends Phaser.Scene {
 			frameWidth: 16,
 			frameHeight: 16,
 		});
-		this.load.aseprite('source-fire1', 'assets/sprites/source_flame01.png', 'assets/sprites/source_flame01.json');
-		this.load.aseprite('source-force1', 'assets/sprites/source_force01.png', 'assets/sprites/source_force01.json');
+		this.load.aseprite(
+			'source-fire1',
+			'assets/sprites/source_flame01.png',
+			'assets/sprites/source_flame01.json'
+		);
+		this.load.aseprite(
+			'source-force1',
+			'assets/sprites/source_force01.png',
+			'assets/sprites/source_force01.json'
+		);
 		this.load.image('icon-source-fire1', 'assets/img/source_icon_flame01.png');
 		this.load.image('icon-source-force1', 'assets/img/source_icon_force01.png');
 
@@ -140,6 +151,12 @@ export default class PreloadScene extends Phaser.Scene {
 			frameWidth: 48,
 			frameHeight: 32,
 		});
+		this.load.image('iron_door_idle', 'assets/img/iron_door_idle.png');
+		this.load.aseprite(
+			'iron_door',
+			'assets/sprites/iron_door.png',
+			'assets/sprites/iron_door.json'
+		);
 
 		// Dungeon Door
 		this.load.image('dungeon-door', 'assets/img/dungeon-door.png');
@@ -195,6 +212,13 @@ export default class PreloadScene extends Phaser.Scene {
 			}
 		});
 
+		// Load all default summons.
+		SummonsTypeList.forEach((type) => {
+			if (!requiredNpcs.has(type)) {
+				requiredNpcs.add(type);
+			}
+		});
+
 		// If we are in map editor mode, also load the library background tilesets
 		if (activeMode === MODE.MAP_EDITOR) {
 			this.load.image('base-background', 'assets/tilesets/base-background.png');
@@ -214,6 +238,69 @@ export default class PreloadScene extends Phaser.Scene {
 		// Quests
 	}
 
+	createAnimFromAseprite(tokenName: string) {
+		const data = this.game.cache.json.get(tokenName);
+		if (!data) {
+			return;
+		}
+
+		const meta = data.meta;
+		const frames = data.frames;
+
+		if (meta && frames) {
+			const frameTags = meta.frameTags || [];
+
+			frameTags.forEach((tag: any) => {
+				let animFrames = [];
+
+				const name = tag.name;
+				const from = tag.from || 0;
+				const to = tag.to || 0;
+				const direction = tag.direction || 'forward';
+
+				if (!name) {
+					//  Skip if no name
+					return;
+				}
+				let totalDuration = 0;
+
+				//  Get all the frames for this tag and calculate the total duration in milliseconds.
+				for (let i = from; i <= to; i++) {
+					const frameKey = i.toString();
+					const frame = frames[frameKey];
+
+					if (frame) {
+						const frameDuration = frame.duration || Number.MAX_SAFE_INTEGER;
+						animFrames.push({ key: tokenName, frame: frameKey, duration: frameDuration });
+						totalDuration += frameDuration;
+					}
+				}
+
+				// Fix duration to play nice with how the next tick is calculated.
+				// var msPerFrame = totalDuration / animFrames.length;
+
+				// animFrames.forEach(function (entry)
+				// {
+				//     entry.duration -= msPerFrame;
+				// });
+
+				if (direction === 'reverse') {
+					animFrames = animFrames.reverse();
+				}
+
+				//  Create the animation
+				const createConfig = {
+					key: name,
+					frames: animFrames,
+					duration: totalDuration,
+					yoyo: direction === 'pingpong',
+				};
+
+				this.anims.create(createConfig);
+			});
+		}
+	}
+
 	async create() {
 		if (activeMode === MODE.NPC_EDITOR) {
 			this.scene.start('NpcEditor');
@@ -225,18 +312,20 @@ export default class PreloadScene extends Phaser.Scene {
 			return;
 		}
 
-		// Item animation
+		// Door animation
+		this.createAnimFromAseprite('iron_door');
 
-		this.anims.createFromAseprite('source-fire1');
-		this.anims.createFromAseprite('source-force1');
+		// Item animation
+		this.createAnimFromAseprite('source-fire1');
+		this.createAnimFromAseprite('source-force1');
 
 		// Create character animations
-		this.anims.createFromAseprite('player');
-		this.anims.createFromAseprite('death_anim_small');
+		this.createAnimFromAseprite('player');
+		this.createAnimFromAseprite('death_anim_small');
 
 		this.neededAnimations.forEach((token) => {
 			if (npcToAespriteMap[token.name]) {
-				this.anims.createFromAseprite(token.name);
+				this.createAnimFromAseprite(token.name);
 				return;
 			}
 			for (let directionIndex = 0; directionIndex < NUM_DIRECTIONS; directionIndex++) {

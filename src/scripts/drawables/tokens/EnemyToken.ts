@@ -1,4 +1,10 @@
-import { facingToSpriteNameMap, Faction, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
+import {
+	facingToSpriteNameMap,
+	Faction,
+	SCALE,
+	VISITED_TILE_TINT,
+	NORMAL_ANIMATION_FRAME_RATE,
+} from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
 import FireBallEffect from '../effects/FireBallEffect';
@@ -29,6 +35,10 @@ export default abstract class EnemyToken extends CharacterToken {
 	aggro: boolean = false;
 	target: Phaser.Geom.Point;
 	level: number;
+
+	protected showHealthbar() {
+		return true;
+	}
 
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
 		super(scene, x, y, tokenName, tokenName, id);
@@ -67,17 +77,6 @@ export default abstract class EnemyToken extends CharacterToken {
 		this.scene.addFixedItem(id, this.x, this.y);
 	}
 
-	protected receiveDotDamage(deltaTime: number) {
-		// dot = damage over time, deltatime is in ms so we have to devide it by 1000
-		const dot =
-			(globalState.playerCharacter.damage * this.necroticEffectStacks * deltaTime) / 1000 / 4;
-		this.stateObject.health = this.stateObject.health - dot;
-	}
-
-	protected setSlowFactor() {
-		this.stateObject.slowFactor = Math.max(1 - this.iceEffectStacks / 4, 0.01);
-	}
-
 	// update from main Scene
 	public update(time: number, deltaTime: number) {
 		super.update(time, deltaTime);
@@ -100,12 +99,14 @@ export default abstract class EnemyToken extends CharacterToken {
 	}
 
 	die() {
-		this.play('death_anim_small');
+		super.die();
+		this.play({ key: 'death_anim_small', frameRate: NORMAL_ANIMATION_FRAME_RATE });
+		this.body.destroy();
 		// 925 ms
 		// new Promise(r => setTimeout(r, 925)).then(result => {
 		// 	this.destroy();
 		// })
-		this.on('animationcomplete', () => this.destroy())
+		this.on('animationcomplete', () => this.destroy());
 	}
 
 	// destroy the enemy
