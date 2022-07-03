@@ -53,8 +53,8 @@ export default class TeleportEffect extends AbilityEffect {
 
 		const trailEmitter = particles.createEmitter({
 			alpha: { start: 1, end: 1 },
-			scale: { start: 0.1 * this.effectScale * SCALE, end: 0 },
-			speed: 140 * SCALE,
+			scale: { start: 0.04 * this.effectScale * SCALE, end: 0 },
+			speed: 100 * SCALE,
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 200, max: 400 }, // used to be: { min: 200, max: 400 },
 			blendMode: Phaser.BlendModes.ADD,
@@ -72,7 +72,7 @@ export default class TeleportEffect extends AbilityEffect {
 			maxParticles: 200,
 		});
 
-		trailEmitter.explode(40, playerToken.x, playerToken.y);
+		trailEmitter.explode(100, playerToken.x, playerToken.y);
 		trailEmitter.startFollow(playerToken);
 
 		setTimeout(() => {
@@ -80,10 +80,11 @@ export default class TeleportEffect extends AbilityEffect {
 			playerCharacter.dashing = false;
 			playerToken.body.checkCollision.none = false;
 			playerToken.alpha = 1;
+			trailEmitter.stopFollow();
 			trailEmitter.explode(
-				40,
-				playerToken.x + 10028 * SCALE * rotationFactors.x,
-				playerToken.y + 10028 * SCALE * rotationFactors.y
+				100,
+				playerToken.x + 16 * SCALE * rotationFactors.x,
+				playerToken.y + 16 * SCALE * rotationFactors.y
 			);
 		}, 100);
 	}

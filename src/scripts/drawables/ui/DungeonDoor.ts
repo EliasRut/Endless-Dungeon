@@ -96,6 +96,6 @@ export default class DungeonDoor extends Phaser.GameObjects.Image {
 
 		window.setTimeout(() => {
 			(this.scene as DungeonDoorScene).enterDungeon(runeAssignment);
-		}, 3000);
+		}, 1 /* 3000 */);
 	};
 }

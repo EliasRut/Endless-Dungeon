@@ -1,5 +1,5 @@
 import { AbilityType } from '../abilities/abilityData';
-import { AbilityKey, Faction } from '../helpers/constants';
+import { AbilityKey, Faction, SCALE } from '../helpers/constants';
 import Character from './Character';
 import MainScene from '../scenes/MainScene';
 import CircelingEffect from '../drawables/effects/CircelingEffect';
@@ -9,13 +9,15 @@ export const enchantmentModifiers = {
 	damage: 0,
 	luck: 0,
 	maxHealth: 0,
-	movementSpeed: 0
-}
+	movementSpeed: 0,
+};
 
 // This class handles the players character and all mechanical events associated with it.
 export default class PlayerCharacter extends Character {
 	public x = 0;
 	public y = 0;
+	public width = 8;
+	public height = 8;
 
 	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
 
@@ -33,7 +35,7 @@ export default class PlayerCharacter extends Character {
 		[AbilityKey.THREE]: AbilityType.DUSTNOVA,
 		[AbilityKey.FOUR]: AbilityType.ROUND_HOUSE_KICK,
 		[AbilityKey.FIVE]: AbilityType.NOTHING,
-		[AbilityKey.SPACE]: AbilityType.TELEPORT,		
+		[AbilityKey.SPACE]: AbilityType.TELEPORT,
 	};
 }
 export const updateAbility = (
