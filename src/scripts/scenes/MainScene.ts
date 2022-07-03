@@ -537,10 +537,13 @@ export default class MainScene extends Phaser.Scene {
 		// Reset Player position to last position if they are on a blocking tile now
 		const playerX = globalState.playerCharacter.x;
 		const playerY = globalState.playerCharacter.y;
-		const currentBaseTileIndex = this.tileLayer.getTileAtWorldXY(playerX, playerY)?.index;
+		const currentBaseTileIndex = this.tileLayer.getTileAtWorldXY(
+			this.mainCharacter.x,
+			this.mainCharacter.y
+		)?.index;
 		const currentDecorationTileIndex = this.decorationLayer.getTileAtWorldXY(
-			playerX,
-			playerY
+			this.mainCharacter.x,
+			this.mainCharacter.y
 		)?.index;
 
 		if (
@@ -549,6 +552,7 @@ export default class MainScene extends Phaser.Scene {
 		) {
 			this.mainCharacter.x = this.lastPlayerPosition!.x;
 			this.mainCharacter.y = this.lastPlayerPosition!.y;
+			this.mainCharacter.setVelocity(0);
 		} else {
 			this.lastPlayerPosition = {
 				x: this.mainCharacter.x,
@@ -578,7 +582,7 @@ export default class MainScene extends Phaser.Scene {
 					isCasting ||
 					(this.mobilePadStick
 						? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
-						Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
+						  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
 						: false);
 				if (playerAnimation) {
 					this.mainCharacter.play({
