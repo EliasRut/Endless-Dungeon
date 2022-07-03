@@ -1,5 +1,5 @@
 import { AbilityType } from '../abilities/abilityData';
-import { AbilityKey, Faction } from '../helpers/constants';
+import { AbilityKey, Faction, SCALE } from '../helpers/constants';
 import Character from './Character';
 import MainScene from '../scenes/MainScene';
 
@@ -19,6 +19,8 @@ export const enchantmentModifiers = {
 export default class PlayerCharacter extends Character {
 	public x = 0;
 	public y = 0;
+	public width = 8;
+	public height = 8;
 
 	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
 

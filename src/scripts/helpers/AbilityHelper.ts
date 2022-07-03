@@ -28,6 +28,8 @@ export default class AbilityHelper {
 			y: number;
 			exactTargetXFactor?: number;
 			exactTargetYFactor?: number;
+			width?: number;
+			height?: number;
 		},
 		type: AbilityType,
 		abilityLevel: number,
@@ -64,8 +66,8 @@ export default class AbilityHelper {
 			}
 			const effect = new projectileData!.effect(
 				this.scene,
-				pointOfOrigin.x + xMultiplier * projectileData!.xOffset, //  * SCALE
-				pointOfOrigin.y + yMultiplier * projectileData!.yOffset, //  * SCALE
+				pointOfOrigin.x + (pointOfOrigin.width || 0) / 2 + xMultiplier * projectileData!.xOffset, //  * SCALE
+				pointOfOrigin.y + (pointOfOrigin.height || 0) / 2 + yMultiplier * projectileData!.yOffset, //  * SCALE
 				usedAbilityData.spriteName || '',
 				getFacing4Dir(xMultiplier, yMultiplier),
 				projectileData
@@ -98,6 +100,16 @@ export default class AbilityHelper {
 				}
 			});
 			this.scene.physics.add.collider(effect, this.scene.decorationLayer, () => {
+				if (projectileData!.destroyOnWallContact) {
+					effect.destroy();
+				}
+				if (projectileData?.collisionSound) {
+					this.scene.sound.play(projectileData.collisionSound!, {
+						volume: projectileData.sfxVolume!,
+					});
+				}
+			});
+			this.scene.physics.add.collider(effect, Object.values(this.scene.doorMap), () => {
 				if (projectileData!.destroyOnWallContact) {
 					effect.destroy();
 				}
