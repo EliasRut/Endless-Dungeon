@@ -2,7 +2,7 @@ import MainScene from '../../scenes/MainScene';
 import {
 	Faction,
 	SCALE,
-	NORMAL_ANIMATION_FRAME_RATE,
+	NPC_ANIMATION_FRAME_RATE,
 	VISITED_TILE_TINT,
 	PossibleTargets,
 } from '../../helpers/constants';
@@ -93,10 +93,10 @@ export default class FollowerToken extends NpcToken {
 			const animation = updateMovingState(this.stateObject, true, newFacing);
 			if (animation) {
 				if (this.scene.game.anims.exists(animation)) {
-					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
+					this.play({ key: animation, frameRate: NPC_ANIMATION_FRAME_RATE, repeat: -1 });
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
-					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
+					this.play({ key: animation, frameRate: NPC_ANIMATION_FRAME_RATE, repeat: -1 });
 				}
 			}
 		} else {
@@ -105,10 +105,10 @@ export default class FollowerToken extends NpcToken {
 			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
 			if (animation) {
 				if (this.scene.game.anims.exists(animation)) {
-					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+					this.play({ key: animation, frameRate: NPC_ANIMATION_FRAME_RATE });
 				} else {
 					console.log(`Animation ${animation} does not exist.`);
-					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+					this.play({ key: animation, frameRate: NPC_ANIMATION_FRAME_RATE });
 				}
 			}
 		}

@@ -308,3 +308,4 @@ export enum SUMMONING_TYPE {
 }
 
 export const NORMAL_ANIMATION_FRAME_RATE = 60;
+export const NPC_ANIMATION_FRAME_RATE = 15;
