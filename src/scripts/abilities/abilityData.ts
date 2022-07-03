@@ -13,6 +13,7 @@ import FireSummoningEffect from '../drawables/effects/FireSummoningEffect';
 import IceSummoningEffect from '../drawables/effects/IceSummoningEffect';
 import ArcaneSummoningEffect from '../drawables/effects/ArcaneSummoningEffect';
 import NecroticSummoningEffect from '../drawables/effects/NecroticSummoningEffect';
+import TeleportEffect from '../drawables/effects/TeleportEffect';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -38,7 +39,7 @@ export interface ProjectileData {
 	shape?: 'source' | 'storm' | 'cone' | 'nova';
 }
 
-interface AbilityData {
+export interface AbilityData {
 	projectiles?: number;
 	projectileData?: ProjectileData;
 	sound?: string;
@@ -88,6 +89,7 @@ export const enum AbilityType {
 	ARCANE_SUMMON_ELEMENTAL = 'arcaneSummonElemental',
 	NECROTIC_SUMMON_CIRCELING = 'necroticSummonCirceling',
 	NECROTIC_SUMMON_ELEMENTAL = 'necroticSummonElemental',
+	TELEPORT = 'teleport'
 }
 
 export const Abilities: { [type: string]: AbilityData } = {
@@ -782,6 +784,27 @@ export const Abilities: { [type: string]: AbilityData } = {
 		damageMultiplier: 0.0,
 		abilityName: 'Summon Fire Elemental',
 		flavorText: `Raise an icy elemental.`,
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.TELEPORT]: {
+		projectiles: 1,
+		projectileData: {
+			xOffset: 0,
+			yOffset: 0,
+			velocity: 0,
+			effect: TeleportEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: false,
+			destroyOnWallContact: false,
+			targeting: false,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.3,
+		cooldownMs: 1500,
+		damageMultiplier: 0.0,
+		abilityName: 'Summon Fire Elemental',
+		flavorText: `Raise an fiery elemental.`,
 		icon: ['icon-abilities', 0],
 	},
 };

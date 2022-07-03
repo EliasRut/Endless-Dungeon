@@ -20,6 +20,7 @@ const ABILITY_COORDINATES_DESKTOP = {
 	[AbilityKey.THREE]: [ABILITY_START_X + 4 + ABILITY_WIDTH * 2, ABILITY_START_Y + 3],
 	[AbilityKey.FOUR]: [ABILITY_START_X + 4 + ABILITY_WIDTH * 3, ABILITY_START_Y + 3],
 	[AbilityKey.FIVE]: [ABILITY_START_X + 4 + ABILITY_WIDTH * 3, ABILITY_START_Y + 3],
+	[AbilityKey.SPACE]: [ABILITY_START_X + 4 + ABILITY_WIDTH * 3, ABILITY_START_Y + 3],
 };
 
 const ABILITY_COORDINATES_MOBILE = {
@@ -28,6 +29,7 @@ const ABILITY_COORDINATES_MOBILE = {
 	[AbilityKey.THREE]: [32, 222],
 	[AbilityKey.FOUR]: [32, 280],
 	[AbilityKey.FIVE]: [32, 280],
+	[AbilityKey.SPACE]: [32, 280],
 };
 
 export default class Avatar extends Phaser.GameObjects.Group {

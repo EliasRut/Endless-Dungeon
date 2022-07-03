@@ -254,6 +254,7 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 					<StyledLink to="/mapEditor">Map Editor</StyledLink>
 					<StyledLink to="/npcEditor">NPC Editor</StyledLink>
 					<StyledLink to="/questEditor">Quest Editor</StyledLink>
+					<StyledLink to="/abilityEditor">Ability Editor</StyledLink>
 					<StyledLink to="/game">Game</StyledLink>
 				</NavigationWrapper>
 				<PageWrapper>

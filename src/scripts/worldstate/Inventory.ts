@@ -78,10 +78,10 @@ export const EmptyInventory: Inventory = {
 		[Ring.WILD]: { level: 1, enchantment: 'None' },
 	},
 	sources: {
-		[Source.FIRE]: { level: 1, enchantment: 'None' },
-		[Source.FORCE]: { level: 1, enchantment: 'None' },
-		[Source.ICE]: { level: 1, enchantment: 'None' },
-		[Source.NECROTIC]: { level: 1, enchantment: 'None' },
+		[Source.FIRE]: { level: 1, enchantment: 'GreaterWolf' },
+		[Source.FORCE]: { level: 1, enchantment: 'GreaterBear' },
+		[Source.ICE]: { level: 1, enchantment: 'GreaterCat' },
+		[Source.NECROTIC]: { level: 1, enchantment: 'GreaterRabbit' },
 	},
 	catalysts: {
 		[Catalyst.CONE]: { level: 1, enchantment: 'None' },

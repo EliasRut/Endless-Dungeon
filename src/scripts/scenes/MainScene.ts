@@ -12,8 +12,21 @@ import DialogScreen from '../screens/DialogScreen';
 import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
-import { getCharacterSpeed, getFacing8Dir, updateMovingState } from '../helpers/movement';
-import { Faction, NORMAL_ANIMATION_FRAME_RATE, SCALE, UiDepths } from '../helpers/constants';
+import {
+	getCharacterSpeed,
+	getFacing8Dir,
+	updateMovingState,
+	isCollidingTile,
+} from '../helpers/movement';
+import {
+	BaseFadingLabelFontSize,
+	Faction,
+	FadingLabelData,
+	FadingLabelSize,
+	NORMAL_ANIMATION_FRAME_RATE,
+	SCALE,
+	UiDepths,
+} from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import Avatar from '../drawables/ui/Avatar';
@@ -53,6 +66,9 @@ const MOBILE_PAD_FOREGROUND_X_OFFSET = 96;
 
 const DEATH_RESPAWN_TIME = 3000;
 
+const FADING_LABEL_Y_DISTANCE = 64;
+const FADING_LABEL_X_DISTANCE = 16;
+
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
 	fpsText: Phaser.GameObjects.Text;
@@ -69,6 +85,7 @@ export default class MainScene extends Phaser.Scene {
 	npcMap: { [id: string]: CharacterToken };
 	doorMap: { [id: string]: DoorToken };
 	worldItems: WorldItemToken[];
+	fadingLabels: FadingLabelData[];
 
 	overlayScreens: {
 		inventory: InventoryScreen;
@@ -109,6 +126,7 @@ export default class MainScene extends Phaser.Scene {
 	lastStepLeft: number | undefined;
 
 	lastScriptUnpausing: number = Date.now();
+	lastPlayerPosition: { x: number; y: number } | undefined;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -129,6 +147,7 @@ export default class MainScene extends Phaser.Scene {
 		this.npcMap = {};
 		this.doorMap = {};
 		this.worldItems = [];
+		this.fadingLabels = [];
 		const [startX, startY] = this.drawRoom();
 
 		this.useDynamicLighting = globalState.currentLevel.startsWith('dungeonLevel');
@@ -515,6 +534,28 @@ export default class MainScene extends Phaser.Scene {
 			return;
 		}
 
+		// Reset Player position to last position if they are on a blocking tile now
+		const playerX = globalState.playerCharacter.x;
+		const playerY = globalState.playerCharacter.y;
+		const currentBaseTileIndex = this.tileLayer.getTileAtWorldXY(playerX, playerY)?.index;
+		const currentDecorationTileIndex = this.decorationLayer.getTileAtWorldXY(
+			playerX,
+			playerY
+		)?.index;
+
+		if (
+			isCollidingTile(currentBaseTileIndex || -1) ||
+			isCollidingTile(currentDecorationTileIndex || -1)
+		) {
+			this.mainCharacter.x = this.lastPlayerPosition!.x;
+			this.mainCharacter.y = this.lastPlayerPosition!.y;
+		} else {
+			this.lastPlayerPosition = {
+				x: this.mainCharacter.x,
+				y: this.mainCharacter.y,
+			};
+		}
+
 		if (!this.blockUserInteraction) {
 			if (globalState.playerCharacter.stunned === true) {
 				this.mainCharacter.setVelocity(0, 0);
@@ -523,48 +564,50 @@ export default class MainScene extends Phaser.Scene {
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
 			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
 
-			const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
-				this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackgorund!.x : 0,
-				this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackgorund!.y : 0
-			);
-			const newFacing = getFacing8Dir(xFacing, yFacing);
+			if (!globalState.playerCharacter.dashing) {
+				const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
+					this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackgorund!.x : 0,
+					this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackgorund!.y : 0
+				);
+				const newFacing = getFacing8Dir(xFacing, yFacing);
 
-			// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
-			const hasMoved = xFacing !== 0 || yFacing !== 0;
-			const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
-			const isWalking =
-				isCasting ||
-				(this.mobilePadStick
-					? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
-					  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
-					: false);
-			if (playerAnimation) {
-				this.mainCharacter.play({
-					key: playerAnimation,
-					// duration: 5,
-					frameRate: isWalking ? NORMAL_ANIMATION_FRAME_RATE / 2 : NORMAL_ANIMATION_FRAME_RATE,
-					repeat: -1,
-				});
-			}
-			if (hasMoved) {
-				const shouldPlayLeftStepSfx =
-					!this.lastStepLeft || globalState.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
-
-				if (shouldPlayLeftStepSfx) {
-					this.sound.play('sound-step-grass-l', { volume: 0.25 });
-					this.lastStepLeft = globalState.gameTime;
+				// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
+				const hasMoved = xFacing !== 0 || yFacing !== 0;
+				const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
+				const isWalking =
+					isCasting ||
+					(this.mobilePadStick
+						? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
+						Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
+						: false);
+				if (playerAnimation) {
+					this.mainCharacter.play({
+						key: playerAnimation,
+						// duration: 5,
+						frameRate: isWalking ? NORMAL_ANIMATION_FRAME_RATE / 2 : NORMAL_ANIMATION_FRAME_RATE,
+						repeat: -1,
+					});
 				}
-			} else {
-				this.lastStepLeft = undefined;
+				if (hasMoved) {
+					const shouldPlayLeftStepSfx =
+						!this.lastStepLeft || globalState.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
+
+					if (shouldPlayLeftStepSfx) {
+						this.sound.play('sound-step-grass-l', { volume: 0.25 });
+						this.lastStepLeft = globalState.gameTime;
+					}
+				} else {
+					this.lastStepLeft = undefined;
+				}
+
+				const speed =
+					isCasting || isWalking
+						? getCharacterSpeed(globalState.playerCharacter) / 2
+						: getCharacterSpeed(globalState.playerCharacter);
+
+				this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
+				this.mainCharacter.body.velocity.normalize().scale(speed);
 			}
-
-			const speed =
-				isCasting || isWalking
-					? getCharacterSpeed(globalState.playerCharacter) / 2
-					: getCharacterSpeed(globalState.playerCharacter);
-
-			this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
-			this.mainCharacter.body.velocity.normalize().scale(speed);
 		}
 		globalState.playerCharacter.x = Math.round(this.mainCharacter.x / SCALE);
 		globalState.playerCharacter.y = Math.round(this.mainCharacter.y / SCALE);
@@ -600,8 +643,6 @@ export default class MainScene extends Phaser.Scene {
 
 		// Check if the player is close to a connection point and move them if so
 		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections || [];
-		const playerX = globalState.playerCharacter.x;
-		const playerY = globalState.playerCharacter.y;
 		connections.forEach((connection) => {
 			if (
 				Math.hypot(connection.x - playerX, connection.y - playerY) <
@@ -648,6 +689,22 @@ export default class MainScene extends Phaser.Scene {
 			}
 		}
 
+		for (const fadingLabel of this.fadingLabels) {
+			const timeDelta = globalTime - fadingLabel.timestamp;
+			if (timeDelta > 1000) {
+				fadingLabel.fontElement?.destroy(true);
+				fadingLabel.fontElement = undefined;
+			} else if (fadingLabel.fontElement) {
+				const timeDeltaFraction = timeDelta / 1000;
+				fadingLabel.fontElement.y = fadingLabel.posY - timeDeltaFraction * FADING_LABEL_Y_DISTANCE;
+				fadingLabel.fontElement.x =
+					fadingLabel.posX + Math.sin(timeDeltaFraction * 4) * FADING_LABEL_X_DISTANCE;
+				fadingLabel.fontElement.alpha = 1 - 0.6 * timeDeltaFraction;
+			}
+		}
+
+		this.fadingLabels = this.fadingLabels.filter((label) => label.fontElement);
+
 		this.scriptHelper.handleScripts(globalState.gameTime);
 
 		// tslint:disable-next-line: no-magic-numbers
@@ -660,6 +717,29 @@ export default class MainScene extends Phaser.Scene {
 		if (Date.now() - this.lastScriptUnpausing > 1000) {
 			this.scriptHelper.resumePausedScripts();
 		}
+	}
+
+	addFadingLabel(
+		text: string,
+		fontSize: FadingLabelSize,
+		color: string,
+		posX: number,
+		posY: number
+	) {
+		const fadingLabel = new Phaser.GameObjects.Text(this, posX, posY, text, {
+			fontFamily: 'endlessDungeon',
+			fontSize: `${BaseFadingLabelFontSize[fontSize] * SCALE}pt`,
+			color,
+		});
+		fadingLabel.setDepth(UiDepths.FLOATING_TEXT_LAYER);
+		this.add.existing(fadingLabel);
+		this.fadingLabels.push({
+			fontSize,
+			fontElement: fadingLabel,
+			timestamp: this.game.getTime(),
+			posX,
+			posY,
+		});
 	}
 
 	pause() {

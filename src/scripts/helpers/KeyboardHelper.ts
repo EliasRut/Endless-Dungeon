@@ -18,6 +18,7 @@ export default class KeyboardHelper {
 	settingsKey: Phaser.Input.Keyboard.Key;
 	questsKey: Phaser.Input.Keyboard.Key;
 	enterKey: Phaser.Input.Keyboard.Key;
+	spaceKey: Phaser.Input.Keyboard.Key;
 
 	wasEnterKeyPressed: boolean;
 
@@ -27,6 +28,7 @@ export default class KeyboardHelper {
 		[AbilityKey.THREE]: false,
 		[AbilityKey.FOUR]: false,
 		[AbilityKey.FIVE]: false,
+		[AbilityKey.SPACE]: false,
 	};
 
 	gamepad: Phaser.Input.Gamepad.Gamepad | undefined;
@@ -43,6 +45,7 @@ export default class KeyboardHelper {
 	isSettingsPressed: () => boolean;
 	isQuestsPressed: () => boolean;
 	isEnterPressed: () => boolean;
+	isSpacePressed: () => boolean;
 
 	scene: Phaser.Scene;
 
@@ -56,6 +59,7 @@ export default class KeyboardHelper {
 		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
 		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+		this.spaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 		this.wasEnterKeyPressed = false;
 
 		this.scene = scene;
@@ -143,6 +147,7 @@ export default class KeyboardHelper {
 		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
 		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+		this.spaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
 		this.isAbility1Pressed = () => {
 			if (this.abilityKeyPressed[AbilityKey.ONE]) {
@@ -199,6 +204,21 @@ export default class KeyboardHelper {
 			}
 			try {
 				return !!this.gamepad?.Y;
+			} catch (err) {
+				return false;
+			}
+		};
+
+		this.isSpacePressed = () => {
+			if (this.abilityKeyPressed[AbilityKey.SPACE]) {
+				this.abilityKeyPressed[AbilityKey.SPACE] = false;
+				return true;
+			}
+			if (this.spaceKey.isDown) {
+				return true;
+			}
+			try {
+				return !!this.gamepad?.A;
 			} catch (err) {
 				return false;
 			}
@@ -261,6 +281,8 @@ export default class KeyboardHelper {
 				return this.isAbility3Pressed;
 			case AbilityKey.FOUR:
 				return this.isAbility4Pressed;
+			case AbilityKey.SPACE:
+				return this.isSpacePressed;
 			default:
 				throw new Error(`No Ability Key mapping for key ${abilityKey}.`);
 		}
@@ -285,6 +307,10 @@ export default class KeyboardHelper {
 				this.castIfPressed(AbilityKey.FOUR, gameTime),
 				inventory.equippedRightRing ? inventory.rings[inventory.equippedRightRing].level : 0,
 			],
+			[
+				this.castIfPressed(AbilityKey.SPACE, gameTime),
+				1,
+			],
 		].filter(([ability]) => !!ability) as [AbilityType, number][];
 	}
 
@@ -306,6 +332,7 @@ export default class KeyboardHelper {
 			globalState.playerCharacter.abilityCastTime[AbilityKey.TWO],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.THREE],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.FOUR],
+			globalState.playerCharacter.abilityCastTime[AbilityKey.SPACE],
 		].reduce((max, value) => Math.max(max, value), 0);
 
 		return gameTime - lastCast;
@@ -317,6 +344,7 @@ export default class KeyboardHelper {
 			this.getAbilityCooldown(AbilityKey.TWO, gameTime),
 			this.getAbilityCooldown(AbilityKey.THREE, gameTime),
 			this.getAbilityCooldown(AbilityKey.FOUR, gameTime),
+			this.getAbilityCooldown(AbilityKey.SPACE, gameTime),
 		];
 	}
 

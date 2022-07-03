@@ -37,6 +37,7 @@ export const enum AbilityKey {
 	THREE = 2,
 	FOUR = 3,
 	FIVE = 4,
+	SPACE = 5,
 }
 
 export const enum UiDepths {
@@ -50,13 +51,15 @@ export const enum UiDepths {
 	OVERLAY_TILE_LAYER = 5,
 	OVERLAY_DECORATION_TILE_LAYER = 6,
 	TOP_TILE_LAYER = 7,
+	FLOATING_HEALTHBAR_LAYER = 8,
+	FLOATING_TEXT_LAYER = 9,
 
-	UI_BACKGROUND_LAYER = 8,
-	UI_MAIN_LAYER = 9,
-	UI_FOREGROUND_LAYER = 10,
-	UI_ABOVE_FOREGROUND_LAYER = 11,
+	UI_BACKGROUND_LAYER = 10,
+	UI_MAIN_LAYER = 11,
+	UI_FOREGROUND_LAYER = 12,
+	UI_ABOVE_FOREGROUND_LAYER = 13,
 
-	UI_STICK_LAYER = 12,
+	UI_STICK_LAYER = 14,
 }
 
 export const TARGETABLE_TILE_TINT = 0x888888;
@@ -278,6 +281,7 @@ export const enum MODE {
 	MAP_EDITOR = 'mapEditor',
 	NPC_EDITOR = 'npcEditor',
 	QUEST_EDITOR = 'questEditor',
+	ABILITY_EDITOR = 'abilityEditor',
 }
 
 export const enum DOOR_TYPE {
@@ -309,3 +313,23 @@ export enum SUMMONING_TYPE {
 
 export const NORMAL_ANIMATION_FRAME_RATE = 60;
 export const NPC_ANIMATION_FRAME_RATE = 15;
+
+export enum FadingLabelSize {
+	SMALL,
+	NORMAL,
+	LARGE,
+}
+
+export const BaseFadingLabelFontSize = {
+	[FadingLabelSize.SMALL]: 6,
+	[FadingLabelSize.NORMAL]: 8,
+	[FadingLabelSize.LARGE]: 12,
+};
+
+export interface FadingLabelData {
+	fontSize: FadingLabelSize;
+	fontElement: Phaser.GameObjects.Text | undefined;
+	timestamp: number;
+	posX: number;
+	posY: number;
+}

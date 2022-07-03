@@ -12,6 +12,7 @@ export default class Character {
 	public stunDuration: number = 0;
 	public stunnedAt: number = 0;
 	public stunned: boolean = false;
+	public dashing: boolean = false;
 
 	public currentFacing: Facings = Facings.SOUTH;
 	public isWalking = false;

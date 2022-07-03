@@ -10,6 +10,7 @@ import './App.css';
 import { QuestEditorScreen } from './screens/QuestEditorScreen';
 import { loadUserData } from '../scripts/helpers/userHelpers';
 import { UserInformation } from '../scripts/helpers/UserInformation';
+import { AbilityEditorScreen } from './screens/AbilityEditorScreen';
 
 const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -66,6 +67,9 @@ export default function App() {
 					</Route>
 					<Route path="/questEditor">
 						<QuestEditorScreen user={user} />
+					</Route>
+					<Route path="/abilityEditor">
+						<AbilityEditorScreen user={user} />
 					</Route>
 					<Route path="/">
 						<StartScreen auth={auth} user={user} />
