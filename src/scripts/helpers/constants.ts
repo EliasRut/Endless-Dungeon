@@ -31,14 +31,13 @@ export const enum Faction {
 	ENEMIES,
 }
 
-
 export const enum AbilityKey {
 	ONE = 0,
 	TWO = 1,
 	THREE = 2,
 	FOUR = 3,
 	FIVE = 4,
-	SPACE = 5
+	SPACE = 5,
 }
 
 export const enum UiDepths {
@@ -333,3 +332,55 @@ export interface FadingLabelData {
 	posX: number;
 	posY: number;
 }
+
+export type MinMaxParticleEffectValue = undefined | number | { min: number; max: number };
+export type SimpleParticleEffectValue = MinMaxParticleEffectValue | { start: number; end: number };
+export type ColorEffectValue =
+	| undefined
+	| number
+	| {
+			redMin: number;
+			greenMin: number;
+			blueMin: number;
+			redDiff: number;
+			greenDiff: number;
+			blueDiff: number;
+	  };
+
+export const multiplyParticleValueByScale = (value: SimpleParticleEffectValue) => {
+	if (value === undefined) {
+		return undefined;
+	}
+	if (typeof value === 'number') {
+		const valueAsAny = value as any;
+		return valueAsAny * SCALE;
+	}
+	if (typeof value === 'object') {
+		const valueAsAny = value as any;
+		return {
+			...(valueAsAny.min !== undefined && valueAsAny.max !== undefined
+				? {
+						min: valueAsAny.min * SCALE,
+						max: valueAsAny.max * SCALE,
+				  }
+				: {}),
+			...(valueAsAny.start !== undefined && valueAsAny.end !== undefined
+				? {
+						start: valueAsAny.start * SCALE,
+						end: valueAsAny.end * SCALE,
+				  }
+				: {}),
+		};
+	}
+};
+
+const ScaledValueKeys = ['scale', 'speed'];
+
+export const convertEmitterDataToScaledValues = (
+	config: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig
+) => {
+	return Object.entries(config).reduce((obj, [key, value]) => {
+		obj[key] = ScaledValueKeys.includes(key) ? multiplyParticleValueByScale(value) : value;
+		return obj;
+	}, {} as any) as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig;
+};

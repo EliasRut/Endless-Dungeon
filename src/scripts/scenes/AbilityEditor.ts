@@ -4,7 +4,13 @@ import AbilityHelper from '../helpers/AbilityHelper';
 import AbilityEffect from '../drawables/effects/AbilityEffect';
 import FireBallEffect from '../drawables/effects/FireBallEffect';
 import MainScene from './MainScene';
-import { ColorsOfMagic, Facings, Faction } from '../helpers/constants';
+import {
+	ColorsOfMagic,
+	Facings,
+	Faction,
+	MinMaxParticleEffectValue,
+	SimpleParticleEffectValue,
+} from '../helpers/constants';
 import { Abilities, AbilityType, ProjectileData } from '../abilities/abilityData';
 import PlayerCharacter from '../worldstate/PlayerCharacter';
 import Character from '../worldstate/Character';
@@ -15,18 +21,57 @@ import globalState from '../worldstate/index';
 import { generateTilemap } from '../helpers/drawDungeon';
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
+import DoorToken from '../drawables/tokens/DoorToken';
+import { ColorEffectValue } from '../helpers/constants';
 
 const SCALE = 2;
 
+export const DefaultAbilityData = {
+	projectileImage: 'fire',
+	particleImage: 'fire',
+	projectiles: 1,
+	delay: 0,
+	minSpread: 0,
+	maxSpread: 0,
+	velocity: 200,
+	drag: 0,
+	emitterAlpha: 1,
+	emitterScale: 1,
+	emitterSpeed: 20,
+	emitterRotate: 0,
+	emitterLifespan: 300,
+	emitterMaxParticles: 100,
+	emitterFrequency: 20,
+	emitterExplosionSpeed: 70,
+	emitterExplosionParticles: 40,
+	emitterExplosionLifespan: 300,
+	emitterTint: 0xffffff,
+};
+
+export interface EditedAbilityData {
+	emitterAlpha: SimpleParticleEffectValue;
+	emitterScale: SimpleParticleEffectValue;
+	emitterSpeed: SimpleParticleEffectValue;
+	emitterRotate: SimpleParticleEffectValue;
+	emitterLifespan: MinMaxParticleEffectValue;
+	emitterMaxParticles: number;
+	emitterFrequency: number;
+	emitterTint: ColorEffectValue;
+	emitterExplosionSpeed: SimpleParticleEffectValue;
+	emitterExplosionLifespan: MinMaxParticleEffectValue;
+	emitterExplosionParticles: number;
+	projectileImage: string;
+	particleImage: string;
+	projectiles: number;
+	delay: number;
+	minSpread: number;
+	maxSpread: number;
+	velocity: number;
+	drag: number;
+}
+
 export interface MapEditorReactBridge {
-	getData: () => {
-		projectiles: number;
-		delay: number;
-		minSpread: number;
-		maxSpread: number;
-		velocity: number;
-		drag: number;
-	};
+	getData: () => EditedAbilityData;
 }
 
 export default class AbilityEditor extends Phaser.Scene {
@@ -35,6 +80,7 @@ export default class AbilityEditor extends Phaser.Scene {
 	abilityHelper: AbilityHelper;
 	mainCharacter: PlayerCharacterToken;
 	npcMap: { [id: string]: CharacterToken } = {};
+	doorMap: { [id: string]: DoorToken } = {};
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
 	overlayLayer: Phaser.Tilemaps.TilemapLayer;
@@ -53,16 +99,11 @@ export default class AbilityEditor extends Phaser.Scene {
 		this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
 
 		// Ability effects
-		this.load.image('fire', 'assets/img/muzzleflash3.png');
-		this.load.image('ice', 'assets/img/ice_spike.png');
-		this.load.image('snow', 'assets/img/snowflake.png');
-		this.load.image('rock', 'assets/img/rock.png');
-		this.load.image('wind', 'assets/img/wind-gust.png');
-		this.load.image('skull', 'assets/img/necrotic-skull.png');
-		this.load.image('arcaneAura', 'assets/img/arcane-aura.png');
-		this.load.image('fireAura', 'assets/img/fire-aura.png');
-		this.load.image('iceAura', 'assets/img/ice-aura.png');
-		this.load.image('necroticAura', 'assets/img/necrotic-aura.png');
+		this.load.image('fire', 'assets/abilities/fire.png');
+		this.load.image('ice', 'assets/abilities/ice.png');
+		this.load.image('snow', 'assets/abilities/snow.png');
+		this.load.image('rock', 'assets/abilities/rock.png');
+		this.load.image('skull', 'assets/abilities/skull.png');
 
 		// load sound effects
 		this.load.audio('sound-step-grass-l', 'assets/sounds/step-grass-l.wav');
@@ -158,14 +199,7 @@ export default class AbilityEditor extends Phaser.Scene {
 		// const projectileData = Abilities[AbilityType.FIREBALL].projectileData;
 		const projectileData = Abilities[AbilityType.FIREBALL].projectileData;
 
-		const data = this.reactBridge?.getData() || {
-			projectiles: 1,
-			delay: 0,
-			minSpread: 0,
-			maxSpread: 0,
-			velocity: 200,
-			drag: 0,
-		};
+		const data = this.reactBridge?.getData() || DefaultAbilityData;
 
 		if (globalTime - this.lastCast > 1000) {
 			this.lastCast = globalTime;
@@ -190,10 +224,29 @@ export default class AbilityEditor extends Phaser.Scene {
 					projectiles: data.projectiles,
 					projectileData: {
 						...projectileData!,
+						projectileImage: data.projectileImage,
 						spread: [data.minSpread, data.maxSpread],
 						velocity: data.velocity,
 						drag: data.drag,
 						delay: data.delay,
+						particleData: {
+							...(projectileData?.particleData || {}),
+							particleImage: data.particleImage,
+							alpha: data.emitterAlpha,
+							scale: data.emitterScale,
+							speed: data.emitterSpeed,
+							rotate: data.emitterRotate,
+							lifespan: data.emitterLifespan,
+							frequency: data.emitterFrequency,
+							maxParticles: data.emitterMaxParticles,
+							tint: data.emitterTint,
+						},
+						explosionData: {
+							...(projectileData?.explosionData || {}),
+							particles: data.emitterExplosionParticles,
+							speed: data.emitterExplosionSpeed,
+							lifespan: data.emitterExplosionLifespan,
+						},
 					},
 				}
 			);

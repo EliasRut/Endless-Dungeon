@@ -14,10 +14,36 @@ import IceSummoningEffect from '../drawables/effects/IceSummoningEffect';
 import ArcaneSummoningEffect from '../drawables/effects/ArcaneSummoningEffect';
 import NecroticSummoningEffect from '../drawables/effects/NecroticSummoningEffect';
 import TeleportEffect from '../drawables/effects/TeleportEffect';
+import {
+	ColorEffectValue,
+	MinMaxParticleEffectValue,
+	SimpleParticleEffectValue,
+} from '../helpers/constants';
+import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
+export interface ProjectileParticleData {
+	particleImage?: string;
+	alpha?: SimpleParticleEffectValue;
+	scale?: SimpleParticleEffectValue;
+	speed?: SimpleParticleEffectValue;
+	rotate?: SimpleParticleEffectValue;
+	lifespan?: MinMaxParticleEffectValue;
+	frequency?: number;
+	maxParticles?: number;
+	tint?: ColorEffectValue;
+}
+
+export interface ProjectileParticleExplosionData {
+	particles?: number;
+	speed?: SimpleParticleEffectValue;
+	lifespan?: MinMaxParticleEffectValue;
+}
 export interface ProjectileData {
+	projectileImage?: string;
+	particleData?: ProjectileParticleData;
+	explosionData?: ProjectileParticleExplosionData;
 	spread?: SpreadData;
 	velocity: number;
 	drag?: number;
@@ -89,7 +115,7 @@ export const enum AbilityType {
 	ARCANE_SUMMON_ELEMENTAL = 'arcaneSummonElemental',
 	NECROTIC_SUMMON_CIRCELING = 'necroticSummonCirceling',
 	NECROTIC_SUMMON_ELEMENTAL = 'necroticSummonElemental',
-	TELEPORT = 'teleport'
+	TELEPORT = 'teleport',
 }
 
 export const Abilities: { [type: string]: AbilityData } = {
@@ -107,7 +133,16 @@ export const Abilities: { [type: string]: AbilityData } = {
 			velocity: 300,
 			xOffset: 0,
 			yOffset: 0,
-			effect: FireBallEffect,
+			projectileImage: 'empty-tile',
+			particleData: {
+				particleImage: 'fire',
+				alpha: { start: 1, end: 0 },
+				scale: { start: 1, end: 0.2 },
+				speed: 20,
+				rotate: { min: -180, max: 180 },
+				lifespan: { min: 200, max: 400 },
+			},
+			effect: TrailingParticleProjectileEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
