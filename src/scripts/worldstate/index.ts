@@ -1,5 +1,6 @@
 import { Room } from '../../../typings/custom';
 import Character from './Character';
+import Follower from './Follower';
 import Door from './Door';
 import Dungeon from './Dungeon';
 import Inventory from './Inventory';
@@ -26,6 +27,7 @@ export class WorldState {
 	public transitionStack: { [id: string]: RoomCoordinates } = {};
 	public npcs: { [id: string]: Character } = {};
 	public enemies: { [id: string]: Character } = {};
+	public followers: { [id: string]: Follower } = {};
 	public doors: { [id: string]: Door } = {};
 	public scripts: ScriptState = {};
 	public quests: { [id: string]: QuestState } = {};
@@ -42,6 +44,7 @@ export class WorldState {
 	public static readonly GAMETIME: string = 'gameTime';
 	public static readonly NPCS: string = 'npcs';
 	public static readonly ENEMIES: string = 'enemies';
+	public static readonly FOLLOWERS: string = 'followers';
 	public static readonly DOORS: string = 'doors';
 	public static readonly SCRIPTS: string = 'scripts';
 	public static readonly QUESTS: string = 'quests';
@@ -68,6 +71,7 @@ export class WorldState {
 		localStorage.setItem(WorldState.GAMETIME, `${this.gameTime}`);
 		localStorage.setItem(WorldState.NPCS, JSON.stringify(this.npcs));
 		localStorage.setItem(WorldState.ENEMIES, JSON.stringify(this.enemies));
+		localStorage.setItem(WorldState.FOLLOWERS, JSON.stringify(this.followers));
 		localStorage.setItem(WorldState.DOORS, JSON.stringify(this.doors));
 		localStorage.setItem(WorldState.SCRIPTS, JSON.stringify(this.scripts));
 		localStorage.setItem(WorldState.QUESTS, JSON.stringify(this.quests));
@@ -97,6 +101,7 @@ export class WorldState {
 		this.playerCharacter = JSON.parse(localStorage.getItem(WorldState.PLAYERCHARACTER) || '{}');
 		this.npcs = JSON.parse(localStorage.getItem(WorldState.NPCS) || '{}');
 		this.enemies = JSON.parse(localStorage.getItem(WorldState.ENEMIES) || '{}');
+		this.followers = JSON.parse(localStorage.getItem(WorldState.FOLLOWERS) || '{}');
 		this.doors = JSON.parse(localStorage.getItem(WorldState.DOORS) || '{}');
 		this.scripts = JSON.parse(localStorage.getItem(WorldState.SCRIPTS) || '{}');
 		this.quests = JSON.parse(localStorage.getItem(WorldState.QUESTS) || '{}');

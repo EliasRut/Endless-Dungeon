@@ -95,6 +95,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('icon-quests', 'assets/img/quest-icon.png');
 		this.load.image('icon-settings', 'assets/img/settings-icon.png');
 		this.load.image('icon-hero', 'assets/img/hero-icon.png');
+		this.load.image('icon-agnes', 'assets/img/agnes-icon.png');
 		this.load.image('icon-healthbar-background', 'assets/img/gui-healthbar.png');
 		this.load.image('ability-background-desktop', 'assets/img/ability-icon-background-desktop.png');
 		this.load.image('ability-background-mobile', 'assets/img/ability-icon-background-mobile.png');
@@ -222,6 +223,8 @@ export default class PreloadScene extends Phaser.Scene {
 			this.load.image('map-editor-highlighting', 'assets/img/map-editor-highlighting.png');
 		}
 
+		requiredNpcs.add('vanya-base');
+
 		// NPCs
 		requiredNpcs.forEach((npc) => {
 			this.neededAnimations.push({
@@ -316,6 +319,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Create character animations
 		this.createAnimFromAseprite('player');
+		this.createAnimFromAseprite('agnes');
 		this.createAnimFromAseprite('death_anim_small');
 
 		this.neededAnimations.forEach((token) => {

@@ -1,7 +1,7 @@
 import { Facings, Faction } from '../helpers/constants';
 
 export default class Character {
-	public animationBase: string;	
+	public animationBase: string;
 	public maxHealth: number;
 	public health: number;
 	public damage: number;
@@ -22,13 +22,16 @@ export default class Character {
 	public vision = 0;
 
 	public faction: Faction;
+	public id: string;
 
 	constructor(
+		id: string,
 		animationBase: string,
-		health: number = 100,
-		damage: number = 1,
-		movementSpeed: number = 200
+		health: number,
+		damage: number,
+		movementSpeed: number
 	) {
+		this.id = id;
 		this.animationBase = animationBase;
 		this.maxHealth = health;
 		this.health = health;
