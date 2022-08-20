@@ -82,7 +82,7 @@ export default class MainScene extends Phaser.Scene {
 	abilityHelper: AbilityHelper;
 
 	mainCharacter: PlayerCharacterToken;
-	testFollower: FollowerToken;
+	follower?: FollowerToken;
 	npcMap: { [id: string]: CharacterToken };
 	doorMap: { [id: string]: DoorToken };
 	worldItems: WorldItemToken[];
@@ -106,7 +106,7 @@ export default class MainScene extends Phaser.Scene {
 	mobilePadStick?: Phaser.GameObjects.Image;
 
 	playerCharacterAvatar: PlayerCharacterAvatar;
-	nPCAvatar: NPCAvatar;
+	nPCAvatar?: NPCAvatar;
 
 	icons: {
 		backpackIcon: BackpackIcon;
@@ -181,25 +181,14 @@ export default class MainScene extends Phaser.Scene {
 			});
 		});
 
-		this.testFollower = new FollowerToken(
-			this,
-			globalState.playerCharacter.x || startX,
-			globalState.playerCharacter.y || startY,
-			'agnes',
-			'testFollower',
-			1,
-			AbilityType.FIREBALL
-		);
-		this.testFollower.setScale(SCALE);
-		this.testFollower.setDepth(UiDepths.TOKEN_MAIN_LAYER);
-		this.physics.add.collider(this.testFollower, this.tileLayer);
-		this.physics.add.collider(this.testFollower, this.decorationLayer);
-		this.physics.add.collider(this.testFollower, this.mainCharacter);
-		Object.values(this.npcMap).forEach((npc) => {
-			this.physics.add.collider(this.testFollower, npc, () => {
-				npc.onCollide(true);
-			});
-		});
+		if (globalState.activeFollower !== '') {
+			this.spawnFollower(
+				globalState.playerCharacter.x || startX,
+				globalState.playerCharacter.y || startY,
+				globalState.activeFollower,
+				globalState.activeFollower
+			);
+		}
 
 		this.fpsText = new FpsText(this);
 		this.icons = {
@@ -212,7 +201,6 @@ export default class MainScene extends Phaser.Scene {
 			this.minimap = new Minimap(this);
 		}
 		this.playerCharacterAvatar = new PlayerCharacterAvatar(this);
-		this.nPCAvatar = new NPCAvatar(this, this.testFollower.id, 'icon-agnes');
 		if (this.isMobile) {
 			this.mobilePadBackgorund = this.add.image(
 				this.cameras.main.width - MOBILE_PAD_BACKGROUND_X_OFFSET,
@@ -297,6 +285,21 @@ export default class MainScene extends Phaser.Scene {
 		} else {
 			this.sound.play('score-dungeon', { volume: 0.08, loop: true });
 		}
+	}
+
+	spawnFollower(x: number, y: number, type: string, id: string) {
+		this.follower = new FollowerToken(this, x, y, type, id);
+		this.follower.setScale(SCALE);
+		this.follower.setDepth(UiDepths.TOKEN_MAIN_LAYER);
+		this.physics.add.collider(this.follower, this.tileLayer);
+		this.physics.add.collider(this.follower, this.decorationLayer);
+		this.physics.add.collider(this.follower, this.mainCharacter);
+		Object.values(this.npcMap).forEach((npc) => {
+			this.physics.add.collider(this.follower!, npc, () => {
+				npc.onCollide(true);
+			});
+		});
+		this.nPCAvatar = new NPCAvatar(this, this.follower.id, 'icon-agnes');
 	}
 
 	addNpc(
@@ -636,8 +639,8 @@ export default class MainScene extends Phaser.Scene {
 			curNpc.update(globalState.gameTime, delta);
 		});
 
-		this.testFollower.update(globalState.gameTime, delta);
-		this.nPCAvatar.update();
+		this.follower?.update(globalState.gameTime, delta);
+		this.nPCAvatar?.update();
 
 		// TODO: remove items that are picked up
 		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);
@@ -794,7 +797,7 @@ export default class MainScene extends Phaser.Scene {
 		if (stateObject.faction === Faction.PLAYER) {
 			return this.mainCharacter;
 		} else if (stateObject.faction === Faction.ALLIES) {
-			return this.testFollower;
+			return this.follower;
 		} else {
 			return this.npcMap[stateObject.id];
 		}

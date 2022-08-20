@@ -10,7 +10,7 @@ import {
 import globalState from '../../worldstate';
 import Follower from '../../worldstate/Follower';
 import { TILE_WIDTH } from '../../helpers/generateDungeon';
-import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
+import { getFacing4Dir, isCollidingTile, updateMovingState } from '../../helpers/movement';
 import { AbilityType } from '../../abilities/abilityData';
 import CharacterToken from './CharacterToken';
 
@@ -24,6 +24,9 @@ const FOLLOWER_MOVEMENT_SPEED = 300;
 
 const REGULAR_ATTACK_RANGE = 150;
 const OPTIMAL_DISTANCE_TO_PLAYER = 4 * TILE_WIDTH * SCALE;
+const OPTIMAL_TILE_DISTANCE_TO_PLAYER = 4;
+
+const MAX_DISTANCE_TO_PLAYER = 20 * TILE_WIDTH * SCALE;
 
 export default class FollowerToken extends CharacterToken {
 	allowedTargets: PossibleTargets = PossibleTargets.ENEMIES;
@@ -31,9 +34,7 @@ export default class FollowerToken extends CharacterToken {
 	aggroLinger: number = 3000;
 	attackRange: number;
 	destroyed: boolean = false;
-	followerAbility: AbilityType;
 	lastUpdate: number = -Infinity;
-	level: number;
 	triggersAttack?: boolean = false;
 	target: Phaser.Geom.Point;
 	exhausted: boolean = false;
@@ -41,35 +42,27 @@ export default class FollowerToken extends CharacterToken {
 	exhaustionDuration: number = 6000;
 	exhaustionText: Phaser.GameObjects.Text;
 
-	constructor(
-		scene: MainScene,
-		x: number,
-		y: number,
-		type: string,
-		id: string,
-		level: number,
-		followerAbility: AbilityType
-	) {
+	constructor(scene: MainScene, x: number, y: number, type: string, id: string) {
 		super(scene, x, y, type, type, id);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
-		this.stateObject = new Follower(
-			id,
-			type,
-			FOLLOWER_HEALTH,
-			FOLLOWER_DAMAGE,
-			FOLLOWER_MOVEMENT_SPEED
-		);
-		globalState.followers[id] = this.stateObject as Follower;
+		this.stateObject = globalState.followers[id];
+
+		// this.stateObject = new Follower(
+		// 	id,
+		// 	type,
+		// 	FOLLOWER_HEALTH,
+		// 	FOLLOWER_DAMAGE,
+		// 	FOLLOWER_MOVEMENT_SPEED
+		// );
+		// globalState.followers[id] = this.stateObject as Follower;
 		this.faction = Faction.ALLIES;
 		this.stateObject.vision = 150;
 		this.stateObject.faction = Faction.ALLIES;
 		this.target = new Phaser.Geom.Point(0, 0);
 		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
-		this.level = level;
-		this.followerAbility = followerAbility;
 	}
 
 	// Since follower should always stay near player, we can use the same logic for checking LoS as
@@ -115,6 +108,63 @@ export default class FollowerToken extends CharacterToken {
 					console.log(`Animation ${animation} does not exist.`);
 					this.play({ key: animation, frameRate: NPC_ANIMATION_FRAME_RATE });
 				}
+			}
+		}
+	}
+
+	// If follower is too far away from the player, it should be teleported to the player
+	protected teleportFollower() {
+		const player = globalState.playerCharacter;
+
+		if (this.getDistanceToWorldStatePosition(player.x, player.y) > MAX_DISTANCE_TO_PLAYER) {
+			const tx = player.x;
+			const ty = player.y;
+
+			// New coordinates for follower position
+			let newXPosition: number;
+			let newYPosition: number;
+			let validPositionFound: boolean = false;
+
+			for (
+				let xDiff = -OPTIMAL_TILE_DISTANCE_TO_PLAYER;
+				xDiff < OPTIMAL_TILE_DISTANCE_TO_PLAYER;
+				xDiff++
+			) {
+				for (
+					let yDiff = -OPTIMAL_TILE_DISTANCE_TO_PLAYER;
+					yDiff < OPTIMAL_TILE_DISTANCE_TO_PLAYER;
+					yDiff++
+				) {
+					newXPosition = (tx + xDiff * TILE_WIDTH) * SCALE;
+					newYPosition = (ty + yDiff * TILE_WIDTH) * SCALE;
+
+					// Test if target base or decoration tile is occupied and find unoccupied tile if necessary
+					const currentBaseTileIndex = (this.scene as MainScene).tileLayer.getTileAtWorldXY(
+						newXPosition,
+						newYPosition
+					)?.index;
+					const currentDecorationTileIndex = (
+						this.scene as MainScene
+					).decorationLayer.getTileAtWorldXY(newXPosition, newYPosition)?.index;
+
+					if (
+						currentBaseTileIndex === undefined ||
+						isCollidingTile(currentBaseTileIndex) ||
+						isCollidingTile(currentDecorationTileIndex)
+					) {
+						continue;
+					}
+					validPositionFound = true;
+					this.x = newXPosition;
+					this.y = newYPosition;
+					break;
+				}
+				if (validPositionFound) {
+					break;
+				}
+			}
+			if (!validPositionFound) {
+				console.log(`Could not teleport follower - no valid position found.`);
 			}
 		}
 	}
@@ -193,8 +243,8 @@ export default class FollowerToken extends CharacterToken {
 						exactTargetXFactor: deltaX / totalDistance,
 						exactTargetYFactor: deltaY / totalDistance,
 					},
-					this.followerAbility,
-					1,
+					(this.stateObject as Follower).ability,
+					(this.stateObject as Follower).level,
 					time.now
 				);
 			}
@@ -239,6 +289,9 @@ export default class FollowerToken extends CharacterToken {
 		}
 
 		if (this.lastUpdate <= globalTime) {
+			// Check if the follower needs to be teleported to player
+			this.teleportFollower();
+
 			// Check if the follower has to move closer to the player
 			this.followPlayer();
 

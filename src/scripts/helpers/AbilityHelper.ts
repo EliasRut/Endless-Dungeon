@@ -124,7 +124,7 @@ export default class AbilityHelper {
 			const targetTokens =
 				caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
 					? Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES)
-					: [this.scene.mainCharacter, this.scene.testFollower];
+					: [this.scene.mainCharacter, ...(this.scene.follower ? [this.scene.follower] : [])];
 			const collidingCallback = (collidingEffect: AbilityEffect, enemy: CharacterToken) => {
 				if (collidingEffect.hitEnemyTokens.includes(enemy)) {
 					return;
