@@ -17,9 +17,10 @@ import {
 	getFacing8Dir,
 	updateMovingState,
 	isCollidingTile,
+	getTwoLetterFacingName,
 } from '../helpers/movement';
 import {
-	BaseFadingLabelFontSize,	
+	BaseFadingLabelFontSize,
 	Faction,
 	FadingLabelData,
 	FadingLabelSize,
@@ -59,7 +60,7 @@ import { AbilityType } from '../abilities/abilityData';
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
 
-const CASTING_SPEED_MS = 250;
+export const CASTING_SPEED_MS = 500;
 
 const CONNECTION_POINT_THRESHOLD_DISTANCE = 32;
 const STEP_SOUND_TIME = 200;
@@ -71,6 +72,8 @@ const DEATH_RESPAWN_TIME = 3000;
 
 const FADING_LABEL_Y_DISTANCE = 64;
 const FADING_LABEL_X_DISTANCE = 16;
+
+const MINIMUM_CASTING_TIME_MS = 80;
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -115,10 +118,10 @@ export default class MainScene extends Phaser.Scene {
 		backpackIcon: BackpackIcon;
 		settingsIcon: SettingsIcon;
 		questsIcon: QuestsIcon;
-		enchantIcon : EnchantIcon;
+		enchantIcon: EnchantIcon;
 	};
 
-	overlayPressed: number = 0;	
+	overlayPressed: number = 0;
 
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
@@ -133,6 +136,8 @@ export default class MainScene extends Phaser.Scene {
 
 	lastScriptUnpausing: number = Date.now();
 	lastPlayerPosition: { x: number; y: number } | undefined;
+
+	hasCasted: boolean = false;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -485,7 +490,7 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visibility)) {
 			if (!this.scriptHelper.isScriptRunning())
 				if (globalState.gameTime - this.overlayPressed > 250) {
-					if(!this.icons.backpackIcon.open){
+					if (!this.icons.backpackIcon.open) {
 						this.closeAllIconScreens();
 						this.icons.backpackIcon.openScreen();
 					} else this.closeAllIconScreens();
@@ -496,7 +501,7 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isSettingsPressed()) {
 			if (!this.scriptHelper.isScriptRunning()) {
 				if (globalState.gameTime - this.overlayPressed > 250) {
-					if(!this.icons.settingsIcon.open){
+					if (!this.icons.settingsIcon.open) {
 						this.closeAllIconScreens();
 						this.icons.settingsIcon.openScreen();
 					} else this.closeAllIconScreens();
@@ -517,7 +522,7 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isQuestsPressed()) {
 			if (!this.scriptHelper.isScriptRunning())
 				if (globalState.gameTime - this.overlayPressed > 250) {
-					if(!this.icons.questsIcon.open){
+					if (!this.icons.questsIcon.open) {
 						this.closeAllIconScreens();
 						this.icons.questsIcon.openScreen();
 					} else this.closeAllIconScreens();
@@ -528,7 +533,7 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isEnchantPressed()) {
 			if (!this.scriptHelper.isScriptRunning())
 				if (globalState.gameTime - this.overlayPressed > 250) {
-					if(!this.icons.enchantIcon.open){
+					if (!this.icons.enchantIcon.open) {
 						this.closeAllIconScreens();
 						this.icons.enchantIcon.openScreen();
 					} else this.closeAllIconScreens();
@@ -593,7 +598,8 @@ export default class MainScene extends Phaser.Scene {
 				return;
 			}
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
-			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
+			const castingDuration = this.keyboardHelper.getLastCastingDuration();
+			const isCasting = msSinceLastCast < castingDuration;
 
 			if (!globalState.playerCharacter.dashing) {
 				const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
@@ -604,18 +610,34 @@ export default class MainScene extends Phaser.Scene {
 
 				// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
 				const hasMoved = xFacing !== 0 || yFacing !== 0;
-				const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
+				let playerAnimation = updateMovingState(
+					globalState.playerCharacter,
+					hasMoved,
+					newFacing,
+					this.hasCasted
+				);
 				const isWalking =
 					isCasting ||
 					(this.mobilePadStick
 						? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
 						  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
 						: false);
+				if (isCasting && !this.hasCasted) {
+					playerAnimation = `player-cast-${getTwoLetterFacingName(
+						globalState.playerCharacter.currentFacing
+					)}`;
+				} else if (isCasting && this.hasCasted) {
+					playerAnimation = false;
+				}
 				if (playerAnimation) {
 					this.mainCharacter.play({
 						key: playerAnimation,
 						// duration: 5,
-						frameRate: isWalking ? NORMAL_ANIMATION_FRAME_RATE / 2 : NORMAL_ANIMATION_FRAME_RATE,
+						frameRate: isCasting
+							? NORMAL_ANIMATION_FRAME_RATE * (MINIMUM_CASTING_TIME_MS / castingDuration)
+							: isWalking
+							? NORMAL_ANIMATION_FRAME_RATE / 2
+							: NORMAL_ANIMATION_FRAME_RATE,
 						repeat: -1,
 					});
 				}
@@ -631,10 +653,17 @@ export default class MainScene extends Phaser.Scene {
 					this.lastStepLeft = undefined;
 				}
 
-				const speed =
-					isCasting || isWalking
-						? getCharacterSpeed(globalState.playerCharacter) / 2
-						: getCharacterSpeed(globalState.playerCharacter);
+				if (!isCasting) {
+					this.hasCasted = false;
+				} else {
+					this.hasCasted = true;
+				}
+
+				const speed = isCasting
+					? 0
+					: isWalking
+					? getCharacterSpeed(globalState.playerCharacter) / 2
+					: getCharacterSpeed(globalState.playerCharacter);
 
 				this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
 				this.mainCharacter.body.velocity.normalize().scale(speed);
@@ -780,7 +809,7 @@ export default class MainScene extends Phaser.Scene {
 		Object.values(this.icons).forEach((icon) => {
 			icon.closeScreen();
 		});
-		this.resume();	
+		this.resume();
 	}
 
 	pause() {
@@ -812,7 +841,7 @@ export default class MainScene extends Phaser.Scene {
 		if (item === undefined) {
 			console.log('ITEM UNDEFINED: ', itemKey);
 			return;
-		}		
+		}
 		let itemToken = new WorldItemToken(this, x, y, itemKey, item, level, getItemTexture(itemKey));
 		itemToken.setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.worldItems.push(itemToken);
