@@ -118,7 +118,7 @@ export const enum AbilityType {
 	NECROTIC_SUMMON_CIRCELING = 'necroticSummonCirceling',
 	NECROTIC_SUMMON_ELEMENTAL = 'necroticSummonElemental',
 	TELEPORT = 'teleport',
-	CHARM = 'charm'
+	CHARM = 'charm',
 }
 
 export type ConditionalAbilityDataMap = EnumDictionary<AbilityType, ConditionalAbilityData[]>;
@@ -850,6 +850,7 @@ export const Abilities: AbilityDataMap = {
 		abilityName: 'Summon Fire Elemental',
 		flavorText: `Raise an fiery elemental.`,
 		icon: ['icon-abilities', 0],
+		castingTime: 250,
 	},
 	[AbilityType.CHARM]: {
 		projectiles: 1,

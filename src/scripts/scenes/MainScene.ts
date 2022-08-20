@@ -614,7 +614,7 @@ export default class MainScene extends Phaser.Scene {
 					globalState.playerCharacter,
 					hasMoved,
 					newFacing,
-					this.hasCasted
+					this.hasCasted && hasMoved
 				);
 				const isWalking =
 					isCasting ||
