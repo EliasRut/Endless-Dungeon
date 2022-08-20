@@ -92,6 +92,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('pad-background', 'assets/img/pad-background.png');
 		this.load.image('pad-stick', 'assets/img/pad-stick.png');
 		this.load.image('icon-backpack', 'assets/img/backpack-icon.png');
+		this.load.image('icon-enchantments', 'assets/img/enchantment-icon.png');
 		this.load.image('icon-quests', 'assets/img/quest-icon.png');
 		this.load.image('icon-settings', 'assets/img/settings-icon.png');
 		this.load.image('icon-hero', 'assets/img/hero-icon.png');
