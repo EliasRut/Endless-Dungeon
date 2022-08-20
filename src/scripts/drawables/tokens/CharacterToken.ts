@@ -187,7 +187,12 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			if (this.iceEffectStacks > 4) {
 				this.iceEffectStacks = 4;
 			}
-			if (this.necroticEffectStacks > 0) {
+			if (this.charmedTime + 6000 >= time) {
+				this.tint = 0xffcccc;
+				if (hasHealthbar) {
+					this.healthbar.tint = 0xffcccc;
+				}
+			} else if (this.necroticEffectStacks > 0) {
 				// Color the token green and deal damage over time
 				this.tint = DOT_TINT[this.necroticEffectStacks - 1];
 				if (hasHealthbar) {
@@ -215,7 +220,6 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 				this.healthbar.x = this.x;
 				this.healthbar.y = this.y - this.height - HEALTHBAR_Y_OFFSET;
 			}
-			
 		}
 	}
 }

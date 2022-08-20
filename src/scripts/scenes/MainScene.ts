@@ -189,6 +189,12 @@ export default class MainScene extends Phaser.Scene {
 				npc.onCollide(true);
 			});
 		});
+		Object.values(this.npcMap).forEach((npc) => {
+			this.physics.add.collider(Object.values(this.npcMap), npc, (collidingToken) => {
+				const castCollidingToken = collidingToken as CharacterToken;
+				npc.onCollide(castCollidingToken.faction !== npc.faction);
+			});
+		});
 
 		if (globalState.activeFollower !== '') {
 			this.spawnFollower(
@@ -295,6 +301,17 @@ export default class MainScene extends Phaser.Scene {
 			this.sound.play('score-town', { volume: 0.05, loop: true });
 		} else {
 			this.sound.play('score-dungeon', { volume: 0.08, loop: true });
+		}
+	}
+
+	despawnFollower() {
+		if (this.follower) {
+			this.follower.destroy(true);
+			this.follower = undefined;
+		}
+		if (this.nPCAvatar) {
+			this.nPCAvatar.destroy(true);
+			this.nPCAvatar = undefined;
 		}
 	}
 

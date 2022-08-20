@@ -92,11 +92,13 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('pad-background', 'assets/img/pad-background.png');
 		this.load.image('pad-stick', 'assets/img/pad-stick.png');
 		this.load.image('icon-backpack', 'assets/img/backpack-icon.png');
+		this.load.image('icon-enchantments', 'assets/img/enchantment-icon.png');
 		this.load.image('icon-quests', 'assets/img/quest-icon.png');
 		this.load.image('icon-settings', 'assets/img/settings-icon.png');
 		this.load.image('icon-hero', 'assets/img/hero-icon.png');
 		this.load.image('icon-agnes', 'assets/img/agnes-icon.png');
 		this.load.image('icon-healthbar-background', 'assets/img/gui-healthbar.png');
+		this.load.image('icon-npc-healthbar-background', 'assets/img/gui-npc-healthbar.png');
 		this.load.image('ability-background-desktop', 'assets/img/ability-icon-background-desktop.png');
 		this.load.image('ability-background-mobile', 'assets/img/ability-icon-background-mobile.png');
 		this.load.image('gui-text-equipment', 'assets/img/gui-text-equipment.png');
@@ -109,6 +111,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('ability-background-4', 'assets/img/ability-icon-background-4.png');
 		this.load.image('icon-guibase', 'assets/img/gui-base.png');
 		this.load.image('icon-healthbar', 'assets/img/gui-life.png');
+		this.load.image('icon-npc-healthbar', 'assets/img/gui-npc-life.png');
 		this.load.image('inventory-borders', 'assets/img/inventory-borders-tall.png');
 		this.load.image('inventory-selection', 'assets/img/inventory-selection.png');
 		this.load.image('checkbox-empty', 'assets/img/checkbox-empty.png');
@@ -142,11 +145,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('icon-source-fire1', 'assets/img/source_icon_flame01.png');
 		this.load.image('icon-source-force1', 'assets/img/source_icon_force01.png');
 
-		this.load.aseprite(
-			'essence',
-			'assets/sprites/essence.png',
-			'assets/sprites/essence.json'
-		)
+		this.load.aseprite('essence', 'assets/sprites/essence.png', 'assets/sprites/essence.json');
 		// Doors
 		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png', {
 			frameWidth: 48,

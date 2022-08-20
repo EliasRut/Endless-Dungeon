@@ -184,11 +184,15 @@ export interface ScriptSetQuestState {
 export interface ScriptSetFollowerData {
 	type: 'setFollowerData';
 	follower: Follower;
-	followerId: string;
 }
 
 export interface ScriptSpawnFollower {
 	type: 'spawnFollower';
+	followerId: string;
+}
+
+export interface ScriptDespawnFollower {
+	type: 'despawnFollower';
 	followerId: string;
 }
 
@@ -212,7 +216,8 @@ export type ScriptEntry =
 	| ScriptSetQuestState
 	| ScriptSpawnItem
 	| ScriptSetFollowerData
-	| ScriptSpawnFollower;
+	| ScriptSpawnFollower
+	| ScriptDespawnFollower;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];

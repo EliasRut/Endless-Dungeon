@@ -87,6 +87,7 @@ export default class ZombieToken extends EnemyToken {
 			return;
 		}
 
+		// Attack, if a target exists and is alive
 		const tx = this.target.x;
 		const ty = this.target.y;
 		const distance = this.getDistanceToWorldStatePosition(tx, ty);
@@ -105,8 +106,9 @@ export default class ZombieToken extends EnemyToken {
 
 		// follows you only if you're close enough, then runs straight at you,
 		// stop when close enough (proximity)
-
 		if (
+			this.targetStateObject &&
+			this.targetStateObject.health > 0 &&
 			this.aggro &&
 			this.attackedAt + this.stateObject.attackTime < time &&
 			this.attackRange < distance
@@ -132,6 +134,7 @@ export default class ZombieToken extends EnemyToken {
 					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
 				}
 			}
+			// Just stand around and do nothing, otherwise
 		} else {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
@@ -145,9 +148,14 @@ export default class ZombieToken extends EnemyToken {
 				}
 			}
 		}
-		if (distance <= this.attackRange) {
+		if (
+			distance <= this.attackRange &&
+			this.targetStateObject &&
+			this.targetStateObject.health > 0
+		) {
 			this.attack(time);
 		}
+
 		this.stateObject.x = this.body.x / SCALE;
 		this.stateObject.y = this.body.y / SCALE;
 	}
