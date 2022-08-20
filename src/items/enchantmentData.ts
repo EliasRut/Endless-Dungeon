@@ -1,9 +1,9 @@
-import { enchantmentModifiers } from '../scripts/worldstate/PlayerCharacter';
+import globalState from '../scripts/worldstate';
 
 export interface EnchantmentData {
 	name: string;
 	description: string;
-	affectedStat?: { stat: keyof typeof enchantmentModifiers; value: number };
+	affectedStat?: { stat: keyof typeof globalState.playerCharacter.enchantmentModifiers; value: number };
 }
 
 enum EnchantmentType {

@@ -189,6 +189,12 @@ export default class MainScene extends Phaser.Scene {
 				npc.onCollide(true);
 			});
 		});
+		Object.values(this.npcMap).forEach((npc) => {
+			this.physics.add.collider(Object.values(this.npcMap), npc, (collidingToken) => {
+				const castCollidingToken = collidingToken as CharacterToken;
+				npc.onCollide(castCollidingToken.faction !== npc.faction);
+			});
+		});
 
 		if (globalState.activeFollower !== '') {
 			this.spawnFollower(
