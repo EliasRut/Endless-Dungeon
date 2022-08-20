@@ -37,7 +37,7 @@ const FOUR_ITEMS_OFFSETS = [
 ];
 
 export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
-	visiblity: boolean;
+	visibility: boolean;
 	scene: MainScene;
 	leftBorderX: number;
 	topBorderY: number;
@@ -51,18 +51,18 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.scene = scene as MainScene;
 
 		this.setDepth(UiDepths.UI_ABOVE_FOREGROUND_LAYER);
-		this.visiblity = true;
+		this.visibility = true;
 	}
 
 	toggleVisibility() {
 		this.toggleVisible();
-		this.visiblity = !this.visiblity;
+		this.visibility = !this.visibility;
 		this.selection?.setVisible(false);
 	}
 
 	setVisible(value: boolean, index?: number, direction?: number): this {
 		super.setVisible(value, index, direction);
-		this.visiblity = false;
+		this.visibility = false;
 		return this;
 	}
 

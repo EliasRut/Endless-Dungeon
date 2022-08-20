@@ -1,4 +1,10 @@
-import { Abilities, AbilityData, AbilityType, SpreadData } from '../abilities/abilityData';
+import {
+	Abilities,
+	AbilityData,
+	AbilityType,
+	SpreadData,
+	getRelevantAbilityVersion,
+} from '../abilities/abilityData';
 import AbilityEffect from '../drawables/effects/AbilityEffect';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import EnemyToken from '../drawables/tokens/EnemyToken';
@@ -39,7 +45,7 @@ export default class AbilityHelper {
 	) {
 		// We allow for multiple projectiles per ability.
 		// Let's get the data for ability projectiles first.
-		const usedAbilityData = abilityData || Abilities[type];
+		const usedAbilityData = abilityData || getRelevantAbilityVersion(type, abilityLevel);
 		const projectileData = usedAbilityData.projectileData;
 		// Since we're allowing projectiles to have a spread, we'll be using radians for easier math
 		const facingRotation = getRotationInRadiansForFacing(pointOfOrigin.currentFacing);

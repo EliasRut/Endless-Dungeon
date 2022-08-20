@@ -19,8 +19,10 @@ import {
 	MinMaxParticleEffectValue,
 	SimpleParticleEffectValue,
 } from '../helpers/constants';
+// tslint:disable-next-line: max-line-length
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
 import { ConditionalAbilityData, EnumDictionary } from '../../../typings/custom';
+import globalState from '../worldstate/index';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -845,4 +847,23 @@ export const Abilities: AbilityDataMap = {
 		flavorText: `Raise an fiery elemental.`,
 		icon: ['icon-abilities', 0],
 	},
+};
+
+export const getRelevantAbilityVersion = (abilityType: AbilityType, abilityLevel: number) => {
+	const options = globalState.abilityData[abilityType] || [{ data: Abilities[abilityType] }];
+	return options.find((option) => {
+		return (
+			!option.conditions ||
+			Object.entries(option.conditions).every(([condition, conditionValue]) => {
+				switch (condition) {
+					case 'minimumLevel':
+						return abilityLevel >= conditionValue;
+					case 'maximumLevel':
+						return abilityLevel <= conditionValue;
+					default:
+						return true;
+				}
+			})
+		);
+	})!.data;
 };
