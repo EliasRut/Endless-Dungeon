@@ -8,7 +8,7 @@ import {
 import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import EnemyToken from './EnemyToken';
+import EnemyToken, { slainEnemy } from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 import { AbilityType } from '../../abilities/abilityData';
 import Enemy from '../../worldstate/Enemy';
@@ -19,7 +19,7 @@ const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
 const BASE_HEALTH = 4;
 
-const ITEM_DROP_CHANCE = 0.65;
+const ITEM_DROP_CHANCE = 0;
 const HEALTH_DROP_CHANCE = 0.06 * globalState.playerCharacter.luck;
 
 const CHARGE_TIME = 1000;
@@ -62,9 +62,9 @@ export default class PierreToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropRandomItem(this.level);
+				this.dropEquippableItem(this.level, slainEnemy.NORMAL);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
-				this.dropFixedItem('health');
+				this.dropNonEquippableItem('health');
 			}
 			this.dead = true;
 			this.die();

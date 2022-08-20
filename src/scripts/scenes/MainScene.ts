@@ -19,7 +19,7 @@ import {
 	isCollidingTile,
 } from '../helpers/movement';
 import {
-	BaseFadingLabelFontSize,
+	BaseFadingLabelFontSize,	
 	Faction,
 	FadingLabelData,
 	FadingLabelSize,
@@ -39,6 +39,7 @@ import CharacterToken from '../drawables/tokens/CharacterToken';
 import { NpcOptions } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import SettingsScreen from '../screens/SettingsScreen';
+import EnchantingScreen from '../screens/EnchantingScreen';
 import DoorToken from '../drawables/tokens/DoorToken';
 
 import { DungeonRunData } from '../models/DungeonRunData';
@@ -50,6 +51,7 @@ import QuestsIcon from '../drawables/ui/QuestsIcon';
 import QuestLogScreen from '../screens/QuestLogScreen';
 import QuestDetailsScreen from '../screens/QuestDetailsScreen';
 import ContentManagementScreen from '../screens/ContentManagementScreen';
+import EnchantIcon from '../drawables/ui/EnchantIcon';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -93,6 +95,7 @@ export default class MainScene extends Phaser.Scene {
 		questDetailsScreen: QuestDetailsScreen;
 		itemScreen: ItemScreen;
 		contentManagementScreen: ContentManagementScreen;
+		enchantingScreen: EnchantingScreen;
 	};
 	alive: number;
 	isPaused = false;
@@ -107,9 +110,10 @@ export default class MainScene extends Phaser.Scene {
 		backpackIcon: BackpackIcon;
 		settingsIcon: SettingsIcon;
 		questsIcon: QuestsIcon;
+		enchantIcon : EnchantIcon;
 	};
 
-	overlayPressed: number = 0;
+	overlayPressed: number = 0;	
 
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
@@ -181,6 +185,7 @@ export default class MainScene extends Phaser.Scene {
 			backpackIcon: new BackpackIcon(this),
 			settingsIcon: new SettingsIcon(this),
 			questsIcon: new QuestsIcon(this),
+			enchantIcon: new EnchantIcon(this),
 		};
 		if (globalState.currentLevel.startsWith('dungeonLevel')) {
 			this.levelName = new LevelName(this);
@@ -255,6 +260,7 @@ export default class MainScene extends Phaser.Scene {
 			questLogScreen: new QuestLogScreen(this),
 			questDetailsScreen: new QuestDetailsScreen(this),
 			contentManagementScreen: new ContentManagementScreen(this),
+			enchantingScreen: new EnchantingScreen(this),
 		};
 
 		this.icons.backpackIcon.setScreens();
@@ -447,23 +453,24 @@ export default class MainScene extends Phaser.Scene {
 			globalState.clearState();
 			location.reload();
 		}
-		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visiblity)) {
+		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visibility)) {
 			if (!this.scriptHelper.isScriptRunning())
 				if (globalState.gameTime - this.overlayPressed > 250) {
-					this.icons.backpackIcon.toggleScreen();
-					this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
+					if(!this.icons.backpackIcon.open){
+						this.closeAllIconScreens();
+						this.icons.backpackIcon.openScreen();
+					} else this.closeAllIconScreens();
+					//this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
 					this.overlayPressed = globalState.gameTime;
 				}
 		}
 		if (this.keyboardHelper.isSettingsPressed()) {
 			if (!this.scriptHelper.isScriptRunning()) {
 				if (globalState.gameTime - this.overlayPressed > 250) {
-					if (this.icons.backpackIcon.screens[0].visiblity) {
-						this.icons.backpackIcon.toggleScreen();
-						this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
-					} else if (this.icons.questsIcon.screens[0].visiblity)
-						this.icons.questsIcon.toggleScreen();
-					else this.icons.settingsIcon.toggleScreen();
+					if(!this.icons.settingsIcon.open){
+						this.closeAllIconScreens();
+						this.icons.settingsIcon.openScreen();
+					} else this.closeAllIconScreens();
 					this.overlayPressed = globalState.gameTime;
 				}
 			} else {
@@ -481,7 +488,21 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isQuestsPressed()) {
 			if (!this.scriptHelper.isScriptRunning())
 				if (globalState.gameTime - this.overlayPressed > 250) {
-					this.icons.questsIcon.toggleScreen();
+					if(!this.icons.questsIcon.open){
+						this.closeAllIconScreens();
+						this.icons.questsIcon.openScreen();
+					} else this.closeAllIconScreens();
+					this.overlayPressed = globalState.gameTime;
+				}
+		}
+
+		if (this.keyboardHelper.isEnchantPressed()) {
+			if (!this.scriptHelper.isScriptRunning())
+				if (globalState.gameTime - this.overlayPressed > 250) {
+					if(!this.icons.enchantIcon.open){
+						this.closeAllIconScreens();
+						this.icons.enchantIcon.openScreen();
+					} else this.closeAllIconScreens();
 					this.overlayPressed = globalState.gameTime;
 				}
 		}
@@ -503,7 +524,7 @@ export default class MainScene extends Phaser.Scene {
 
 		if (this.isPaused) {
 			this.scriptHelper.handleScripts(globalState.gameTime);
-			if (this.icons.backpackIcon.screens[0].visiblity)
+			if (this.icons.backpackIcon.open)
 				this.overlayScreens.inventory.interactInventory(
 					this.keyboardHelper.getInventoryKeyPress(),
 					globalState.gameTime
@@ -721,6 +742,13 @@ export default class MainScene extends Phaser.Scene {
 		});
 	}
 
+	closeAllIconScreens() {
+		Object.values(this.icons).forEach((icon) => {
+			icon.closeScreen();
+		});
+		this.resume();	
+	}
+
 	pause() {
 		this.isPaused = true;
 		this.physics.pause();
@@ -745,16 +773,13 @@ export default class MainScene extends Phaser.Scene {
 		this.time.paused = false;
 	}
 
-	dropItem(x: number, y: number, itemKey: string, level?: number) {
+	dropItem(x: number, y: number, itemKey: string, level: number = 0) {
 		const item = getItemDataForName(itemKey);
 		if (item === undefined) {
 			console.log('ITEM UNDEFINED: ', itemKey);
 			return;
-		}
-		let itemToken;
-		// if(itemKey == 'source-fire') itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0, 'icon_source_fire1');
-		// else itemToken = new WorldItemToken(this, x, y, itemKey, item, getItemTexture(itemKey), level || 0);
-		itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0, getItemTexture(itemKey));
+		}		
+		let itemToken = new WorldItemToken(this, x, y, itemKey, item, level, getItemTexture(itemKey));
 		itemToken.setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.worldItems.push(itemToken);
 	}

@@ -2,7 +2,7 @@ import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 import { getFacing8Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import EnemyToken from './EnemyToken';
+import EnemyToken, { slainEnemy } from './EnemyToken';
 
 const MAX_SLOW_DISTANCE = 100;
 const SLOW_FACTOR = 0.5;
@@ -11,7 +11,7 @@ const AURA_DAMAGE_PER_TICK = 0.01;
 const REGULAR_ATTACK_DAMAGE = 0;
 const REGULAR_ATTACK_RANGE = 15;
 
-const ITEM_DROP_CHANCE = 0.15;
+const ITEM_DROP_CHANCE = 0;
 const HEALTH_DROP_CHANCE = 0.06;
 
 export default class MeleeEnemyToken extends EnemyToken {
@@ -47,12 +47,12 @@ export default class MeleeEnemyToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropRandomItem(this.level);
+				this.dropEquippableItem(this.level, slainEnemy.BOSS);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
-				this.dropFixedItem('health');
+				this.dropNonEquippableItem('health');
 			}
 
-			this.destroy();
+			this.die();
 			return;
 		}
 

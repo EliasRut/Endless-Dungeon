@@ -3,7 +3,7 @@ import { getFacing8Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
-import EnemyToken from './EnemyToken';
+import EnemyToken, { slainEnemy } from './EnemyToken';
 import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 const ATTACK_RANGE = 100;
@@ -22,8 +22,8 @@ export default class RangedEnemyToken extends EnemyToken {
 
 		// check death
 		if (this.stateObject.health <= 0) {
-			this.dropRandomItem();
-			this.destroy();
+			this.dropEquippableItem(this.level, slainEnemy.NORMAL);
+			this.die();
 			return;
 		}
 
