@@ -180,7 +180,6 @@ export interface ScriptSetQuestState {
 export interface ScriptSetFollowerData {
 	type: 'setFollowerData';
 	follower: Follower;
-	followerId: string;
 }
 
 export interface ScriptSpawnFollower {

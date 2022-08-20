@@ -5,6 +5,7 @@ import { Condition } from './ScriptBlockTypes/Condition';
 import { Dialog } from './ScriptBlockTypes/Dialog';
 import { Move } from './ScriptBlockTypes/Move';
 import { PausedCondition } from './ScriptBlockTypes/PausedCondition';
+import { SetFollowerData } from './ScriptBlockTypes/SetFollowerData';
 import { SetQuestState } from './ScriptBlockTypes/SetQuestState';
 import { Wait } from './ScriptBlockTypes/Wait';
 import { ScriptTypeDropdown } from './ScriptTypeDropdown';
@@ -112,6 +113,26 @@ export const ScriptBlock: (props: ScriptBlockProps) => JSX.Element = ({
 						type: 'setQuestState',
 					}}
 					availableQuests={knownQuests}
+					updateData={onChange}
+					removeData={onRemove}
+				/>
+			);
+		}
+		case 'setFollowerData': {
+			return (
+				<SetFollowerData
+					currentData={{
+						id: '',
+						animationBase: '',
+						health: 0,
+						damage: 0,
+						movementSpeed: 0,
+						level: 0,
+						ability: '',
+						...scriptBlock,
+						type: 'setFollowerData',
+					}}
+					// availableFollowerAbilities={knownFollowerAbilities}
 					updateData={onChange}
 					removeData={onRemove}
 				/>
