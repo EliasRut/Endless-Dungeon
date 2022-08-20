@@ -2,7 +2,10 @@ import { AbilityType } from '../abilities/abilityData';
 import { AbilityKey, Faction, SCALE } from '../helpers/constants';
 import Character from './Character';
 import MainScene from '../scenes/MainScene';
-import CircelingEffect from '../drawables/effects/CircelingEffect';
+
+const DEFAULT_HEALTH = 100;
+const DEFAULT_DAMAGE = 1;
+const DEFAULT_MOVEMENTSPEED = 200;
 
 // Stats are increased by this amount, given by enchantments
 export const enchantmentModifiers = {
@@ -21,23 +24,24 @@ export default class PlayerCharacter extends Character {
 
 	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
 
-	public activeSummons: Array<{ id: string; summoningType: string }> = [];
+	public activeSummons: { id: string; summoningType: string }[] = [];
 
 	constructor() {
 		// tslint:disable-next-line: no-magic-numbers
-		super('player');
+		super('player', 'player', DEFAULT_HEALTH, DEFAULT_DAMAGE, DEFAULT_MOVEMENTSPEED);
 		this.faction = Faction.PLAYER;
 	}
 
 	public abilityKeyMapping = {
 		[AbilityKey.ONE]: AbilityType.FIREBALL,
-		[AbilityKey.TWO]: AbilityType.ICESPIKE,
-		[AbilityKey.THREE]: AbilityType.DUSTNOVA,
-		[AbilityKey.FOUR]: AbilityType.ROUND_HOUSE_KICK,
+		[AbilityKey.TWO]: AbilityType.NOTHING,
+		[AbilityKey.THREE]: AbilityType.NOTHING,
+		[AbilityKey.FOUR]: AbilityType.NOTHING,
 		[AbilityKey.FIVE]: AbilityType.NOTHING,
 		[AbilityKey.SPACE]: AbilityType.TELEPORT,
 	};
 }
+
 export const updateAbility = (
 	scene: MainScene,
 	player: PlayerCharacter,
@@ -46,5 +50,5 @@ export const updateAbility = (
 ) => {
 	if (abilityKey === AbilityKey.FIVE) return;
 	player.abilityKeyMapping[abilityKey] = ability;
-	scene.avatar.updateAbility(abilityKey, ability);
+	scene.playerCharacterAvatar.updateAbility(abilityKey, ability);
 };

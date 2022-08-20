@@ -10,6 +10,7 @@ import { Facings, Faction, PossibleTargets, SCALE } from './constants';
 import { getFacing4Dir, getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
 import Enemy from '../worldstate/Enemy';
+import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
 
 export default class AbilityHelper {
 	scene: MainScene;
@@ -64,17 +65,19 @@ export default class AbilityHelper {
 			if (pointOfOrigin.exactTargetYFactor !== undefined) {
 				yMultiplier = pointOfOrigin.exactTargetYFactor;
 			}
-			const effect = new projectileData!.effect(
+			const effect = new (projectileData!.effect || TrailingParticleProjectileEffect)(
 				this.scene,
-				pointOfOrigin.x + (pointOfOrigin.width || 0) / 2 + xMultiplier * projectileData!.xOffset, //  * SCALE
-				pointOfOrigin.y + (pointOfOrigin.height || 0) / 2 + yMultiplier * projectileData!.yOffset, //  * SCALE
+				pointOfOrigin.x + (pointOfOrigin.width || 0) / 2 + xMultiplier * projectileData!.xOffset,
+				pointOfOrigin.y + (pointOfOrigin.height || 0) / 2 + yMultiplier * projectileData!.yOffset,
 				usedAbilityData.spriteName || '',
 				getFacing4Dir(xMultiplier, yMultiplier),
 				projectileData
 			);
 			if (projectileData?.targeting) {
 				(effect as TargetingEffect).allowedTargets =
-					caster.faction === Faction.PLAYER ? PossibleTargets.ENEMIES : PossibleTargets.PLAYER;
+					caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
+						? PossibleTargets.ENEMIES
+						: PossibleTargets.PLAYER;
 			}
 			effect.setVelocity(xMultiplier * SCALE, yMultiplier * SCALE);
 			effect.setMaxVelocity(projectileData!.velocity * SCALE);
@@ -119,9 +122,9 @@ export default class AbilityHelper {
 			});
 
 			const targetTokens =
-				caster.faction === Faction.PLAYER
+				caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
 					? Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES)
-					: this.scene.mainCharacter;
+					: [this.scene.mainCharacter, ...(this.scene.follower ? [this.scene.follower] : [])];
 			const collidingCallback = (collidingEffect: AbilityEffect, enemy: CharacterToken) => {
 				if (collidingEffect.hitEnemyTokens.includes(enemy)) {
 					return;

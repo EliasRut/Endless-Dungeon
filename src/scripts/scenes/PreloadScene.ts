@@ -70,16 +70,11 @@ export default class PreloadScene extends Phaser.Scene {
 		});
 
 		// Ability effects
-		this.load.image('fire', 'assets/img/muzzleflash3.png');
-		this.load.image('ice', 'assets/img/ice_spike.png');
-		this.load.image('snow', 'assets/img/snowflake.png');
-		this.load.image('rock', 'assets/img/rock.png');
-		this.load.image('wind', 'assets/img/wind-gust.png');
-		this.load.image('skull', 'assets/img/necrotic-skull.png');
-		this.load.image('arcaneAura', 'assets/img/arcane-aura.png');
-		this.load.image('fireAura', 'assets/img/fire-aura.png');
-		this.load.image('iceAura', 'assets/img/ice-aura.png');
-		this.load.image('necroticAura', 'assets/img/necrotic-aura.png');
+		this.load.image('fire', 'assets/abilities/fire.png');
+		this.load.image('ice', 'assets/abilities/ice.png');
+		this.load.image('snow', 'assets/abilities/snow.png');
+		this.load.image('rock', 'assets/abilities/rock.png');
+		this.load.image('skull', 'assets/abilities/skull.png');
 
 		// Other elements
 		this.load.image('quest', 'assets/img/quest.png');
@@ -100,6 +95,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('icon-quests', 'assets/img/quest-icon.png');
 		this.load.image('icon-settings', 'assets/img/settings-icon.png');
 		this.load.image('icon-hero', 'assets/img/hero-icon.png');
+		this.load.image('icon-agnes', 'assets/img/agnes-icon.png');
 		this.load.image('icon-healthbar-background', 'assets/img/gui-healthbar.png');
 		this.load.image('ability-background-desktop', 'assets/img/ability-icon-background-desktop.png');
 		this.load.image('ability-background-mobile', 'assets/img/ability-icon-background-mobile.png');
@@ -232,6 +228,8 @@ export default class PreloadScene extends Phaser.Scene {
 			this.load.image('map-editor-highlighting', 'assets/img/map-editor-highlighting.png');
 		}
 
+		requiredNpcs.add('vanya-base');
+
 		// NPCs
 		requiredNpcs.forEach((npc) => {
 			this.neededAnimations.push({
@@ -329,6 +327,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Create character animations
 		this.createAnimFromAseprite('player');
+		this.createAnimFromAseprite('agnes');
 		this.createAnimFromAseprite('death_anim_small');
 
 		this.neededAnimations.forEach((token) => {

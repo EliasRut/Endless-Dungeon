@@ -12,7 +12,7 @@ const BODY_Y_OFFSET = 16;
 
 const ELEMENTAL_DAMAGE = 5;
 const ELEMENTAL_HEALTH = 4;
-const ELEMENTAL_SPEED = 5;
+const ELEMENTAL_MOVEMENT_SPEED = 200;
 
 const REGULAR_ATTACK_RANGE = 10;
 
@@ -48,13 +48,13 @@ export default class ElementalToken extends CharacterToken {
 
 		globalState.npcs[id] = this.stateObject;
 		this.stateObject = new Character(
+			id,
 			tokenName,
 			ELEMENTAL_HEALTH,
 			ELEMENTAL_DAMAGE,
-			ELEMENTAL_SPEED
+			ELEMENTAL_MOVEMENT_SPEED
 		);
 		this.stateObject.vision = 150;
-		this.stateObject.movementSpeed = 200;
 		this.target = new Phaser.Geom.Point(0, 0);
 		this.faction = Faction.NPCS;
 		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;

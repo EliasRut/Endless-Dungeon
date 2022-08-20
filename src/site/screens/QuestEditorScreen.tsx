@@ -91,7 +91,7 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 			});
 	}
 
-	replaceScriptBlockData(index: number, newData: any) {
+	replaceScriptBlockData(index: number, newData: Partial<ScriptEntry>) {
 		this.setState({
 			scriptBlocks: [
 				...this.state.scriptBlocks.slice(0, index),
@@ -457,8 +457,8 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 								this.state.scriptBlocks.map((scriptBlock, index) => (
 									<ScriptBlock
 										scriptBlock={scriptBlock}
-										onChange={(value: string) =>
-											this.replaceScriptBlockData(index, { type: value })
+										onChange={(value: Partial<ScriptEntry>) =>
+											this.replaceScriptBlockData(index, value)
 										}
 										onRemove={() => this.removeScriptBlockData(index)}
 										knownQuests={this.state.knownQuests}

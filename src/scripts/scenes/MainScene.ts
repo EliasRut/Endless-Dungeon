@@ -1,7 +1,7 @@
 import 'phaser';
 
 import globalState from '../worldstate/index';
-import { updateStatus } from '../worldstate/Character';
+import Character, { updateStatus } from '../worldstate/Character';
 
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import FpsText from '../drawables/ui/FpsText';
@@ -29,7 +29,8 @@ import {
 } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
-import Avatar from '../drawables/ui/Avatar';
+import PlayerCharacterAvatar from '../drawables/ui/PlayerCharacterAvatar';
+import NPCAvatar from '../drawables/ui/NPCAvatar';
 import ScriptHelper from '../helpers/ScriptHelper';
 import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
@@ -52,6 +53,8 @@ import QuestLogScreen from '../screens/QuestLogScreen';
 import QuestDetailsScreen from '../screens/QuestDetailsScreen';
 import ContentManagementScreen from '../screens/ContentManagementScreen';
 import EnchantIcon from '../drawables/ui/EnchantIcon';
+import FollowerToken from '../drawables/tokens/FollowerToken';
+import { AbilityType } from '../abilities/abilityData';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -81,6 +84,7 @@ export default class MainScene extends Phaser.Scene {
 	abilityHelper: AbilityHelper;
 
 	mainCharacter: PlayerCharacterToken;
+	follower?: FollowerToken;
 	npcMap: { [id: string]: CharacterToken };
 	doorMap: { [id: string]: DoorToken };
 	worldItems: WorldItemToken[];
@@ -104,7 +108,8 @@ export default class MainScene extends Phaser.Scene {
 	mobilePadBackgorund?: Phaser.GameObjects.Image;
 	mobilePadStick?: Phaser.GameObjects.Image;
 
-	avatar: Avatar;
+	playerCharacterAvatar: PlayerCharacterAvatar;
+	nPCAvatar?: NPCAvatar;
 
 	icons: {
 		backpackIcon: BackpackIcon;
@@ -180,6 +185,15 @@ export default class MainScene extends Phaser.Scene {
 			});
 		});
 
+		if (globalState.activeFollower !== '') {
+			this.spawnFollower(
+				globalState.playerCharacter.x || startX,
+				globalState.playerCharacter.y || startY,
+				globalState.activeFollower,
+				globalState.activeFollower
+			);
+		}
+
 		this.fpsText = new FpsText(this);
 		this.icons = {
 			backpackIcon: new BackpackIcon(this),
@@ -191,7 +205,7 @@ export default class MainScene extends Phaser.Scene {
 			this.levelName = new LevelName(this);
 			this.minimap = new Minimap(this);
 		}
-		this.avatar = new Avatar(this);
+		this.playerCharacterAvatar = new PlayerCharacterAvatar(this);
 		if (this.isMobile) {
 			this.mobilePadBackgorund = this.add.image(
 				this.cameras.main.width - MOBILE_PAD_BACKGROUND_X_OFFSET,
@@ -277,6 +291,21 @@ export default class MainScene extends Phaser.Scene {
 		} else {
 			this.sound.play('score-dungeon', { volume: 0.08, loop: true });
 		}
+	}
+
+	spawnFollower(x: number, y: number, type: string, id: string) {
+		this.follower = new FollowerToken(this, x, y, type, id);
+		this.follower.setScale(SCALE);
+		this.follower.setDepth(UiDepths.TOKEN_MAIN_LAYER);
+		this.physics.add.collider(this.follower, this.tileLayer);
+		this.physics.add.collider(this.follower, this.decorationLayer);
+		this.physics.add.collider(this.follower, this.mainCharacter);
+		Object.values(this.npcMap).forEach((npc) => {
+			this.physics.add.collider(this.follower!, npc, () => {
+				npc.onCollide(true);
+			});
+		});
+		this.nPCAvatar = new NPCAvatar(this, this.follower.id, 'icon-agnes');
 	}
 
 	addNpc(
@@ -620,7 +649,7 @@ export default class MainScene extends Phaser.Scene {
 		}
 
 		const cooldowns = this.keyboardHelper.getAbilityCooldowns(globalState.gameTime);
-		this.avatar.update(cooldowns);
+		this.playerCharacterAvatar.update(cooldowns);
 
 		if (this.useDynamicLighting && this.dynamicLightingHelper) {
 			this.dynamicLightingHelper.updateDynamicLighting();
@@ -630,6 +659,9 @@ export default class MainScene extends Phaser.Scene {
 		Object.values(this.npcMap).forEach((curNpc) => {
 			curNpc.update(globalState.gameTime, delta);
 		});
+
+		this.follower?.update(globalState.gameTime, delta);
+		this.nPCAvatar?.update();
 
 		// TODO: remove items that are picked up
 		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);
@@ -691,11 +723,11 @@ export default class MainScene extends Phaser.Scene {
 
 		for (const fadingLabel of this.fadingLabels) {
 			const timeDelta = globalTime - fadingLabel.timestamp;
-			if (timeDelta > 1000) {
+			if (timeDelta > fadingLabel.timeToLive) {
 				fadingLabel.fontElement?.destroy(true);
 				fadingLabel.fontElement = undefined;
 			} else if (fadingLabel.fontElement) {
-				const timeDeltaFraction = timeDelta / 1000;
+				const timeDeltaFraction = timeDelta / fadingLabel.timeToLive;
 				fadingLabel.fontElement.y = fadingLabel.posY - timeDeltaFraction * FADING_LABEL_Y_DISTANCE;
 				fadingLabel.fontElement.x =
 					fadingLabel.posX + Math.sin(timeDeltaFraction * 4) * FADING_LABEL_X_DISTANCE;
@@ -724,7 +756,8 @@ export default class MainScene extends Phaser.Scene {
 		fontSize: FadingLabelSize,
 		color: string,
 		posX: number,
-		posY: number
+		posY: number,
+		timeToLive: number
 	) {
 		const fadingLabel = new Phaser.GameObjects.Text(this, posX, posY, text, {
 			fontFamily: 'endlessDungeon',
@@ -737,6 +770,7 @@ export default class MainScene extends Phaser.Scene {
 			fontSize,
 			fontElement: fadingLabel,
 			timestamp: this.game.getTime(),
+			timeToLive,
 			posX,
 			posY,
 		});
@@ -782,5 +816,15 @@ export default class MainScene extends Phaser.Scene {
 		let itemToken = new WorldItemToken(this, x, y, itemKey, item, level, getItemTexture(itemKey));
 		itemToken.setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.worldItems.push(itemToken);
+	}
+
+	getTokenForStateObject(stateObject: Character) {
+		if (stateObject.faction === Faction.PLAYER) {
+			return this.mainCharacter;
+		} else if (stateObject.faction === Faction.ALLIES) {
+			return this.follower;
+		} else {
+			return this.npcMap[stateObject.id];
+		}
 	}
 }

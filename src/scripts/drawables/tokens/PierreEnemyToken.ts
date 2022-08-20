@@ -1,11 +1,10 @@
 import {
-	Facings,
 	facingToSpriteNameMap,
 	KNOCKBACK_TIME,
 	SCALE,
 	NORMAL_ANIMATION_FRAME_RATE,
 } from '../../helpers/constants';
-import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
+import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken, { slainEnemy } from './EnemyToken';
@@ -96,11 +95,11 @@ export default class PierreToken extends EnemyToken {
 
 		// follows you only if you're close enough, then runs straight at you,
 		// stop when close enough (proximity)
-		if (!this.attacking) {
+		if (!this.attacking && this.targetStateObject) {
 			const tx = this.target.x;
 			const ty = this.target.y;
-			const px = globalState.playerCharacter.x;
-			const py = globalState.playerCharacter.y;
+			const px = this.targetStateObject.x;
+			const py = this.targetStateObject.y;
 			if (this.aggro) {
 				if (
 					px !== tx ||
@@ -152,6 +151,7 @@ export default class PierreToken extends EnemyToken {
 
 	// FRAME RATE: 16
 	attack(time: number) {
+		console.log(`attacking ${this.target}`);
 		if (!this.attacking) {
 			this.stateObject.isWalking = false;
 			const tx = this.target.x * SCALE;

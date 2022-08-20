@@ -14,10 +14,37 @@ import IceSummoningEffect from '../drawables/effects/IceSummoningEffect';
 import ArcaneSummoningEffect from '../drawables/effects/ArcaneSummoningEffect';
 import NecroticSummoningEffect from '../drawables/effects/NecroticSummoningEffect';
 import TeleportEffect from '../drawables/effects/TeleportEffect';
+import {
+	ColorEffectValue,
+	MinMaxParticleEffectValue,
+	SimpleParticleEffectValue,
+} from '../helpers/constants';
+import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
+import { ConditionalAbilityData, EnumDictionary } from '../../../typings/custom';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
+export interface ProjectileParticleData {
+	particleImage?: string;
+	alpha?: SimpleParticleEffectValue;
+	scale?: SimpleParticleEffectValue;
+	speed?: SimpleParticleEffectValue;
+	rotate?: SimpleParticleEffectValue;
+	lifespan?: MinMaxParticleEffectValue;
+	frequency?: number;
+	maxParticles?: number;
+	tint?: ColorEffectValue;
+}
+
+export interface ProjectileParticleExplosionData {
+	particles?: number;
+	speed?: SimpleParticleEffectValue;
+	lifespan?: MinMaxParticleEffectValue;
+}
 export interface ProjectileData {
+	projectileImage?: string;
+	particleData?: ProjectileParticleData;
+	explosionData?: ProjectileParticleExplosionData;
 	spread?: SpreadData;
 	velocity: number;
 	drag?: number;
@@ -25,7 +52,7 @@ export interface ProjectileData {
 	spriteScale?: number;
 	xOffset: number;
 	yOffset: number;
-	effect: typeof AbilityEffect;
+	effect?: typeof AbilityEffect;
 	collisionSound?: string;
 	sfxVolume?: number;
 	delay?: number;
@@ -46,6 +73,7 @@ export interface AbilityData {
 	sfxVolume?: number;
 	cooldownMs?: number;
 	abilityName: string;
+	id?: string;
 	flavorText: string;
 	icon?: [string, number];
 	damageMultiplier: number;
@@ -65,9 +93,6 @@ export const enum AbilityType {
 	HAIL_OF_FLAMES = 'hailOfFlames',
 	HAIL_OF_ICE = 'hailOfIce',
 	ICESPIKE = 'icespike',
-	DUSTNOVA = 'dustnova',
-	ROUND_HOUSE_KICK = 'roundhousekick',
-	HEALING_LIGHT = 'healinglight',
 	ARCANE_BLADE = 'arcaneBlade',
 	FIRE_CONE = 'fireCone',
 	FIRE_NOVA = 'fireNova',
@@ -89,10 +114,14 @@ export const enum AbilityType {
 	ARCANE_SUMMON_ELEMENTAL = 'arcaneSummonElemental',
 	NECROTIC_SUMMON_CIRCELING = 'necroticSummonCirceling',
 	NECROTIC_SUMMON_ELEMENTAL = 'necroticSummonElemental',
-	TELEPORT = 'teleport'
+	TELEPORT = 'teleport',
 }
 
-export const Abilities: { [type: string]: AbilityData } = {
+export type ConditionalAbilityDataMap = EnumDictionary<AbilityType, ConditionalAbilityData[]>;
+
+export type AbilityDataMap = EnumDictionary<AbilityType, AbilityData>;
+
+export const Abilities: AbilityDataMap = {
 	[AbilityType.NOTHING]: {
 		projectiles: 0,
 		cooldownMs: 0,
@@ -107,7 +136,16 @@ export const Abilities: { [type: string]: AbilityData } = {
 			velocity: 300,
 			xOffset: 0,
 			yOffset: 0,
-			effect: FireBallEffect,
+			projectileImage: 'empty-tile',
+			particleData: {
+				particleImage: 'fire',
+				alpha: { start: 1, end: 0 },
+				scale: { start: 1, end: 0.2 },
+				speed: 20,
+				rotate: { min: -180, max: 180 },
+				lifespan: { min: 200, max: 400 },
+			},
+			effect: TrailingParticleProjectileEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			destroyOnEnemyContact: true,
@@ -118,7 +156,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sfxVolume: 0.1,
 		cooldownMs: 250,
 		damageMultiplier: 1,
-		//stun: 3000,
+		// stun: 3000,
 		abilityName: 'Fireball',
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],

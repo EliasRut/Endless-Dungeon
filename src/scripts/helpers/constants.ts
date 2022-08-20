@@ -29,8 +29,8 @@ export const enum Faction {
 	PLAYER,
 	NPCS,
 	ENEMIES,
+	ALLIES,
 }
-
 
 export const enum AbilityKey {
 	ONE = 0,
@@ -38,7 +38,7 @@ export const enum AbilityKey {
 	THREE = 2,
 	FOUR = 3,
 	FIVE = 4,
-	SPACE = 5
+	SPACE = 5,
 }
 
 export const enum UiDepths {
@@ -129,6 +129,7 @@ export const npcTypeToFileMap: { [name: string]: { file: string; facing: FacingR
 
 export const npcToAespriteMap: { [name: string]: { png: string; json: string } } = {
 	player: { png: 'assets/sprites/player.png', json: 'assets/sprites/player.json' },
+	agnes: { png: 'assets/sprites/agnes.png', json: 'assets/sprites/agnes.json' },
 	rich: { png: 'assets/sprites/rich.png', json: 'assets/sprites/rich.json' },
 	jacques: { png: 'assets/sprites/jacques.png', json: 'assets/sprites/jacques.json' },
 	pierre: { png: 'assets/sprites/pierre.png', json: 'assets/sprites/pierre.json' },
@@ -313,6 +314,7 @@ export enum SUMMONING_TYPE {
 }
 
 export const NORMAL_ANIMATION_FRAME_RATE = 60;
+export const NPC_ANIMATION_FRAME_RATE = 15;
 
 export enum FadingLabelSize {
 	SMALL,
@@ -330,6 +332,59 @@ export interface FadingLabelData {
 	fontSize: FadingLabelSize;
 	fontElement: Phaser.GameObjects.Text | undefined;
 	timestamp: number;
+	timeToLive: number;
 	posX: number;
 	posY: number;
 }
+
+export type MinMaxParticleEffectValue = undefined | number | { min: number; max: number };
+export type SimpleParticleEffectValue = MinMaxParticleEffectValue | { start: number; end: number };
+export type ColorEffectValue =
+	| undefined
+	| number
+	| {
+			redMin: number;
+			greenMin: number;
+			blueMin: number;
+			redDiff: number;
+			greenDiff: number;
+			blueDiff: number;
+	  };
+
+export const multiplyParticleValueByScale = (value: SimpleParticleEffectValue) => {
+	if (value === undefined) {
+		return undefined;
+	}
+	if (typeof value === 'number') {
+		const valueAsAny = value as any;
+		return valueAsAny * SCALE;
+	}
+	if (typeof value === 'object') {
+		const valueAsAny = value as any;
+		return {
+			...(valueAsAny.min !== undefined && valueAsAny.max !== undefined
+				? {
+						min: valueAsAny.min * SCALE,
+						max: valueAsAny.max * SCALE,
+				  }
+				: {}),
+			...(valueAsAny.start !== undefined && valueAsAny.end !== undefined
+				? {
+						start: valueAsAny.start * SCALE,
+						end: valueAsAny.end * SCALE,
+				  }
+				: {}),
+		};
+	}
+};
+
+const ScaledValueKeys = ['scale', 'speed'];
+
+export const convertEmitterDataToScaledValues = (
+	config: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig
+) => {
+	return Object.entries(config).reduce((obj, [key, value]) => {
+		obj[key] = ScaledValueKeys.includes(key) ? multiplyParticleValueByScale(value) : value;
+		return obj;
+	}, {} as any) as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig;
+};
