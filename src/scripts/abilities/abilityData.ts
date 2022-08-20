@@ -20,7 +20,7 @@ import {
 	SimpleParticleEffectValue,
 } from '../helpers/constants';
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
-import { EnumDictionary } from '../../../typings/custom';
+import { ConditionalAbilityData, EnumDictionary } from '../../../typings/custom';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -116,6 +116,8 @@ export const enum AbilityType {
 	NECROTIC_SUMMON_ELEMENTAL = 'necroticSummonElemental',
 	TELEPORT = 'teleport',
 }
+
+export type ConditionalAbilityDataMap = EnumDictionary<AbilityType, ConditionalAbilityData[]>;
 
 export type AbilityDataMap = EnumDictionary<AbilityType, AbilityData>;
 
