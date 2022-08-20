@@ -228,11 +228,11 @@ export const AbilityEditorScreen = ({ user }: AbilityEditorScreenProps) => {
 												rotate: abilityData.emitterRotate,
 												lifespan: abilityData.emitterLifespan,
 												tint: abilityData.emitterTint,
-											} as ProjectileParticleData,
-										} as ProjectileData,
+											} as unknown as ProjectileParticleData, // forced conversion: missing data
+										} as unknown as ProjectileData, // forced conversion: missing data
 										flavorText: '',
 										damageMultiplier: 1,
-									} as AbilityData,
+									} as unknown as AbilityData, // forced conversion: missing data
 									activeAbilityId
 								)
 							}
