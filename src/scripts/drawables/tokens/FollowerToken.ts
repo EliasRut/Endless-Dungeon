@@ -63,9 +63,9 @@ export default class FollowerToken extends CharacterToken {
 			FOLLOWER_MOVEMENT_SPEED
 		);
 		globalState.followers[id] = this.stateObject as Follower;
-		this.faction = Faction.FOLLOWER;
+		this.faction = Faction.ALLIES;
 		this.stateObject.vision = 150;
-		this.stateObject.faction = Faction.FOLLOWER;
+		this.stateObject.faction = Faction.ALLIES;
 		this.target = new Phaser.Geom.Point(0, 0);
 		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
 		this.level = level;
@@ -229,8 +229,8 @@ export default class FollowerToken extends CharacterToken {
 		if (globalTime > this.exhaustedAt + this.exhaustionDuration && this.exhausted) {
 			this.exhausted = false;
 			this.stateObject.health = FOLLOWER_HEALTH;
-			this.faction = Faction.FOLLOWER;
-			this.stateObject.faction = Faction.FOLLOWER;
+			this.faction = Faction.ALLIES;
+			this.stateObject.faction = Faction.ALLIES;
 		}
 
 		// Don't do NPC actions if exhausted

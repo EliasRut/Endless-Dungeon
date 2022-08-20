@@ -75,7 +75,7 @@ export default class AbilityHelper {
 			);
 			if (projectileData?.targeting) {
 				(effect as TargetingEffect).allowedTargets =
-					caster.faction === Faction.PLAYER || caster.faction === Faction.FOLLOWER
+					caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
 						? PossibleTargets.ENEMIES
 						: PossibleTargets.PLAYER;
 			}
@@ -122,7 +122,7 @@ export default class AbilityHelper {
 			});
 
 			const targetTokens =
-				caster.faction === Faction.PLAYER || caster.faction === Faction.FOLLOWER
+				caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
 					? Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES)
 					: [this.scene.mainCharacter, this.scene.testFollower];
 			const collidingCallback = (collidingEffect: AbilityEffect, enemy: CharacterToken) => {
