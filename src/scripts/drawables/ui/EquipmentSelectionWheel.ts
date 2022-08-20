@@ -7,6 +7,7 @@ import {
 } from '../../helpers/constants';
 import { EquipmentKey, getItemDataForName, getItemTexture } from '../../../items/itemData';
 import {
+	attachEnchantmentItem,
 	equipItem,
 	getFullDataForEquipmentSlot,
 	getFullDataForItemKey,
@@ -14,6 +15,8 @@ import {
 import MainScene from '../../scenes/MainScene';
 import ItemToken from '../tokens/WorldItemToken';
 import { ScriptPlaceItem } from '../../../../typings/custom';
+import { EnchantmentName } from '../../../items/enchantmentData';
+import globalState from '../../worldstate';
 
 const EIGHT_ITEMS_OFFSETS = [
 	[0, -40],
@@ -34,7 +37,7 @@ const FOUR_ITEMS_OFFSETS = [
 ];
 
 export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
-	visiblity: boolean;
+	visibility: boolean;
 	scene: MainScene;
 	leftBorderX: number;
 	topBorderY: number;
@@ -48,18 +51,18 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.scene = scene as MainScene;
 
 		this.setDepth(UiDepths.UI_ABOVE_FOREGROUND_LAYER);
-		this.visiblity = true;
+		this.visibility = true;
 	}
 
 	toggleVisibility() {
 		this.toggleVisible();
-		this.visiblity = !this.visiblity;
+		this.visibility = !this.visibility;
 		this.selection?.setVisible(false);
 	}
 
 	setVisible(value: boolean, index?: number, direction?: number): this {
 		super.setVisible(value, index, direction);
-		this.visiblity = false;
+		this.visibility = false;
 		return this;
 	}
 
@@ -98,7 +101,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		}
 	}
 
-	executeSelection() {
+	executeSelection(enchantment: EnchantmentName = 'None') {
 		if (this.selectedItem === -1 || this.selectedItem === undefined) {
 			this.toggleVisibility();
 			this.selection?.setVisible(false);
@@ -106,16 +109,25 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		}
 
 		const itemKey = Object.keys(this.itemMap)[this.selectedItem!] as EquipmentKey;
-		const [itemData, equipmentData] = getFullDataForItemKey(itemKey);
-		if (equipmentData.level > 0) {
-			equipItem(this.equipmentSlot!, itemKey);
-			this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+		if (enchantment === 'None') {
+			const [itemData, equipmentData] = getFullDataForItemKey(itemKey);
+			if (equipmentData.level > 0) {
+				equipItem(this.equipmentSlot!, itemKey);
+				this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+			} else {
+				this.scene.overlayScreens.itemScreen.update();
+			}
 		} else {
-			this.scene.overlayScreens.itemScreen.update();
+			attachEnchantmentItem(itemKey, enchantment);
 		}
 		this.scene.overlayScreens.inventory.update();
 		this.toggleVisibility();
 		this.selection?.setVisible(false);
+
+		if(enchantment !== 'None') {
+			this.scene.closeAllIconScreens();
+			this.scene.icons.enchantIcon.openScreen();
+		}
 	}
 
 	closeSelection() {
@@ -180,13 +192,10 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 			itemImage.setScale(UI_SCALE);
 			if (equipmentData.level) {
 				itemImage.on('pointerdown', () => {
-					equipItem(equipmentSlot, itemKey);
-					const [itemData, equipmentData] = getFullDataForItemKey(itemKey as EquipmentKey);
-					this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
-					this.scene.overlayScreens.inventory.update();
-					this.toggleVisibility();
+					this.scene.overlayScreens.inventory.interactInventory(['enter'], globalState.gameTime);
 				});
 				itemImage.on('pointerover', () => {
+					this.selectedItem = itemIndex;
 					const [itemData, equipmentData] = getFullDataForItemKey(itemKey as EquipmentKey);
 					this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
 					this.selection?.setVisible(true);

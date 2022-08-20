@@ -1,12 +1,13 @@
-import { UiDepths, UI_SCALE } from '../helpers/constants';
+import { EquipmentSlot, UiDepths, UI_SCALE } from '../helpers/constants';
 import OverlayScreen from './OverlayScreen';
-import { Abilities, AbilityType } from '../abilities/abilityData';
+import { Abilities, AbilityType, getRelevantAbilityVersion } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { ItemData } from '../../items/itemData';
 import { EquippedItemData } from '../worldstate/Inventory';
 import { Enchantment } from '../../items/enchantmentData';
 import { STAT_SCREEN_RIGHT_BORDER } from './StatScreen';
 import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
+import { getEquipmentDataForSlot } from '../helpers/inventory';
 
 const BASE_SIZE_NAME = 20;
 
@@ -191,19 +192,23 @@ export default class ItemScreen extends OverlayScreen {
 		}
 	}
 
-	updateAbility(ability: AbilityType) {
-		const damageValue = Abilities[ability].damageMultiplier * globalState.playerCharacter.damage;
+	updateAbility(ability: AbilityType, slotKey: EquipmentSlot) {
+		const itemLevel = getEquipmentDataForSlot(slotKey)?.level ?? 0;
+		const relevantAbility = getRelevantAbilityVersion(ability, itemLevel);
+
+		const damageValue = relevantAbility.damageMultiplier * globalState.playerCharacter.damage;
 		this.lableEnchantmentValue.setText(`${damageValue.toFixed(2)}`);
 		this.lableLevel.setText(`Level 1`);
 		// this.lableMovSpeedValue.setText(`${0}`);
 		// center flavor text
-		this.flavorText.setText(`${Abilities[ability].flavorText}`);
+
+		this.flavorText.setText(`${relevantAbility.flavorText}`);
 		let residualHeight = FLAVOR_HEIGHT - this.flavorText.getBounds().height;
 		residualHeight = residualHeight / 2;
 		// this.flavorText.setY(SCREEN_Y + 80 + residualHeight);
 
 		// update item name
-		this.itemName.setText(`${Abilities[ability].abilityName}`);
+		this.itemName.setText(`${relevantAbility.abilityName}`);
 
 		this.lableEnchantment.setText('');
 		this.lableEnchantmentValue.setText('');

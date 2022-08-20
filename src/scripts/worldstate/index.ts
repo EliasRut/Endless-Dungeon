@@ -40,7 +40,7 @@ export class WorldState {
 	public roomAssignment: { [name: string]: RoomAssignment } = {};
 	public inventory: Inventory;
 	public itemList: Item[];
-	public abilityData: ConditionalAbilityDataMap;
+	public abilityData: ConditionalAbilityDataMap = {} as ConditionalAbilityDataMap;
 
 	public static readonly CONTENTPACKAGE: string = 'contentPackages';
 	public static readonly PLAYERCHARACTER: string = 'playerCharacter';
@@ -121,7 +121,14 @@ export class WorldState {
 		this.roomAssignment = JSON.parse(localStorage.getItem(WorldState.ROOMASSIGNMENT) || '{}');
 		this.inventory = JSON.parse(localStorage.getItem(WorldState.INVENTORY) || '{}');
 		// Reset cast times.
-		this.playerCharacter.abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity];
+		this.playerCharacter.abilityCastTime = [
+			-Infinity,
+			-Infinity,
+			-Infinity,
+			-Infinity,
+			-Infinity,
+			-Infinity,
+		];
 	}
 
 	clearState() {

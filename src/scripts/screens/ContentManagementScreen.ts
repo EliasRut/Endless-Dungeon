@@ -37,7 +37,7 @@ export default class ContentManagementScreen extends OverlayScreen {
 
 		scene.add.existing(this);
 		this.setVisible(false);
-		this.visiblity = false;
+		this.visibility = false;
 	}
 
 	updateContent() {
@@ -77,7 +77,7 @@ export default class ContentManagementScreen extends OverlayScreen {
 				}
 				this.updateContent();
 			});
-			questBox.setVisible(this.visiblity);
+			questBox.setVisible(this.visibility);
 			this.add(questBox, true);
 			this.checkBoxes.push(questBox);
 
@@ -114,7 +114,7 @@ export default class ContentManagementScreen extends OverlayScreen {
 				}
 				this.updateContent();
 			});
-			contentPackageTitle.setVisible(this.visiblity);
+			contentPackageTitle.setVisible(this.visibility);
 			this.add(contentPackageTitle, true);
 			this.contentBlockTitles.push(contentPackageTitle);
 		});
@@ -127,7 +127,7 @@ export default class ContentManagementScreen extends OverlayScreen {
 
 	setVisible(value: boolean, index?: number | undefined, direction?: number | undefined) {
 		super.setVisible(value, index, direction);
-		this.visiblity = value;
+		this.visibility = value;
 		if (value === true) {
 			this.reloadDataAndUpdateContent();
 		}

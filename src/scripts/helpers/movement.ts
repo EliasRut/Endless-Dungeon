@@ -192,3 +192,25 @@ export const getOneLetterFacingName = (facing: Facings) => {
 			return 's';
 	}
 };
+export const getTwoLetterFacingName = (facing: Facings) => {
+	switch (facing) {
+		case Facings.EAST:
+			return 'e';
+		case Facings.WEST:
+			return 'w';
+		case Facings.NORTH:
+			return 'n';
+		case Facings.SOUTH:
+			return 's';
+		case Facings.NORTH_EAST:
+			return 'ne';
+		case Facings.SOUTH_EAST:
+			return 'se';
+		case Facings.SOUTH_WEST:
+			return 'sw';
+		case Facings.NORTH_WEST:
+			return 'nw';
+		default:
+			return 's';
+	}
+};

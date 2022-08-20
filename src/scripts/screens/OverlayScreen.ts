@@ -1,7 +1,7 @@
 import { UiDepths, UI_SCALE } from '../helpers/constants';
 
 export default class OverlayScreen extends Phaser.GameObjects.Group {
-	visiblity: boolean;
+	visibility: boolean;
 
 	constructor(scene: Phaser.Scene, startX: number, startY: number, width: number, height: number) {
 		super(scene);
@@ -124,8 +124,11 @@ export default class OverlayScreen extends Phaser.GameObjects.Group {
 
 	toggleVisibility() {
 		this.toggleVisible();
-		this.visiblity = !this.visiblity;
+		this.visibility = !this.visibility;
 	}
 
 	update() {}
+
+	// sets a screen modifier: For the duration of this opening, its behaviour is somehow modified.
+	modify(modifier?: any) {}
 }
