@@ -87,25 +87,29 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		}
 	}
 	public receiveStun(duration: number) {
-		const time = globalState.gameTime;
-		if (this.stateObject.stunnedAt + this.stateObject.stunDuration > time) {
-			return true;
+		if (this.stateObject.health > 0) {
+			const time = globalState.gameTime;
+			if (this.stateObject.stunnedAt + this.stateObject.stunDuration > time) {
+				return true;
+			}
+			this.stateObject.stunned = true;
+			this.stateObject.stunnedAt = time;
+			this.stateObject.stunDuration = duration;
+			this.stateObject.isWalking = false;
+			const animation = `${this.type}-stun-${
+				facingToSpriteNameMap[this.stateObject.currentFacing]
+			}`;
+			if (duration >= 500 && this.scene.game.anims.exists(animation)) {
+				this.play({
+					key: animation,
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+					// 1 run = 500ms
+					repeat: Math.floor((2 * duration) / 1000),
+				});
+				return true;
+			}
+			return false;
 		}
-		this.stateObject.stunned = true;
-		this.stateObject.stunnedAt = time;
-		this.stateObject.stunDuration = duration;
-		this.stateObject.isWalking = false;
-		const animation = `${this.type}-stun-${facingToSpriteNameMap[this.stateObject.currentFacing]}`;
-		if (duration >= 500 && this.scene.game.anims.exists(animation)) {
-			this.play({
-				key: animation,
-				frameRate: NORMAL_ANIMATION_FRAME_RATE,
-				// 1 run = 500ms
-				repeat: Math.floor((2 * duration) / 1000),
-			});
-			return true;
-		}
-		return false;
 	}
 
 	public getDistanceToWorldStatePosition(px: number, py: number) {

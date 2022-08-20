@@ -10,7 +10,12 @@ import {
 import globalState from '../../worldstate';
 import Follower from '../../worldstate/Follower';
 import { TILE_WIDTH } from '../../helpers/generateDungeon';
-import { getFacing4Dir, isCollidingTile, updateMovingState } from '../../helpers/movement';
+import {
+	getFacing4Dir,
+	getOneLetterFacingName,
+	isCollidingTile,
+	updateMovingState,
+} from '../../helpers/movement';
 import { AbilityType } from '../../abilities/abilityData';
 import CharacterToken from './CharacterToken';
 
@@ -27,6 +32,8 @@ const OPTIMAL_DISTANCE_TO_PLAYER = 4 * TILE_WIDTH * SCALE;
 const OPTIMAL_TILE_DISTANCE_TO_PLAYER = 4;
 
 const MAX_DISTANCE_TO_PLAYER = 20 * TILE_WIDTH * SCALE;
+
+const FOLLOWER_CAST_TIME = 450;
 
 export default class FollowerToken extends CharacterToken {
 	allowedTargets: PossibleTargets = PossibleTargets.ENEMIES;
@@ -197,7 +204,6 @@ export default class FollowerToken extends CharacterToken {
 		}
 
 		if (nearestEnemy) {
-			console.log(`Closest distance: ${closestDistance}`);
 			if (this.checkLoS() && closestDistance < this.stateObject.vision * SCALE) {
 				aggro = true;
 				this.lastUpdate = globalTime;
@@ -221,32 +227,34 @@ export default class FollowerToken extends CharacterToken {
 				// Make sure follower is faced in direction of target when trigger ability
 				const xSpeed = (deltaX / totalDistance) * this.stateObject.movementSpeed;
 				const ySpeed = (deltaY / totalDistance) * this.stateObject.movementSpeed;
-				this.setVelocityX(xSpeed);
-				this.setVelocityY(ySpeed);
+				this.setVelocityX(0);
+				this.setVelocityY(0);
 				const newFacing = getFacing4Dir(xSpeed, ySpeed);
-				const animation = updateMovingState(this.stateObject, true, newFacing);
-				if (animation) {
-					if (this.scene.game.anims.exists(animation)) {
-						this.play({ key: animation, frameRate: NPC_ANIMATION_FRAME_RATE, repeat: -1 });
-					} else {
-						console.log(`Animation ${animation} does not exist.`);
-						this.play({ key: animation, frameRate: NPC_ANIMATION_FRAME_RATE, repeat: -1 });
-					}
+				updateMovingState(this.stateObject, true, newFacing);
+				// Play attack animation
+				const animation = `${this.stateObject.animationBase}-cast-${getOneLetterFacingName(
+					this.stateObject.currentFacing
+				)}`;
+				if (this.scene.game.anims.exists(animation)) {
+					this.play({ key: animation, frameRate: NPC_ANIMATION_FRAME_RATE, repeat: 0 });
+				} else {
+					console.log(`Animation ${animation} does not exist.`);
 				}
-
-				(this.scene as MainScene).abilityHelper.triggerAbility(
-					this.stateObject,
-					{
-						...this.stateObject,
-						x: this.x / SCALE,
-						y: this.y / SCALE,
-						exactTargetXFactor: deltaX / totalDistance,
-						exactTargetYFactor: deltaY / totalDistance,
-					},
-					(this.stateObject as Follower).ability,
-					(this.stateObject as Follower).level,
-					time.now
-				);
+				setTimeout(() => {
+					(this.scene as MainScene).abilityHelper.triggerAbility(
+						this.stateObject,
+						{
+							...this.stateObject,
+							x: this.x / SCALE,
+							y: this.y / SCALE,
+							exactTargetXFactor: deltaX / totalDistance,
+							exactTargetYFactor: deltaY / totalDistance,
+						},
+						(this.stateObject as Follower).ability,
+						(this.stateObject as Follower).level,
+						time.now
+					);
+				}, FOLLOWER_CAST_TIME * 0.67);
 			}
 		}
 	}
@@ -273,6 +281,13 @@ export default class FollowerToken extends CharacterToken {
 				this.y - 24 * SCALE,
 				this.exhaustionDuration
 			);
+
+			const animation = `${this.stateObject.animationBase}-exhaust`;
+			if (this.scene.game.anims.exists(animation)) {
+				this.play({ key: animation, frameRate: NPC_ANIMATION_FRAME_RATE, repeat: 0 });
+			} else {
+				console.log(`Animation ${animation} does not exist.`);
+			}
 		}
 
 		// Reset state for follower after exhaustion time is over
@@ -288,6 +303,13 @@ export default class FollowerToken extends CharacterToken {
 			return;
 		}
 
+		const stateObject = this.stateObject as Follower;
+
+		// Don't do NPC actions if they are still casting
+		if (stateObject.abilityCastTime[0] + FOLLOWER_CAST_TIME > globalTime) {
+			return;
+		}
+
 		if (this.lastUpdate <= globalTime) {
 			// Check if the follower needs to be teleported to player
 			this.teleportFollower();
@@ -299,7 +321,6 @@ export default class FollowerToken extends CharacterToken {
 			this.stateObject.x = Math.round(this.x / SCALE);
 			this.stateObject.y = Math.round(this.y / SCALE);
 
-			const stateObject = this.stateObject as Follower;
 			if (globalTime - stateObject.abilityCastTime[0] > 1000) {
 				// Check if enemy is in attack range and set attack trigger
 				this.triggerAbility(globalTime);
