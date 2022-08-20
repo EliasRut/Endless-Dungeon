@@ -40,7 +40,7 @@ export class WorldState {
 	public roomAssignment: { [name: string]: RoomAssignment } = {};
 	public inventory: Inventory;
 	public itemList: Item[];
-	public abilityData: ConditionalAbilityDataMap;
+	public abilityData: ConditionalAbilityDataMap = {} as ConditionalAbilityDataMap;
 
 	public static readonly CONTENTPACKAGE: string = 'contentPackages';
 	public static readonly PLAYERCHARACTER: string = 'playerCharacter';

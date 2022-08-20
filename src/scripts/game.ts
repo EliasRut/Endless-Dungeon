@@ -10,6 +10,7 @@ import NpcEditor from './scenes/NpcEditor';
 import { MODE } from './helpers/constants';
 import NpcGenerationScene from './scenes/NpcGenerationScene';
 import AbilityEditor from './scenes/AbilityEditor';
+import AbilitiesPreloaderScene from './scenes/AbilitiesPreloaderScene';
 
 const firebaseConfig = {
 	apiKey: 'AIzaSyBwHFZ7A9t8rHi4p6r-D2wr5WDrt9O7Yow',
@@ -32,7 +33,13 @@ const NPC_EDITOR_HEIGHT = 240;
 const getEditorScenes: (mode: MODE) => typeof Phaser.Scene[] = (mode) => {
 	switch (mode) {
 		case MODE.MAP_EDITOR:
-			return [RoomPreloaderScene, NpcGenerationScene, PreloadScene, MapEditor];
+			return [
+				AbilitiesPreloaderScene,
+				RoomPreloaderScene,
+				NpcGenerationScene,
+				PreloadScene,
+				MapEditor,
+			];
 		case MODE.NPC_EDITOR:
 			return [NpcEditor];
 		case MODE.ABILITY_EDITOR:
@@ -60,6 +67,7 @@ export const getGameConfig = (parent: HTMLElement, mode: MODE) => ({
 	scene:
 		mode === MODE.GAME
 			? [
+					AbilitiesPreloaderScene,
 					RoomPreloaderScene,
 					NpcGenerationScene,
 					PreloadScene,

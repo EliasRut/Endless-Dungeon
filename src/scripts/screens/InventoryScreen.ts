@@ -6,7 +6,7 @@ import {
 	UI_SCALE,
 	NORMAL_ANIMATION_FRAME_RATE,
 } from '../helpers/constants';
-import { AbilityType, Abilities } from '../abilities/abilityData';
+import { AbilityType, Abilities, getRelevantAbilityVersion } from '../abilities/abilityData';
 import OverlayScreen from './OverlayScreen';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import globalState from '../worldstate';
@@ -32,6 +32,7 @@ import {
 	getEquipmentDataRecordForEquipmentSlot,
 	getEquipmentDataForItemKey,
 	attachEnchantmentItem,
+	getEquipmentDataForSlot,
 } from '../helpers/inventory';
 import { STAT_SCREEN_RIGHT_BORDER } from './StatScreen';
 import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
@@ -362,7 +363,7 @@ export default class InventoryScreen extends OverlayScreen {
 				if (slotKey === EquipmentSlot.SOURCE) {
 					updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
 					const newAbilityIcon = this.createAbilityIcon();
-					this.handleIconOptions(newAbilityIcon, AbilityType.FIREBALL);
+					this.handleIconOptions(newAbilityIcon, AbilityType.FIREBALL, slotKey);
 					this.abilityIconMap[EquipmentSlot.SOURCE] = newAbilityIcon;
 					const newAbilityText = this.createAbilityText();
 					this.abilityTextMap[slotKey] = newAbilityText;
@@ -408,7 +409,7 @@ export default class InventoryScreen extends OverlayScreen {
 				EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
 				ability
 			);
-			this.handleIconOptions(abilityIcon, ability);
+			this.handleIconOptions(abilityIcon, ability, slotKey);
 		});
 	}
 
@@ -441,11 +442,13 @@ export default class InventoryScreen extends OverlayScreen {
 		ability: AbilityType = AbilityType.FIREBALL
 	) {
 		const [iconX, iconY] = ITEM_ABILITY_COORDINATES[slotKey];
+		const itemLevel = getEquipmentDataForSlot(slotKey)?.level ?? 0;
+		const relevantAbility = getRelevantAbilityVersion(ability, itemLevel);
 		const abilityText = new Phaser.GameObjects.Text(
 			this.scene,
 			(iconX + 28) * UI_SCALE,
 			(iconY - 3) * UI_SCALE,
-			Abilities[ability].abilityName,
+			relevantAbility.abilityName,
 			{
 				color: 'white',
 				fontSize: `${12 * UI_SCALE}pt`,
@@ -461,12 +464,16 @@ export default class InventoryScreen extends OverlayScreen {
 		return abilityText;
 	}
 
-	handleIconOptions(abilityIcon: Phaser.GameObjects.Image, ability: AbilityType) {
+	handleIconOptions(
+		abilityIcon: Phaser.GameObjects.Image,
+		ability: AbilityType,
+		slotKey: EquipmentSlot
+	) {
 		abilityIcon.setVisible(this.visiblity);
 
 		abilityIcon.on('pointerdown', () => {
 			if (this.focusedSlot !== undefined) this.focusedSlot = undefined;
-			this.scene.overlayScreens.itemScreen.updateAbility(ability);
+			this.scene.overlayScreens.itemScreen.updateAbility(ability, slotKey);
 		});
 	}
 

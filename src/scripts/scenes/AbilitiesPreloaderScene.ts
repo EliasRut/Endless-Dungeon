@@ -5,13 +5,18 @@ import RoomGenerator from '../helpers/generateRoom';
 import globalState from '../worldstate';
 import firebase from 'firebase';
 import { deserializeRoom } from '../helpers/serialization';
-import { ConditionalAbilityDataMap, Abilities, AbilityType } from '../abilities/abilityData';
+import {
+	ConditionalAbilityDataMap,
+	Abilities,
+	AbilityType,
+	AbilityData,
+} from '../abilities/abilityData';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
 	scene.
 */
-export default class RoomPreloaderScene extends Phaser.Scene {
+export default class AbilitiesPreloaderScene extends Phaser.Scene {
 	constructor() {
 		super({ key: 'AbilitiesPreloaderScene' });
 	}
@@ -31,11 +36,15 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 		this.add.existing(text);
 	}
 
-	preload() {}
+	preload() {
+		if (globalState.loadGame) {
+			globalState.loadState();
+		}
+	}
 
-	create() {
+	async create() {
 		const { contentPackages } = globalState;
-		const abilityMappings: ConditionalAbilityListing[] = [];
+		const dbAbilities: { [dbKey: string]: AbilityData } = {};
 		const conditionalAbilities: ConditionalAbilityDataMap = Object.entries(Abilities).reduce(
 			(obj, [key, ability]) => {
 				obj[key as AbilityType] = [{ data: ability }];
@@ -44,16 +53,53 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 			{} as ConditionalAbilityDataMap
 		);
 
+		const abilityMappingPromises: Promise<
+			firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>
+		>[] = [];
+		const abilitiesPromises: Promise<
+			firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>
+		>[] = [];
+
 		for (const contentPackage of contentPackages) {
 			const abilityMappingsQuery = firebase
 				.firestore()
 				.collection('abilityMappings')
 				.where('contentPackage', '==', contentPackage);
-
+			abilityMappingPromises.push(abilityMappingsQuery.get());
 			const abilitiesQuery = firebase
 				.firestore()
 				.collection('abilities')
 				.where('contentPackage', '==', contentPackage);
+			abilitiesPromises.push(abilitiesQuery.get());
 		}
+
+		await Promise.all(abilitiesPromises).then((abilitiesPromise) => {
+			for (const abilitiesQuery of abilitiesPromise) {
+				for (const ability of abilitiesQuery.docs) {
+					dbAbilities[ability.id as AbilityType] = ability.data() as AbilityData;
+				}
+			}
+		});
+
+		await Promise.all(abilityMappingPromises).then((abilityMappingPromise) => {
+			abilityMappingPromise.forEach((abilityMappingQuery) => {
+				for (const abilityMapping of abilityMappingQuery.docs) {
+					const abilityMappingDataList = abilityMapping.get('abilities');
+					for (const abilityMappingData of abilityMappingDataList) {
+						const abilityType = abilityMappingData.abilityType as AbilityType;
+						conditionalAbilities[abilityType] = [
+							{
+								conditions: abilityMappingData.conditions,
+								data: dbAbilities[abilityMappingData.abilityId],
+							},
+							...(conditionalAbilities[abilityType] || []),
+						];
+					}
+				}
+			});
+		});
+
+		globalState.abilityData = conditionalAbilities;
+		this.scene.start('RoomPreloaderScene');
 	}
 }
