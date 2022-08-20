@@ -3,6 +3,7 @@ import {
 	KNOCKBACK_TIME,
 	SCALE,
 	NORMAL_ANIMATION_FRAME_RATE,
+	ColorsOfMagic,
 } from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
@@ -48,6 +49,7 @@ export default class PierreToken extends EnemyToken {
 		this.stateObject.health = this.startingHealth;
 		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
 		this.stateObject.attackTime = ATTACK_DURATION;
+		this.color = ColorsOfMagic.ROYAL;
 	}
 
 	public update(time: number, delta: number) {
@@ -65,6 +67,7 @@ export default class PierreToken extends EnemyToken {
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
 				this.dropNonEquippableItem('health');
 			}
+			this.dropNonEquippableItem('essence');
 			this.dead = true;
 			this.die();
 			return;
