@@ -131,6 +131,39 @@ export default abstract class EnemyToken extends CharacterToken {
 				this.targetStateObject = undefined;
 			}
 		}
+		// let the enemy get back to normal aggro pattern
+		if (this.charmedTime + 6000 < globalState.gameTime) {
+			this.faction = Faction.ENEMIES
+			this.stateObject.faction = Faction.ENEMIES
+		}
+		// set aggro boolean when charmed
+		if (this.lastUpdate <= time && this.faction === Faction.ALLIES) {
+			const possibleTargets = [
+				...Object.values(globalState.enemies),
+				].filter((character) => character.health > 0 && character.faction === Faction.ENEMIES);
+			const sortedTargets = possibleTargets.sort((left, right) => {
+				const distanceLeft = this.getDistanceToWorldStatePosition(left.x, left.y);
+				const distanceRight = this.getDistanceToWorldStatePosition(right.x, right.y);
+				return distanceLeft - distanceRight;
+			});
+			const closestTarget = sortedTargets[0];
+			if (
+				closestTarget &&
+				this.checkLoS() &&
+				this.getDistanceToWorldStatePosition(closestTarget.x, closestTarget.y) <
+					this.stateObject.vision * SCALE
+			) {
+				this.aggro = true;
+				this.lastUpdate = time;
+				this.target.x = closestTarget.x;
+				this.target.y = closestTarget.y;
+				this.targetStateObject = closestTarget;
+			} else if (this.aggro && this.lastUpdate + this.aggroLinger < time) {
+				this.aggro = false;
+				this.targetStateObject = undefined;
+			}
+		}
+
 	}
 
 	die() {

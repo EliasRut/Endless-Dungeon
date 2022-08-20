@@ -128,7 +128,7 @@ export const RingData: Record<Ring, AbilityLinkedItem> = {
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.PASSION]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.CHARM,
 		name: 'Ring of Passion',
 		description: 'A ring giving you power associated with the color of magic: Passion',
 		iconFrame: 56,
