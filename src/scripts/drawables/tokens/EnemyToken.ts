@@ -28,13 +28,13 @@ const GREEN_DIFF = 0x003300;
 export enum slainEnemy {
 	BOSS = 'boss',
 	ELITE = 'elite',
-	NORMAL = 'normal'
+	NORMAL = 'normal',
 }
 
 const dropType = {
-	BOSS : {ringWeight: 1, amuletWeight: 1} as Partial<RandomItemOptions>,
-	ELITE: {sourceWeight: 1, armorWeight: 1, catalystWeight: 1} as Partial<RandomItemOptions>
-}
+	BOSS: { ringWeight: 1, amuletWeight: 1 } as Partial<RandomItemOptions>,
+	ELITE: { sourceWeight: 1, armorWeight: 1, catalystWeight: 1 } as Partial<RandomItemOptions>,
+};
 export default abstract class EnemyToken extends CharacterToken {
 	fireballEffect: FireBallEffect | undefined;
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -72,19 +72,28 @@ export default abstract class EnemyToken extends CharacterToken {
 		return tile && tile.tint > VISITED_TILE_TINT;
 	}
 
-	dropEquippableItem(level: number = 1, type: slainEnemy ) {
+	dropEquippableItem(level: number = 1, type: slainEnemy) {
 		if (this.scene === undefined) {
 			// TODO find out when this happens
 			return;
 		}
 		if (type === slainEnemy.BOSS) {
-			const itemData = generateRandomItem({level, ...dropType.BOSS} as Partial<RandomItemOptions>);
+			const itemData = generateRandomItem({
+				level,
+				...dropType.BOSS,
+			} as Partial<RandomItemOptions>);
 			this.scene.dropItem(this.x, this.y, itemData.itemKey, itemData.level);
 
-			const itemData2 = generateRandomItem({level, ...dropType.ELITE} as Partial<RandomItemOptions>);
+			const itemData2 = generateRandomItem({
+				level,
+				...dropType.ELITE,
+			} as Partial<RandomItemOptions>);
 			this.scene.dropItem(this.x, this.y, itemData2.itemKey, itemData2.level);
 		} else if (type === slainEnemy.ELITE) {
-			const itemData = generateRandomItem({level, ...dropType.ELITE} as Partial<RandomItemOptions>);
+			const itemData = generateRandomItem({
+				level,
+				...dropType.ELITE,
+			} as Partial<RandomItemOptions>);
 			this.scene.dropItem(this.x, this.y, itemData.itemKey, itemData.level);
 		}
 	}
@@ -103,67 +112,47 @@ export default abstract class EnemyToken extends CharacterToken {
 	public update(time: number, deltaTime: number) {
 		super.update(time, deltaTime);
 		this.setSlowFactor();
-		// set aggro boolean, use a linger time for aggro
-		if (this.lastUpdate <= time) {
-			const possibleTargets = [
-				globalState.playerCharacter,
-				...Object.values(globalState.followers),
-			].filter((character) => character.health > 0);
-			const sortedTargets = possibleTargets.sort((left, right) => {
-				const distanceLeft = this.getDistanceToWorldStatePosition(left.x, left.y);
-				const distanceRight = this.getDistanceToWorldStatePosition(right.x, right.y);
-				return distanceLeft - distanceRight;
-			});
-			const closestTarget = sortedTargets[0];
-			if (
-				closestTarget &&
-				this.checkLoS() &&
-				this.getDistanceToWorldStatePosition(closestTarget.x, closestTarget.y) <
-					this.stateObject.vision * SCALE
-			) {
-				this.aggro = true;
-				this.lastUpdate = time;
-				this.target.x = closestTarget.x;
-				this.target.y = closestTarget.y;
-				this.targetStateObject = closestTarget;
-			} else if (this.aggro && this.lastUpdate + this.aggroLinger < time) {
-				this.aggro = false;
-				this.targetStateObject = undefined;
-			}
-		}
+
 		// let the enemy get back to normal aggro pattern
 		if (this.charmedTime + 6000 < globalState.gameTime) {
-			this.faction = Faction.ENEMIES
-			this.stateObject.faction = Faction.ENEMIES
-		}
-		// set aggro boolean when charmed
-		if (this.lastUpdate <= time && this.faction === Faction.ALLIES) {
-			const possibleTargets = [
-				...Object.values(globalState.enemies),
-				].filter((character) => character.health > 0 && character.faction === Faction.ENEMIES);
-			const sortedTargets = possibleTargets.sort((left, right) => {
-				const distanceLeft = this.getDistanceToWorldStatePosition(left.x, left.y);
-				const distanceRight = this.getDistanceToWorldStatePosition(right.x, right.y);
-				return distanceLeft - distanceRight;
-			});
-			const closestTarget = sortedTargets[0];
-			if (
-				closestTarget &&
-				this.checkLoS() &&
-				this.getDistanceToWorldStatePosition(closestTarget.x, closestTarget.y) <
-					this.stateObject.vision * SCALE
-			) {
-				this.aggro = true;
-				this.lastUpdate = time;
-				this.target.x = closestTarget.x;
-				this.target.y = closestTarget.y;
-				this.targetStateObject = closestTarget;
-			} else if (this.aggro && this.lastUpdate + this.aggroLinger < time) {
-				this.aggro = false;
-				this.targetStateObject = undefined;
-			}
+			this.faction = Faction.ENEMIES;
+			this.stateObject.faction = Faction.ENEMIES;
 		}
 
+		let possibleTargets: Character[];
+		if (this.faction === Faction.ALLIES) {
+			possibleTargets = [...Object.values(globalState.enemies)].filter(
+				(character) => character.health > 0 && character.faction === Faction.ENEMIES
+			);
+		} else {
+			possibleTargets = [
+				globalState.playerCharacter,
+				...(globalState.activeFollower ? [globalState.followers[globalState.activeFollower]] : []),
+			].filter((character) => character.health > 0);
+		}
+		const sortedTargets = possibleTargets.sort((left, right) => {
+			const distanceLeft = this.getDistanceToWorldStatePosition(left.x, left.y);
+			const distanceRight = this.getDistanceToWorldStatePosition(right.x, right.y);
+			return distanceLeft - distanceRight;
+		});
+		const closestTarget = sortedTargets[0];
+
+		if (
+			closestTarget &&
+			this.checkLoS() &&
+			this.getDistanceToWorldStatePosition(closestTarget.x, closestTarget.y) <
+				this.stateObject.vision * SCALE
+		) {
+			this.aggro = true;
+			this.lastUpdate = time;
+			this.target.x = closestTarget.x;
+			this.target.y = closestTarget.y;
+			this.targetStateObject = closestTarget;
+			// if we no longer see the target, and the aggro linger time has passed, reset the target
+		} else if (this.aggro && this.lastUpdate + this.aggroLinger < time) {
+			this.aggro = false;
+			this.targetStateObject = undefined;
+		}
 	}
 
 	die() {

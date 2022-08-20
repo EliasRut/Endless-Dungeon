@@ -1,8 +1,17 @@
-import { Facings, Faction, PossibleTargets, SCALE, UiDepths } from '../../helpers/constants';
+import {
+	Facings,
+	Faction,
+	FadingLabelSize,
+	PossibleTargets,
+	SCALE,
+	UiDepths,
+} from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
 import CharacterToken from '../tokens/CharacterToken';
 import globalState from '../../worldstate';
+import MainScene from '../../scenes/MainScene';
+import EnemyToken from '../tokens/EnemyToken';
 
 const BODY_RADIUS = 4;
 const VISIBILITY_DELAY = 50;
@@ -61,11 +70,23 @@ export default class CharmEffect extends TargetingEffect {
 		}
 	}
 
-    onCollisionWithEnemy(enemy: Phaser.GameObjects.GameObject) {
-		const enemyToken = enemy as CharacterToken
-        enemyToken.faction = Faction.ALLIES;
-        enemyToken.stateObject.faction = Faction.ALLIES;
-        enemyToken.charmedTime = globalState.gameTime;
+	onCollisionWithEnemy(enemy: Phaser.GameObjects.GameObject) {
+		const hitToken = enemy as CharacterToken;
+		hitToken.faction = Faction.ALLIES;
+		hitToken.stateObject.faction = Faction.ALLIES;
+		hitToken.charmedTime = globalState.gameTime;
+		if (Object.keys(hitToken).includes('targetStateObject')) {
+			const enemyToken = hitToken as EnemyToken;
+			enemyToken.targetStateObject = undefined;
+		}
+		(this.scene as MainScene).addFadingLabel(
+			'Charmed',
+			FadingLabelSize.SMALL,
+			'#ff9999',
+			hitToken.x,
+			hitToken.y,
+			6000
+		);
 	}
 
 	destroy() {
