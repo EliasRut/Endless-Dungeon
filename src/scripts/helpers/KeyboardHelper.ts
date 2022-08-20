@@ -1,6 +1,7 @@
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { AbilityKey } from './constants';
+import { CASTING_SPEED_MS } from '../scenes/MainScene';
 
 const AXIS_MOVEMENT_THRESHOLD = 0.4;
 
@@ -33,6 +34,8 @@ export default class KeyboardHelper {
 	};
 
 	gamepad: Phaser.Input.Gamepad.Gamepad | undefined;
+
+	lastCastingDuration: number = CASTING_SPEED_MS;
 
 	isMoveUpPressed: () => boolean;
 	isMoveDownPressed: () => boolean;
@@ -321,10 +324,7 @@ export default class KeyboardHelper {
 				this.castIfPressed(AbilityKey.FOUR, gameTime),
 				inventory.equippedRightRing ? inventory.rings[inventory.equippedRightRing].level : 0,
 			],
-			[
-				this.castIfPressed(AbilityKey.SPACE, gameTime),
-				1,
-			],
+			[this.castIfPressed(AbilityKey.SPACE, gameTime), 1],
 		].filter(([ability]) => !!ability) as [AbilityType, number][];
 	}
 
@@ -350,6 +350,10 @@ export default class KeyboardHelper {
 		].reduce((max, value) => Math.max(max, value), 0);
 
 		return gameTime - lastCast;
+	}
+
+	getLastCastingDuration() {
+		return this.lastCastingDuration;
 	}
 
 	getAbilityCooldowns(gameTime: number) {

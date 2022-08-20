@@ -84,6 +84,7 @@ export interface AbilityData {
 	iceStacks?: number;
 	castOnEnemyDestroyed?: AbilityType;
 	spriteName?: string;
+	castingTime?: number;
 }
 
 export const enum AbilityType {
@@ -163,6 +164,7 @@ export const Abilities: AbilityDataMap = {
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
 		castOnEnemyDestroyed: AbilityType.EXPLODING_CORPSE,
+		castingTime: 250,
 	},
 	[AbilityType.ARCANE_BOLT]: {
 		projectiles: 1,
@@ -474,10 +476,11 @@ export const Abilities: AbilityDataMap = {
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
 		cooldownMs: 1500,
-		damageMultiplier: 0.25,
+		damageMultiplier: 1,
 		abilityName: `Fire Nova`,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
+		castingTime: 1000,
 	},
 	[AbilityType.EXPLODING_CORPSE]: {
 		projectiles: 16,

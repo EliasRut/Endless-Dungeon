@@ -17,6 +17,7 @@ import { getFacing4Dir, getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
 import Enemy from '../worldstate/Enemy';
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
+import { CASTING_SPEED_MS } from '../scenes/MainScene';
 
 export default class AbilityHelper {
 	scene: MainScene;
@@ -207,6 +208,8 @@ export default class AbilityHelper {
 	}
 	update(time: number, castAbilities: [AbilityType, number][]) {
 		castAbilities.forEach(([ability, abilityLevel]) => {
+			const castingTime =
+				getRelevantAbilityVersion(ability, abilityLevel).castingTime || CASTING_SPEED_MS;
 			setTimeout(() => {
 				this.triggerAbility(
 					globalState.playerCharacter,
@@ -215,7 +218,8 @@ export default class AbilityHelper {
 					abilityLevel,
 					time
 				);
-			}, 300);
+			}, castingTime * 0.67);
+			this.scene.keyboardHelper.lastCastingDuration = castingTime;
 		});
 
 		this.abilityEffects = this.abilityEffects.filter((effect) => !effect.destroyed);
