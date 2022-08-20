@@ -7,6 +7,7 @@ import { Move } from './ScriptBlockTypes/Move';
 import { PausedCondition } from './ScriptBlockTypes/PausedCondition';
 import { SetFollowerData } from './ScriptBlockTypes/SetFollowerData';
 import { SetQuestState } from './ScriptBlockTypes/SetQuestState';
+import { SpawnFollower } from './ScriptBlockTypes/SpawnFollower';
 import { Wait } from './ScriptBlockTypes/Wait';
 import { ScriptTypeDropdown } from './ScriptTypeDropdown';
 
@@ -133,6 +134,19 @@ export const ScriptBlock: (props: ScriptBlockProps) => JSX.Element = ({
 						type: 'setFollowerData',
 					}}
 					// availableFollowerAbilities={knownFollowerAbilities}
+					updateData={onChange}
+					removeData={onRemove}
+				/>
+			);
+		}
+		case 'spawnFollower': {
+			return (
+				<SpawnFollower
+					currentData={{
+						followerId: '',
+						...scriptBlock,
+						type: 'spawnFollower',
+					}}
 					updateData={onChange}
 					removeData={onRemove}
 				/>
