@@ -4,6 +4,7 @@ import {
 	SCALE,
 	VISITED_TILE_TINT,
 	NORMAL_ANIMATION_FRAME_RATE,
+	ColorsOfMagic,
 } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
@@ -11,6 +12,7 @@ import FireBallEffect from '../effects/FireBallEffect';
 import globalState from '../../worldstate';
 import MainScene from '../../scenes/MainScene';
 import { generateRandomItem } from '../../helpers/item';
+import { RandomItemOptions } from '../../helpers/item';
 import Character from '../../worldstate/Character';
 
 const BODY_RADIUS = 8;
@@ -23,6 +25,16 @@ const ENEMY_SPEED = 35;
 
 const GREEN_DIFF = 0x003300;
 
+export enum slainEnemy {
+	BOSS = 'boss',
+	ELITE = 'elite',
+	NORMAL = 'normal'
+}
+
+const dropType = {
+	BOSS : {ringWeight: 1, amuletWeight: 1} as Partial<RandomItemOptions>,
+	ELITE: {sourceWeight: 1, armorWeight: 1, catalystWeight: 1} as Partial<RandomItemOptions>
+}
 export default abstract class EnemyToken extends CharacterToken {
 	fireballEffect: FireBallEffect | undefined;
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -34,6 +46,7 @@ export default abstract class EnemyToken extends CharacterToken {
 	aggro: boolean = false;
 	target: Phaser.Geom.Point;
 	level: number;
+	color: ColorsOfMagic;
 	targetStateObject: Character | undefined;
 
 	protected showHealthbar() {
@@ -59,22 +72,31 @@ export default abstract class EnemyToken extends CharacterToken {
 		return tile && tile.tint > VISITED_TILE_TINT;
 	}
 
-	dropRandomItem(level: number = 1) {
+	dropEquippableItem(level: number = 1, type: slainEnemy ) {
 		if (this.scene === undefined) {
 			// TODO find out when this happens
 			return;
 		}
+		if (type === slainEnemy.BOSS) {
+			const itemData = generateRandomItem({level, ...dropType.BOSS} as Partial<RandomItemOptions>);
+			this.scene.dropItem(this.x, this.y, itemData.itemKey, itemData.level);
 
-		const itemData = generateRandomItem({ level });
-		this.scene.dropItem(this.x, this.y, itemData.itemKey, itemData.level);
+			const itemData2 = generateRandomItem({level, ...dropType.ELITE} as Partial<RandomItemOptions>);
+			this.scene.dropItem(this.x, this.y, itemData2.itemKey, itemData2.level);
+		} else if (type === slainEnemy.ELITE) {
+			const itemData = generateRandomItem({level, ...dropType.ELITE} as Partial<RandomItemOptions>);
+			this.scene.dropItem(this.x, this.y, itemData.itemKey, itemData.level);
+		}
 	}
 
-	dropFixedItem(id: string) {
+	dropNonEquippableItem(id: string) {
 		if (this.scene === undefined) {
 			// ???
 			return;
 		}
-		this.scene.addFixedItem(id, this.x, this.y);
+		if (id === 'essence') {
+			this.scene.addFixedItem(this.color, this.x, this.y);
+		} else this.scene.addFixedItem(id, this.x, this.y);
 	}
 
 	// update from main Scene

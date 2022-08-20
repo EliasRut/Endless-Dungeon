@@ -19,6 +19,7 @@ export default class KeyboardHelper {
 	questsKey: Phaser.Input.Keyboard.Key;
 	enterKey: Phaser.Input.Keyboard.Key;
 	spaceKey: Phaser.Input.Keyboard.Key;
+	enchantKey: Phaser.Input.Keyboard.Key;
 
 	wasEnterKeyPressed: boolean;
 
@@ -41,11 +42,12 @@ export default class KeyboardHelper {
 	isAbility2Pressed: () => boolean;
 	isAbility3Pressed: () => boolean;
 	isAbility4Pressed: () => boolean;
-	isInventoryPressed: (inventoryOpen: boolean) => boolean;
+	isInventoryPressed: (inventoryOpen: boolean) => boolean; // <= bool for gamepad: if inventory is open, B button closes it as well, not just inventory button
 	isSettingsPressed: () => boolean;
 	isQuestsPressed: () => boolean;
 	isEnterPressed: () => boolean;
 	isSpacePressed: () => boolean;
+	isEnchantPressed: () => boolean;
 
 	scene: Phaser.Scene;
 
@@ -60,6 +62,7 @@ export default class KeyboardHelper {
 		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 		this.spaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+		this.enchantKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 		this.wasEnterKeyPressed = false;
 
 		this.scene = scene;
@@ -138,6 +141,16 @@ export default class KeyboardHelper {
 				return false;
 			}
 		};
+		this.isEnchantPressed = () => {
+			if (this.enchantKey.isDown) {
+				return true;
+			}
+			try {
+				return !!this.gamepad?.isButtonDown(11);
+			} catch (err) {
+				return false;
+			}
+		};
 
 		this.abilityKey1 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 		this.abilityKey2 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
@@ -148,6 +161,7 @@ export default class KeyboardHelper {
 		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
 		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 		this.spaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+		this.enchantKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
 		this.isAbility1Pressed = () => {
 			if (this.abilityKeyPressed[AbilityKey.ONE]) {

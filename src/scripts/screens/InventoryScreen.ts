@@ -113,11 +113,12 @@ export default class InventoryScreen extends OverlayScreen {
 	focusedSlot?: EquipmentSlot;
 	scene: MainScene;
 	keyLastPressed: number = 0;
-	keyCD: number = 150;
+	keyCD: number = 250;
 	currentXY: [number, number];
 	inventorySelection: Phaser.GameObjects.Image;
 	equipmentSelectionWheel: EquipmentSelectionWheel;
 	isEquipmentSelectionWheelShown: boolean;
+	currentEnchantment: EnchantmentName = 'None';
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
@@ -239,7 +240,7 @@ export default class InventoryScreen extends OverlayScreen {
 		itemToken.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		itemToken.setScrollFactor(0);
 		itemToken.setInteractive();
-		itemToken.setVisible(this.visiblity);
+		itemToken.setVisible(this.visibility);
 		this.playItemAnimation(itemToken, itemName);
 		itemToken.setScale(UI_SCALE);
 		this.add(itemToken, true);
@@ -272,7 +273,7 @@ export default class InventoryScreen extends OverlayScreen {
 
 	handleEquipmentSlotInteraction(slotName: EquipmentSlot) {
 		if (this.focusedSlot === slotName) {
-			if (this.equipmentSelectionWheel.visiblity) {
+			if (this.equipmentSelectionWheel.visibility) {
 				this.equipmentSelectionWheel.toggleVisibility();
 				this.equipmentSelectionWheel.closeSelection();
 			} else {
@@ -292,9 +293,9 @@ export default class InventoryScreen extends OverlayScreen {
 	interactInventory(directions: string[], globalTime: number) {
 		if (directions.includes('nothing')) return;
 
-		if (this.equipmentSelectionWheel.visiblity) {
+		if (this.equipmentSelectionWheel.visibility) {
 			if (directions.includes('enter')) {
-				this.equipmentSelectionWheel.executeSelection();
+				this.equipmentSelectionWheel.executeSelection(this.currentEnchantment); // <= place enchantment as arg here
 				return;
 			}
 			const yAxis = directions.includes('up') ? -1 : directions.includes('down') ? 1 : 0;
@@ -306,7 +307,7 @@ export default class InventoryScreen extends OverlayScreen {
 		if (globalTime - this.keyLastPressed > this.keyCD) this.keyLastPressed = globalTime;
 		else return;
 		if (directions.includes('enter') && this.focusedSlot) {
-			if (this.equipmentSelectionWheel.visiblity) {
+			if (this.equipmentSelectionWheel.visibility) {
 			} else {
 				this.showEquipmentSelectionWheel();
 			}
@@ -431,7 +432,7 @@ export default class InventoryScreen extends OverlayScreen {
 		abilityIcon.setScrollFactor(0);
 		abilityIcon.setScale(UI_SCALE);
 		abilityIcon.setInteractive();
-		abilityIcon.setVisible(this.visiblity);
+		abilityIcon.setVisible(this.visibility);
 		abilityIcon.setOrigin(0);
 		this.add(abilityIcon, true);
 		return abilityIcon;
@@ -459,7 +460,7 @@ export default class InventoryScreen extends OverlayScreen {
 		abilityText.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		abilityText.setScrollFactor(0);
 		abilityText.setShadow(0, 1 * UI_SCALE, 'black');
-		abilityText.setVisible(this.visiblity);
+		abilityText.setVisible(this.visibility);
 		this.add(abilityText, true);
 		return abilityText;
 	}
@@ -469,7 +470,7 @@ export default class InventoryScreen extends OverlayScreen {
 		ability: AbilityType,
 		slotKey: EquipmentSlot
 	) {
-		abilityIcon.setVisible(this.visiblity);
+		abilityIcon.setVisible(this.visibility);
 
 		abilityIcon.on('pointerdown', () => {
 			if (this.focusedSlot !== undefined) this.focusedSlot = undefined;
@@ -516,6 +517,11 @@ export default class InventoryScreen extends OverlayScreen {
 			? getFullDataForEquipmentSlot(this.focusedSlot)
 			: [undefined, undefined];
 		this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+	}
+
+	modify(enchantment?: EnchantmentName): void {
+		if(enchantment !== undefined) this.currentEnchantment = enchantment;
+		else this.currentEnchantment = 'None';
 	}
 
 	setVisible(value: boolean, index?: number, direction?: number): this {

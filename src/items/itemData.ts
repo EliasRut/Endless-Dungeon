@@ -1,4 +1,5 @@
 import { AbilityType } from '../scripts/abilities/abilityData';
+import { ColorsOfMagic } from '../scripts/helpers/constants';
 
 export interface ItemData {
 	name: string;
@@ -299,6 +300,7 @@ export const enum UneqippableItem {
 	SILVER_KEY = 'silverKey',
 	MYSTIC_BOOK = 'mysticBook',
 	POTION = 'health',
+	ESSENCE = 'essence'
 }
 
 export const UneqippableItemData = {
@@ -320,6 +322,11 @@ export const UneqippableItemData = {
 	[UneqippableItem.POTION]: {
 		name: 'Health Potion',
 		description: 'A health potion. Tastes like blood...',
+		iconFrame: 0,
+	} as ItemData,
+	[UneqippableItem.ESSENCE]: {
+		name: 'Essence',
+		description: 'Essence for crafting.',
 		iconFrame: 0,
 	} as ItemData,
 };
@@ -345,7 +352,8 @@ export const getItemDataForName = (name: string) => {
 	}
 	if (name.startsWith('amulet-')) {
 		return AmuletData[name as Amulet] as ItemData;
-	}
+	}	
+	if (Object.values(ColorsOfMagic).includes(name as ColorsOfMagic)) name = 'essence';
 	return UneqippableItemData[name as UneqippableItem] as ItemData;
 };
 

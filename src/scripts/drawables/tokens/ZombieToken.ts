@@ -1,4 +1,5 @@
 import {
+	ColorsOfMagic,
 	facingToSpriteNameMap,
 	KNOCKBACK_TIME,
 	NORMAL_ANIMATION_FRAME_RATE,
@@ -7,7 +8,7 @@ import {
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import EnemyToken from './EnemyToken';
+import EnemyToken, { slainEnemy } from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 
 const BASE_ATTACK_DAMAGE = 3;
@@ -18,8 +19,8 @@ const BASE_HEALTH = 4;
 
 const ATTACK_DAMAGE_DELAY = 250;
 
-const ITEM_DROP_CHANCE = 0.65;
-const HEALTH_DROP_CHANCE = 0.06 * globalState.playerCharacter.luck;
+const ITEM_DROP_CHANCE = 0;
+const HEALTH_DROP_CHANCE = 0 * globalState.playerCharacter.luck;
 
 export default class ZombieToken extends EnemyToken {
 	attackExecuted: boolean;
@@ -43,6 +44,7 @@ export default class ZombieToken extends EnemyToken {
 		this.startingHealth = BASE_HEALTH * (1 + this.level * 0.5);
 		this.stateObject.health = this.startingHealth;
 		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
+		this.color = ColorsOfMagic.FLUX;
 	}
 
 	public update(time: number, delta: number) {
@@ -56,11 +58,11 @@ export default class ZombieToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropRandomItem(this.level);
+				this.dropEquippableItem(this.level, slainEnemy.NORMAL);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
-				this.dropFixedItem('health');
+				this.dropNonEquippableItem('health');
 			}
-			//this.dropFixedItem('source-fire');
+			this.dropNonEquippableItem('essence');
 			this.dead = true;
 			this.die();
 			return;
