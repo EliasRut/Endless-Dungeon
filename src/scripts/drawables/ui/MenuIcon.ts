@@ -35,7 +35,7 @@ export default abstract class MenuIcon extends Phaser.GameObjects.Image implemen
 
 	toggleScreen() {
 		if (!this.scene.scriptHelper.isScriptRunning()) {
-			if (this.open) this.closeScreen();
+			if (this.open) this.scene.closeAllIconScreens();
 			else {
 				this.scene.closeAllIconScreens();
 				this.openScreen();

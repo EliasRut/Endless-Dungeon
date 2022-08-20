@@ -23,6 +23,7 @@ import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 const RED_DIFF = 0x010000;
 const GREEN_DIFF = 0x000100;
+const TELEPORT_VELOCITY = 600;
 
 export default class TeleportEffect extends AbilityEffect {
 	constructor(
@@ -43,7 +44,10 @@ export default class TeleportEffect extends AbilityEffect {
 
 		const playerToken = (this.scene as MainScene).mainCharacter;
 		const velocity = playerToken.body.velocity;
-		playerToken.setVelocity(1000 * SCALE * rotationFactors.x, 1000 * SCALE * rotationFactors.y);
+		playerToken.setVelocity(
+			TELEPORT_VELOCITY * SCALE * rotationFactors.x,
+			TELEPORT_VELOCITY * SCALE * rotationFactors.y
+		);
 		playerToken.body.checkCollision.none = true;
 		playerCharacter.dashing = true;
 		playerToken.alpha = 0.2;
@@ -53,8 +57,8 @@ export default class TeleportEffect extends AbilityEffect {
 
 		const trailEmitter = particles.createEmitter({
 			alpha: { start: 1, end: 1 },
-			scale: { start: 0.04 * this.effectScale * SCALE, end: 0 },
-			speed: 100 * SCALE,
+			scale: { start: 0.4 * this.effectScale * SCALE, end: 0 },
+			speed: 0,
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 200, max: 400 }, // used to be: { min: 200, max: 400 },
 			blendMode: Phaser.BlendModes.ADD,
@@ -72,7 +76,6 @@ export default class TeleportEffect extends AbilityEffect {
 			maxParticles: 200,
 		});
 
-		trailEmitter.explode(100, playerToken.x, playerToken.y);
 		trailEmitter.startFollow(playerToken);
 
 		setTimeout(() => {
@@ -81,11 +84,6 @@ export default class TeleportEffect extends AbilityEffect {
 			playerToken.body.checkCollision.none = false;
 			playerToken.alpha = 1;
 			trailEmitter.stopFollow();
-			trailEmitter.explode(
-				100,
-				playerToken.x + 16 * SCALE * rotationFactors.x,
-				playerToken.y + 16 * SCALE * rotationFactors.y
-			);
-		}, 100);
+		}, 200);
 	}
 }

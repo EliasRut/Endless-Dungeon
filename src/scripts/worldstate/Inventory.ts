@@ -74,7 +74,7 @@ export const EmptyInventory: Inventory = {
 		[Ring.DEATH]: { level: 1, enchantment: 'None' },
 		[Ring.FLUX]: { level: 0, enchantment: 'None' },
 		[Ring.METAL]: { level: 1, enchantment: 'None' },
-		[Ring.PASSION]: { level: 0, enchantment: 'None' },
+		[Ring.PASSION]: { level: 1, enchantment: 'None' },
 		[Ring.ROYAL]: { level: 1, enchantment: 'None' },
 		[Ring.WILD]: { level: 1, enchantment: 'None' },
 	},

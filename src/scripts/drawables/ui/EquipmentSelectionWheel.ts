@@ -118,6 +118,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 				this.scene.overlayScreens.itemScreen.update();
 			}
 		} else {
+			console.log(enchantment)
 			attachEnchantmentItem(itemKey, enchantment);
 		}
 		this.scene.overlayScreens.inventory.update();
