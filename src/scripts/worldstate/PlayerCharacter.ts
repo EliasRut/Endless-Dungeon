@@ -24,7 +24,7 @@ export default class PlayerCharacter extends Character {
 
 	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
 
-	public activeSummons: Array<{ id: string; summoningType: string }> = [];
+	public activeSummons: { id: string; summoningType: string }[] = [];
 
 	constructor() {
 		// tslint:disable-next-line: no-magic-numbers
