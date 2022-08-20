@@ -793,7 +793,7 @@ export default class MainScene extends Phaser.Scene {
 	getTokenForStateObject(stateObject: Character) {
 		if (stateObject.faction === Faction.PLAYER) {
 			return this.mainCharacter;
-		} else if (stateObject.faction === Faction.FOLLOWER) {
+		} else if (stateObject.faction === Faction.ALLIES) {
 			return this.testFollower;
 		} else {
 			return this.npcMap[stateObject.id];
