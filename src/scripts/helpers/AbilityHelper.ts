@@ -10,6 +10,7 @@ import { Facings, Faction, PossibleTargets, SCALE } from './constants';
 import { getFacing4Dir, getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
 import Enemy from '../worldstate/Enemy';
+import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
 
 export default class AbilityHelper {
 	scene: MainScene;
@@ -64,10 +65,10 @@ export default class AbilityHelper {
 			if (pointOfOrigin.exactTargetYFactor !== undefined) {
 				yMultiplier = pointOfOrigin.exactTargetYFactor;
 			}
-			const effect = new projectileData!.effect(
+			const effect = new (projectileData!.effect || TrailingParticleProjectileEffect)(
 				this.scene,
-				pointOfOrigin.x + (pointOfOrigin.width || 0) / 2 + xMultiplier * projectileData!.xOffset, //  * SCALE
-				pointOfOrigin.y + (pointOfOrigin.height || 0) / 2 + yMultiplier * projectileData!.yOffset, //  * SCALE
+				pointOfOrigin.x + (pointOfOrigin.width || 0) / 2 + xMultiplier * projectileData!.xOffset,
+				pointOfOrigin.y + (pointOfOrigin.height || 0) / 2 + yMultiplier * projectileData!.yOffset,
 				usedAbilityData.spriteName || '',
 				getFacing4Dir(xMultiplier, yMultiplier),
 				projectileData

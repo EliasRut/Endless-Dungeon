@@ -15,6 +15,7 @@ import AbilityEditor, {
 } from '../../scripts/scenes/AbilityEditor';
 import { EmitterInputBlock } from '../components/EmitterInputBlock';
 import { EmitterTintInputBlock } from '../components/EmitterTintInputBlock';
+import { AbilityData, ProjectileData } from '../../scripts/abilities/abilityData';
 
 const showGame = true;
 
@@ -22,9 +23,39 @@ export interface AbilityEditorScreenProps {
 	user: UserInformation;
 }
 
-const abilityData: EditedAbilityData = { ...DefaultAbilityData };
+let abilityData: EditedAbilityData = { ...DefaultAbilityData };
 
 const getData = () => abilityData;
+
+const setAbilityDataFromDataObject = (data: AbilityData) => {
+	abilityData.emitterAlpha = data.projectileData?.particleData?.alpha || 1;
+	abilityData.emitterScale = data.projectileData?.particleData?.scale || 1;
+	abilityData.emitterSpeed = data.projectileData?.particleData?.speed || 1;
+	abilityData.emitterRotate = data.projectileData?.particleData?.rotate || 1;
+	abilityData.emitterLifespan = data.projectileData?.particleData?.lifespan || 1;
+	abilityData.emitterTint = data.projectileData?.particleData?.tint || {
+		redMin: 1,
+		greenMin: 1,
+		blueMin: 1,
+		redDiff: 1,
+		greenDiff: 1,
+		blueDiff: 1,
+	};
+
+	abilityData.emitterMaxParticles = data.projectileData?.particleData?.maxParticles || 0;
+	abilityData.emitterFrequency = data.projectileData?.particleData?.frequency || 0;
+	abilityData.emitterExplosionSpeed = data.projectileData?.explosionData?.speed || 0;
+	abilityData.emitterExplosionLifespan = data.projectileData?.explosionData?.lifespan || 0;
+	abilityData.emitterExplosionParticles = data.projectileData?.explosionData?.particles || 0;
+	abilityData.projectileImage = data.projectileData?.projectileImage || 'fire';
+	abilityData.particleImage = data.projectileData?.particleData?.particleImage || 'fire';
+	abilityData.projectiles = data.projectiles || 0;
+	abilityData.delay = data.projectileData?.delay || 0;
+	abilityData.minSpread = data.projectileData?.spread ? data.projectileData?.spread[0] : 0;
+	abilityData.maxSpread = data.projectileData?.spread ? data.projectileData?.spread[1] : 0;
+	abilityData.velocity = data.projectileData?.velocity || 0;
+	abilityData.drag = data.projectileData?.drag || 0;
+};
 
 export const AbilityEditorScreen = ({ user }: AbilityEditorScreenProps) => {
 	const phaserRef = useRef<HTMLDivElement>(null);
@@ -44,6 +75,8 @@ export const AbilityEditorScreen = ({ user }: AbilityEditorScreenProps) => {
 		}, 100);
 	}, [showGame]);
 
+	const [activeAbilityId, setActiveAbilityId] = useState<string | undefined>(undefined);
+	const [abilityName, setAbilityName] = useState<string>('New Ability');
 	const [projectiles, setProjectiles] = useState<number>(1);
 	const [delay, setDelay] = useState<number>(0);
 	const [minSpread, setMinSpread] = useState<string>('0');
@@ -54,6 +87,75 @@ export const AbilityEditorScreen = ({ user }: AbilityEditorScreenProps) => {
 	const [particleImage, setParticleImage] = useState<string>('fire');
 	const [maxParticles, setMaxParticles] = useState<number>(200);
 	const [frequency, setFrequency] = useState<number>(2);
+	const [storedAbilities, setStoredAbilities] = useState<[string, string][]>([]);
+
+	const saveAbility = async (data: AbilityData, id: string | undefined) => {
+		const abilityDoc = firebase.firestore().collection('abilities').doc(id);
+
+		await abilityDoc.set(data);
+		const abilityId = abilityDoc.id;
+		setActiveAbilityId(abilityId);
+
+		firebase
+			.firestore()
+			.collection('abilities')
+			.get()
+			.then((query) => {
+				const abilities: [string, string][] = query.docs.map((doc) => [
+					doc.id,
+					doc.get('abilityName') as string,
+				]);
+				setStoredAbilities(abilities);
+			});
+	};
+
+	const loadAbility = async (id: string) => {
+		const doc = await firebase.firestore().collection('abilities').doc(id).get();
+		const data = doc.data() as AbilityData;
+		setAbilityName(data.abilityName);
+		setProjectiles(data.projectiles || 0);
+		setDelay(data.projectileData?.delay || 0);
+		setMinSpread(`${data.projectileData?.spread ? data.projectileData?.spread[0] : 0}`);
+		setMaxSpread(`${data.projectileData?.spread ? data.projectileData?.spread[1] : 0}`);
+		setVelocity(data.projectileData?.velocity || 0);
+		setDrag(data.projectileData?.drag || 0);
+		setProjectileImage(data.projectileData?.projectileImage || 'fire');
+		setParticleImage(data.projectileData?.particleData?.particleImage || 'fire');
+		setMaxParticles(data.projectileData?.particleData?.maxParticles || 0);
+		setFrequency(data.projectileData?.particleData?.frequency || 0);
+
+		setAbilityDataFromDataObject(data);
+	};
+
+	const resetData = () => {
+		setAbilityName('New Ability');
+		setProjectiles(1);
+		setDelay(0);
+		setMinSpread(`0`);
+		setMaxSpread(`0`);
+		setVelocity(200);
+		setDrag(0);
+		setProjectileImage('fire');
+		setParticleImage('fire');
+		setMaxParticles(200);
+		setFrequency(2);
+
+		abilityData = { ...DefaultAbilityData };
+	};
+
+	useEffect(() => {
+		firebase
+			.firestore()
+			.collection('abilities')
+			.get()
+			.then((query) => {
+				const abilities: [string, string][] = query.docs.map((doc) => [
+					doc.id,
+					doc.get('abilityName') as string,
+				]);
+				setStoredAbilities(abilities);
+			});
+	}, [showGame]);
 
 	return (
 		<PageContainer>
@@ -66,6 +168,74 @@ export const AbilityEditorScreen = ({ user }: AbilityEditorScreenProps) => {
 			</NavigationWrapper>
 			<PageWrapper>
 				<AbilityEditorWrapper>
+					<SettingsColumn>
+						<ColumnHeader>Ability Data</ColumnHeader>
+						<Dropdown
+							value={activeAbilityId}
+							onChange={(e: any) => {
+								if (e.target.value) {
+									setActiveAbilityId(e.target.value);
+									loadAbility(e.target.value);
+								} else {
+									setActiveAbilityId(undefined);
+									resetData();
+								}
+							}}
+						>
+							<option key="empty_ability" value="">
+								New Ability
+							</option>
+							{storedAbilities.map(([id, name]) => (
+								<option key={id} value={id}>
+									{name}
+								</option>
+							))}
+						</Dropdown>
+						Ability Name
+						<input
+							value={abilityName}
+							onChange={(e) => {
+								setAbilityName(e.target.value);
+							}}
+						/>
+						<SaveButton
+							onClick={() =>
+								saveAbility(
+									{
+										abilityName,
+										projectiles,
+										projectileData: {
+											delay,
+											spread: [parseFloat(minSpread), parseFloat(maxSpread)],
+											xOffset: 0,
+											yOffset: 0,
+											destroyOnEnemyContact: true,
+											destroyOnWallContact: true,
+											velocity,
+											drag,
+											projectileImage,
+											particleData: {
+												particleImage,
+												maxParticles,
+												frequency,
+												alpha: abilityData.emitterAlpha,
+												scale: abilityData.emitterScale,
+												speed: abilityData.emitterSpeed,
+												rotate: abilityData.emitterRotate,
+												lifespan: abilityData.emitterLifespan,
+												tint: abilityData.emitterTint,
+											},
+										},
+										flavorText: '',
+										damageMultiplier: 1,
+									},
+									activeAbilityId
+								)
+							}
+						>
+							Save
+						</SaveButton>
+					</SettingsColumn>
 					<LeftColumn>
 						<ColumnHeader>Projectile Data</ColumnHeader>
 						Projectile Image
@@ -309,7 +479,7 @@ const GameWrapper = styled.div`
 `;
 
 const AbilityEditorWrapper = styled.div`
-	width: 336px;
+	width: 408px;
 	color: white;
 	padding: 16px;
 	display: flex;
@@ -320,6 +490,14 @@ const AbilityEditorWrapper = styled.div`
 		width: 96px;
 		box-sizing: border-box;
 	}
+`;
+
+const SettingsColumn = styled.div`
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+	width: 96px;
 `;
 
 const LeftColumn = styled.div`
@@ -340,4 +518,10 @@ const RightColumn = styled.div`
 
 const ColumnHeader = styled.div`
 	font-weight: bold;
+`;
+
+const SaveButton = styled.button`
+	margin-top: 16px;
+	width: 96px;
+	padding: 4px 0;
 `;

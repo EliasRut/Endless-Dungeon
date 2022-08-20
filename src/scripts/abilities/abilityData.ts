@@ -51,7 +51,7 @@ export interface ProjectileData {
 	spriteScale?: number;
 	xOffset: number;
 	yOffset: number;
-	effect: typeof AbilityEffect;
+	effect?: typeof AbilityEffect;
 	collisionSound?: string;
 	sfxVolume?: number;
 	delay?: number;
@@ -72,6 +72,7 @@ export interface AbilityData {
 	sfxVolume?: number;
 	cooldownMs?: number;
 	abilityName: string;
+	id?: string;
 	flavorText: string;
 	icon?: [string, number];
 	damageMultiplier: number;
@@ -153,7 +154,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sfxVolume: 0.1,
 		cooldownMs: 250,
 		damageMultiplier: 1,
-		//stun: 3000,
+		// stun: 3000,
 		abilityName: 'Fireball',
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
