@@ -1,7 +1,10 @@
 import React from 'react';
 import { ScriptEntry } from '../../../typings/custom';
+import { AbilityType } from '../../scripts/abilities/abilityData';
+import { DefaultCharacterData } from '../../scripts/worldstate/Character';
 import { ScriptBlockContainer } from './ScriptBlockContainer';
 import { Condition } from './ScriptBlockTypes/Condition';
+import { DespawnFollower } from './ScriptBlockTypes/DespawnFollower';
 import { Dialog } from './ScriptBlockTypes/Dialog';
 import { Move } from './ScriptBlockTypes/Move';
 import { PausedCondition } from './ScriptBlockTypes/PausedCondition';
@@ -123,14 +126,18 @@ export const ScriptBlock: (props: ScriptBlockProps) => JSX.Element = ({
 			return (
 				<SetFollowerData
 					currentData={{
-						id: '',
-						animationBase: '',
-						health: 0,
-						damage: 0,
-						movementSpeed: 0,
-						level: 0,
-						ability: '',
-						...scriptBlock,
+						follower: {
+							...DefaultCharacterData,
+							id: '',
+							animationBase: '',
+							health: 0,
+							damage: 0,
+							movementSpeed: 0,
+							abilityCastTime: [-Infinity, -Infinity, -Infinity, -Infinity],
+							level: 0,
+							ability: AbilityType.FIREBALL,
+							...scriptBlock.follower,
+						},
 						type: 'setFollowerData',
 					}}
 					// availableFollowerAbilities={knownFollowerAbilities}
@@ -146,6 +153,19 @@ export const ScriptBlock: (props: ScriptBlockProps) => JSX.Element = ({
 						followerId: '',
 						...scriptBlock,
 						type: 'spawnFollower',
+					}}
+					updateData={onChange}
+					removeData={onRemove}
+				/>
+			);
+		}
+		case 'despawnFollower': {
+			return (
+				<DespawnFollower
+					currentData={{
+						followerId: '',
+						...scriptBlock,
+						type: 'despawnFollower',
 					}}
 					updateData={onChange}
 					removeData={onRemove}

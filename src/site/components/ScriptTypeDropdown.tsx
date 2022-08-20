@@ -31,6 +31,7 @@ export const ScriptTypeDropdown = (props: ScriptTypeDropdownProps) => (
 				<option value="setQuestState">Set Quest State</option>
 				<option value="setFollowerData">Set Follower Data</option>
 				<option value="spawnFollower">Spawn Follower</option>
+				<option value="despawnFollower">Despawn Follower</option>
 			</LargeDropdown>
 		</TypeContainer>
 	</SingleInputWrapper>

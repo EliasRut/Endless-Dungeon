@@ -4,16 +4,16 @@ import { LargeInput } from '../LargeInput';
 import { ScriptBlockContainer } from '../ScriptBlockContainer';
 import { ScriptTypeDropdown } from '../ScriptTypeDropdown';
 
-export interface SpawnFollowerProps {
+export interface DespawnFollowerProps {
 	currentData: {
-		type: 'spawnFollower';
+		type: 'despawnFollower';
 		followerId: string;
 	};
 	updateData: (newData: any) => void;
 	removeData: () => void;
 }
 
-export const SpawnFollower = (props: SpawnFollowerProps) => {
+export const DespawnFollower = (props: DespawnFollowerProps) => {
 	return (
 		<ScriptBlockContainer>
 			<ScriptTypeDropdown
@@ -28,7 +28,7 @@ export const SpawnFollower = (props: SpawnFollowerProps) => {
 			<Wrapper>
 				<TextWrapper>Follower Id</TextWrapper>
 				<LargeInput
-					id="spawnFollowerId"
+					id="despawnFollowerId"
 					value={props.currentData.followerId}
 					onChange={(e: any) =>
 						props.updateData({

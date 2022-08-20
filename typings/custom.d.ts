@@ -191,6 +191,11 @@ export interface ScriptSpawnFollower {
 	followerId: string;
 }
 
+export interface ScriptDespawnFollower {
+	type: 'despawnFollower';
+	followerId: string;
+}
+
 export type ScriptEntry =
 	| ScriptWait
 	| ScriptDialog
@@ -211,7 +216,8 @@ export type ScriptEntry =
 	| ScriptSetQuestState
 	| ScriptSpawnItem
 	| ScriptSetFollowerData
-	| ScriptSpawnFollower;
+	| ScriptSpawnFollower
+	| ScriptDespawnFollower;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];

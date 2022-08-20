@@ -47,3 +47,25 @@ export const updateStatus = (globalTime: number, character: Character) => {
 		}
 	}
 };
+
+export const DefaultCharacterData: Character = {
+	animationBase: '',
+	maxHealth: 100,
+	health: 100,
+	damage: 1,
+	luck: 1,
+	movementSpeed: 30,
+	slowFactor: 1,
+	attackTime: 0,
+	stunDuration: 0,
+	stunnedAt: 0,
+	stunned: false,
+	dashing: false,
+	currentFacing: Facings.SOUTH,
+	isWalking: false,
+	x: 0,
+	y: 0,
+	vision: 0,
+	faction: Faction.PLAYER,
+	id: '',
+};

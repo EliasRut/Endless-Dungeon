@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { AbilityType } from '../../../scripts/abilities/abilityData';
+import Follower from '../../../scripts/worldstate/Follower';
 import { LargeInput } from '../LargeInput';
 import { ScriptBlockContainer } from '../ScriptBlockContainer';
 import { ScriptTypeDropdown } from '../ScriptTypeDropdown';
@@ -8,14 +8,7 @@ import { ScriptTypeDropdown } from '../ScriptTypeDropdown';
 export interface SetFollowerDataProps {
 	currentData: {
 		type: 'setFollowerData';
-		id: string;
-		animationBase: string;
-		health: number;
-		damage: number;
-		movementSpeed: number;
-		level: number;
-		ability: string;
-		// ability: AbilityType;
+		follower: Follower;
 	};
 	updateData: (newData: any) => void;
 	removeData: () => void;
@@ -24,15 +17,27 @@ export interface SetFollowerDataProps {
 export const SetFollowerData = (props: SetFollowerDataProps) => {
 	return (
 		<ScriptBlockContainer>
+			<ScriptTypeDropdown
+				value={props.currentData.type}
+				onChange={(value: string) =>
+					props.updateData({
+						type: value,
+					})
+				}
+				onRemove={() => props.removeData()}
+			/>
 			<Wrapper>
 				<TextWrapper>Id</TextWrapper>
 				<LargeInput
 					id="followerId"
-					value={props.currentData.id}
+					value={props.currentData.follower.id}
 					onChange={(e: any) =>
 						props.updateData({
 							...props.currentData,
-							id: e.target.value,
+							follower: {
+								...props.currentData.follower,
+								id: e.target.value,
+							},
 						})
 					}
 				/>
@@ -41,11 +46,14 @@ export const SetFollowerData = (props: SetFollowerDataProps) => {
 				<TextWrapper>Animation Base</TextWrapper>
 				<LargeInput
 					id="followerAnimationBase"
-					value={props.currentData.animationBase}
+					value={props.currentData.follower.animationBase}
 					onChange={(e: any) =>
 						props.updateData({
 							...props.currentData,
-							animationBase: e.target.value,
+							follower: {
+								...props.currentData.follower,
+								animationBase: e.target.value,
+							},
 						})
 					}
 				/>
@@ -54,11 +62,14 @@ export const SetFollowerData = (props: SetFollowerDataProps) => {
 				<TextWrapper>Health</TextWrapper>
 				<LargeInput
 					id="followerHealth"
-					value={props.currentData.health}
+					value={props.currentData.follower.health}
 					onChange={(e: any) =>
 						props.updateData({
 							...props.currentData,
-							health: e.target.value,
+							follower: {
+								...props.currentData.follower,
+								health: e.target.value,
+							},
 						})
 					}
 				/>
@@ -67,11 +78,14 @@ export const SetFollowerData = (props: SetFollowerDataProps) => {
 				<TextWrapper>Damage</TextWrapper>
 				<LargeInput
 					id="followerDamage"
-					value={props.currentData.damage}
+					value={props.currentData.follower.damage}
 					onChange={(e: any) =>
 						props.updateData({
 							...props.currentData,
-							damage: e.target.value,
+							follower: {
+								...props.currentData.follower,
+								damage: e.target.value,
+							},
 						})
 					}
 				/>
@@ -80,11 +94,14 @@ export const SetFollowerData = (props: SetFollowerDataProps) => {
 				<TextWrapper>Movement Speed</TextWrapper>
 				<LargeInput
 					id="followerMovementSpeed"
-					value={props.currentData.movementSpeed}
+					value={props.currentData.follower.movementSpeed}
 					onChange={(e: any) =>
 						props.updateData({
 							...props.currentData,
-							movementSpeed: e.target.value,
+							follower: {
+								...props.currentData.follower,
+								movementSpeed: e.target.value,
+							},
 						})
 					}
 				/>
@@ -93,11 +110,14 @@ export const SetFollowerData = (props: SetFollowerDataProps) => {
 				<TextWrapper>Level</TextWrapper>
 				<LargeInput
 					id="followerLevel"
-					value={props.currentData.level}
+					value={props.currentData.follower.level}
 					onChange={(e: any) =>
 						props.updateData({
 							...props.currentData,
-							level: e.target.value,
+							follower: {
+								...props.currentData.follower,
+								level: e.target.value,
+							},
 						})
 					}
 				/>
@@ -106,24 +126,18 @@ export const SetFollowerData = (props: SetFollowerDataProps) => {
 				<TextWrapper>Ability</TextWrapper>
 				<LargeInput
 					id="followerAbility"
-					value={props.currentData.ability}
+					value={props.currentData.follower.ability}
 					onChange={(e: any) =>
 						props.updateData({
 							...props.currentData,
-							ability: e.target.value,
+							follower: {
+								...props.currentData.follower,
+								ability: e.target.value,
+							},
 						})
 					}
 				/>
 			</Wrapper>
-			{/* <ScriptTypeDropdown
-				value={props.currentData.ability}
-				onChange={(value: string) =>
-					props.updateData({
-						ability: value,
-					})
-				}
-				onRemove={() => props.removeData()}
-			/> */}
 		</ScriptBlockContainer>
 	);
 };
