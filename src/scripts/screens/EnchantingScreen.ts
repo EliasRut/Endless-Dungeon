@@ -1,9 +1,10 @@
-import { EnchantmentName } from '../../items/enchantmentData';
+import { Enchantment, EnchantmentName } from '../../items/enchantmentData';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import {
 	ColorsOfMagic,
 	essenceNames,
 	NORMAL_ANIMATION_FRAME_RATE,
+	statDisplayNames,
 	UiDepths,
 	UI_SCALE,
 } from '../helpers/constants';
@@ -15,22 +16,22 @@ const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
 const SCALED_WINDOW_HEIGHT = window.innerHeight / UI_SCALE;
 
 const SCREEN_WIDTH = 500;
-const SCREEN_HEIGHT = 260;
-const SCREEN_START_X = (SCALED_WINDOW_WIDTH - SCREEN_WIDTH) / 2;
-const SCREEN_START_Y = (SCALED_WINDOW_HEIGHT - SCREEN_HEIGHT) / 1.5;
+const SCREEN_HEIGHT = 300;
+const SCREEN_START_X = (SCALED_WINDOW_WIDTH - SCREEN_WIDTH ) / 2;
+const SCREEN_START_Y = (SCALED_WINDOW_HEIGHT - SCREEN_HEIGHT) / 2;
 
-const ELEMENT_SEPARATOR_X = 300;
-const ELEMENT_SEPARATOR_Y = 100;
-const NOUN_START_X = (SCREEN_START_X + 300) * UI_SCALE;
+const ELEMENT_SEPARATOR_X = 75 * UI_SCALE;
+const ELEMENT_SEPARATOR_Y = 30 * UI_SCALE;
+const NOUN_START_X = (SCREEN_START_X + 320) * UI_SCALE;
 const NOUN_START_Y = (SCREEN_START_Y + 50) * UI_SCALE;
 
-const ADJECTIVE_START_X = (SCREEN_START_X + 100) * UI_SCALE;
+const ADJECTIVE_START_X = (SCREEN_START_X + 70) * UI_SCALE;
 const ADJECTIVE_START_Y = (SCREEN_START_Y + 50) * UI_SCALE;
 
-const ESSENCE_START_X = (SCREEN_START_X + 325) * UI_SCALE;
+const ESSENCE_START_X = (SCREEN_START_X + 300) * UI_SCALE;
 const ESSENCE_START_Y = (SCREEN_START_Y + 175) * UI_SCALE;
-const ESSENCE_SEPARATOR = 100;
-const ESSENCE_NUMBER_OFFSET = 30;
+const ESSENCE_SEPARATOR = 50 * UI_SCALE;
+const ESSENCE_NUMBER_OFFSET = 15 * UI_SCALE;
 
 export default class EnchantingScreen extends OverlayScreen {
 	title: Phaser.GameObjects.Text;
@@ -42,9 +43,13 @@ export default class EnchantingScreen extends OverlayScreen {
 	splendid: Phaser.GameObjects.Text;
 	greater: Phaser.GameObjects.Text;
 	mighty: Phaser.GameObjects.Text;
-	selectedNoun: string;
+	selectedNoun: string = 'Bear';
+	selectedAdjective: string = 'Lesser';
 	essenTokens: InventoryItemToken[];
 	essenceNumbers: Phaser.GameObjects.Text[] = [];
+	enchantmentName: Phaser.GameObjects.Text;
+	enchantmentModifier: Phaser.GameObjects.Text;
+
 
 	scene: MainScene;
 
@@ -94,6 +99,7 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.bear.setShadow(0, 1 * UI_SCALE, 'black');
 		this.bear.on('pointerdown', () => {
 			this.selectedNoun = 'Bear';
+			this.update();
 		});
 		this.add(this.bear, true);
 
@@ -116,6 +122,7 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.wolf.setShadow(0, 1 * UI_SCALE, 'black');
 		this.wolf.on('pointerdown', () => {
 			this.selectedNoun = 'Wolf';
+			this.update();
 		});
 		this.add(this.wolf, true);
 
@@ -139,6 +146,7 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.cat.setShadow(0, 1 * UI_SCALE, 'black');
 		this.cat.on('pointerdown', () => {
 			this.selectedNoun = 'Cat';
+			this.update();
 		});
 		this.add(this.cat, true);
 
@@ -162,6 +170,7 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.rabbit.setShadow(0, 1 * UI_SCALE, 'black');
 		this.rabbit.on('pointerdown', () => {
 			this.selectedNoun = 'Rabbit';
+			this.update();
 		});
 		this.add(this.rabbit, true);
 		// tslint:enable
@@ -191,10 +200,8 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.lesser.setShadow(0, 1 * UI_SCALE, 'black');
 		this.lesser.on('pointerdown', () => {
 			if (this.selectedNoun !== undefined) {
-				let adjective = 'Lesser';
-				let enchantment = (adjective + this.selectedNoun) as EnchantmentName;
-				this.scene.closeAllIconScreens();
-				this.scene.icons.backpackIcon.openScreen(enchantment);
+				this.selectedAdjective = 'Lesser';
+				this.update();
 			}
 		});
 		this.add(this.lesser, true);
@@ -222,10 +229,8 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.splendid.setShadow(0, 1 * UI_SCALE, 'black');
 		this.splendid.on('pointerdown', () => {
 			if (this.selectedNoun !== undefined) {
-				let adjective = 'Splendid';
-				let enchantment = (adjective + this.selectedNoun) as EnchantmentName;
-				this.scene.closeAllIconScreens();
-				this.scene.icons.backpackIcon.openScreen(enchantment);
+				this.selectedAdjective = 'Splendid';
+				this.update();
 			}
 		});
 		this.add(this.splendid, true);
@@ -253,10 +258,8 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.greater.setShadow(0, 1 * UI_SCALE, 'black');
 		this.greater.on('pointerdown', () => {
 			if (this.selectedNoun !== undefined) {
-				let adjective = 'Greater';
-				let enchantment = (adjective + this.selectedNoun) as EnchantmentName;
-				this.scene.closeAllIconScreens();
-				this.scene.icons.backpackIcon.openScreen(enchantment);
+				this.selectedAdjective = 'Greater';
+				this.update();
 			}
 		});
 		this.add(this.greater, true);
@@ -284,10 +287,8 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.mighty.setShadow(0, 1 * UI_SCALE, 'black');
 		this.mighty.on('pointerdown', () => {
 			if (this.selectedNoun !== undefined) {
-				let adjective = 'Mighty';
-				let enchantment = (adjective + this.selectedNoun) as EnchantmentName;
-				this.scene.closeAllIconScreens();
-				this.scene.icons.backpackIcon.openScreen(enchantment);
+				this.selectedAdjective = 'Mighty';				
+				this.update();
 			}
 		});
 		this.add(this.mighty, true);
@@ -339,6 +340,48 @@ export default class EnchantingScreen extends OverlayScreen {
 			this.add(this.essenceNumbers[counter], true);
 			counter++;
 		});
+		//-------------------------------------------------------------------------------------
+		let currentEnchantment = this.selectedAdjective + this.selectedNoun as EnchantmentName;
+		let enchantment = Enchantment[currentEnchantment];		
+		this.enchantmentName = new Phaser.GameObjects.Text(
+			scene,
+			ADJECTIVE_START_X,
+			ESSENCE_START_Y,
+			`${enchantment?.name}`,
+			{
+				color: 'white',
+				fontSize: `${12 * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+				align: 'center',
+			}
+		);
+		this.enchantmentName.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.enchantmentName.setScrollFactor(0);		
+		this.enchantmentName.setShadow(0, 1 * UI_SCALE, 'black');
+		this.add(this.enchantmentName, true);
+		scene.add.existing(this);
+		this.setVisible(false);
+		this.visibility = false;
+		//-------------------------------------------------------------------------------------
+		this.enchantmentModifier = new Phaser.GameObjects.Text(
+			scene,
+			ADJECTIVE_START_X,
+			ESSENCE_START_Y + ESSENCE_NUMBER_OFFSET,
+			`${statDisplayNames[enchantment!.affectedStat!.stat]}: `.padEnd(18) + `${enchantment?.affectedStat?.value}`,
+			{
+				color: 'white',
+				fontSize: `${12 * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+				align: 'center',
+			}
+		);
+		this.enchantmentModifier.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.enchantmentModifier.setScrollFactor(0);		
+		this.enchantmentModifier.setShadow(0, 1 * UI_SCALE, 'black');
+		this.add(this.enchantmentModifier, true);
+		scene.add.existing(this);
+		this.setVisible(false);
+		this.visibility = false;
 	}
 
 	playItemAnimation(itemToken: InventoryItemToken, essenceName: string) {
@@ -354,6 +397,12 @@ export default class EnchantingScreen extends OverlayScreen {
 		essenceNames.forEach((essence) => {
 			this.essenceNumbers[counter].setText(`${essences[essence as ColorsOfMagic]}`);
 			counter++;
-		});
+		});		
+		let enchantment = Enchantment[this.selectedAdjective + this.selectedNoun as EnchantmentName];		
+		this.enchantmentName.setText(`${enchantment?.name}`);
+		this.enchantmentModifier.setText(`${statDisplayNames[enchantment!.affectedStat!.stat]}: `.padEnd(18) + `${enchantment?.affectedStat?.value}`);
 	}
 }
+// let enchantment = (adjective + this.selectedNoun) as EnchantmentName;
+// this.scene.closeAllIconScreens();
+// this.scene.icons.backpackIcon.openScreen(enchantment);

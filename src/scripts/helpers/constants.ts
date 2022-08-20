@@ -80,6 +80,13 @@ export const enum EquipmentSlot {
 	LEFT_RING = 'leftRing',
 }
 
+export const statDisplayNames = {
+	'maxHealth' : 'Maxmum Health',
+	'damage' : 'Damage',
+	'luck' : 'Luck',
+	'movementSpeed' : 'Movement Speed'
+}
+
 export enum ColorsOfMagic {
 	FLUX = 'flux',
 	METAL = 'metal',
