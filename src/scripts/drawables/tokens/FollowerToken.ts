@@ -34,9 +34,7 @@ export default class FollowerToken extends CharacterToken {
 	aggroLinger: number = 3000;
 	attackRange: number;
 	destroyed: boolean = false;
-	followerAbility: AbilityType;
 	lastUpdate: number = -Infinity;
-	level: number;
 	triggersAttack?: boolean = false;
 	target: Phaser.Geom.Point;
 	exhausted: boolean = false;
@@ -44,35 +42,27 @@ export default class FollowerToken extends CharacterToken {
 	exhaustionDuration: number = 6000;
 	exhaustionText: Phaser.GameObjects.Text;
 
-	constructor(
-		scene: MainScene,
-		x: number,
-		y: number,
-		type: string,
-		id: string,
-		level: number,
-		followerAbility: AbilityType
-	) {
+	constructor(scene: MainScene, x: number, y: number, type: string, id: string) {
 		super(scene, x, y, type, type, id);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
-		this.stateObject = new Follower(
-			id,
-			type,
-			FOLLOWER_HEALTH,
-			FOLLOWER_DAMAGE,
-			FOLLOWER_MOVEMENT_SPEED
-		);
-		globalState.followers[id] = this.stateObject as Follower;
+		this.stateObject = globalState.followers[id];
+
+		// this.stateObject = new Follower(
+		// 	id,
+		// 	type,
+		// 	FOLLOWER_HEALTH,
+		// 	FOLLOWER_DAMAGE,
+		// 	FOLLOWER_MOVEMENT_SPEED
+		// );
+		// globalState.followers[id] = this.stateObject as Follower;
 		this.faction = Faction.ALLIES;
 		this.stateObject.vision = 150;
 		this.stateObject.faction = Faction.ALLIES;
 		this.target = new Phaser.Geom.Point(0, 0);
 		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
-		this.level = level;
-		this.followerAbility = followerAbility;
 	}
 
 	// Since follower should always stay near player, we can use the same logic for checking LoS as
@@ -253,8 +243,8 @@ export default class FollowerToken extends CharacterToken {
 						exactTargetXFactor: deltaX / totalDistance,
 						exactTargetYFactor: deltaY / totalDistance,
 					},
-					this.followerAbility,
-					1,
+					(this.stateObject as Follower).ability,
+					(this.stateObject as Follower).level,
 					time.now
 				);
 			}

@@ -2,6 +2,7 @@ import { AbilityType } from '../src/scripts/abilities/abilityData';
 import { ColorsOfMagic } from '../src/scripts/helpers/constants';
 import { RandomItemOptions } from '../src/scripts/helpers/item';
 import { QuestScripts } from '../src/scripts/helpers/quests';
+import Follower from '../src/scripts/worldstate/Follower';
 
 export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
 
@@ -176,6 +177,17 @@ export interface ScriptSetQuestState {
 	questState: 'new' | 'ongoing' | 'finished';
 }
 
+export interface ScriptSetFollowerData {
+	type: 'setFollowerData';
+	follower: Follower;
+	followerId: string;
+}
+
+export interface ScriptSpawnFollower {
+	type: 'spawnFollower';
+	followerId: string;
+}
+
 export type ScriptEntry =
 	| ScriptWait
 	| ScriptDialog
@@ -194,7 +206,9 @@ export type ScriptEntry =
 	| ScriptPlaceItem
 	| ScriptPausedCondition
 	| ScriptSetQuestState
-	| ScriptSpawnItem;
+	| ScriptSpawnItem
+	| ScriptSetFollowerData
+	| ScriptSpawnFollower;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];
