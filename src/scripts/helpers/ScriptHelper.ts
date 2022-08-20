@@ -392,6 +392,7 @@ export default class ScriptHelper {
 				break;
 			}
 			case 'despawnFollower': {
+				globalState.activeFollower = '';
 				this.scene.despawnFollower();
 				break;
 			}

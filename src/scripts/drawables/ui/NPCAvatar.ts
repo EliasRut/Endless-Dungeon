@@ -30,6 +30,7 @@ export default class NPCAvatar extends Phaser.GameObjects.Group {
 		avatarIcon.setScale(UI_SCALE);
 		avatarIcon.setDepth(UiDepths.UI_MAIN_LAYER);
 		avatarIcon.setOrigin(0);
+		this.add(avatarIcon);
 
 		const guiBaseIcon = scene.add.image(
 			HEALTH_BAR_START_X * UI_SCALE,
@@ -40,6 +41,7 @@ export default class NPCAvatar extends Phaser.GameObjects.Group {
 		guiBaseIcon.setScale(UI_SCALE);
 		guiBaseIcon.setDepth(UiDepths.UI_MAIN_LAYER);
 		guiBaseIcon.setOrigin(0);
+		this.add(guiBaseIcon);
 
 		this.healthBar = scene.add.image(
 			(HEALTH_BAR_START_X + 4) * UI_SCALE,
@@ -50,6 +52,7 @@ export default class NPCAvatar extends Phaser.GameObjects.Group {
 		this.healthBar.setScale(UI_SCALE);
 		this.healthBar.setOrigin(0);
 		this.healthBar.setDepth(UiDepths.UI_MAIN_LAYER);
+		this.add(this.healthBar);
 	}
 
 	update() {

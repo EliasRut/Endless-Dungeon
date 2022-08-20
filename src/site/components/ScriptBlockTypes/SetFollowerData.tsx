@@ -68,7 +68,7 @@ export const SetFollowerData = (props: SetFollowerDataProps) => {
 							...props.currentData,
 							follower: {
 								...props.currentData.follower,
-								health: e.target.value,
+								health: parseInt(e.target.value, 10),
 							},
 						})
 					}
@@ -84,7 +84,7 @@ export const SetFollowerData = (props: SetFollowerDataProps) => {
 							...props.currentData,
 							follower: {
 								...props.currentData.follower,
-								damage: e.target.value,
+								damage: parseInt(e.target.value, 10),
 							},
 						})
 					}
@@ -100,7 +100,7 @@ export const SetFollowerData = (props: SetFollowerDataProps) => {
 							...props.currentData,
 							follower: {
 								...props.currentData.follower,
-								movementSpeed: e.target.value,
+								movementSpeed: parseInt(e.target.value, 10),
 							},
 						})
 					}
