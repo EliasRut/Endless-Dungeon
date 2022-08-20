@@ -1,8 +1,12 @@
-import { AbilityType } from '../src/scripts/abilities/abilityData';
+import { AbilityType, AbilityData } from '../src/scripts/abilities/abilityData';
 import { ColorsOfMagic } from '../src/scripts/helpers/constants';
 import { RandomItemOptions } from '../src/scripts/helpers/item';
 import { QuestScripts } from '../src/scripts/helpers/quests';
 import Follower from '../src/scripts/worldstate/Follower';
+
+export type EnumDictionary<T extends string | symbol | number, U> = {
+	[K in T]: U;
+};
 
 export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
 
@@ -328,6 +332,18 @@ export interface ItemWithCount {
 	count: number;
 }
 
-export type EnumDictionary<T extends string | symbol | number, U> = {
-	[K in T]: U;
-};
+export interface AbilityListingConditions {
+	minimumLevel?: number;
+	maximumLevel?: number;
+}
+
+export interface ConditionalAbilityListing {
+	abilityType: AbilityType;
+	conditions?: AbilityListingConditions;
+	abilityId: string;
+}
+
+export interface ConditionalAbilityData {
+	conditions?: AbilityListingConditions;
+	data: AbilityData;
+}

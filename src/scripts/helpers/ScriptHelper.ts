@@ -376,7 +376,7 @@ export default class ScriptHelper {
 			}
 			case 'setFollowerData': {
 				cleanUpStep = true;
-				globalState.followers[currentStep.followerId] = currentStep.follower;
+				globalState.followers[currentStep.follower.id] = currentStep.follower;
 				break;
 			}
 			case 'spawnFollower': {
