@@ -347,7 +347,7 @@ export default class KeyboardHelper {
 			globalState.playerCharacter.abilityCastTime[AbilityKey.THREE],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.FOUR],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.SPACE],
-		].reduce((max, value) => Math.max(max, value), 0);
+		].reduce((max, value) => Math.max(max, value), -Infinity);
 
 		return gameTime - lastCast;
 	}
