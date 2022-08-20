@@ -14,6 +14,7 @@ import IceSummoningEffect from '../drawables/effects/IceSummoningEffect';
 import ArcaneSummoningEffect from '../drawables/effects/ArcaneSummoningEffect';
 import NecroticSummoningEffect from '../drawables/effects/NecroticSummoningEffect';
 import TeleportEffect from '../drawables/effects/TeleportEffect';
+import CharmEffect from '../drawables/effects/CharmEffect';
 import {
 	ColorEffectValue,
 	MinMaxParticleEffectValue,
@@ -51,7 +52,7 @@ export interface ProjectileData {
 	spriteScale?: number;
 	xOffset: number;
 	yOffset: number;
-	effect?: typeof AbilityEffect;
+	effect: typeof AbilityEffect;
 	collisionSound?: string;
 	sfxVolume?: number;
 	delay?: number;
@@ -72,7 +73,6 @@ export interface AbilityData {
 	sfxVolume?: number;
 	cooldownMs?: number;
 	abilityName: string;
-	id?: string;
 	flavorText: string;
 	icon?: [string, number];
 	damageMultiplier: number;
@@ -117,6 +117,7 @@ export const enum AbilityType {
 	NECROTIC_SUMMON_CIRCELING = 'necroticSummonCirceling',
 	NECROTIC_SUMMON_ELEMENTAL = 'necroticSummonElemental',
 	TELEPORT = 'teleport',
+	CHARM = 'charm'
 }
 
 export const Abilities: { [type: string]: AbilityData } = {
@@ -154,7 +155,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		sfxVolume: 0.1,
 		cooldownMs: 250,
 		damageMultiplier: 1,
-		// stun: 3000,
+		//stun: 3000,
 		abilityName: 'Fireball',
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
@@ -841,6 +842,37 @@ export const Abilities: { [type: string]: AbilityData } = {
 		damageMultiplier: 0.0,
 		abilityName: 'Summon Fire Elemental',
 		flavorText: `Raise an fiery elemental.`,
+		icon: ['icon-abilities', 0],
+	},
+	[AbilityType.CHARM]: {
+		projectiles: 1,
+		projectileData: {
+			velocity: 300,
+			xOffset: 0,
+			yOffset: 0,
+			projectileImage: 'empty-tile',
+			particleData: {
+				particleImage: 'snow',
+				alpha: { start: 1, end: 0 },
+				scale: { start: 1, end: 0.2 },
+				speed: 20,
+				rotate: { min: -180, max: 180 },
+				lifespan: { min: 200, max: 400 },
+			},
+			effect: CharmEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: true,
+			explodeOnDestruction: true,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.1,
+		cooldownMs: 250,
+		damageMultiplier: 0.2,
+		//stun: 3000,
+		abilityName: 'Charm',
+		flavorText: `The Enemy falls in love^^`,
 		icon: ['icon-abilities', 0],
 	},
 };

@@ -38,6 +38,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	iceEffectStacks: number;
 	tokenName: string;
 	healthbar: Phaser.GameObjects.Image;
+	charmedTime: number;
 
 	protected showHealthbar() {
 		return false;
@@ -67,6 +68,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			this.healthbar.setDepth(UiDepths.FLOATING_HEALTHBAR_LAYER);
 			scene.add.existing(this.healthbar);
 		}
+		this.charmedTime = -Infinity;
 	}
 
 	public onCollide(withEnemy: boolean) {}
@@ -213,6 +215,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 				this.healthbar.x = this.x;
 				this.healthbar.y = this.y - this.height - HEALTHBAR_Y_OFFSET;
 			}
+			
 		}
 	}
 }
