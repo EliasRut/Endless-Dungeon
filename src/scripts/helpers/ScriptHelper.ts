@@ -374,6 +374,8 @@ export default class ScriptHelper {
 				}
 				break;
 			}
+			// Implement follower spawning script steps
+
 			// To Do's:
 			// Implememt item take and drop case (for example wizard scroll)
 		}

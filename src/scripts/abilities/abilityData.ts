@@ -20,6 +20,7 @@ import {
 	SimpleParticleEffectValue,
 } from '../helpers/constants';
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
+import { EnumDictionary } from '../../../typings/custom';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -92,9 +93,6 @@ export const enum AbilityType {
 	HAIL_OF_FLAMES = 'hailOfFlames',
 	HAIL_OF_ICE = 'hailOfIce',
 	ICESPIKE = 'icespike',
-	DUSTNOVA = 'dustnova',
-	ROUND_HOUSE_KICK = 'roundhousekick',
-	HEALING_LIGHT = 'healinglight',
 	ARCANE_BLADE = 'arcaneBlade',
 	FIRE_CONE = 'fireCone',
 	FIRE_NOVA = 'fireNova',
@@ -119,7 +117,9 @@ export const enum AbilityType {
 	TELEPORT = 'teleport',
 }
 
-export const Abilities: { [type: string]: AbilityData } = {
+export type AbilityDataMap = EnumDictionary<AbilityType, AbilityData>;
+
+export const Abilities: AbilityDataMap = {
 	[AbilityType.NOTHING]: {
 		projectiles: 0,
 		cooldownMs: 0,
