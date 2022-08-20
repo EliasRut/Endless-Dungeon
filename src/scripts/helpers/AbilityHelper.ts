@@ -207,13 +207,15 @@ export default class AbilityHelper {
 	}
 	update(time: number, castAbilities: [AbilityType, number][]) {
 		castAbilities.forEach(([ability, abilityLevel]) => {
-			this.triggerAbility(
-				globalState.playerCharacter,
-				globalState.playerCharacter,
-				ability,
-				abilityLevel,
-				time
-			);
+			setTimeout(() => {
+				this.triggerAbility(
+					globalState.playerCharacter,
+					globalState.playerCharacter,
+					ability,
+					abilityLevel,
+					time
+				);
+			}, 300);
 		});
 
 		this.abilityEffects = this.abilityEffects.filter((effect) => !effect.destroyed);

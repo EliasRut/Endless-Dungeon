@@ -17,6 +17,7 @@ import {
 	getFacing8Dir,
 	updateMovingState,
 	isCollidingTile,
+	getTwoLetterFacingName,
 } from '../helpers/movement';
 import {
 	BaseFadingLabelFontSize,
@@ -57,7 +58,7 @@ import { AbilityType } from '../abilities/abilityData';
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
 
-const CASTING_SPEED_MS = 250;
+const CASTING_SPEED_MS = 450;
 
 const CONNECTION_POINT_THRESHOLD_DISTANCE = 32;
 const STEP_SOUND_TIME = 200;
@@ -129,6 +130,8 @@ export default class MainScene extends Phaser.Scene {
 
 	lastScriptUnpausing: number = Date.now();
 	lastPlayerPosition: { x: number; y: number } | undefined;
+
+	hasCasted: boolean = false;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -583,18 +586,29 @@ export default class MainScene extends Phaser.Scene {
 
 				// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
 				const hasMoved = xFacing !== 0 || yFacing !== 0;
-				const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
+				let playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
 				const isWalking =
 					isCasting ||
 					(this.mobilePadStick
 						? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
 						  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
 						: false);
+				if (isCasting && !this.hasCasted) {
+					playerAnimation = `player-cast-${getTwoLetterFacingName(
+						globalState.playerCharacter.currentFacing
+					)}`;
+				} else if (isCasting && this.hasCasted) {
+					playerAnimation = false;
+				}
 				if (playerAnimation) {
 					this.mainCharacter.play({
 						key: playerAnimation,
 						// duration: 5,
-						frameRate: isWalking ? NORMAL_ANIMATION_FRAME_RATE / 2 : NORMAL_ANIMATION_FRAME_RATE,
+						frameRate: isCasting
+							? NORMAL_ANIMATION_FRAME_RATE * 2
+							: isWalking
+							? NORMAL_ANIMATION_FRAME_RATE / 2
+							: NORMAL_ANIMATION_FRAME_RATE,
 						repeat: -1,
 					});
 				}
@@ -610,10 +624,17 @@ export default class MainScene extends Phaser.Scene {
 					this.lastStepLeft = undefined;
 				}
 
-				const speed =
-					isCasting || isWalking
-						? getCharacterSpeed(globalState.playerCharacter) / 2
-						: getCharacterSpeed(globalState.playerCharacter);
+				if (!isCasting) {
+					this.hasCasted = false;
+				} else {
+					this.hasCasted = true;
+				}
+
+				const speed = isCasting
+					? 0
+					: isWalking
+					? getCharacterSpeed(globalState.playerCharacter) / 2
+					: getCharacterSpeed(globalState.playerCharacter);
 
 				this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
 				this.mainCharacter.body.velocity.normalize().scale(speed);

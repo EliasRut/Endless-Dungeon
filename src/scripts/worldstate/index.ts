@@ -121,7 +121,14 @@ export class WorldState {
 		this.roomAssignment = JSON.parse(localStorage.getItem(WorldState.ROOMASSIGNMENT) || '{}');
 		this.inventory = JSON.parse(localStorage.getItem(WorldState.INVENTORY) || '{}');
 		// Reset cast times.
-		this.playerCharacter.abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity];
+		this.playerCharacter.abilityCastTime = [
+			-Infinity,
+			-Infinity,
+			-Infinity,
+			-Infinity,
+			-Infinity,
+			-Infinity,
+		];
 	}
 
 	clearState() {

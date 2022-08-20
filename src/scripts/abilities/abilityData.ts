@@ -156,7 +156,7 @@ export const Abilities: AbilityDataMap = {
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
-		cooldownMs: 250,
+		cooldownMs: 500,
 		damageMultiplier: 1,
 		// stun: 3000,
 		abilityName: 'Fireball',
