@@ -15,7 +15,11 @@ import AbilityEditor, {
 } from '../../scripts/scenes/AbilityEditor';
 import { EmitterInputBlock } from '../components/EmitterInputBlock';
 import { EmitterTintInputBlock } from '../components/EmitterTintInputBlock';
-import { AbilityData, ProjectileData } from '../../scripts/abilities/abilityData';
+import {
+	AbilityData,
+	ProjectileData,
+	ProjectileParticleData,
+} from '../../scripts/abilities/abilityData';
 
 const showGame = true;
 
@@ -224,11 +228,11 @@ export const AbilityEditorScreen = ({ user }: AbilityEditorScreenProps) => {
 												rotate: abilityData.emitterRotate,
 												lifespan: abilityData.emitterLifespan,
 												tint: abilityData.emitterTint,
-											},
-										},
+											} as ProjectileParticleData,
+										} as ProjectileData,
 										flavorText: '',
 										damageMultiplier: 1,
-									},
+									} as AbilityData,
 									activeAbilityId
 								)
 							}
