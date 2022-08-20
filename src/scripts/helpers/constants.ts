@@ -29,7 +29,7 @@ export const enum Faction {
 	PLAYER,
 	NPCS,
 	ENEMIES,
-	FOLLOWER,
+	ALLIES,
 }
 
 export const enum AbilityKey {

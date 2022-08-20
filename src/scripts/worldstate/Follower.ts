@@ -13,6 +13,6 @@ export default class Follower extends Character {
 	) {
 		super(id, animationBase, health, damage, movementSpeed);
 
-		this.faction = Faction.FOLLOWER;
+		this.faction = Faction.ALLIES;
 	}
 }
