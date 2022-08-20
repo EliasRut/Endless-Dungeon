@@ -11,7 +11,7 @@ import { ScriptTypeDropdown } from './ScriptTypeDropdown';
 
 export interface ScriptBlockProps {
 	scriptBlock: Partial<ScriptEntry>;
-	onChange: (value: string) => void;
+	onChange: (value: Partial<ScriptEntry>) => void;
 	onRemove: () => void;
 	knownQuests: {
 		id: string;
@@ -120,7 +120,11 @@ export const ScriptBlock: (props: ScriptBlockProps) => JSX.Element = ({
 		default:
 			return (
 				<ScriptBlockContainer>
-					<ScriptTypeDropdown value="-" onChange={onChange} onRemove={onRemove} />
+					<ScriptTypeDropdown
+						value="-"
+						onChange={(scriptType: any) => onChange({ type: scriptType })}
+						onRemove={onRemove}
+					/>
 				</ScriptBlockContainer>
 			);
 	}

@@ -11,6 +11,7 @@ import RoomAssignment from './RoomAssignment';
 import { RoomCoordinates } from './RoomCoordinates';
 import ScriptState from './ScriptState';
 import { EmptyInventory } from './Inventory';
+import { ConditionalAbilityDataMap } from '../abilities/abilityData';
 
 /*
 	This file contains the full, current game state. It is intended to handle all information that
@@ -39,6 +40,7 @@ export class WorldState {
 	public roomAssignment: { [name: string]: RoomAssignment } = {};
 	public inventory: Inventory;
 	public itemList: Item[];
+	public abilityData: ConditionalAbilityDataMap;
 
 	public static readonly CONTENTPACKAGE: string = 'contentPackages';
 	public static readonly PLAYERCHARACTER: string = 'playerCharacter';
