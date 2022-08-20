@@ -7,13 +7,6 @@ const DEFAULT_HEALTH = 100;
 const DEFAULT_DAMAGE = 1;
 const DEFAULT_MOVEMENTSPEED = 200;
 
-// Stats are increased by this amount, given by enchantments
-export const enchantmentModifiers = {
-	damage: 0,
-	luck: 0,
-	maxHealth: 0,
-	movementSpeed: 0,
-};
 
 // This class handles the players character and all mechanical events associated with it.
 export default class PlayerCharacter extends Character {
@@ -21,6 +14,14 @@ export default class PlayerCharacter extends Character {
 	public y = 0;
 	public width = 8;
 	public height = 8;
+
+	// Stats are increased by this amount, given by enchantments
+	public enchantmentModifiers = {
+		damage: 0,
+		luck: 0,
+		maxHealth: 0,
+		movementSpeed: 0,
+	};
 
 	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
 

@@ -19,7 +19,6 @@ import Item from '../worldstate/Item';
 import { EquipmentSlot, BAG_BOXES_X, BAG_BOXES_Y } from './constants';
 import { ItemData, CatalystKey, AmuletKey } from '../../items/itemData';
 import { EnchantmentName } from '../../items/enchantmentData';
-import { enchantmentModifiers } from '../worldstate/PlayerCharacter';
 
 const BASE_HEALTH = 100;
 const BASE_MOVEMENT_SPEED = 200;

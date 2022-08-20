@@ -19,7 +19,6 @@ import {
 	getItemTexture,
 } from '../../items/itemData';
 import PlayerCharacter, {
-	enchantmentModifiers,
 	updateAbility,
 } from '../worldstate/PlayerCharacter';
 import { getCatalystAbility } from '../helpers/item';
@@ -478,8 +477,10 @@ export default class InventoryScreen extends OverlayScreen {
 		});
 	}
 
+	// enchantment = undefined => erase all enchantment modifiers.
 	applyEnchantment(enchantment?: EnchantmentName) {
-		if (enchantment === undefined) {
+		let enchantmentModifiers = globalState.playerCharacter.enchantmentModifiers;
+		if (enchantment === undefined) {			
 			Object.entries(enchantmentModifiers).forEach((mod) => {
 				let stat = mod[0] as keyof typeof enchantmentModifiers;
 				globalState.playerCharacter[stat] -= mod[1];
