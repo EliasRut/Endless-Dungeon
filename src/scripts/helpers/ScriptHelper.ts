@@ -391,6 +391,10 @@ export default class ScriptHelper {
 				);
 				break;
 			}
+			case 'despawnFollower': {
+				this.scene.despawnFollower();
+				break;
+			}
 			// To Do's:
 			// Implememt item take and drop case (for example wizard scroll)
 		}

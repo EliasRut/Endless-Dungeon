@@ -287,6 +287,17 @@ export default class MainScene extends Phaser.Scene {
 		}
 	}
 
+	despawnFollower() {
+		if (this.follower) {
+			this.follower.destroy(true);
+			this.follower = undefined;
+		}
+		if (this.nPCAvatar) {
+			this.nPCAvatar.destroy(true);
+			this.nPCAvatar = undefined;
+		}
+	}
+
 	spawnFollower(x: number, y: number, type: string, id: string) {
 		this.follower = new FollowerToken(this, x, y, type, id);
 		this.follower.setScale(SCALE);
