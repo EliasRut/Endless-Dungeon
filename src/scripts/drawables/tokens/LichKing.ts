@@ -3,7 +3,7 @@ import { getFacing8Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
-import EnemyToken from './EnemyToken';
+import EnemyToken, { slainEnemy } from './EnemyToken';
 import { isCollidingTile } from '../../helpers/movement';
 import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
@@ -59,12 +59,10 @@ export default class LichtKingToken extends EnemyToken {
 
 		// check death
 		if (this.stateObject.health <= 0) {
-			this.dropFixedItem('book');
-			this.dropRandomItem(this.level + 1);
-			this.dropRandomItem(this.level + 1);
-			this.dropRandomItem(this.level + 1);
+			this.dropNonEquippableItem('book');
+			this.dropEquippableItem(this.level, slainEnemy.BOSS);
 			this.emitter.stop();
-			this.destroy();
+			this.die();
 			return;
 		}
 

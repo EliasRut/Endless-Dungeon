@@ -24,7 +24,7 @@ export default class PlayerCharacter extends Character {
 
 	public abilityCastTime = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
 
-	public activeSummons: Array<{ id: string; summoningType: string }> = [];
+	public activeSummons: { id: string; summoningType: string }[] = [];
 
 	constructor() {
 		// tslint:disable-next-line: no-magic-numbers
@@ -34,9 +34,9 @@ export default class PlayerCharacter extends Character {
 
 	public abilityKeyMapping = {
 		[AbilityKey.ONE]: AbilityType.FIREBALL,
-		[AbilityKey.TWO]: AbilityType.ICESPIKE,
-		[AbilityKey.THREE]: AbilityType.DUSTNOVA,
-		[AbilityKey.FOUR]: AbilityType.ROUND_HOUSE_KICK,
+		[AbilityKey.TWO]: AbilityType.NOTHING,
+		[AbilityKey.THREE]: AbilityType.NOTHING,
+		[AbilityKey.FOUR]: AbilityType.NOTHING,
 		[AbilityKey.FIVE]: AbilityType.NOTHING,
 		[AbilityKey.SPACE]: AbilityType.TELEPORT,
 	};

@@ -37,11 +37,11 @@ export interface RandomItemOptions {
 
 const randomItemDefaultOptionss: RandomItemOptions = {
 	level: 1,
-	sourceWeight: 1,
-	catalystWeight: 1,
-	armorWeight: 1,
-	ringWeight: 1,
-	amuletWeight: 1,
+	sourceWeight: 0,
+	catalystWeight: 0,
+	armorWeight: 0,
+	ringWeight: 0,
+	amuletWeight: 0,
 };
 
 export const generateRandomItem = (options: Partial<RandomItemOptions>) => {

@@ -1,4 +1,4 @@
-import { EquipmentSlot } from '../helpers/constants';
+import { ColorsOfMagic, EquipmentSlot } from '../helpers/constants';
 import {
 	Amulet,
 	Catalyst,
@@ -48,6 +48,7 @@ export default interface Inventory {
 	equippedRightRing?: RingKey;
 	equippedAmulet?: AmuletKey;
 	bag: Partial<Record<UneqippableItem, number>>;
+	essences: Record<ColorsOfMagic, number>;
 }
 
 export const EmptyInventory: Inventory = {
@@ -78,10 +79,10 @@ export const EmptyInventory: Inventory = {
 		[Ring.WILD]: { level: 1, enchantment: 'None' },
 	},
 	sources: {
-		[Source.FIRE]: { level: 1, enchantment: 'GreaterWolf' },
-		[Source.FORCE]: { level: 1, enchantment: 'GreaterBear' },
-		[Source.ICE]: { level: 1, enchantment: 'GreaterCat' },
-		[Source.NECROTIC]: { level: 1, enchantment: 'GreaterRabbit' },
+		[Source.FIRE]: { level: 1, enchantment: 'None' },
+		[Source.FORCE]: { level: 1, enchantment: 'None' },
+		[Source.ICE]: { level: 1, enchantment: 'None' },
+		[Source.NECROTIC]: { level: 1, enchantment: 'None' },
 	},
 	catalysts: {
 		[Catalyst.CONE]: { level: 1, enchantment: 'None' },
@@ -96,4 +97,5 @@ export const EmptyInventory: Inventory = {
 		[ChestPiece.ROBE]: { level: 1, enchantment: 'None' },
 	},
 	bag: {},
+	essences: {flux: 0, metal: 0, blood: 0, change: 0, death: 0, royal: 0, passion: 0, wild: 0},
 };

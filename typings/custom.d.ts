@@ -1,7 +1,12 @@
-import { AbilityType } from '../src/scripts/abilities/abilityData';
+import { AbilityType, AbilityData } from '../src/scripts/abilities/abilityData';
 import { ColorsOfMagic } from '../src/scripts/helpers/constants';
 import { RandomItemOptions } from '../src/scripts/helpers/item';
 import { QuestScripts } from '../src/scripts/helpers/quests';
+import Follower from '../src/scripts/worldstate/Follower';
+
+export type EnumDictionary<T extends string | symbol | number, U> = {
+	[K in T]: U;
+};
 
 export type NpcScriptStep = ScriptWait | ScriptAnimation | ScriptMove | ScriptWalk;
 
@@ -176,6 +181,17 @@ export interface ScriptSetQuestState {
 	questState: 'new' | 'ongoing' | 'finished';
 }
 
+export interface ScriptSetFollowerData {
+	type: 'setFollowerData';
+	follower: Follower;
+	followerId: string;
+}
+
+export interface ScriptSpawnFollower {
+	type: 'spawnFollower';
+	followerId: string;
+}
+
 export type ScriptEntry =
 	| ScriptWait
 	| ScriptDialog
@@ -194,7 +210,9 @@ export type ScriptEntry =
 	| ScriptPlaceItem
 	| ScriptPausedCondition
 	| ScriptSetQuestState
-	| ScriptSpawnItem;
+	| ScriptSpawnItem
+	| ScriptSetFollowerData
+	| ScriptSpawnFollower;
 
 export interface Scripting {
 	onEntry?: ScriptEntry[];
@@ -312,4 +330,20 @@ export interface Quest {
 export interface ItemWithCount {
 	id: string;
 	count: number;
+}
+
+export interface AbilityListingConditions {
+	minimumLevel?: number;
+	maximumLevel?: number;
+}
+
+export interface ConditionalAbilityListing {
+	abilityType: AbilityType;
+	conditions?: AbilityListingConditions;
+	abilityId: string;
+}
+
+export interface ConditionalAbilityData {
+	conditions?: AbilityListingConditions;
+	data: AbilityData;
 }

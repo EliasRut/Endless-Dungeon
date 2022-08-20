@@ -7,7 +7,7 @@ import {
 	getEquipmentDataForItemKey,
 	equipItemIfNoneEquipped,
 } from '../../helpers/inventory';
-import { SCALE } from '../../helpers/constants';
+import { ColorsOfMagic, SCALE } from '../../helpers/constants';
 
 const MAX_INTERACTION_DISTANCE = 30;
 const HEAL_PERCENTAGE = 1 / 4; // health
@@ -38,6 +38,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		this.tile = (this.scene as MainScene).tileLayer.getTileAt(this.tileX, this.tileY);
 		this.setScale(SCALE);
 		scene.add.existing(this);
+		this.playItemAnimation();
 	}
 
 	loadIcon() {}
@@ -53,6 +54,8 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 					globalState.playerCharacter.health + heal > globalState.playerCharacter.maxHealth
 						? globalState.playerCharacter.maxHealth
 						: globalState.playerCharacter.health + heal;
+			} else if (this.isEssence()){				
+				globalState.inventory.essences[this.itemKey as ColorsOfMagic]++;
 			} else {
 				if (isEquippable(this.itemKey)) {
 					const equipmentData = getEquipmentDataForItemKey(this.itemKey as EquipmentKey);
@@ -76,10 +79,14 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		}
 	}
 
-	// public playItemAnimation() {
-	// 	if(this.itemKey === 'source-fire') {
-	// 		this.setScale(1);
-	// 		this.play('source_fire1');
-	// 	}
-	// }
+	public playItemAnimation() {
+		if (this.isEssence()) {
+			this.play({ key: 'essence_' + this.itemKey, repeat: -1 });
+		}
+	}
+	public isEssence() {
+		if (Object.values(ColorsOfMagic).includes(this.itemKey as ColorsOfMagic)) {
+			return true;
+		} else return false;
+	}
 }

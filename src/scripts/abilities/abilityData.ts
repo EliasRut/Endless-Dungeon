@@ -20,7 +20,10 @@ import {
 	MinMaxParticleEffectValue,
 	SimpleParticleEffectValue,
 } from '../helpers/constants';
+// tslint:disable-next-line: max-line-length
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
+import { ConditionalAbilityData, EnumDictionary } from '../../../typings/custom';
+import globalState from '../worldstate/index';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -92,9 +95,6 @@ export const enum AbilityType {
 	HAIL_OF_FLAMES = 'hailOfFlames',
 	HAIL_OF_ICE = 'hailOfIce',
 	ICESPIKE = 'icespike',
-	DUSTNOVA = 'dustnova',
-	ROUND_HOUSE_KICK = 'roundhousekick',
-	HEALING_LIGHT = 'healinglight',
 	ARCANE_BLADE = 'arcaneBlade',
 	FIRE_CONE = 'fireCone',
 	FIRE_NOVA = 'fireNova',
@@ -120,7 +120,11 @@ export const enum AbilityType {
 	CHARM = 'charm'
 }
 
-export const Abilities: { [type: string]: AbilityData } = {
+export type ConditionalAbilityDataMap = EnumDictionary<AbilityType, ConditionalAbilityData[]>;
+
+export type AbilityDataMap = EnumDictionary<AbilityType, AbilityData>;
+
+export const Abilities: AbilityDataMap = {
 	[AbilityType.NOTHING]: {
 		projectiles: 0,
 		cooldownMs: 0,
@@ -153,7 +157,7 @@ export const Abilities: { [type: string]: AbilityData } = {
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
-		cooldownMs: 250,
+		cooldownMs: 500,
 		damageMultiplier: 1,
 		//stun: 3000,
 		abilityName: 'Fireball',
@@ -875,4 +879,23 @@ export const Abilities: { [type: string]: AbilityData } = {
 		flavorText: `The Enemy falls in love^^`,
 		icon: ['icon-abilities', 0],
 	},
+};
+
+export const getRelevantAbilityVersion = (abilityType: AbilityType, abilityLevel: number) => {
+	const options = globalState.abilityData[abilityType] || [{ data: Abilities[abilityType] }];
+	return options.find((option) => {
+		return (
+			!option.conditions ||
+			Object.entries(option.conditions).every(([condition, conditionValue]) => {
+				switch (condition) {
+					case 'minimumLevel':
+						return abilityLevel >= conditionValue;
+					case 'maximumLevel':
+						return abilityLevel <= conditionValue;
+					default:
+						return true;
+				}
+			})
+		);
+	})!.data;
 };

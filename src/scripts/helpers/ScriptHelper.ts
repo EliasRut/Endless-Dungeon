@@ -374,6 +374,23 @@ export default class ScriptHelper {
 				}
 				break;
 			}
+			case 'setFollowerData': {
+				cleanUpStep = true;
+				globalState.followers[currentStep.follower.id] = currentStep.follower;
+				break;
+			}
+			case 'spawnFollower': {
+				cleanUpStep = true;
+				globalState.activeFollower = currentStep.followerId;
+				const playerCharacter = globalState.playerCharacter;
+				this.scene.spawnFollower(
+					playerCharacter.x,
+					playerCharacter.y,
+					currentStep.followerId,
+					currentStep.followerId
+				);
+				break;
+			}
 			// To Do's:
 			// Implememt item take and drop case (for example wizard scroll)
 		}

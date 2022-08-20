@@ -80,7 +80,7 @@ export const enum EquipmentSlot {
 	LEFT_RING = 'leftRing',
 }
 
-export const enum ColorsOfMagic {
+export enum ColorsOfMagic {
 	FLUX = 'flux',
 	METAL = 'metal',
 	CHANGE = 'change',
