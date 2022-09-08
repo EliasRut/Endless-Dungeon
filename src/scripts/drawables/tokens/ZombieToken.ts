@@ -1,5 +1,6 @@
 import {
 	ColorsOfMagic,
+	DEBUG_PATHFINDING,
 	facingToSpriteNameMap,
 	KNOCKBACK_TIME,
 	NORMAL_ANIMATION_FRAME_RATE,
@@ -10,6 +11,7 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken, { slainEnemy } from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
+import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 
 const BASE_ATTACK_DAMAGE = 3;
 const REGULAR_ATTACK_RANGE = 25;
@@ -88,8 +90,8 @@ export default class ZombieToken extends EnemyToken {
 		}
 
 		// Attack, if a target exists and is alive
-		const tx = this.target.x;
-		const ty = this.target.y;
+		let tx = this.target.x;
+		let ty = this.target.y;
 		const distance = this.getDistanceToWorldStatePosition(tx, ty);
 
 		if (
@@ -113,27 +115,7 @@ export default class ZombieToken extends EnemyToken {
 			this.attackedAt + this.stateObject.attackTime < time &&
 			this.attackRange < distance
 		) {
-			const totalDistance = Math.abs(tx * SCALE - this.x) + Math.abs(ty * SCALE - this.y);
-			const xSpeed =
-				((tx * SCALE - this.x) / totalDistance) *
-				this.stateObject.movementSpeed *
-				this.stateObject.slowFactor;
-			const ySpeed =
-				((ty * SCALE - this.y) / totalDistance) *
-				this.stateObject.movementSpeed *
-				this.stateObject.slowFactor;
-			this.setVelocityX(xSpeed);
-			this.setVelocityY(ySpeed);
-			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const animation = updateMovingState(this.stateObject, true, newFacing);
-			if (animation) {
-				if (this.scene.game.anims.exists(animation)) {
-					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
-				} else {
-					console.log(`Animation ${animation} does not exist.`);
-					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
-				}
-			}
+			super.walkToWaypoint();
 			// Just stand around and do nothing, otherwise
 		} else {
 			this.setVelocityX(0);

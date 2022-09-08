@@ -7,6 +7,7 @@ import {
 } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
+import globalState from '../../worldstate/index';
 
 const BODY_RADIUS = 4;
 const VISIBILITY_DELAY = 50;
@@ -14,6 +15,27 @@ const VISIBILITY_DELAY = 50;
 const RED_VAL = 0x010000;
 const GREEN_VAL = 0x000100;
 const BLUE_VAL = 0x000001;
+
+const getBodyOffset = (facing: Facings) => {
+	switch (facing) {
+		case Facings.NORTH:
+			return { x: 4, y: 8 };
+		case Facings.EAST:
+			return { x: 0, y: 4 };
+		case Facings.WEST:
+			return { x: 8, y: 4 };
+		case Facings.SOUTH:
+			return { x: 4, y: 0 };
+		case Facings.NORTH_EAST:
+			return { x: 0, y: 8 };
+		case Facings.SOUTH_EAST:
+			return { x: 0, y: 0 };
+		case Facings.NORTH_WEST:
+			return { x: 8, y: 8 };
+		case Facings.SOUTH_WEST:
+			return { x: 8, y: 0 };
+	}
+};
 
 export default class TrailingParticleProjectileEffect extends TargetingEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -32,7 +54,10 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 		this.setDepth(UiDepths.TOKEN_FOREGROUND_LAYER);
 		this.setScale(SCALE);
 		scene.physics.add.existing(this);
-		this.body.setCircle(BODY_RADIUS, 0, 0);
+
+		const bodyOffset = getBodyOffset(facing);
+
+		this.body.setCircle(BODY_RADIUS, bodyOffset.x, bodyOffset.y);
 		this.body.setMass(1);
 
 		this.projectileData = projectileData;
@@ -93,10 +118,19 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 			);
 		}
 
+		this.lightingRadius = 4;
+		this.lightingStrength = undefined;
+		this.lightingMinStrength = 0;
+		this.lightingMaxStrength = 4;
+		this.lightingFrequency = 1000;
+		this.lightingSeed = globalState.gameTime - 100;
+		this.body.destroy();
 		setTimeout(() => {
 			this.particles.destroy();
 		}, 1000);
-		super.destroy();
+		setTimeout(() => {
+			super.destroy();
+		}, 500);
 	}
 
 	update(time: number) {

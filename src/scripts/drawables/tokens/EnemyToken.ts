@@ -5,6 +5,7 @@ import {
 	VISITED_TILE_TINT,
 	NORMAL_ANIMATION_FRAME_RATE,
 	ColorsOfMagic,
+	DEBUG_PATHFINDING,
 } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
@@ -14,6 +15,9 @@ import MainScene from '../../scenes/MainScene';
 import { generateRandomItem } from '../../helpers/item';
 import { RandomItemOptions } from '../../helpers/item';
 import Character from '../../worldstate/Character';
+import { findNextPathSegmentTo } from '../../helpers/pathfindingHelper';
+import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
+import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 
 const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;
@@ -45,12 +49,15 @@ export default abstract class EnemyToken extends CharacterToken {
 	aggroLinger: number = 3000;
 	aggro: boolean = false;
 	target: Phaser.Geom.Point;
+	nextWaypoint: [number, number][] | undefined;
 	level: number;
 	color: ColorsOfMagic;
 	targetStateObject: Character | undefined;
+	lastTileX: number;
+	lastTileY: number;
 
 	protected showHealthbar() {
-		return true;
+		return !!this.scene.showHealthbars;
 	}
 
 	constructor(scene: MainScene, x: number, y: number, tokenName: string, id: string) {
@@ -145,6 +152,24 @@ export default abstract class EnemyToken extends CharacterToken {
 		) {
 			this.aggro = true;
 			this.lastUpdate = time;
+			const currentTileX = Math.round(this.stateObject.x / TILE_WIDTH);
+			const currentTileY = Math.round(this.stateObject.y / TILE_HEIGHT);
+			if (
+				this.lastTileX !== currentTileX ||
+				this.lastTileY !== currentTileY ||
+				this.target.x !== closestTarget.x ||
+				this.target.y !== closestTarget.y
+			) {
+				this.lastTileX = currentTileX;
+				this.lastTileY = currentTileY;
+				this.nextWaypoint = findNextPathSegmentTo(
+					currentTileX,
+					currentTileY,
+					Math.round(this.target.x / TILE_WIDTH),
+					Math.round(this.target.y / TILE_HEIGHT),
+					this.scene.navigationalMap
+				);
+			}
 			this.target.x = closestTarget.x;
 			this.target.y = closestTarget.y;
 			this.targetStateObject = closestTarget;
@@ -152,6 +177,45 @@ export default abstract class EnemyToken extends CharacterToken {
 		} else if (this.aggro && this.lastUpdate + this.aggroLinger < time) {
 			this.aggro = false;
 			this.targetStateObject = undefined;
+		}
+	}
+
+	walkToWaypoint() {
+		let tx = this.target.x;
+		let ty = this.target.y;
+		[tx, ty] = this.nextWaypoint
+			? [this.nextWaypoint[0][0] * TILE_WIDTH, this.nextWaypoint[0][1] * TILE_HEIGHT]
+			: [tx, ty];
+		if (DEBUG_PATHFINDING) {
+			this.nextWaypoint?.forEach((waypoint) => {
+				const tile = this.scene.tileLayer.getTileAt(waypoint[0], waypoint[1]);
+				if (tile) {
+					tile.tint = 0xff0000;
+				}
+			});
+		}
+		const totalDistance =
+			Math.abs(tx * SCALE - this.body.x) + Math.abs(ty * SCALE - this.body.y) || 1;
+		const xSpeed =
+			((tx * SCALE - this.body.x) / totalDistance) *
+			this.stateObject.movementSpeed *
+			this.stateObject.slowFactor;
+		const ySpeed =
+			((ty * SCALE - this.body.y) / totalDistance) *
+			this.stateObject.movementSpeed *
+			this.stateObject.slowFactor;
+		this.setVelocityX(xSpeed);
+		this.setVelocityY(ySpeed);
+		const newFacing = getFacing4Dir(xSpeed, ySpeed);
+		const animation = updateMovingState(this.stateObject, true, newFacing);
+		if (animation) {
+			if (this.scene.game.anims.exists(animation)) {
+				this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
+			} else {
+				// tslint:disable-next-line: no-console
+				console.log(`Animation ${animation} does not exist.`);
+				this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
+			}
 		}
 	}
 

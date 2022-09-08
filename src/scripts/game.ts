@@ -7,7 +7,7 @@ import MapEditor from './scenes/MapEditor';
 import PreloadScene from './scenes/PreloadScene';
 import RoomPreloaderScene from './scenes/RoomPreloaderScene';
 import NpcEditor from './scenes/NpcEditor';
-import { MODE } from './helpers/constants';
+import { DEBUG_PHYSICS, MODE } from './helpers/constants';
 import NpcGenerationScene from './scenes/NpcGenerationScene';
 import AbilityEditor from './scenes/AbilityEditor';
 import AbilitiesPreloaderScene from './scenes/AbilitiesPreloaderScene';
@@ -80,7 +80,7 @@ export const getGameConfig = (parent: HTMLElement, mode: MODE) => ({
 	physics: {
 		default: 'arcade',
 		arcade: {
-			debug: false,
+			debug: DEBUG_PHYSICS,
 		},
 	},
 	render: {

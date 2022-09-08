@@ -485,13 +485,23 @@ export const Abilities: AbilityDataMap = {
 	},
 	[AbilityType.EXPLODING_CORPSE]: {
 		projectiles: 16,
+
 		projectileData: {
 			spread: [-1, 1],
 			velocity: 220,
-			drag: 800,
+			drag: 0,
 			xOffset: 0,
 			yOffset: 0,
-			effect: FireBallEffect,
+			projectileImage: 'empty-tile',
+			particleData: {
+				particleImage: 'fire',
+				alpha: { start: 1, end: 0 },
+				scale: { start: 1, end: 0.2 },
+				speed: 20,
+				rotate: { min: -180, max: 180 },
+				lifespan: { min: 200, max: 400 },
+			},
+			effect: TrailingParticleProjectileEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			timeToLive: 300,

@@ -15,6 +15,13 @@ export default class AbilityEffect extends Phaser.Physics.Arcade.Sprite {
 	explodeOnDestruction: boolean;
 	hitEnemyTokens: CharacterToken[] = [];
 	particleDeathZone: { contains: (x: number, y: number) => boolean };
+
+	lightingRadius: number | undefined = 2;
+	lightingStrength: number | undefined = 2;
+	lightingMinStrength: number | undefined = undefined;
+	lightingMaxStrength: number | undefined = undefined;
+	lightingFrequency: number | undefined = undefined;
+	lightingSeed: number | undefined = undefined;
 	constructor(
 		scene: Phaser.Scene,
 		x: number,

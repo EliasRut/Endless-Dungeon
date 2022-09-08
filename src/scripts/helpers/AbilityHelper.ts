@@ -13,7 +13,7 @@ import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import { Facings, Faction, PossibleTargets, SCALE } from './constants';
-import { getFacing4Dir, getRotationInRadiansForFacing } from './movement';
+import { getFacing8Dir, getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
 import Enemy from '../worldstate/Enemy';
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
@@ -77,7 +77,7 @@ export default class AbilityHelper {
 				pointOfOrigin.x + (pointOfOrigin.width || 0) / 2 + xMultiplier * projectileData!.xOffset,
 				pointOfOrigin.y + (pointOfOrigin.height || 0) / 2 + yMultiplier * projectileData!.yOffset,
 				usedAbilityData.spriteName || '',
-				getFacing4Dir(xMultiplier, yMultiplier),
+				getFacing8Dir(xMultiplier, yMultiplier),
 				projectileData
 			);
 			if (projectileData?.targeting) {

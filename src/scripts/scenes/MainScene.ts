@@ -21,6 +21,7 @@ import {
 } from '../helpers/movement';
 import {
 	BaseFadingLabelFontSize,
+	DEBUG_PHYSICS,
 	Faction,
 	FadingLabelData,
 	FadingLabelSize,
@@ -29,7 +30,7 @@ import {
 	UiDepths,
 } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
-import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
+import DynamicLightingHelper, { LightingSource } from '../helpers/DynamicLightingHelper';
 import PlayerCharacterAvatar from '../drawables/ui/PlayerCharacterAvatar';
 import NPCAvatar from '../drawables/ui/NPCAvatar';
 import ScriptHelper from '../helpers/ScriptHelper';
@@ -127,6 +128,8 @@ export default class MainScene extends Phaser.Scene {
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
 	overlayLayer: Phaser.Tilemaps.TilemapLayer;
 
+	navigationalMap: boolean[][];
+
 	useDynamicLighting = false;
 	dungeonRunData: DungeonRunData;
 
@@ -138,6 +141,8 @@ export default class MainScene extends Phaser.Scene {
 	lastPlayerPosition: { x: number; y: number } | undefined;
 
 	hasCasted: boolean = false;
+
+	showHealthbars: boolean = true;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -167,7 +172,8 @@ export default class MainScene extends Phaser.Scene {
 			this.dynamicLightingHelper = new DynamicLightingHelper(
 				this.tileLayer,
 				this.decorationLayer,
-				this.overlayLayer
+				this.overlayLayer,
+				this
 			);
 		}
 
@@ -302,6 +308,10 @@ export default class MainScene extends Phaser.Scene {
 		} else {
 			this.sound.play('score-dungeon', { volume: 0.08, loop: true });
 		}
+
+		if (DEBUG_PHYSICS) {
+			this.renderDebugGraphics();
+		}
 	}
 
 	despawnFollower() {
@@ -418,6 +428,19 @@ export default class MainScene extends Phaser.Scene {
 		this.decorationLayer = decorationLayer;
 		this.overlayLayer = overlayLayer;
 
+		this.navigationalMap = [];
+		for (let y = 0; y < this.tileLayer.height; y++) {
+			this.navigationalMap[y] = [];
+			for (let x = 0; x < this.tileLayer.width; x++) {
+				const tile = this.tileLayer.getTileAt(x, y);
+				const decorationTile = this.decorationLayer.getTileAt(x, y);
+				this.navigationalMap[y][x] =
+					tile &&
+					!isCollidingTile(tile.index) &&
+					(!decorationTile || !isCollidingTile(decorationTile.index));
+			}
+		}
+
 		this.tileLayer.setDepth(UiDepths.BASE_TILE_LAYER);
 		this.tileLayer.setScale(SCALE);
 		this.decorationLayer.setDepth(UiDepths.DECORATION_TILE_LAYER);
@@ -495,6 +518,7 @@ export default class MainScene extends Phaser.Scene {
 
 	update(globalTime: number, delta: number) {
 		globalState.gameTime += delta;
+
 		this.fpsText.update();
 		this.minimap?.update();
 		this.keyboardHelper.updateGamepad();
@@ -698,7 +722,7 @@ export default class MainScene extends Phaser.Scene {
 		this.playerCharacterAvatar.update(cooldowns);
 
 		if (this.useDynamicLighting && this.dynamicLightingHelper) {
-			this.dynamicLightingHelper.updateDynamicLighting();
+			this.dynamicLightingHelper.updateDynamicLighting(globalState.gameTime);
 		}
 
 		// Updated npcs
@@ -872,5 +896,27 @@ export default class MainScene extends Phaser.Scene {
 		} else {
 			return this.npcMap[stateObject.id];
 		}
+	}
+
+	getLightingSources(): LightingSource[] {
+		return this.abilityHelper.abilityEffects.map((abilityEffect) => {
+			return {
+				x: Math.round(abilityEffect.x / TILE_WIDTH / SCALE),
+				y: Math.round(abilityEffect.y / TILE_HEIGHT / SCALE),
+				radius: abilityEffect.lightingRadius || 2,
+				strength:
+					abilityEffect.lightingStrength !== undefined
+						? abilityEffect.lightingStrength || 2
+						: undefined,
+				...(abilityEffect.lightingMinStrength !== undefined
+					? {
+							minStrength: abilityEffect.lightingMinStrength,
+							maxStrength: abilityEffect.lightingMaxStrength,
+							frequency: abilityEffect.lightingFrequency,
+							seed: abilityEffect.lightingSeed,
+					  }
+					: {}),
+			};
+		});
 	}
 }

@@ -81,11 +81,11 @@ export const enum EquipmentSlot {
 }
 
 export const statDisplayNames = {
-	'maxHealth' : 'Maxmum Health',
-	'damage' : 'Damage',
-	'luck' : 'Luck',
-	'movementSpeed' : 'Movement Speed'
-}
+	maxHealth: 'Maxmum Health',
+	damage: 'Damage',
+	luck: 'Luck',
+	movementSpeed: 'Movement Speed',
+};
 
 export enum ColorsOfMagic {
 	FLUX = 'flux',
@@ -395,3 +395,6 @@ export const convertEmitterDataToScaledValues = (
 		return obj;
 	}, {} as any) as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig;
 };
+
+export const DEBUG_PHYSICS = false;
+export const DEBUG_PATHFINDING = true;
