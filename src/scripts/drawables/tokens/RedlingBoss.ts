@@ -3,8 +3,10 @@ import { getFacing8Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
-import EnemyToken, { slainEnemy } from './EnemyToken';
+import EnemyToken from './EnemyToken';
 import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
+import { UneqippableItem } from '../../../items/itemData';
+import { SlainEnemy } from '../../enemies/enemyData';
 
 const ATTACK_RANGE = 80;
 
@@ -51,8 +53,8 @@ export default class RedlingBossToken extends EnemyToken {
 
 		// check death
 		if (this.stateObject.health <= 0) {
-			this.dropNonEquippableItem('book');
-			this.dropEquippableItem(this.level, slainEnemy.BOSS);			
+			this.dropNonEquippableItem(UneqippableItem.MYSTIC_BOOK);
+			this.dropEquippableItem(this.level, SlainEnemy.BOSS);
 			this.emitter.stop();
 			this.die();
 			return;

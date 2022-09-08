@@ -9,9 +9,11 @@ import {
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import EnemyToken, { slainEnemy } from './EnemyToken';
+import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
+import { SlainEnemy } from '../../enemies/enemyData';
+import { UneqippableItem } from '../../../items/itemData';
 
 const BASE_ATTACK_DAMAGE = 3;
 const REGULAR_ATTACK_RANGE = 25;
@@ -60,11 +62,11 @@ export default class ZombieToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropEquippableItem(this.level, slainEnemy.NORMAL);
+				this.dropEquippableItem(this.level, SlainEnemy.NORMAL);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
-				this.dropNonEquippableItem('health');
+				this.dropNonEquippableItem(UneqippableItem.HEALTH_POTION);
 			}
-			this.dropNonEquippableItem('essence');
+			this.dropNonEquippableItem(UneqippableItem.ESSENCE);
 			this.dead = true;
 			this.die();
 			return;

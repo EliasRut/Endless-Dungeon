@@ -88,6 +88,75 @@ export const CatalystData: Record<Catalyst, CatalystItem> = {
 	} as CatalystItem,
 };
 
+export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystItem) => {
+	if (offHand.catalystType === Catalyst.CONE) {
+		switch (baseAbility) {
+			case AbilityType.ARCANE_BOLT: {
+				return AbilityType.ARCANE_CONE;
+			}
+			case AbilityType.NECROTIC_BOLT: {
+				return AbilityType.NECROTIC_CONE;
+			}
+			case AbilityType.ICESPIKE: {
+				return AbilityType.ICE_CONE;
+			}
+			case AbilityType.FIREBALL:
+			default: {
+				return AbilityType.FIRE_CONE;
+			}
+		}
+	}
+	if (offHand.catalystType === Catalyst.NOVA) {
+		switch (baseAbility) {
+			case AbilityType.ARCANE_BOLT: {
+				return AbilityType.ARCANE_NOVA;
+			}
+			case AbilityType.NECROTIC_BOLT: {
+				return AbilityType.NECROTIC_NOVA;
+			}
+			case AbilityType.ICESPIKE: {
+				return AbilityType.ICE_NOVA;
+			}
+			case AbilityType.FIREBALL:
+			default: {
+				return AbilityType.FIRE_NOVA;
+			}
+		}
+	}
+	if (offHand.catalystType === Catalyst.SUMMON) {
+		switch (baseAbility) {
+			case AbilityType.ARCANE_BOLT: {
+				return AbilityType.ARCANE_SUMMON_CIRCELING;
+			}
+			case AbilityType.NECROTIC_BOLT: {
+				return AbilityType.NECROTIC_SUMMON_CIRCELING;
+			}
+			case AbilityType.ICESPIKE: {
+				return AbilityType.ICE_SUMMON_CIRCELING;
+			}
+			case AbilityType.FIREBALL:
+			default: {
+				return AbilityType.FIRE_SUMMON_CIRCELING;
+			}
+		}
+	}
+	switch (baseAbility) {
+		case AbilityType.ICESPIKE: {
+			return AbilityType.HAIL_OF_ICE;
+		}
+		case AbilityType.ARCANE_BOLT: {
+			return AbilityType.HAIL_OF_BOLTS;
+		}
+		case AbilityType.NECROTIC_BOLT: {
+			return AbilityType.HAIL_OF_DEATH;
+		}
+		case AbilityType.FIREBALL:
+		default: {
+			return AbilityType.HAIL_OF_FLAMES;
+		}
+	}
+};
+
 export const enum Ring {
 	WILD = 'ring-wild',
 	ROYAL = 'ring-royal',
@@ -299,8 +368,8 @@ export const enum UneqippableItem {
 	GOLD_KEY = 'goldKey',
 	SILVER_KEY = 'silverKey',
 	MYSTIC_BOOK = 'mysticBook',
-	POTION = 'health',
-	ESSENCE = 'essence'
+	HEALTH_POTION = 'health',
+	ESSENCE = 'essence',
 }
 
 export const UneqippableItemData = {
@@ -319,7 +388,7 @@ export const UneqippableItemData = {
 		description: 'A book full of ancient runes. Smells like old bones.',
 		iconFrame: 32,
 	} as ItemData,
-	[UneqippableItem.POTION]: {
+	[UneqippableItem.HEALTH_POTION]: {
 		name: 'Health Potion',
 		description: 'A health potion. Tastes like blood...',
 		iconFrame: 0,
@@ -352,7 +421,7 @@ export const getItemDataForName = (name: string) => {
 	}
 	if (name.startsWith('amulet-')) {
 		return AmuletData[name as Amulet] as ItemData;
-	}	
+	}
 	if (Object.values(ColorsOfMagic).includes(name as ColorsOfMagic)) name = 'essence';
 	return UneqippableItemData[name as UneqippableItem] as ItemData;
 };

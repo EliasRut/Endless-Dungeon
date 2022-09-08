@@ -1,8 +1,10 @@
+import { UneqippableItem } from '../../../items/itemData';
+import { SlainEnemy } from '../../enemies/enemyData';
 import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 import { getFacing8Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import EnemyToken, { slainEnemy } from './EnemyToken';
+import EnemyToken from './EnemyToken';
 
 const MAX_SLOW_DISTANCE = 100;
 const SLOW_FACTOR = 0.5;
@@ -47,9 +49,9 @@ export default class MeleeEnemyToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropEquippableItem(this.level, slainEnemy.BOSS);
+				this.dropEquippableItem(this.level, SlainEnemy.BOSS);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
-				this.dropNonEquippableItem('health');
+				this.dropNonEquippableItem(UneqippableItem.HEALTH_POTION);
 			}
 
 			this.die();
