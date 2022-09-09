@@ -10,7 +10,7 @@ import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
-import { SlainEnemy } from '../../enemies/enemyData';
+import { EnemyCategory } from '../../enemies/enemyData';
 import { UneqippableItem } from '../../../items/itemData';
 
 const BASE_ATTACK_DAMAGE = 10;
@@ -45,15 +45,23 @@ export default class VampireToken extends EnemyToken {
 		level: number,
 		id: string
 	) {
-		super(scene, x, y, tokenName, id);
+		super(scene, x, y, tokenName, id, {
+			startingHealth: BASE_HEALTH * (1 + level * 0.5),
+			damage: BASE_ATTACK_DAMAGE * (1 + level * 0.5),
+			movementSpeed: REGULAR_MOVEMENT_SPEED,
+			attackRange: REGULAR_ATTACK_RANGE,
+			itemDropChance: 0,
+			healthPotionDropChance: 0.05,
+			category: EnemyCategory.NORMAL,
+			color: ColorsOfMagic.BLOOD,
+			isMeleeEnemy: false,
+			isRangedEnemy: false,
+		});
 		// cool effects!
 		this.level = level;
-		this.attackRange = REGULAR_ATTACK_RANGE;
 		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
 		this.attacking = false;
-		this.startingHealth = BASE_HEALTH * (1 + this.level * 0.5);
-		this.stateObject.health = this.startingHealth;
-		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
+
 		this.stateObject.attackTime = ATTACK_DURATION;
 		this.color = ColorsOfMagic.BLOOD;
 	}
@@ -61,15 +69,10 @@ export default class VampireToken extends EnemyToken {
 	public update(time: number, delta: number) {
 		super.update(time, delta);
 
-		this.stateObject.movementSpeed = Math.max(
-			MIN_MOVEMENT_SPEED,
-			(REGULAR_MOVEMENT_SPEED * this.stateObject.health) / this.startingHealth
-		);
-
 		// check death
 		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropEquippableItem(this.level, SlainEnemy.NORMAL);
+				this.maybeDropEquippableItem();
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
 				this.dropNonEquippableItem(UneqippableItem.HEALTH_POTION);
 			}
@@ -155,9 +158,6 @@ export default class VampireToken extends EnemyToken {
 				this.launched = false;
 			} else this.attack(time);
 		}
-
-		this.stateObject.x = this.body.x;
-		this.stateObject.y = this.body.y;
 	}
 
 	// FRAME RATE: 16

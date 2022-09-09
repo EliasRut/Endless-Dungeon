@@ -12,7 +12,7 @@ import globalState from '../../worldstate';
 import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
-import { SlainEnemy } from '../../enemies/enemyData';
+import { EnemyCategory, EnemyData } from '../../enemies/enemyData';
 import { UneqippableItem } from '../../../items/itemData';
 
 const BASE_ATTACK_DAMAGE = 3;
@@ -37,9 +37,10 @@ export default class ZombieToken extends EnemyToken {
 		y: number,
 		tokenName: string,
 		level: number,
-		id: string
+		id: string,
+		enemyData: EnemyData
 	) {
-		super(scene, x, y, tokenName, id);
+		super(scene, x, y, tokenName, id, enemyData);
 		// cool effects!
 		this.level = level;
 		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
@@ -62,7 +63,7 @@ export default class ZombieToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropEquippableItem(this.level, SlainEnemy.NORMAL);
+				this.maybeDropEquippableItem();
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
 				this.dropNonEquippableItem(UneqippableItem.HEALTH_POTION);
 			}

@@ -1,20 +1,24 @@
+import { ColorsOfMagic } from '../helpers/constants';
+
 export interface EnemyData {
 	startingHealth: number;
 	damage: number;
 	movementSpeed: number;
+	attackRange: number;
 	itemDropChance: number;
 	healthPotionDropChance: number;
 
-	isStunned: boolean;
+	category: EnemyCategory;
+	color: ColorsOfMagic;
 
 	isMeleeEnemy: boolean;
 	isRangedEnemy: boolean;
 
 	// Melee Attack Data
-	meleeAttackData: MeleeAttackData;
+	meleeAttackData?: MeleeAttackData;
 }
 
-export enum SlainEnemy {
+export enum EnemyCategory {
 	BOSS = 'boss',
 	ELITE = 'elite',
 	NORMAL = 'normal',

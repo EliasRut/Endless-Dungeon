@@ -5,9 +5,9 @@ import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
 import { isCollidingTile } from '../../helpers/movement';
-import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
+import { ColorsOfMagic, NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 import { UneqippableItem } from '../../../items/itemData';
-import { SlainEnemy } from '../../enemies/enemyData';
+import { EnemyCategory } from '../../enemies/enemyData';
 
 const ATTACK_RANGE = 120;
 const SUMMON_SPEED = 500;
@@ -28,13 +28,20 @@ export default class LichtKingToken extends EnemyToken {
 		level: number,
 		id: string
 	) {
-		super(scene, x, y, tokenName, id);
+		super(scene, x, y, tokenName, id, {
+			startingHealth: 40 * level,
+			damage: 5 * level,
+			movementSpeed: 100 * (1 + level * 0.1),
+			attackRange: ATTACK_RANGE,
+			itemDropChance: 0,
+			healthPotionDropChance: 0.05,
+			category: EnemyCategory.BOSS,
+			color: ColorsOfMagic.DEATH,
+			isMeleeEnemy: false,
+			isRangedEnemy: false,
+		});
 
 		this.setScale(2);
-		this.attackRange = ATTACK_RANGE; // how close the enemy comes.
-		this.stateObject.health = 40 * level;
-		this.stateObject.movementSpeed = 100 * (1 + level * 0.1);
-		this.stateObject.damage = 5 * level;
 		this.stateObject.attackTime = 4000;
 		this.level = level;
 
@@ -62,7 +69,7 @@ export default class LichtKingToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0) {
 			this.dropNonEquippableItem(UneqippableItem.MYSTIC_BOOK);
-			this.dropEquippableItem(this.level, SlainEnemy.BOSS);
+			this.maybeDropEquippableItem();
 			this.emitter.stop();
 			this.die();
 			return;
