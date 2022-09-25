@@ -252,7 +252,8 @@ export default class FollowerToken extends CharacterToken {
 						},
 						(this.stateObject as Follower).ability,
 						(this.stateObject as Follower).level,
-						time.now
+						time.now,
+						1
 					);
 				}, FOLLOWER_CAST_TIME * 0.67);
 			}

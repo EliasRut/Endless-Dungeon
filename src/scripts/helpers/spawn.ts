@@ -39,6 +39,9 @@ export const spawnNpc = (
 					attackRange: 32 * SCALE,
 					animationName: 'attack',
 				},
+				useSpawnAnimation: !!options?.useSpawnAnimation,
+				spawnAnimationTime: 2000,
+				...options?.enemyData,
 			});
 		}
 		case 'jacques': {

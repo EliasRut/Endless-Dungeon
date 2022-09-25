@@ -40,6 +40,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	healthbar: Phaser.GameObjects.Image;
 	charmedTime: number;
 
+	isSpawning: boolean = false;
+
 	protected showHealthbar() {
 		return false;
 	}
@@ -74,6 +76,9 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	public onCollide(withEnemy: boolean) {}
 
 	public receiveHit() {
+		if (this.isSpawning) {
+			return;
+		}
 		if (this.stateObject.health > 0) {
 			if (!this.receiveStun(250)) {
 				this.play({
@@ -87,6 +92,9 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		}
 	}
 	public receiveStun(duration: number) {
+		if (this.isSpawning) {
+			return;
+		}
 		if (this.stateObject.health > 0) {
 			const time = globalState.gameTime;
 			if (this.stateObject.stunnedAt + this.stateObject.stunDuration > time) {

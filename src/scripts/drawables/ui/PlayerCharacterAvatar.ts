@@ -24,10 +24,10 @@ const ABILITY_COORDINATES_DESKTOP = {
 };
 
 const ABILITY_COORDINATES_MOBILE = {
-	[AbilityKey.ONE]: [32, 106],
-	[AbilityKey.TWO]: [32, 164],
-	[AbilityKey.THREE]: [32, 222],
-	[AbilityKey.FOUR]: [32, 280],
+	[AbilityKey.ONE]: [80, 40],
+	[AbilityKey.TWO]: [100, 60],
+	[AbilityKey.THREE]: [80, 80],
+	[AbilityKey.FOUR]: [60, 60],
 	[AbilityKey.FIVE]: [32, 280],
 	[AbilityKey.SPACE]: [32, 280],
 };
@@ -62,23 +62,23 @@ export default class PlayerCharacterAvatar extends Phaser.GameObjects.Group {
 		guiBaseIcon.setOrigin(0);
 
 		let abilityBackground: Phaser.GameObjects.Image;
-		if (scene.isMobile) {
-			abilityBackground = scene.add.image(
-				32 * UI_SCALE,
-				194 * UI_SCALE,
-				'ability-background-mobile'
-			);
-		} else {
+		if (!scene.isMobile) {
+			// 	abilityBackground = scene.add.image(
+			// 		32 * UI_SCALE,
+			// 		194 * UI_SCALE,
+			// 		'ability-background-mobile'
+			// 	);
+			// } else {
 			abilityBackground = scene.add.image(
 				ABILITY_START_X * UI_SCALE,
 				ABILITY_START_Y * UI_SCALE,
 				'ability-background-desktop'
 			);
+			abilityBackground.setScrollFactor(0);
+			abilityBackground.setOrigin(0);
+			abilityBackground.setScale(UI_SCALE);
+			abilityBackground.setDepth(UiDepths.UI_MAIN_LAYER);
 		}
-		abilityBackground.setScrollFactor(0);
-		abilityBackground.setOrigin(0);
-		abilityBackground.setScale(UI_SCALE);
-		abilityBackground.setDepth(UiDepths.UI_MAIN_LAYER);
 
 		this.healthBar = scene.add.image(
 			(HEALTH_BAR_START_X + 4) * UI_SCALE,
@@ -118,7 +118,12 @@ export default class PlayerCharacterAvatar extends Phaser.GameObjects.Group {
 		if (ability !== AbilityType.NOTHING) {
 			const mainScene = this.scene as MainScene;
 			const coordinate = mainScene.isMobile
-				? ABILITY_COORDINATES_MOBILE[abilityKey]
+				? [
+						this.scene.cameras.main.width -
+							ABILITY_COORDINATES_MOBILE[abilityKey][0] * UI_SCALE * 2,
+						this.scene.cameras.main.height -
+							ABILITY_COORDINATES_MOBILE[abilityKey][1] * UI_SCALE * 2,
+				  ]
 				: ABILITY_COORDINATES_DESKTOP[abilityKey];
 			const abilityIcon = this.scene.add.image(
 				coordinate[0] * UI_SCALE,
@@ -139,7 +144,7 @@ export default class PlayerCharacterAvatar extends Phaser.GameObjects.Group {
 				});
 			}
 			abilityIcon.setScrollFactor(0);
-			abilityIcon.setScale(UI_SCALE);
+			abilityIcon.setScale(mainScene.isMobile ? UI_SCALE * 2 : UI_SCALE);
 			abilityIcon.setOrigin(0);
 			abilityIcon.setDepth(UiDepths.UI_MAIN_LAYER);
 			this.abilityIcons.set(abilityKey, abilityIcon);

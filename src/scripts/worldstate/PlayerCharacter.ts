@@ -7,13 +7,14 @@ const DEFAULT_HEALTH = 100;
 const DEFAULT_DAMAGE = 1;
 const DEFAULT_MOVEMENTSPEED = 200;
 
-
 // This class handles the players character and all mechanical events associated with it.
 export default class PlayerCharacter extends Character {
 	public x = 0;
 	public y = 0;
 	public width = 8;
 	public height = 8;
+	public comboCast = 0;
+	public lastComboCast = 0;
 
 	// Stats are increased by this amount, given by enchantments
 	public enchantmentModifiers = {

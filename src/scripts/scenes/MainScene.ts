@@ -25,9 +25,12 @@ import {
 	Faction,
 	FadingLabelData,
 	FadingLabelSize,
+	FPS_DEBUG,
+	MOBILE_INTERACTION_OFFSETS,
 	NORMAL_ANIMATION_FRAME_RATE,
 	SCALE,
 	UiDepths,
+	UI_SCALE,
 } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper, { LightingSource } from '../helpers/DynamicLightingHelper';
@@ -65,8 +68,9 @@ export const CASTING_SPEED_MS = 500;
 const CONNECTION_POINT_THRESHOLD_DISTANCE = 32;
 const STEP_SOUND_TIME = 200;
 
-const MOBILE_PAD_BACKGROUND_X_OFFSET = 96;
-const MOBILE_PAD_FOREGROUND_X_OFFSET = 96;
+const MOBILE_PAD_BACKGROUND_X_OFFSET = 96 * UI_SCALE;
+const MOBILE_PAD_BACKGROUND_Y_OFFSET = 96 * UI_SCALE;
+const MOBILE_PAD_FOREGROUND_X_OFFSET = 96 * UI_SCALE;
 
 const DEATH_RESPAWN_TIME = 3000;
 
@@ -77,7 +81,7 @@ const MINIMUM_CASTING_TIME_MS = 80;
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
-	fpsText: Phaser.GameObjects.Text;
+	fpsText?: Phaser.GameObjects.Text;
 	levelName?: LevelName;
 	minimap?: Minimap;
 
@@ -108,7 +112,7 @@ export default class MainScene extends Phaser.Scene {
 	isPaused = false;
 	blockUserInteraction = false;
 
-	mobilePadBackgorund?: Phaser.GameObjects.Image;
+	mobilePadBackground?: Phaser.GameObjects.Image;
 	mobilePadStick?: Phaser.GameObjects.Image;
 
 	playerCharacterAvatar: PlayerCharacterAvatar;
@@ -210,7 +214,9 @@ export default class MainScene extends Phaser.Scene {
 			);
 		}
 
-		this.fpsText = new FpsText(this);
+		if (FPS_DEBUG) {
+			this.fpsText = new FpsText(this);
+		}
 		this.icons = {
 			backpackIcon: new BackpackIcon(this),
 			settingsIcon: new SettingsIcon(this),
@@ -223,59 +229,65 @@ export default class MainScene extends Phaser.Scene {
 		}
 		this.playerCharacterAvatar = new PlayerCharacterAvatar(this);
 		if (this.isMobile) {
-			this.mobilePadBackgorund = this.add.image(
-				this.cameras.main.width - MOBILE_PAD_BACKGROUND_X_OFFSET,
-				this.cameras.main.height / 2,
+			this.mobilePadBackground = this.add.image(
+				MOBILE_INTERACTION_OFFSETS + MOBILE_PAD_BACKGROUND_X_OFFSET,
+				this.cameras.main.height - MOBILE_PAD_BACKGROUND_Y_OFFSET,
 				'pad-background'
 			);
-			this.mobilePadBackgorund.setScrollFactor(0);
-			this.mobilePadBackgorund.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-			this.add.existing(this.mobilePadBackgorund);
+			this.mobilePadBackground.setScrollFactor(0);
+			this.mobilePadBackground.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+			this.add.existing(this.mobilePadBackground);
 
 			this.mobilePadStick = this.add.image(
-				this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET,
-				this.cameras.main.height / 2,
+				MOBILE_INTERACTION_OFFSETS + MOBILE_PAD_FOREGROUND_X_OFFSET,
+				this.cameras.main.height - MOBILE_PAD_BACKGROUND_Y_OFFSET,
 				'pad-stick'
 			);
 			this.mobilePadStick.setScrollFactor(0);
 			this.mobilePadStick.setDepth(UiDepths.UI_STICK_LAYER);
 
-			const hitArea = new Phaser.Geom.Circle(70, 70, 70);
-			this.mobilePadBackgorund.setInteractive(hitArea, Phaser.Geom.Circle.Contains);
-			this.mobilePadBackgorund.on('pointerup', (event: any) => {
-				this.mobilePadStick!.x = this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET;
-				this.mobilePadStick!.y = this.cameras.main.height / 2;
+			const hitArea = new Phaser.Geom.Circle(152, 152, 304);
+			this.mobilePadBackground.setInteractive(hitArea, Phaser.Geom.Circle.Contains);
+			this.mobilePadBackground.on('pointerup', (event: any) => {
+				this.mobilePadStick!.x = MOBILE_INTERACTION_OFFSETS + MOBILE_PAD_FOREGROUND_X_OFFSET;
+				this.mobilePadStick!.y = this.cameras.main.height - MOBILE_PAD_BACKGROUND_Y_OFFSET;
 			});
-			this.mobilePadBackgorund.on('pointermove', (event: any) => {
+			this.mobilePadBackground.on('pointermove', (event: any) => {
 				if (!event.isDown) {
-					this.mobilePadStick!.x = this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET;
-					this.mobilePadStick!.y = this.cameras.main.height / 2;
+					this.mobilePadStick!.x = MOBILE_INTERACTION_OFFSETS + MOBILE_PAD_FOREGROUND_X_OFFSET;
+					this.mobilePadStick!.y = this.cameras.main.height - MOBILE_PAD_BACKGROUND_Y_OFFSET;
 					return;
 				}
 
 				this.mobilePadStick!.x = Math.min(
-					this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET + 60,
-					Math.max(this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET - 60, event.position.x)
+					MOBILE_INTERACTION_OFFSETS + MOBILE_PAD_FOREGROUND_X_OFFSET + 60,
+					Math.max(
+						MOBILE_INTERACTION_OFFSETS + MOBILE_PAD_FOREGROUND_X_OFFSET - 60,
+						event.position.x
+					)
 				);
 				this.mobilePadStick!.y = Math.min(
-					this.cameras.main.height / 2 + 60,
-					Math.max(this.cameras.main.height / 2 - 60, event.position.y)
+					this.cameras.main.height - MOBILE_PAD_BACKGROUND_Y_OFFSET + 60,
+					Math.max(this.cameras.main.height - MOBILE_PAD_BACKGROUND_Y_OFFSET - 60, event.position.y)
 				);
 			});
-			this.mobilePadBackgorund.on('pointerover', (_: any, event: any) => {
+			this.mobilePadBackground.on('pointerover', (_: any, event: any) => {
 				if (!event.isDown) {
-					this.mobilePadStick!.x = this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET;
-					this.mobilePadStick!.y = this.cameras.main.height / 2;
+					this.mobilePadStick!.x = MOBILE_INTERACTION_OFFSETS + MOBILE_PAD_FOREGROUND_X_OFFSET;
+					this.mobilePadStick!.y = this.cameras.main.height - MOBILE_PAD_BACKGROUND_Y_OFFSET;
 					return;
 				}
 
-				this.mobilePadStick!.x = Math.min(
-					this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET + 60,
-					Math.max(this.cameras.main.width - MOBILE_PAD_FOREGROUND_X_OFFSET - 60, event.position.x)
+				Math.min(
+					MOBILE_INTERACTION_OFFSETS + MOBILE_PAD_FOREGROUND_X_OFFSET + 60,
+					Math.max(
+						MOBILE_INTERACTION_OFFSETS + MOBILE_PAD_FOREGROUND_X_OFFSET - 60,
+						event.position.x
+					)
 				);
-				this.mobilePadStick!.y = Math.min(
-					this.cameras.main.height / 2 + 60,
-					Math.max(this.cameras.main.height / 2 - 60, event.position.y)
+				Math.min(
+					this.cameras.main.height - MOBILE_PAD_BACKGROUND_Y_OFFSET + 60,
+					Math.max(this.cameras.main.height - MOBILE_PAD_BACKGROUND_Y_OFFSET - 60, event.position.y)
 				);
 			});
 			this.add.existing(this.mobilePadStick);
@@ -450,7 +462,6 @@ export default class MainScene extends Phaser.Scene {
 
 		npcs.forEach((npc) => {
 			if ((enemies[npc.id] && enemies[npc.id].health > 0) || !enemies[npc.id]) {
-				console.log('add npc');
 				this.addNpc(
 					npc.id,
 					npc.type,
@@ -463,6 +474,7 @@ export default class MainScene extends Phaser.Scene {
 						script: npc.script,
 						questGiverId: npc.questGiverId,
 						traderId: npc.traderId,
+						enemyData: npc.options,
 					}
 				);
 			}
@@ -528,7 +540,9 @@ export default class MainScene extends Phaser.Scene {
 	update(globalTime: number, delta: number) {
 		globalState.gameTime += delta;
 
-		this.fpsText.update();
+		if (FPS_DEBUG) {
+			this.fpsText?.update();
+		}
 		this.minimap?.update();
 		this.keyboardHelper.updateGamepad();
 		updateStatus(globalState.gameTime, globalState.playerCharacter);
@@ -654,8 +668,8 @@ export default class MainScene extends Phaser.Scene {
 
 			if (!globalState.playerCharacter.dashing) {
 				const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
-					this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackgorund!.x : 0,
-					this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackgorund!.y : 0
+					this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackground!.x : 0,
+					this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackground!.y : 0
 				);
 				const newFacing = getFacing8Dir(xFacing, yFacing);
 
@@ -670,8 +684,8 @@ export default class MainScene extends Phaser.Scene {
 				const isWalking =
 					isCasting ||
 					(this.mobilePadStick
-						? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
-						  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
+						? Math.abs(this.mobilePadStick.x - this.mobilePadBackground!.x) < 40 &&
+						  Math.abs(this.mobilePadStick.y - this.mobilePadBackground!.y) < 40
 						: false);
 				if (isCasting && !this.hasCasted) {
 					playerAnimation = `player-cast-${getTwoLetterFacingName(

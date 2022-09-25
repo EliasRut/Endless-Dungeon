@@ -1,3 +1,4 @@
+import { EnemyData } from '../enemies/enemyData';
 export const enum Facings {
 	SOUTH,
 	SOUTH_EAST,
@@ -235,48 +236,50 @@ export const colorOfMagicToTilesetMap = {
 export const NpcTypeList = ['rich', 'jacques', 'pierre'];
 export const SummonsTypeList = ['firesprite'];
 
-export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
-	[ColorsOfMagic.FLUX]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.METAL]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.CHANGE]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.BLOOD]: [
-		// [0.5, 'rich'],
-		// [0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.DEATH]: [
-		// [0.5, 'rich'],
-		// [0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.PASSION]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.WILD]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.ROYAL]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-};
+export const EnemyByColorOfMagicMap: { [color: string]: [number, string, Partial<EnemyData>?][] } =
+	{
+		[ColorsOfMagic.FLUX]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.METAL]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.CHANGE]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.BLOOD]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.DEATH]: [
+			[0.25, 'rich', { useSpawnAnimation: false }],
+			[0.5, 'rich', { useSpawnAnimation: true, spawnOnVisible: true }],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.PASSION]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.WILD]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.ROYAL]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+	};
 
 export const enemyBudgetCost = {
 	rich: 1,
@@ -358,27 +361,30 @@ export type ColorEffectValue =
 			blueDiff: number;
 	  };
 
-export const multiplyParticleValueByScale = (value: SimpleParticleEffectValue) => {
+export const multiplyParticleValueByScale = (
+	value: SimpleParticleEffectValue,
+	effectScale: number
+) => {
 	if (value === undefined) {
 		return undefined;
 	}
 	if (typeof value === 'number') {
 		const valueAsAny = value as any;
-		return valueAsAny * SCALE;
+		return valueAsAny * effectScale * SCALE;
 	}
 	if (typeof value === 'object') {
 		const valueAsAny = value as any;
 		return {
 			...(valueAsAny.min !== undefined && valueAsAny.max !== undefined
 				? {
-						min: valueAsAny.min * SCALE,
-						max: valueAsAny.max * SCALE,
+						min: valueAsAny.min * effectScale * SCALE,
+						max: valueAsAny.max * effectScale * SCALE,
 				  }
 				: {}),
 			...(valueAsAny.start !== undefined && valueAsAny.end !== undefined
 				? {
-						start: valueAsAny.start * SCALE,
-						end: valueAsAny.end * SCALE,
+						start: valueAsAny.start * effectScale * SCALE,
+						end: valueAsAny.end * effectScale * SCALE,
 				  }
 				: {}),
 		};
@@ -388,14 +394,20 @@ export const multiplyParticleValueByScale = (value: SimpleParticleEffectValue) =
 const ScaledValueKeys = ['scale', 'speed'];
 
 export const convertEmitterDataToScaledValues = (
-	config: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig
+	config: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig,
+	effectScale: number
 ) => {
 	return Object.entries(config).reduce((obj, [key, value]) => {
-		obj[key] = ScaledValueKeys.includes(key) ? multiplyParticleValueByScale(value) : value;
+		obj[key] = ScaledValueKeys.includes(key)
+			? multiplyParticleValueByScale(value, effectScale)
+			: value;
 		return obj;
 	}, {} as any) as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig;
 };
 
+export const MOBILE_INTERACTION_OFFSETS = 96;
+
 export const DEBUG_PHYSICS = false;
 export const DEBUG_PATHFINDING = false;
-export const DEBUG_ENEMY_AI = true;
+export const DEBUG_ENEMY_AI = false;
+export const FPS_DEBUG = false;

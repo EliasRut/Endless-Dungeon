@@ -134,7 +134,8 @@ export default class ElementalToken extends CharacterToken {
 					},
 					this.elementalAbility,
 					1,
-					time.now
+					time.now,
+					1
 				);
 
 				this.destroyed = true;
