@@ -1,4 +1,5 @@
 import { AbilityType, AbilityData } from '../src/scripts/abilities/abilityData';
+import { EnemyData } from '../src/scripts/enemies/enemyData';
 import { ColorsOfMagic } from '../src/scripts/helpers/constants';
 import { RandomItemOptions } from '../src/scripts/helpers/item';
 import { QuestScripts } from '../src/scripts/helpers/quests';
@@ -19,6 +20,8 @@ export interface NpcOptions {
 	script?: NpcScript;
 	questGiverId?: string;
 	traderId?: string;
+	useSpawnAnimation?: boolean;
+	enemyData?: Partial<EnemyData>;
 }
 
 export interface NpcPositioning extends NpcOptions {
@@ -29,6 +32,7 @@ export interface NpcPositioning extends NpcOptions {
 	facingX?: number;
 	facingY?: number;
 	level?: string;
+	options?: Partial<EnemyData>;
 }
 
 export interface MapConnection {
@@ -125,6 +129,7 @@ export interface ScriptSpawn {
 	npcType: string;
 	posX: number;
 	posY: number;
+	useAnimation?: boolean;
 }
 
 export interface ScriptSpawnItem {

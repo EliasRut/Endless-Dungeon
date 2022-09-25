@@ -42,6 +42,7 @@ export default class EnemyToken extends CharacterToken {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	tokenName: string;
 	attackRange: number;
+	spawnedAt: number | undefined = undefined;
 	attackedAt: number = -Infinity;
 	lastUpdate: number = -Infinity;
 	aggroLinger: number = 3000;
@@ -63,7 +64,7 @@ export default class EnemyToken extends CharacterToken {
 	isWaitingToDealDamage: boolean = false;
 
 	protected showHealthbar() {
-		return !!this.scene?.showHealthbars;
+		return !!this.scene?.showHealthbars && !this.isSpawning;
 	}
 
 	constructor(
@@ -429,6 +430,38 @@ export default class EnemyToken extends CharacterToken {
 	 */
 	update(time: number, deltaTime: number) {
 		super.update(time, deltaTime);
+
+		if (!this.spawnedAt) {
+			if (this.enemyData.spawnOnVisible) {
+				if (!this.visible) {
+					return;
+				}
+			}
+			this.spawnedAt = time;
+			this.isSpawning = true;
+			if (this.enemyData.useSpawnAnimation) {
+				const animation = `${this.tokenName}-spawn-e`;
+				this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+				this.healthbar.setVisible(false);
+			}
+		}
+
+		if (
+			this.enemyData.useSpawnAnimation &&
+			this.spawnedAt + (this.enemyData.spawnAnimationTime || 1000) > time
+		) {
+			return;
+		}
+
+		if (this.isSpawning) {
+			this.isSpawning = false;
+			const isHealthbarVisible = this.showHealthbar();
+			if (isHealthbarVisible) {
+				this.healthbar.setVisible(true);
+				this.updateHealthbar();
+			}
+		}
+
 		this.setSlowFactor();
 
 		// Check if enemy died and in that case, drop item

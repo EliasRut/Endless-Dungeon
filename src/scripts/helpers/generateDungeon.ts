@@ -465,6 +465,7 @@ export default class DungeonGenerator {
 					id: `filler-${lastId++}`,
 					x: x * TILE_WIDTH,
 					y: y * TILE_HEIGHT,
+					options: potentialEnemy![2] || {},
 				});
 
 				this.potentialEnemyFields.splice(randomIndex, 1);

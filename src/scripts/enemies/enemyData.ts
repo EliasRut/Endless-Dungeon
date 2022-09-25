@@ -14,6 +14,10 @@ export interface EnemyData {
 	isMeleeEnemy: boolean;
 	isRangedEnemy: boolean;
 
+	spawnAnimationTime?: number;
+	useSpawnAnimation?: boolean;
+	spawnOnVisible?: boolean;
+
 	// Melee Attack Data
 	meleeAttackData?: MeleeAttackData;
 }

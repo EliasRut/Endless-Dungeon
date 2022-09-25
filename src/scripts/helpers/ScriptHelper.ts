@@ -253,7 +253,10 @@ export default class ScriptHelper {
 					targetY,
 					globalState.dungeon.levels[globalState.currentLevel].enemyLevel,
 					currentStep.facingX || 0,
-					currentStep.facingY || 0
+					currentStep.facingY || 0,
+					{
+						useSpawnAnimation: !!currentStep.useAnimation,
+					}
 				);
 				break;
 			}

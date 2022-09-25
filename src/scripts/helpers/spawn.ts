@@ -38,6 +38,9 @@ export const spawnNpc = (
 					attackType: MeleeAttackType.HIT,
 					animationName: 'attack',
 				},
+				useSpawnAnimation: !!options?.useSpawnAnimation,
+				spawnAnimationTime: 2000,
+				...options?.enemyData,
 			});
 		}
 		case 'jacques': {

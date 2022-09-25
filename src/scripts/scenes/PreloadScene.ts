@@ -139,8 +139,8 @@ export default class PreloadScene extends Phaser.Scene {
 		);
 		this.load.aseprite(
 			'source-force1',
-			'assets/sprites/source_force01.png',
-			'assets/sprites/source_force01.json'
+			'assets/sprites/source_arcane01.png',
+			'assets/sprites/source_arcane01.json'
 		);
 		this.load.image('icon-source-fire1', 'assets/img/source_icon_flame01.png');
 		this.load.image('icon-source-force1', 'assets/img/source_icon_force01.png');

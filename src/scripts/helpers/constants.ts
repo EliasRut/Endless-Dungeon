@@ -1,3 +1,4 @@
+import { EnemyData } from '../enemies/enemyData';
 export const enum Facings {
 	SOUTH,
 	SOUTH_EAST,
@@ -235,48 +236,50 @@ export const colorOfMagicToTilesetMap = {
 export const NpcTypeList = ['rich', 'jacques', 'pierre'];
 export const SummonsTypeList = ['firesprite'];
 
-export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
-	[ColorsOfMagic.FLUX]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.METAL]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.CHANGE]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.BLOOD]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.DEATH]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.PASSION]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.WILD]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-	[ColorsOfMagic.ROYAL]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
-		[1, 'pierre'],
-	],
-};
+export const EnemyByColorOfMagicMap: { [color: string]: [number, string, Partial<EnemyData>?][] } =
+	{
+		[ColorsOfMagic.FLUX]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.METAL]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.CHANGE]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.BLOOD]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.DEATH]: [
+			[0.25, 'rich', { useSpawnAnimation: false }],
+			[0.5, 'rich', { useSpawnAnimation: true, spawnOnVisible: true }],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.PASSION]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.WILD]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+		[ColorsOfMagic.ROYAL]: [
+			[0.5, 'rich'],
+			[0.85, 'jacques'],
+			[1, 'pierre'],
+		],
+	};
 
 export const enemyBudgetCost = {
 	rich: 1,
@@ -396,6 +399,9 @@ export const convertEmitterDataToScaledValues = (
 	}, {} as any) as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig;
 };
 
+export const MOBILE_INTERACTION_OFFSETS = 96;
+
 export const DEBUG_PHYSICS = false;
 export const DEBUG_PATHFINDING = false;
-export const DEBUG_ENEMY_AI = true;
+export const DEBUG_ENEMY_AI = false;
+export const FPS_DEBUG = false;
