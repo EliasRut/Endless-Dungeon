@@ -71,7 +71,6 @@ export default class SettingsScreen extends OverlayScreen {
 			'change',
 			() => {
 				const json = this.loadJSONFile(fileInput);
-				console.log(json);
 				json.then((value) => {
 					this.load(value);
 				});
@@ -104,6 +103,8 @@ export default class SettingsScreen extends OverlayScreen {
 			console.log('load game');
 			// this.load(fileInput);
 			fileInput.click();
+			// this.scene.scene.start('RoomPreloaderScene');
+			// (this.scene as MainScene).resume();
 		});
 		this.add(this.loadText, true);
 
@@ -127,8 +128,8 @@ export default class SettingsScreen extends OverlayScreen {
 		this.newGameText.setInteractive();
 		this.newGameText.setShadow(0, 1 * UI_SCALE, 'black');
 		this.newGameText.on('pointerdown', () => {
-			this.load(data);
-			this.scene.scene.start('RoomPreloaderScene');
+			// this.load(data);
+			this.scene.scene.start('AbilitiesPreloaderScene');
 			(this.scene as MainScene).resume();
 		});
 		this.add(this.newGameText, true);
@@ -165,49 +166,47 @@ export default class SettingsScreen extends OverlayScreen {
 
 	save() {
 		globalState.storeState();
+		let jsonData: string = '{';
+
+		for (let i = 0; i < localStorage.length; i++) {
+			const key: string | null = localStorage.key(i);
+			const value: string | null = localStorage.getItem(key || "");
+
+			if(!key || !value) continue;
+			if(key === "loglevel:webpack-dev-server") {
+				console.log("skipping "+key)
+				continue;
+			}
+
+			jsonData += '"' + key + '": ' + value + ',\n';
+
+		}
+		jsonData = jsonData.trimEnd();
+		jsonData = jsonData.substring(0,jsonData.length-1) + '}';
 
 		/* tslint:disable: max-line-length */
-		let jsonData: string = '{';
-		jsonData +=
-			'"' +
-			WorldState.PLAYERCHARACTER +
-			'": ' +
-			JSON.stringify(globalState.playerCharacter) +
-			',\n';
-		jsonData += '"' + WorldState.GAMETIME + '": ' + `${globalState.gameTime}` + ',\n';
-		jsonData += '"' + WorldState.NPCS + '": ' + JSON.stringify(globalState.npcs) + ',\n';
-		jsonData += '"' + WorldState.ENEMIES + '": ' + JSON.stringify(globalState.enemies) + ',\n';
-		jsonData += '"' + WorldState.DOORS + '": ' + JSON.stringify(globalState.doors) + ',\n';
-		jsonData += '"' + WorldState.SCRIPTS + '": ' + JSON.stringify(globalState.scripts) + ',\n';
-		jsonData += '"' + WorldState.QUESTS + '": ' + JSON.stringify(globalState.quests) + ',\n';
-		jsonData += '"' + WorldState.DUNGEON + '": ' + JSON.stringify(globalState.dungeon) + ',\n';
-		jsonData +=
-			'"' +
-			WorldState.TRANSITIONSTACK +
-			'": ' +
-			JSON.stringify(globalState.transitionStack) +
-			',\n';
-		jsonData +=
-			'"' + WorldState.AVAILABLEROOMS + '": ' + JSON.stringify(globalState.availableRooms) + ',\n';
-		jsonData +=
-			'"' +
-			WorldState.AVAILABLETILESETS +
-			'": ' +
-			JSON.stringify(globalState.availableTilesets) +
-			',\n';
-		jsonData +=
-			'"' + WorldState.CURRENTLEVEL + '": ' + JSON.stringify(globalState.currentLevel) + ',\n';
-		jsonData +=
-			'"' + WorldState.ROOMASSIGNMENT + '": ' + JSON.stringify(globalState.roomAssignment) + ',\n';
-		jsonData += '"' + WorldState.INVENTORY + '": ' + JSON.stringify(globalState.inventory) + ',\n';
-		jsonData += '"' + WorldState.SAVEGAMENAME + '": ' + '"test-save+"';
-		jsonData += '}';
+		// jsonData += '"' + WorldState.PLAYERCHARACTER + '": ' + JSON.stringify(globalState.playerCharacter) + ',\n';
+		// jsonData += '"' + WorldState.GAMETIME + '": ' + `${globalState.gameTime}` + ',\n';
+		// jsonData += '"' + WorldState.NPCS + '": ' + JSON.stringify(globalState.npcs) + ',\n';
+		// jsonData += '"' + WorldState.ENEMIES + '": ' + JSON.stringify(globalState.enemies) + ',\n';
+		// jsonData += '"' + WorldState.DOORS + '": ' + JSON.stringify(globalState.doors) + ',\n';
+		// jsonData += '"' + WorldState.SCRIPTS + '": ' + JSON.stringify(globalState.scripts) + ',\n';
+		// jsonData += '"' + WorldState.QUESTS + '": ' + JSON.stringify(globalState.quests) + ',\n';
+		// jsonData += '"' + WorldState.DUNGEON + '": ' + JSON.stringify(globalState.dungeon) + ',\n';
+		// jsonData += '"' + WorldState.TRANSITIONSTACK + '": ' + JSON.stringify(globalState.transitionStack) + ',\n';
+		// jsonData += '"' + WorldState.AVAILABLEROOMS + '": ' + JSON.stringify(globalState.availableRooms) + ',\n'; 
+		// jsonData += '"' + WorldState.AVAILABLETILESETS + '": ' + JSON.stringify(globalState.availableTilesets) + ',\n';
+		// jsonData += '"' + WorldState.CURRENTLEVEL + '": ' + JSON.stringify(globalState.currentLevel) + ',\n'; 
+		// jsonData += '"' + WorldState.ROOMASSIGNMENT + '": ' + JSON.stringify(globalState.roomAssignment) + ',\n';
+		// jsonData += '"' + WorldState.INVENTORY + '": ' + JSON.stringify(globalState.inventory) + ',\n';
+		// jsonData += '"' + WorldState.SAVEGAMENAME + '": ' + '"test-save+"';
+		// jsonData += '}';
 		/* tslint:enable: max-line-length */
 
 		// tslint:disable-next-line: no-console
 		console.log(this.scene.scene);
 
-		this.download(jsonData, 'json.txt', 'text/plain');
+		this.download(jsonData, 'savegame.json', 'text/plain');
 	}
 
 	async loadJSONFile(element: HTMLInputElement): Promise<any> {
@@ -223,10 +222,10 @@ export default class SettingsScreen extends OverlayScreen {
 		// tslint:disable-next-line: no-console
 		console.log('loading file ' + element.files[0].name);
 
-		const saveStr: string = await savegame.text();
+		const savegameStr: string = await savegame.text();
 
-		if (isJSON(saveStr)) {
-			savegameJSON = JSON.parse(saveStr);
+		if (isJSON(savegameStr)) {
+			savegameJSON = JSON.parse(savegameStr);
 			// console.log(saveStr);
 			// console.log(savegameJSON)
 			return new Promise<any>((resolve) => {
@@ -237,49 +236,42 @@ export default class SettingsScreen extends OverlayScreen {
 		// tslint:disable-next-line: no-console
 		console.log(element.files[0].name + ' is not a json file.');
 		// tslint:disable-next-line: no-console
-		console.log(saveStr);
+		console.log(savegameStr);
 		return new Promise<any>((reject) => {
 			reject('File is not a json file.');
 		});
+
+
 	}
 
 	async load(savegame: any): Promise<any> {
+
+		Object.keys(savegame).forEach(key => {
+			localStorage.setItem(key, JSON.stringify(savegame[key]));
+		})
+
 		/* tslint:disable: max-line-length */
-		if (savegame.playerCharacter)
-			localStorage.setItem(WorldState.PLAYERCHARACTER, JSON.stringify(savegame.playerCharacter));
-		if (savegame.gameTime) localStorage.setItem(WorldState.GAMETIME, `${savegame.gameTime}`);
-		if (savegame.npcs) localStorage.setItem(WorldState.NPCS, JSON.stringify(savegame.npcs));
-		if (savegame.enemies)
-			localStorage.setItem(WorldState.ENEMIES, JSON.stringify(savegame.enemies));
-		if (savegame.doors) localStorage.setItem(WorldState.DOORS, JSON.stringify(savegame.doors));
-		if (savegame.scripts)
-			localStorage.setItem(WorldState.SCRIPTS, JSON.stringify(savegame.scripts));
-		if (savegame.quests) localStorage.setItem(WorldState.QUESTS, JSON.stringify(savegame.quests));
-		if (savegame.dungeon)
-			localStorage.setItem(WorldState.DUNGEON, JSON.stringify(savegame.dungeon));
-		if (savegame.transitionStack)
-			localStorage.setItem(WorldState.TRANSITIONSTACK, JSON.stringify(savegame.transitionStack));
-		if (savegame.availableRooms)
-			localStorage.setItem(WorldState.AVAILABLEROOMS, JSON.stringify(savegame.availableRooms));
-		if (savegame.availableTilesets)
-			localStorage.setItem(
-				WorldState.AVAILABLETILESETS,
-				JSON.stringify(savegame.availableTilesets)
-			);
-		if (savegame.currentLevel)
-			localStorage.setItem(WorldState.CURRENTLEVEL, JSON.stringify(savegame.currentLevel));
-		if (savegame.roomAssignment)
-			localStorage.setItem(WorldState.ROOMASSIGNMENT, JSON.stringify(savegame.roomAssignment));
-		if (savegame.inventory)
-			localStorage.setItem(WorldState.INVENTORY, JSON.stringify(savegame.inventory));
-		if (savegame.saveGameName)
-			localStorage.setItem(WorldState.SAVEGAMENAME, JSON.stringify(savegame.saveGameName));
+		// if (savegame.playerCharacter) 	localStorage.setItem(WorldState.PLAYERCHARACTER, JSON.stringify(savegame.playerCharacter));
+		// if (savegame.gameTime) 			localStorage.setItem(WorldState.GAMETIME, `${savegame.gameTime}`);
+		// if (savegame.npcs) 				localStorage.setItem(WorldState.NPCS, JSON.stringify(savegame.npcs));
+		// if (savegame.enemies) 			localStorage.setItem(WorldState.ENEMIES, JSON.stringify(savegame.enemies));
+		// if (savegame.doors) 			localStorage.setItem(WorldState.DOORS, JSON.stringify(savegame.doors));
+		// if (savegame.scripts) 			localStorage.setItem(WorldState.SCRIPTS, JSON.stringify(savegame.scripts));
+		// if (savegame.quests) 			localStorage.setItem(WorldState.QUESTS, JSON.stringify(savegame.quests));
+		// if (savegame.dungeon) 			localStorage.setItem(WorldState.DUNGEON, JSON.stringify(savegame.dungeon));
+		// if (savegame.transitionStack) 	localStorage.setItem(WorldState.TRANSITIONSTACK, JSON.stringify(savegame.transitionStack));
+		// if (savegame.availableRooms) 	localStorage.setItem(WorldState.AVAILABLEROOMS, JSON.stringify(savegame.availableRooms));
+		// if (savegame.availableTilesets) localStorage.setItem(WorldState.AVAILABLETILESETS, JSON.stringify(savegame.availableTilesets));
+		// if (savegame.currentLevel) 		localStorage.setItem(WorldState.CURRENTLEVEL, JSON.stringify(savegame.currentLevel));
+		// if (savegame.roomAssignment) 	localStorage.setItem(WorldState.ROOMASSIGNMENT, JSON.stringify(savegame.roomAssignment));
+		// if (savegame.inventory) 		localStorage.setItem(WorldState.INVENTORY, JSON.stringify(savegame.inventory));
+		// if (savegame.saveGameName) 		localStorage.setItem(WorldState.SAVEGAMENAME, JSON.stringify(savegame.saveGameName));
 		/* tslint:enable: max-line-length */
 
 		// globalState.loadState();
 		globalState.loadGame = true;
-		this.scene.scene.start('RoomPreloaderScene');
-		this.scene.resume();
+		this.scene.scene.start('AbilitiesPreloaderScene');
+		(this.scene as MainScene).resume();
 
 		return '';
 	}
