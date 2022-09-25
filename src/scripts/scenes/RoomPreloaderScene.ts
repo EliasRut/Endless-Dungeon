@@ -35,10 +35,6 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 		// Rooms
 		const requestedRoomId = getUrlParam('roomName');
 
-		if (globalState.loadGame) {
-			globalState.loadState();
-		}
-
 		if (requestedRoomId) {
 			this.usedRooms.push(requestedRoomId);
 			globalState.roomAssignment = {

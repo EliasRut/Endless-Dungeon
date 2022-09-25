@@ -1,7 +1,7 @@
 import 'phaser';
 
 import globalState from '../worldstate/index';
-import { updateStatus } from '../worldstate/Character';
+import Character, { updateStatus } from '../worldstate/Character';
 
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import FpsText from '../drawables/ui/FpsText';
@@ -17,9 +17,11 @@ import {
 	getFacing8Dir,
 	updateMovingState,
 	isCollidingTile,
+	getTwoLetterFacingName,
 } from '../helpers/movement';
 import {
 	BaseFadingLabelFontSize,
+	DEBUG_PHYSICS,
 	Faction,
 	FadingLabelData,
 	FadingLabelSize,
@@ -28,8 +30,9 @@ import {
 	UiDepths,
 } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
-import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
-import Avatar from '../drawables/ui/Avatar';
+import DynamicLightingHelper, { LightingSource } from '../helpers/DynamicLightingHelper';
+import PlayerCharacterAvatar from '../drawables/ui/PlayerCharacterAvatar';
+import NPCAvatar from '../drawables/ui/NPCAvatar';
 import ScriptHelper from '../helpers/ScriptHelper';
 import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
@@ -39,6 +42,7 @@ import CharacterToken from '../drawables/tokens/CharacterToken';
 import { NpcOptions } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import SettingsScreen from '../screens/SettingsScreen';
+import EnchantingScreen from '../screens/EnchantingScreen';
 import DoorToken from '../drawables/tokens/DoorToken';
 
 import { DungeonRunData } from '../models/DungeonRunData';
@@ -50,11 +54,14 @@ import QuestsIcon from '../drawables/ui/QuestsIcon';
 import QuestLogScreen from '../screens/QuestLogScreen';
 import QuestDetailsScreen from '../screens/QuestDetailsScreen';
 import ContentManagementScreen from '../screens/ContentManagementScreen';
+import EnchantIcon from '../drawables/ui/EnchantIcon';
+import FollowerToken from '../drawables/tokens/FollowerToken';
+import { AbilityType } from '../abilities/abilityData';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
 
-const CASTING_SPEED_MS = 250;
+export const CASTING_SPEED_MS = 500;
 
 const CONNECTION_POINT_THRESHOLD_DISTANCE = 32;
 const STEP_SOUND_TIME = 200;
@@ -66,6 +73,8 @@ const DEATH_RESPAWN_TIME = 3000;
 
 const FADING_LABEL_Y_DISTANCE = 64;
 const FADING_LABEL_X_DISTANCE = 16;
+
+const MINIMUM_CASTING_TIME_MS = 80;
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -79,6 +88,7 @@ export default class MainScene extends Phaser.Scene {
 	abilityHelper: AbilityHelper;
 
 	mainCharacter: PlayerCharacterToken;
+	follower?: FollowerToken;
 	npcMap: { [id: string]: CharacterToken };
 	doorMap: { [id: string]: DoorToken };
 	worldItems: WorldItemToken[];
@@ -93,6 +103,7 @@ export default class MainScene extends Phaser.Scene {
 		questDetailsScreen: QuestDetailsScreen;
 		itemScreen: ItemScreen;
 		contentManagementScreen: ContentManagementScreen;
+		enchantingScreen: EnchantingScreen;
 	};
 	alive: number;
 	isPaused = false;
@@ -101,12 +112,14 @@ export default class MainScene extends Phaser.Scene {
 	mobilePadBackgorund?: Phaser.GameObjects.Image;
 	mobilePadStick?: Phaser.GameObjects.Image;
 
-	avatar: Avatar;
+	playerCharacterAvatar: PlayerCharacterAvatar;
+	nPCAvatar?: NPCAvatar;
 
 	icons: {
 		backpackIcon: BackpackIcon;
 		settingsIcon: SettingsIcon;
 		questsIcon: QuestsIcon;
+		enchantIcon: EnchantIcon;
 	};
 
 	overlayPressed: number = 0;
@@ -114,6 +127,8 @@ export default class MainScene extends Phaser.Scene {
 	tileLayer: Phaser.Tilemaps.TilemapLayer;
 	decorationLayer: Phaser.Tilemaps.TilemapLayer;
 	overlayLayer: Phaser.Tilemaps.TilemapLayer;
+
+	navigationalMap: boolean[][];
 
 	useDynamicLighting = false;
 	dungeonRunData: DungeonRunData;
@@ -124,6 +139,10 @@ export default class MainScene extends Phaser.Scene {
 
 	lastScriptUnpausing: number = Date.now();
 	lastPlayerPosition: { x: number; y: number } | undefined;
+
+	hasCasted: boolean = false;
+
+	showHealthbars: boolean = true;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -153,7 +172,8 @@ export default class MainScene extends Phaser.Scene {
 			this.dynamicLightingHelper = new DynamicLightingHelper(
 				this.tileLayer,
 				this.decorationLayer,
-				this.overlayLayer
+				this.overlayLayer,
+				this
 			);
 		}
 
@@ -175,18 +195,34 @@ export default class MainScene extends Phaser.Scene {
 				npc.onCollide(true);
 			});
 		});
+		Object.values(this.npcMap).forEach((npc) => {
+			this.physics.add.collider(Object.values(this.npcMap), npc, (collidingToken) => {
+				const castCollidingToken = collidingToken as CharacterToken;
+				npc.onCollide(castCollidingToken.faction !== npc.faction);
+			});
+		});
+
+		if (globalState.activeFollower !== '') {
+			this.spawnFollower(
+				globalState.playerCharacter.x || startX,
+				globalState.playerCharacter.y || startY,
+				globalState.activeFollower,
+				globalState.activeFollower
+			);
+		}
 
 		this.fpsText = new FpsText(this);
 		this.icons = {
 			backpackIcon: new BackpackIcon(this),
 			settingsIcon: new SettingsIcon(this),
 			questsIcon: new QuestsIcon(this),
+			enchantIcon: new EnchantIcon(this),
 		};
 		if (globalState.currentLevel.startsWith('dungeonLevel')) {
 			this.levelName = new LevelName(this);
 			this.minimap = new Minimap(this);
 		}
-		this.avatar = new Avatar(this);
+		this.playerCharacterAvatar = new PlayerCharacterAvatar(this);
 		if (this.isMobile) {
 			this.mobilePadBackgorund = this.add.image(
 				this.cameras.main.width - MOBILE_PAD_BACKGROUND_X_OFFSET,
@@ -255,6 +291,7 @@ export default class MainScene extends Phaser.Scene {
 			questLogScreen: new QuestLogScreen(this),
 			questDetailsScreen: new QuestDetailsScreen(this),
 			contentManagementScreen: new ContentManagementScreen(this),
+			enchantingScreen: new EnchantingScreen(this),
 		};
 
 		this.icons.backpackIcon.setScreens();
@@ -271,6 +308,36 @@ export default class MainScene extends Phaser.Scene {
 		} else {
 			this.sound.play('score-dungeon', { volume: 0.08, loop: true });
 		}
+
+		if (DEBUG_PHYSICS) {
+			this.renderDebugGraphics();
+		}
+	}
+
+	despawnFollower() {
+		if (this.follower) {
+			this.follower.destroy(true);
+			this.follower = undefined;
+		}
+		if (this.nPCAvatar) {
+			this.nPCAvatar.destroy(true);
+			this.nPCAvatar = undefined;
+		}
+	}
+
+	spawnFollower(x: number, y: number, type: string, id: string) {
+		this.follower = new FollowerToken(this, x, y, type, id);
+		this.follower.setScale(SCALE);
+		this.follower.setDepth(UiDepths.TOKEN_MAIN_LAYER);
+		this.physics.add.collider(this.follower, this.tileLayer);
+		this.physics.add.collider(this.follower, this.decorationLayer);
+		this.physics.add.collider(this.follower, this.mainCharacter);
+		Object.values(this.npcMap).forEach((npc) => {
+			this.physics.add.collider(this.follower!, npc, () => {
+				npc.onCollide(true);
+			});
+		});
+		this.nPCAvatar = new NPCAvatar(this, this.follower.id, 'icon-agnes');
 	}
 
 	addNpc(
@@ -361,6 +428,19 @@ export default class MainScene extends Phaser.Scene {
 		this.decorationLayer = decorationLayer;
 		this.overlayLayer = overlayLayer;
 
+		this.navigationalMap = [];
+		for (let y = 0; y < this.tileLayer.height; y++) {
+			this.navigationalMap[y] = [];
+			for (let x = 0; x < this.tileLayer.width; x++) {
+				const tile = this.tileLayer.getTileAt(x, y);
+				const decorationTile = this.decorationLayer.getTileAt(x, y);
+				this.navigationalMap[y][x] =
+					tile &&
+					!isCollidingTile(tile.index) &&
+					(!decorationTile || !isCollidingTile(decorationTile.index));
+			}
+		}
+
 		this.tileLayer.setDepth(UiDepths.BASE_TILE_LAYER);
 		this.tileLayer.setScale(SCALE);
 		this.decorationLayer.setDepth(UiDepths.DECORATION_TILE_LAYER);
@@ -438,6 +518,7 @@ export default class MainScene extends Phaser.Scene {
 
 	update(globalTime: number, delta: number) {
 		globalState.gameTime += delta;
+
 		this.fpsText.update();
 		this.minimap?.update();
 		this.keyboardHelper.updateGamepad();
@@ -447,23 +528,24 @@ export default class MainScene extends Phaser.Scene {
 			globalState.clearState();
 			location.reload();
 		}
-		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visiblity)) {
+		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visibility)) {
 			if (!this.scriptHelper.isScriptRunning())
 				if (globalState.gameTime - this.overlayPressed > 250) {
-					this.icons.backpackIcon.toggleScreen();
-					this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
+					if (!this.icons.backpackIcon.open) {
+						this.closeAllIconScreens();
+						this.icons.backpackIcon.openScreen();
+					} else this.closeAllIconScreens();
+					//this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
 					this.overlayPressed = globalState.gameTime;
 				}
 		}
 		if (this.keyboardHelper.isSettingsPressed()) {
 			if (!this.scriptHelper.isScriptRunning()) {
 				if (globalState.gameTime - this.overlayPressed > 250) {
-					if (this.icons.backpackIcon.screens[0].visiblity) {
-						this.icons.backpackIcon.toggleScreen();
-						this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
-					} else if (this.icons.questsIcon.screens[0].visiblity)
-						this.icons.questsIcon.toggleScreen();
-					else this.icons.settingsIcon.toggleScreen();
+					if (!this.icons.settingsIcon.open) {
+						this.closeAllIconScreens();
+						this.icons.settingsIcon.openScreen();
+					} else this.closeAllIconScreens();
 					this.overlayPressed = globalState.gameTime;
 				}
 			} else {
@@ -481,7 +563,21 @@ export default class MainScene extends Phaser.Scene {
 		if (this.keyboardHelper.isQuestsPressed()) {
 			if (!this.scriptHelper.isScriptRunning())
 				if (globalState.gameTime - this.overlayPressed > 250) {
-					this.icons.questsIcon.toggleScreen();
+					if (!this.icons.questsIcon.open) {
+						this.closeAllIconScreens();
+						this.icons.questsIcon.openScreen();
+					} else this.closeAllIconScreens();
+					this.overlayPressed = globalState.gameTime;
+				}
+		}
+
+		if (this.keyboardHelper.isEnchantPressed()) {
+			if (!this.scriptHelper.isScriptRunning())
+				if (globalState.gameTime - this.overlayPressed > 250) {
+					if (!this.icons.enchantIcon.open) {
+						this.closeAllIconScreens();
+						this.icons.enchantIcon.openScreen();
+					} else this.closeAllIconScreens();
 					this.overlayPressed = globalState.gameTime;
 				}
 		}
@@ -503,7 +599,7 @@ export default class MainScene extends Phaser.Scene {
 
 		if (this.isPaused) {
 			this.scriptHelper.handleScripts(globalState.gameTime);
-			if (this.icons.backpackIcon.screens[0].visiblity)
+			if (this.icons.backpackIcon.open)
 				this.overlayScreens.inventory.interactInventory(
 					this.keyboardHelper.getInventoryKeyPress(),
 					globalState.gameTime
@@ -514,10 +610,13 @@ export default class MainScene extends Phaser.Scene {
 		// Reset Player position to last position if they are on a blocking tile now
 		const playerX = globalState.playerCharacter.x;
 		const playerY = globalState.playerCharacter.y;
-		const currentBaseTileIndex = this.tileLayer.getTileAtWorldXY(playerX, playerY)?.index;
+		const currentBaseTileIndex = this.tileLayer.getTileAtWorldXY(
+			this.mainCharacter.x,
+			this.mainCharacter.y
+		)?.index;
 		const currentDecorationTileIndex = this.decorationLayer.getTileAtWorldXY(
-			playerX,
-			playerY
+			this.mainCharacter.x,
+			this.mainCharacter.y
 		)?.index;
 
 		if (
@@ -526,6 +625,7 @@ export default class MainScene extends Phaser.Scene {
 		) {
 			this.mainCharacter.x = this.lastPlayerPosition!.x;
 			this.mainCharacter.y = this.lastPlayerPosition!.y;
+			this.mainCharacter.setVelocity(0);
 		} else {
 			this.lastPlayerPosition = {
 				x: this.mainCharacter.x,
@@ -539,7 +639,8 @@ export default class MainScene extends Phaser.Scene {
 				return;
 			}
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
-			const isCasting = msSinceLastCast < CASTING_SPEED_MS;
+			const castingDuration = this.keyboardHelper.getLastCastingDuration();
+			const isCasting = msSinceLastCast < castingDuration;
 
 			if (!globalState.playerCharacter.dashing) {
 				const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
@@ -550,18 +651,34 @@ export default class MainScene extends Phaser.Scene {
 
 				// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
 				const hasMoved = xFacing !== 0 || yFacing !== 0;
-				const playerAnimation = updateMovingState(globalState.playerCharacter, hasMoved, newFacing);
+				let playerAnimation = updateMovingState(
+					globalState.playerCharacter,
+					hasMoved,
+					newFacing,
+					this.hasCasted && hasMoved
+				);
 				const isWalking =
 					isCasting ||
 					(this.mobilePadStick
 						? Math.abs(this.mobilePadStick.x - this.mobilePadBackgorund!.x) < 40 &&
-						Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
+						  Math.abs(this.mobilePadStick.y - this.mobilePadBackgorund!.y) < 40
 						: false);
+				if (isCasting && !this.hasCasted) {
+					playerAnimation = `player-cast-${getTwoLetterFacingName(
+						globalState.playerCharacter.currentFacing
+					)}`;
+				} else if (isCasting && this.hasCasted) {
+					playerAnimation = false;
+				}
 				if (playerAnimation) {
 					this.mainCharacter.play({
 						key: playerAnimation,
 						// duration: 5,
-						frameRate: isWalking ? NORMAL_ANIMATION_FRAME_RATE / 2 : NORMAL_ANIMATION_FRAME_RATE,
+						frameRate: isCasting
+							? NORMAL_ANIMATION_FRAME_RATE * (MINIMUM_CASTING_TIME_MS / castingDuration)
+							: isWalking
+							? NORMAL_ANIMATION_FRAME_RATE / 2
+							: NORMAL_ANIMATION_FRAME_RATE,
 						repeat: -1,
 					});
 				}
@@ -577,10 +694,17 @@ export default class MainScene extends Phaser.Scene {
 					this.lastStepLeft = undefined;
 				}
 
-				const speed =
-					isCasting || isWalking
-						? getCharacterSpeed(globalState.playerCharacter) / 2
-						: getCharacterSpeed(globalState.playerCharacter);
+				if (!isCasting) {
+					this.hasCasted = false;
+				} else {
+					this.hasCasted = true;
+				}
+
+				const speed = isCasting
+					? 0
+					: isWalking
+					? getCharacterSpeed(globalState.playerCharacter) / 2
+					: getCharacterSpeed(globalState.playerCharacter);
 
 				this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
 				this.mainCharacter.body.velocity.normalize().scale(speed);
@@ -595,16 +719,19 @@ export default class MainScene extends Phaser.Scene {
 		}
 
 		const cooldowns = this.keyboardHelper.getAbilityCooldowns(globalState.gameTime);
-		this.avatar.update(cooldowns);
+		this.playerCharacterAvatar.update(cooldowns);
 
 		if (this.useDynamicLighting && this.dynamicLightingHelper) {
-			this.dynamicLightingHelper.updateDynamicLighting();
+			this.dynamicLightingHelper.updateDynamicLighting(globalState.gameTime);
 		}
 
 		// Updated npcs
 		Object.values(this.npcMap).forEach((curNpc) => {
 			curNpc.update(globalState.gameTime, delta);
 		});
+
+		this.follower?.update(globalState.gameTime, delta);
+		this.nPCAvatar?.update();
 
 		// TODO: remove items that are picked up
 		this.worldItems = this.worldItems.filter((itemToken) => !itemToken.isDestroyed);
@@ -666,11 +793,11 @@ export default class MainScene extends Phaser.Scene {
 
 		for (const fadingLabel of this.fadingLabels) {
 			const timeDelta = globalTime - fadingLabel.timestamp;
-			if (timeDelta > 1000) {
+			if (timeDelta > fadingLabel.timeToLive) {
 				fadingLabel.fontElement?.destroy(true);
 				fadingLabel.fontElement = undefined;
 			} else if (fadingLabel.fontElement) {
-				const timeDeltaFraction = timeDelta / 1000;
+				const timeDeltaFraction = timeDelta / fadingLabel.timeToLive;
 				fadingLabel.fontElement.y = fadingLabel.posY - timeDeltaFraction * FADING_LABEL_Y_DISTANCE;
 				fadingLabel.fontElement.x =
 					fadingLabel.posX + Math.sin(timeDeltaFraction * 4) * FADING_LABEL_X_DISTANCE;
@@ -699,7 +826,8 @@ export default class MainScene extends Phaser.Scene {
 		fontSize: FadingLabelSize,
 		color: string,
 		posX: number,
-		posY: number
+		posY: number,
+		timeToLive: number
 	) {
 		const fadingLabel = new Phaser.GameObjects.Text(this, posX, posY, text, {
 			fontFamily: 'endlessDungeon',
@@ -712,9 +840,17 @@ export default class MainScene extends Phaser.Scene {
 			fontSize,
 			fontElement: fadingLabel,
 			timestamp: this.game.getTime(),
+			timeToLive,
 			posX,
 			posY,
 		});
+	}
+
+	closeAllIconScreens() {
+		Object.values(this.icons).forEach((icon) => {
+			icon.closeScreen();
+		});
+		this.resume();
 	}
 
 	pause() {
@@ -741,17 +877,46 @@ export default class MainScene extends Phaser.Scene {
 		this.time.paused = false;
 	}
 
-	dropItem(x: number, y: number, itemKey: string, level?: number) {
+	dropItem(x: number, y: number, itemKey: string, level: number = 0) {
 		const item = getItemDataForName(itemKey);
 		if (item === undefined) {
 			console.log('ITEM UNDEFINED: ', itemKey);
 			return;
 		}
-		let itemToken;
-		// if(itemKey == 'source-fire') itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0, 'icon_source_fire1');
-		// else itemToken = new WorldItemToken(this, x, y, itemKey, item, getItemTexture(itemKey), level || 0);
-		itemToken = new WorldItemToken(this, x, y, itemKey, item, level || 0, getItemTexture(itemKey));
+		let itemToken = new WorldItemToken(this, x, y, itemKey, item, level, getItemTexture(itemKey));
 		itemToken.setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.worldItems.push(itemToken);
+	}
+
+	getTokenForStateObject(stateObject: Character) {
+		if (stateObject.faction === Faction.PLAYER) {
+			return this.mainCharacter;
+		} else if (stateObject.faction === Faction.ALLIES) {
+			return this.follower;
+		} else {
+			return this.npcMap[stateObject.id];
+		}
+	}
+
+	getLightingSources(): LightingSource[] {
+		return this.abilityHelper.abilityEffects.map((abilityEffect) => {
+			return {
+				x: Math.round(abilityEffect.x / TILE_WIDTH / SCALE),
+				y: Math.round(abilityEffect.y / TILE_HEIGHT / SCALE),
+				radius: abilityEffect.lightingRadius || 2,
+				strength:
+					abilityEffect.lightingStrength !== undefined
+						? abilityEffect.lightingStrength || 2
+						: undefined,
+				...(abilityEffect.lightingMinStrength !== undefined
+					? {
+							minStrength: abilityEffect.lightingMinStrength,
+							maxStrength: abilityEffect.lightingMaxStrength,
+							frequency: abilityEffect.lightingFrequency,
+							seed: abilityEffect.lightingSeed,
+					  }
+					: {}),
+			};
+		});
 	}
 }

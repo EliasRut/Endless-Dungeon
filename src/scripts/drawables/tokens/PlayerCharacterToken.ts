@@ -2,7 +2,6 @@ import { Faction } from '../../helpers/constants';
 import globalState from '../../worldstate';
 import CharacterToken from './CharacterToken';
 import MainScene from '../../scenes/MainScene';
-import { facingToSpriteNameMap } from '../../helpers/constants'
 
 const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;

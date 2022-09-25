@@ -32,7 +32,7 @@ const ABILITY_COORDINATES_MOBILE = {
 	[AbilityKey.SPACE]: [32, 280],
 };
 
-export default class Avatar extends Phaser.GameObjects.Group {
+export default class PlayerCharacterAvatar extends Phaser.GameObjects.Group {
 	healthBar: Phaser.GameObjects.Image;
 	abilityIcons: Map<AbilityKey, Phaser.GameObjects.Image>;
 

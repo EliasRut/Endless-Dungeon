@@ -2,6 +2,7 @@ import MainScene from '../../scenes/MainScene';
 import { UI_SCALE, UiDepths } from '../../helpers/constants';
 import { Icons } from './Icons';
 import OverlayScreen from '../../screens/OverlayScreen';
+import { EnchantmentName } from '../../../items/enchantmentData';
 
 export const MENU_ICON_LEFT_BORDER = 32;
 
@@ -9,6 +10,7 @@ export default abstract class MenuIcon extends Phaser.GameObjects.Image implemen
 	scene: MainScene;
 	screens: OverlayScreen[];
 	ICON: string;
+	open: boolean = false;
 
 	constructor(
 		scene: MainScene,
@@ -32,36 +34,37 @@ export default abstract class MenuIcon extends Phaser.GameObjects.Image implemen
 	}
 
 	toggleScreen() {
+		if (!this.scene.scriptHelper.isScriptRunning()) {
+			if (this.open) this.scene.closeAllIconScreens();
+			else {
+				this.scene.closeAllIconScreens();
+				this.openScreen();
+			}
+		}
+	}
+
+	closeScreen() {
+		this.setScreens();
+		
+		this.screens.forEach((screen) => {
+			screen.modify();
+			screen.setVisible(false);
+			screen.visibility = false;
+		});
+		this.open = false;
+	}
+
+	openScreen(openingModifier?: any) {
 		this.setScreens();
 
-		Object.values(this.scene.icons)
-			.filter((e) => e.name !== this.name)
-			.forEach((value) => {
-				value.setScreenVisibility(false);
-				this.scene.resume();
-			});
-
-		let oneVisible: boolean = false;
-
 		this.screens.forEach((screen) => {
-			if (screen.visiblity) {
-				// this.scene.pause();
-				oneVisible = true;
-				screen.setVisible(false);
-				screen.visiblity = false;
-			} else {
-				// this.scene.resume();
-				screen.update();
-				screen.setVisible(true);
-				screen.visiblity = true;
-			}
+			screen.modify(openingModifier);
+			screen.update();
+			screen.setVisible(true);
+			screen.visibility = true;
 		});
-
-		if (oneVisible) {
-			this.scene.resume();
-		} else {
-			this.scene.pause();
-		}
+		this.open = true;
+		this.scene.pause();
 	}
 
 	setScreenVisibility(visible: boolean): void {

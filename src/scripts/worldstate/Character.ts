@@ -1,7 +1,7 @@
 import { Facings, Faction } from '../helpers/constants';
 
 export default class Character {
-	public animationBase: string;	
+	public animationBase: string;
 	public maxHealth: number;
 	public health: number;
 	public damage: number;
@@ -22,13 +22,16 @@ export default class Character {
 	public vision = 0;
 
 	public faction: Faction;
+	public id: string;
 
 	constructor(
+		id: string,
 		animationBase: string,
-		health: number = 100,
-		damage: number = 1,
-		movementSpeed: number = 200
+		health: number,
+		damage: number,
+		movementSpeed: number
 	) {
+		this.id = id;
 		this.animationBase = animationBase;
 		this.maxHealth = health;
 		this.health = health;
@@ -43,4 +46,26 @@ export const updateStatus = (globalTime: number, character: Character) => {
 			character.stunned = false;
 		}
 	}
+};
+
+export const DefaultCharacterData: Character = {
+	animationBase: '',
+	maxHealth: 100,
+	health: 100,
+	damage: 1,
+	luck: 1,
+	movementSpeed: 30,
+	slowFactor: 1,
+	attackTime: 0,
+	stunDuration: 0,
+	stunnedAt: 0,
+	stunned: false,
+	dashing: false,
+	currentFacing: Facings.SOUTH,
+	isWalking: false,
+	x: 0,
+	y: 0,
+	vision: 0,
+	faction: Faction.PLAYER,
+	id: '',
 };

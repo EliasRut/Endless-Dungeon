@@ -1,4 +1,6 @@
 import {
+	ColorsOfMagic,
+	DEBUG_PATHFINDING,
 	facingToSpriteNameMap,
 	KNOCKBACK_TIME,
 	NORMAL_ANIMATION_FRAME_RATE,
@@ -7,8 +9,9 @@ import {
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import EnemyToken from './EnemyToken';
+import EnemyToken, { slainEnemy } from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
+import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 
 const BASE_ATTACK_DAMAGE = 3;
 const REGULAR_ATTACK_RANGE = 25;
@@ -18,8 +21,8 @@ const BASE_HEALTH = 4;
 
 const ATTACK_DAMAGE_DELAY = 250;
 
-const ITEM_DROP_CHANCE = 0.65;
-const HEALTH_DROP_CHANCE = 0.06 * globalState.playerCharacter.luck;
+const ITEM_DROP_CHANCE = 0;
+const HEALTH_DROP_CHANCE = 0 * globalState.playerCharacter.luck;
 
 export default class ZombieToken extends EnemyToken {
 	attackExecuted: boolean;
@@ -43,6 +46,7 @@ export default class ZombieToken extends EnemyToken {
 		this.startingHealth = BASE_HEALTH * (1 + this.level * 0.5);
 		this.stateObject.health = this.startingHealth;
 		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
+		this.color = ColorsOfMagic.FLUX;
 	}
 
 	public update(time: number, delta: number) {
@@ -56,11 +60,11 @@ export default class ZombieToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropRandomItem(this.level);
+				this.dropEquippableItem(this.level, slainEnemy.NORMAL);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
-				this.dropFixedItem('health');
+				this.dropNonEquippableItem('health');
 			}
-			//this.dropFixedItem('source-fire');
+			this.dropNonEquippableItem('essence');
 			this.dead = true;
 			this.die();
 			return;
@@ -85,8 +89,9 @@ export default class ZombieToken extends EnemyToken {
 			return;
 		}
 
-		const tx = this.target.x;
-		const ty = this.target.y;
+		// Attack, if a target exists and is alive
+		let tx = this.target.x;
+		let ty = this.target.y;
 		const distance = this.getDistanceToWorldStatePosition(tx, ty);
 
 		if (
@@ -103,33 +108,15 @@ export default class ZombieToken extends EnemyToken {
 
 		// follows you only if you're close enough, then runs straight at you,
 		// stop when close enough (proximity)
-
 		if (
+			this.targetStateObject &&
+			this.targetStateObject.health > 0 &&
 			this.aggro &&
 			this.attackedAt + this.stateObject.attackTime < time &&
 			this.attackRange < distance
 		) {
-			const totalDistance = Math.abs(tx * SCALE - this.x) + Math.abs(ty * SCALE - this.y);
-			const xSpeed =
-				((tx * SCALE - this.x) / totalDistance) *
-				this.stateObject.movementSpeed *
-				this.stateObject.slowFactor;
-			const ySpeed =
-				((ty * SCALE - this.y) / totalDistance) *
-				this.stateObject.movementSpeed *
-				this.stateObject.slowFactor;
-			this.setVelocityX(xSpeed);
-			this.setVelocityY(ySpeed);
-			const newFacing = getFacing4Dir(xSpeed, ySpeed);
-			const animation = updateMovingState(this.stateObject, true, newFacing);
-			if (animation) {
-				if (this.scene.game.anims.exists(animation)) {
-					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
-				} else {
-					console.log(`Animation ${animation} does not exist.`);
-					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
-				}
-			}
+			super.walkToWaypoint();
+			// Just stand around and do nothing, otherwise
 		} else {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
@@ -143,9 +130,14 @@ export default class ZombieToken extends EnemyToken {
 				}
 			}
 		}
-		if (distance <= this.attackRange) {
+		if (
+			distance <= this.attackRange &&
+			this.targetStateObject &&
+			this.targetStateObject.health > 0
+		) {
 			this.attack(time);
 		}
+
 		this.stateObject.x = this.body.x / SCALE;
 		this.stateObject.y = this.body.y / SCALE;
 	}
@@ -170,14 +162,18 @@ export default class ZombieToken extends EnemyToken {
 	}
 
 	maybeDealDamage() {
-		const player = globalState.playerCharacter;
-		const tx = player.x;
-		const ty = player.y;
+		const target = this.targetStateObject;
+		if (!target) {
+			return;
+		}
+		const tx = target.x;
+		const ty = target.y;
 		const distance = this.getDistanceToWorldStatePosition(tx, ty);
 
 		if (distance < this.attackRange) {
-			this.scene.mainCharacter.takeDamage(this.stateObject.damage);
-			this.scene.mainCharacter.receiveHit();
+			const targetToken = this.scene.getTokenForStateObject(target);
+			targetToken?.takeDamage(this.stateObject.damage);
+			targetToken?.receiveHit();
 		}
 	}
 }

@@ -1,14 +1,14 @@
 import {
-	Facings,
 	facingToSpriteNameMap,
 	KNOCKBACK_TIME,
 	SCALE,
 	NORMAL_ANIMATION_FRAME_RATE,
+	ColorsOfMagic,
 } from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import EnemyToken from './EnemyToken';
+import EnemyToken, { slainEnemy } from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 
 const BASE_ATTACK_DAMAGE = 10;
@@ -17,13 +17,12 @@ const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
 const BASE_HEALTH = 4;
 
-const ITEM_DROP_CHANCE = 0.65;
+const ITEM_DROP_CHANCE = 0;
 const HEALTH_DROP_CHANCE = 0.06 * globalState.playerCharacter.luck;
 
 const CHARGE_TIME = 650;
 const ATTACK_DURATION = 2500;
 const WALL_COLLISION_STUN = 2000;
-const PLAYER_STUN = 800;
 const COLLISION_STUN = 1000;
 const LAUNCH_SPEED = 150;
 export default class VampireToken extends EnemyToken {
@@ -54,6 +53,7 @@ export default class VampireToken extends EnemyToken {
 		this.stateObject.health = this.startingHealth;
 		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
 		this.stateObject.attackTime = ATTACK_DURATION;
+		this.color = ColorsOfMagic.BLOOD;
 	}
 
 	public update(time: number, delta: number) {
@@ -67,10 +67,11 @@ export default class VampireToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropRandomItem(this.level);
+				this.dropEquippableItem(this.level, slainEnemy.NORMAL);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
-				this.dropFixedItem('health');
+				this.dropNonEquippableItem('health');
 			}
+			this.dropNonEquippableItem('essence');
 			this.dead = true;
 			this.die();
 			return;
@@ -104,11 +105,11 @@ export default class VampireToken extends EnemyToken {
 
 		// follows you only if you're close enough, then runs straight at you,
 		// stop when close enough (proximity)
-		if (!this.attacking) {
+		if (!this.attacking && this.targetStateObject) {
 			const tx = this.target.x;
 			const ty = this.target.y;
-			const px = globalState.playerCharacter.x * SCALE;
-			const py = globalState.playerCharacter.y * SCALE;
+			const px = this.targetStateObject.x * SCALE;
+			const py = this.targetStateObject.y * SCALE;
 			if (this.aggro) {
 				if (
 					px !== tx * SCALE ||
@@ -204,10 +205,11 @@ export default class VampireToken extends EnemyToken {
 			let stunDuration = WALL_COLLISION_STUN;
 			if (withEnemy) {
 				stunDuration = COLLISION_STUN;
-				if (!this.damaged) {
-					this.scene.mainCharacter.receiveStun(stunDuration);
-					this.scene.mainCharacter.takeDamage(this.stateObject.damage);
-					this.scene.mainCharacter.receiveHit();
+				if (!this.damaged && this.targetStateObject) {
+					const targetToken = this.scene.getTokenForStateObject(this.targetStateObject);
+					targetToken?.receiveStun(stunDuration);
+					targetToken?.takeDamage(this.stateObject.damage);
+					targetToken?.receiveHit();
 					this.damaged = true;
 				}
 			}

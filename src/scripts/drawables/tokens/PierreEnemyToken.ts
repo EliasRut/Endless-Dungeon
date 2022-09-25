@@ -1,14 +1,14 @@
 import {
-	Facings,
 	facingToSpriteNameMap,
 	KNOCKBACK_TIME,
 	SCALE,
 	NORMAL_ANIMATION_FRAME_RATE,
+	ColorsOfMagic,
 } from '../../helpers/constants';
-import { getFacing4Dir, updateMovingState, getXYfromTotalSpeed } from '../../helpers/movement';
+import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import EnemyToken from './EnemyToken';
+import EnemyToken, { slainEnemy } from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 import { AbilityType } from '../../abilities/abilityData';
 import Enemy from '../../worldstate/Enemy';
@@ -19,7 +19,7 @@ const REGULAR_MOVEMENT_SPEED = 80;
 const MIN_MOVEMENT_SPEED = 25;
 const BASE_HEALTH = 4;
 
-const ITEM_DROP_CHANCE = 0.65;
+const ITEM_DROP_CHANCE = 0;
 const HEALTH_DROP_CHANCE = 0.06 * globalState.playerCharacter.luck;
 
 const CHARGE_TIME = 1000;
@@ -49,6 +49,7 @@ export default class PierreToken extends EnemyToken {
 		this.stateObject.health = this.startingHealth;
 		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
 		this.stateObject.attackTime = ATTACK_DURATION;
+		this.color = ColorsOfMagic.ROYAL;
 	}
 
 	public update(time: number, delta: number) {
@@ -62,10 +63,11 @@ export default class PierreToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropRandomItem(this.level);
+				this.dropEquippableItem(this.level, slainEnemy.NORMAL);
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
-				this.dropFixedItem('health');
+				this.dropNonEquippableItem('health');
 			}
+			this.dropNonEquippableItem('essence');
 			this.dead = true;
 			this.die();
 			return;
@@ -96,11 +98,11 @@ export default class PierreToken extends EnemyToken {
 
 		// follows you only if you're close enough, then runs straight at you,
 		// stop when close enough (proximity)
-		if (!this.attacking) {
+		if (!this.attacking && this.targetStateObject) {
 			const tx = this.target.x;
 			const ty = this.target.y;
-			const px = globalState.playerCharacter.x;
-			const py = globalState.playerCharacter.y;
+			const px = this.targetStateObject.x;
+			const py = this.targetStateObject.y;
 			if (this.aggro) {
 				if (
 					px !== tx ||
@@ -152,6 +154,7 @@ export default class PierreToken extends EnemyToken {
 
 	// FRAME RATE: 16
 	attack(time: number) {
+		console.log(`attacking ${this.target}`);
 		if (!this.attacking) {
 			this.stateObject.isWalking = false;
 			const tx = this.target.x * SCALE;

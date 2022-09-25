@@ -1,6 +1,7 @@
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { AbilityKey } from './constants';
+import { CASTING_SPEED_MS } from '../scenes/MainScene';
 
 const AXIS_MOVEMENT_THRESHOLD = 0.4;
 
@@ -19,6 +20,7 @@ export default class KeyboardHelper {
 	questsKey: Phaser.Input.Keyboard.Key;
 	enterKey: Phaser.Input.Keyboard.Key;
 	spaceKey: Phaser.Input.Keyboard.Key;
+	enchantKey: Phaser.Input.Keyboard.Key;
 
 	wasEnterKeyPressed: boolean;
 
@@ -33,6 +35,8 @@ export default class KeyboardHelper {
 
 	gamepad: Phaser.Input.Gamepad.Gamepad | undefined;
 
+	lastCastingDuration: number = CASTING_SPEED_MS;
+
 	isMoveUpPressed: () => boolean;
 	isMoveDownPressed: () => boolean;
 	isMoveLeftPressed: () => boolean;
@@ -41,11 +45,12 @@ export default class KeyboardHelper {
 	isAbility2Pressed: () => boolean;
 	isAbility3Pressed: () => boolean;
 	isAbility4Pressed: () => boolean;
-	isInventoryPressed: (inventoryOpen: boolean) => boolean;
+	isInventoryPressed: (inventoryOpen: boolean) => boolean; // <= bool for gamepad: if inventory is open, B button closes it as well, not just inventory button
 	isSettingsPressed: () => boolean;
 	isQuestsPressed: () => boolean;
 	isEnterPressed: () => boolean;
 	isSpacePressed: () => boolean;
+	isEnchantPressed: () => boolean;
 
 	scene: Phaser.Scene;
 
@@ -60,6 +65,7 @@ export default class KeyboardHelper {
 		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 		this.spaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+		this.enchantKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 		this.wasEnterKeyPressed = false;
 
 		this.scene = scene;
@@ -138,6 +144,16 @@ export default class KeyboardHelper {
 				return false;
 			}
 		};
+		this.isEnchantPressed = () => {
+			if (this.enchantKey.isDown) {
+				return true;
+			}
+			try {
+				return !!this.gamepad?.isButtonDown(11);
+			} catch (err) {
+				return false;
+			}
+		};
 
 		this.abilityKey1 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
 		this.abilityKey2 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
@@ -148,6 +164,7 @@ export default class KeyboardHelper {
 		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
 		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 		this.spaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+		this.enchantKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
 		this.isAbility1Pressed = () => {
 			if (this.abilityKeyPressed[AbilityKey.ONE]) {
@@ -307,10 +324,7 @@ export default class KeyboardHelper {
 				this.castIfPressed(AbilityKey.FOUR, gameTime),
 				inventory.equippedRightRing ? inventory.rings[inventory.equippedRightRing].level : 0,
 			],
-			[
-				this.castIfPressed(AbilityKey.SPACE, gameTime),
-				1,
-			],
+			[this.castIfPressed(AbilityKey.SPACE, gameTime), 1],
 		].filter(([ability]) => !!ability) as [AbilityType, number][];
 	}
 
@@ -333,9 +347,13 @@ export default class KeyboardHelper {
 			globalState.playerCharacter.abilityCastTime[AbilityKey.THREE],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.FOUR],
 			globalState.playerCharacter.abilityCastTime[AbilityKey.SPACE],
-		].reduce((max, value) => Math.max(max, value), 0);
+		].reduce((max, value) => Math.max(max, value), -Infinity);
 
 		return gameTime - lastCast;
+	}
+
+	getLastCastingDuration() {
+		return this.lastCastingDuration;
 	}
 
 	getAbilityCooldowns(gameTime: number) {

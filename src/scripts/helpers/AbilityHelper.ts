@@ -1,4 +1,10 @@
-import { Abilities, AbilityData, AbilityType, SpreadData } from '../abilities/abilityData';
+import {
+	Abilities,
+	AbilityData,
+	AbilityType,
+	SpreadData,
+	getRelevantAbilityVersion,
+} from '../abilities/abilityData';
 import AbilityEffect from '../drawables/effects/AbilityEffect';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import EnemyToken from '../drawables/tokens/EnemyToken';
@@ -7,9 +13,11 @@ import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import { Facings, Faction, PossibleTargets, SCALE } from './constants';
-import { getFacing4Dir, getRotationInRadiansForFacing } from './movement';
+import { getFacing8Dir, getRotationInRadiansForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
 import Enemy from '../worldstate/Enemy';
+import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
+import { CASTING_SPEED_MS } from '../scenes/MainScene';
 
 export default class AbilityHelper {
 	scene: MainScene;
@@ -28,6 +36,8 @@ export default class AbilityHelper {
 			y: number;
 			exactTargetXFactor?: number;
 			exactTargetYFactor?: number;
+			width?: number;
+			height?: number;
 		},
 		type: AbilityType,
 		abilityLevel: number,
@@ -36,7 +46,7 @@ export default class AbilityHelper {
 	) {
 		// We allow for multiple projectiles per ability.
 		// Let's get the data for ability projectiles first.
-		const usedAbilityData = abilityData || Abilities[type];
+		const usedAbilityData = abilityData || getRelevantAbilityVersion(type, abilityLevel);
 		const projectileData = usedAbilityData.projectileData;
 		// Since we're allowing projectiles to have a spread, we'll be using radians for easier math
 		const facingRotation = getRotationInRadiansForFacing(pointOfOrigin.currentFacing);
@@ -62,17 +72,19 @@ export default class AbilityHelper {
 			if (pointOfOrigin.exactTargetYFactor !== undefined) {
 				yMultiplier = pointOfOrigin.exactTargetYFactor;
 			}
-			const effect = new projectileData!.effect(
+			const effect = new (projectileData!.effect || TrailingParticleProjectileEffect)(
 				this.scene,
-				pointOfOrigin.x + xMultiplier * projectileData!.xOffset, //  * SCALE
-				pointOfOrigin.y + yMultiplier * projectileData!.yOffset, //  * SCALE
+				pointOfOrigin.x + (pointOfOrigin.width || 0) / 2 + xMultiplier * projectileData!.xOffset,
+				pointOfOrigin.y + (pointOfOrigin.height || 0) / 2 + yMultiplier * projectileData!.yOffset,
 				usedAbilityData.spriteName || '',
-				getFacing4Dir(xMultiplier, yMultiplier),
+				getFacing8Dir(xMultiplier, yMultiplier),
 				projectileData
 			);
 			if (projectileData?.targeting) {
 				(effect as TargetingEffect).allowedTargets =
-					caster.faction === Faction.PLAYER ? PossibleTargets.ENEMIES : PossibleTargets.PLAYER;
+					caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
+						? PossibleTargets.ENEMIES
+						: PossibleTargets.PLAYER;
 			}
 			effect.setVelocity(xMultiplier * SCALE, yMultiplier * SCALE);
 			effect.setMaxVelocity(projectileData!.velocity * SCALE);
@@ -105,11 +117,21 @@ export default class AbilityHelper {
 					});
 				}
 			});
+			this.scene.physics.add.collider(effect, Object.values(this.scene.doorMap), () => {
+				if (projectileData!.destroyOnWallContact) {
+					effect.destroy();
+				}
+				if (projectileData?.collisionSound) {
+					this.scene.sound.play(projectileData.collisionSound!, {
+						volume: projectileData.sfxVolume!,
+					});
+				}
+			});
 
 			const targetTokens =
-				caster.faction === Faction.PLAYER
+				caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
 					? Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES)
-					: this.scene.mainCharacter;
+					: [this.scene.mainCharacter, ...(this.scene.follower ? [this.scene.follower] : [])];
 			const collidingCallback = (collidingEffect: AbilityEffect, enemy: CharacterToken) => {
 				if (collidingEffect.hitEnemyTokens.includes(enemy)) {
 					return;
@@ -186,13 +208,18 @@ export default class AbilityHelper {
 	}
 	update(time: number, castAbilities: [AbilityType, number][]) {
 		castAbilities.forEach(([ability, abilityLevel]) => {
-			this.triggerAbility(
-				globalState.playerCharacter,
-				globalState.playerCharacter,
-				ability,
-				abilityLevel,
-				time
-			);
+			const castingTime =
+				getRelevantAbilityVersion(ability, abilityLevel).castingTime || CASTING_SPEED_MS;
+			setTimeout(() => {
+				this.triggerAbility(
+					globalState.playerCharacter,
+					globalState.playerCharacter,
+					ability,
+					abilityLevel,
+					time
+				);
+			}, castingTime * 0.67);
+			this.scene.keyboardHelper.lastCastingDuration = castingTime;
 		});
 
 		this.abilityEffects = this.abilityEffects.filter((effect) => !effect.destroyed);

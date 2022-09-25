@@ -24,6 +24,7 @@ export default class DungeonDoorScene extends Phaser.Scene {
 		this.sound.stopAll();
 		this.sound.play('score-mage-tower', { volume: 0.04 });
 		this.contentDataLibraryUpdatePromise = loadContentBlocksFromDatabase();
+		this.dungeonDoor.openDoor();
 	}
 
 	async enterDungeon(runeAssignment: RuneAssignment) {

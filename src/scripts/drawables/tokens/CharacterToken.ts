@@ -38,6 +38,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	iceEffectStacks: number;
 	tokenName: string;
 	healthbar: Phaser.GameObjects.Image;
+	charmedTime: number;
 
 	protected showHealthbar() {
 		return false;
@@ -67,6 +68,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			this.healthbar.setDepth(UiDepths.FLOATING_HEALTHBAR_LAYER);
 			scene.add.existing(this.healthbar);
 		}
+		this.charmedTime = -Infinity;
 	}
 
 	public onCollide(withEnemy: boolean) {}
@@ -85,25 +87,29 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		}
 	}
 	public receiveStun(duration: number) {
-		const time = globalState.gameTime;
-		if (this.stateObject.stunnedAt + this.stateObject.stunDuration > time) {
-			return true;
+		if (this.stateObject.health > 0) {
+			const time = globalState.gameTime;
+			if (this.stateObject.stunnedAt + this.stateObject.stunDuration > time) {
+				return true;
+			}
+			this.stateObject.stunned = true;
+			this.stateObject.stunnedAt = time;
+			this.stateObject.stunDuration = duration;
+			this.stateObject.isWalking = false;
+			const animation = `${this.type}-stun-${
+				facingToSpriteNameMap[this.stateObject.currentFacing]
+			}`;
+			if (duration >= 500 && this.scene.game.anims.exists(animation)) {
+				this.play({
+					key: animation,
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+					// 1 run = 500ms
+					repeat: Math.floor((2 * duration) / 1000),
+				});
+				return true;
+			}
+			return false;
 		}
-		this.stateObject.stunned = true;
-		this.stateObject.stunnedAt = time;
-		this.stateObject.stunDuration = duration;
-		this.stateObject.isWalking = false;
-		const animation = `${this.type}-stun-${facingToSpriteNameMap[this.stateObject.currentFacing]}`;
-		if (duration >= 500 && this.scene.game.anims.exists(animation)) {
-			this.play({
-				key: animation,
-				frameRate: NORMAL_ANIMATION_FRAME_RATE,
-				// 1 run = 500ms
-				repeat: Math.floor((2 * duration) / 1000),
-			});
-			return true;
-		}
-		return false;
 	}
 
 	public getDistanceToWorldStatePosition(px: number, py: number) {
@@ -127,7 +133,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			FadingLabelSize.NORMAL,
 			'#FFFF00',
 			this.x,
-			this.y - this.body.height
+			this.y - this.body.height,
+			1000
 		);
 		this.stateObject.health -= damage;
 		if (this.showHealthbar()) {
@@ -184,7 +191,12 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			if (this.iceEffectStacks > 4) {
 				this.iceEffectStacks = 4;
 			}
-			if (this.necroticEffectStacks > 0) {
+			if (this.charmedTime + 6000 >= time) {
+				this.tint = 0xffcccc;
+				if (hasHealthbar) {
+					this.healthbar.tint = 0xffcccc;
+				}
+			} else if (this.necroticEffectStacks > 0) {
 				// Color the token green and deal damage over time
 				this.tint = DOT_TINT[this.necroticEffectStacks - 1];
 				if (hasHealthbar) {

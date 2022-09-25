@@ -2,8 +2,7 @@ import { Facings, SCALE, UiDepths } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
 
-const BODY_RADIUS = 6;
-const EXPLOSION_PARTICLE_SPEED = 100;
+const BODY_RADIUS = 4;
 const VISIBILITY_DELAY = 50;
 
 const RED_MIN = 0xcc0000;
@@ -21,7 +20,7 @@ export default class FireBallEffect extends TargetingEffect {
 		facing: Facings,
 		projectileData: ProjectileData
 	) {
-		super(scene, x, y, 'empty-tile', facing, projectileData);
+		super(scene, x, y, projectileData.projectileImage || 'empty-tile', facing, projectileData);
 		scene.add.existing(this);
 		this.setDepth(UiDepths.TOKEN_FOREGROUND_LAYER);
 		this.setScale(SCALE);
@@ -29,10 +28,10 @@ export default class FireBallEffect extends TargetingEffect {
 		this.body.setCircle(BODY_RADIUS, 0, 0);
 		this.body.setMass(1);
 
-		this.particles = scene.add.particles('fire');
+		this.particles = scene.add.particles(projectileData.particleData?.particleImage || 'fire');
 		this.emitter = this.particles.createEmitter({
 			alpha: { start: 1, end: 0 },
-			scale: { start: 0.2 * this.effectScale * SCALE, end: 0.05 * SCALE },
+			scale: { start: this.effectScale * SCALE, end: 0.2 * SCALE },
 			speed: 20 * SCALE,
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 200, max: 400 },
@@ -66,10 +65,10 @@ export default class FireBallEffect extends TargetingEffect {
 			this.emitter.setEmitterAngle({ min: -180, max: 180 });
 			this.emitter.setSpeed(70 * SCALE);
 			this.emitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
-			this.emitter.setScale({ start: 0.4 * this.effectScale, end: 0.05 });
+			this.emitter.setScale({ start: this.effectScale, end: 0.125 });
 			this.emitter.explode(20, this.body.x + 6 * SCALE, this.body.y + 6 * SCALE);
 			this.emitter.setSpeed({ min: 5 * SCALE, max: 55 * SCALE });
-			this.emitter.setScale({ start: 0.3 * this.effectScale * SCALE, end: 0.01 * SCALE });
+			this.emitter.setScale({ start: 0.8 * this.effectScale * SCALE, end: 0.1 * SCALE });
 			this.emitter.explode(10, this.body.x + 6 * SCALE, this.body.y + 6 * SCALE);
 		}
 

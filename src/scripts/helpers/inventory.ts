@@ -19,7 +19,6 @@ import Item from '../worldstate/Item';
 import { EquipmentSlot, BAG_BOXES_X, BAG_BOXES_Y } from './constants';
 import { ItemData, CatalystKey, AmuletKey } from '../../items/itemData';
 import { EnchantmentName } from '../../items/enchantmentData';
-import { enchantmentModifiers } from '../worldstate/PlayerCharacter';
 
 const BASE_HEALTH = 100;
 const BASE_MOVEMENT_SPEED = 200;
@@ -87,6 +86,16 @@ export const getEquippedItems: () => EquippedItems = () => {
 	};
 };
 
+export const getEquipmentDataForSlot: (slot: EquipmentSlot) => EquippedItemData | undefined = (
+	slot
+) => {
+	const equippmentKeyInSlot = getEquippedItems()[slot];
+	if (!equippmentKeyInSlot) {
+		return undefined;
+	}
+	return getEquipmentDataForItemKey(equippmentKeyInSlot);
+};
+
 export const getEquipmentDataForItemKey: (itemKey: EquipmentKey) => EquippedItemData = (
 	itemKey
 ) => {
@@ -106,43 +115,44 @@ export const getEquipmentDataForItemKey: (itemKey: EquipmentKey) => EquippedItem
 	throw new Error(`Unknown equipment type ${itemKey}.`);
 };
 
- export const attachEnchantmentItem: (itemKey: EquipmentKey, enchantment: EnchantmentName) => void = (
-	 itemKey,
-	 enchantment
-	 ) => {
+export const attachEnchantmentItem: (
+	itemKey: EquipmentKey,
+	enchantment: EnchantmentName
+) => void = (itemKey, enchantment) => {
 	const prefix = itemKey.split('-')[0];
 	switch (prefix) {
 		case 'source':
-			return globalState.inventory.sources[itemKey as Source].enchantment = enchantment;
+			return (globalState.inventory.sources[itemKey as Source].enchantment = enchantment);
 		case 'catalyst':
-			return globalState.inventory.catalysts[itemKey as Catalyst].enchantment = enchantment;
+			return (globalState.inventory.catalysts[itemKey as Catalyst].enchantment = enchantment);
 		case 'chestpiece':
-			return globalState.inventory.chestPieces[itemKey as ChestPiece].enchantment = enchantment;
+			return (globalState.inventory.chestPieces[itemKey as ChestPiece].enchantment = enchantment);
 		case 'amulet':
-			return globalState.inventory.amulets[itemKey as Amulet].enchantment = enchantment;
+			return (globalState.inventory.amulets[itemKey as Amulet].enchantment = enchantment);
 		case 'ring':
-			return globalState.inventory.rings[itemKey as Ring].enchantment = enchantment;
+			return (globalState.inventory.rings[itemKey as Ring].enchantment = enchantment);
 	}
 	throw new Error(`Unknown equipment type ${itemKey}.`);
- };
+};
 
-export const getEquipmentDataRecordForEquipmentSlot: (slot: EquipmentSlot) => EquippedItemRecords =
-	(slot) => {
-		switch (slot) {
-			case EquipmentSlot.SOURCE:
-				return globalState.inventory.sources;
-			case EquipmentSlot.CATALYST:
-				return globalState.inventory.catalysts;
-			case EquipmentSlot.AMULET:
-				return globalState.inventory.amulets;
-			case EquipmentSlot.CHESTPIECE:
-				return globalState.inventory.chestPieces;
-			case EquipmentSlot.LEFT_RING:
-				return globalState.inventory.rings;
-			case EquipmentSlot.RIGHT_RING:
-				return globalState.inventory.rings;
-		}
-	};
+export const getEquipmentDataRecordForEquipmentSlot: (
+	slot: EquipmentSlot
+) => EquippedItemRecords = (slot) => {
+	switch (slot) {
+		case EquipmentSlot.SOURCE:
+			return globalState.inventory.sources;
+		case EquipmentSlot.CATALYST:
+			return globalState.inventory.catalysts;
+		case EquipmentSlot.AMULET:
+			return globalState.inventory.amulets;
+		case EquipmentSlot.CHESTPIECE:
+			return globalState.inventory.chestPieces;
+		case EquipmentSlot.LEFT_RING:
+			return globalState.inventory.rings;
+		case EquipmentSlot.RIGHT_RING:
+			return globalState.inventory.rings;
+	}
+};
 
 // export const getUnequippedItemsWithPositions = () => {
 // 	return globalState.inventory.unequippedItemList;

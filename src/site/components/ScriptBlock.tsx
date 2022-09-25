@@ -1,17 +1,22 @@
 import React from 'react';
 import { ScriptEntry } from '../../../typings/custom';
+import { AbilityType } from '../../scripts/abilities/abilityData';
+import { DefaultCharacterData } from '../../scripts/worldstate/Character';
 import { ScriptBlockContainer } from './ScriptBlockContainer';
 import { Condition } from './ScriptBlockTypes/Condition';
+import { DespawnFollower } from './ScriptBlockTypes/DespawnFollower';
 import { Dialog } from './ScriptBlockTypes/Dialog';
 import { Move } from './ScriptBlockTypes/Move';
 import { PausedCondition } from './ScriptBlockTypes/PausedCondition';
+import { SetFollowerData } from './ScriptBlockTypes/SetFollowerData';
 import { SetQuestState } from './ScriptBlockTypes/SetQuestState';
+import { SpawnFollower } from './ScriptBlockTypes/SpawnFollower';
 import { Wait } from './ScriptBlockTypes/Wait';
 import { ScriptTypeDropdown } from './ScriptTypeDropdown';
 
 export interface ScriptBlockProps {
 	scriptBlock: Partial<ScriptEntry>;
-	onChange: (value: string) => void;
+	onChange: (value: Partial<ScriptEntry>) => void;
 	onRemove: () => void;
 	knownQuests: {
 		id: string;
@@ -117,10 +122,64 @@ export const ScriptBlock: (props: ScriptBlockProps) => JSX.Element = ({
 				/>
 			);
 		}
+		case 'setFollowerData': {
+			return (
+				<SetFollowerData
+					currentData={{
+						follower: {
+							...DefaultCharacterData,
+							id: '',
+							animationBase: '',
+							health: 0,
+							damage: 0,
+							movementSpeed: 0,
+							abilityCastTime: [-Infinity, -Infinity, -Infinity, -Infinity],
+							level: 0,
+							ability: AbilityType.FIREBALL,
+							...scriptBlock.follower,
+						},
+						type: 'setFollowerData',
+					}}
+					// availableFollowerAbilities={knownFollowerAbilities}
+					updateData={onChange}
+					removeData={onRemove}
+				/>
+			);
+		}
+		case 'spawnFollower': {
+			return (
+				<SpawnFollower
+					currentData={{
+						followerId: '',
+						...scriptBlock,
+						type: 'spawnFollower',
+					}}
+					updateData={onChange}
+					removeData={onRemove}
+				/>
+			);
+		}
+		case 'despawnFollower': {
+			return (
+				<DespawnFollower
+					currentData={{
+						followerId: '',
+						...scriptBlock,
+						type: 'despawnFollower',
+					}}
+					updateData={onChange}
+					removeData={onRemove}
+				/>
+			);
+		}
 		default:
 			return (
 				<ScriptBlockContainer>
-					<ScriptTypeDropdown value="-" onChange={onChange} onRemove={onRemove} />
+					<ScriptTypeDropdown
+						value="-"
+						onChange={(scriptType: any) => onChange({ type: scriptType })}
+						onRemove={onRemove}
+					/>
 				</ScriptBlockContainer>
 			);
 	}

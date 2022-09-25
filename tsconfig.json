@@ -12,5 +12,6 @@
 		"lib": ["dom", "es5", "esnext"],
 		"resolveJsonModule": true,
 		"allowSyntheticDefaultImports": true
-	}
+	},
+	"exclude": ["**/__tests__"]
 }

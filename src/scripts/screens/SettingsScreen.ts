@@ -160,7 +160,7 @@ export default class SettingsScreen extends OverlayScreen {
 		// tslint:enable
 		scene.add.existing(this);
 		this.setVisible(false);
-		this.visiblity = false;
+		this.visibility = false;
 	}
 
 	save() {
