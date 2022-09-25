@@ -164,6 +164,9 @@ export default class SettingsScreen extends OverlayScreen {
 	}
 
 	save() {
+		globalState.storeState();
+
+		/* tslint:disable: max-line-length */
 		let jsonData: string = '{';
 		jsonData +=
 			'"' +
@@ -199,6 +202,7 @@ export default class SettingsScreen extends OverlayScreen {
 		jsonData += '"' + WorldState.INVENTORY + '": ' + JSON.stringify(globalState.inventory) + ',\n';
 		jsonData += '"' + WorldState.SAVEGAMENAME + '": ' + '"test-save+"';
 		jsonData += '}';
+		/* tslint:enable: max-line-length */
 
 		// tslint:disable-next-line: no-console
 		console.log(this.scene.scene);
