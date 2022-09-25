@@ -126,6 +126,7 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 		this.lightingFrequency = 1000;
 		this.lightingSeed = globalState.gameTime - 100;
 		this.body.destroy();
+		this.setVisible(false);
 		setTimeout(() => {
 			this.particles.destroy();
 		}, 1000);

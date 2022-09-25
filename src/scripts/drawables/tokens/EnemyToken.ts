@@ -587,6 +587,8 @@ export default class EnemyToken extends CharacterToken {
 			return;
 		}
 		if (this.isCharging) {
+			this.stateObject.x = this.body.x / SCALE;
+			this.stateObject.y = this.body.y / SCALE;
 			this.executeMeleeAttack(time);
 			return;
 		}

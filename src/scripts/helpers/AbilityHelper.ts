@@ -67,10 +67,10 @@ export default class AbilityHelper {
 			// We want to combine the arc position with the characters facing to allow cone-like effects
 			let yMultiplier = -Math.cos(currentSpread * Math.PI + facingRotation);
 			let xMultiplier = Math.sin(currentSpread * Math.PI + facingRotation);
-			if (pointOfOrigin.exactTargetXFactor !== undefined) {
+			if (usedAbilityData.useExactTargetVector && pointOfOrigin.exactTargetXFactor !== undefined) {
 				xMultiplier = pointOfOrigin.exactTargetXFactor;
 			}
-			if (pointOfOrigin.exactTargetYFactor !== undefined) {
+			if (usedAbilityData.useExactTargetVector && pointOfOrigin.exactTargetYFactor !== undefined) {
 				yMultiplier = pointOfOrigin.exactTargetYFactor;
 			}
 			const effect = new (projectileData!.effect || TrailingParticleProjectileEffect)(
@@ -146,14 +146,14 @@ export default class AbilityHelper {
 				const prevHealth = enemy.stateObject.health;
 				enemy.takeDamage(damage);
 				if (prevHealth > 0 && enemy.stateObject.health <= 0) {
-					console.log(`Enemy died`);
 					// Enemy died from this attack
 					if (usedAbilityData.castOnEnemyDestroyed) {
+						const enemyStateObject = { ...enemy.stateObject };
 						this.triggerAbility(
 							caster,
-							enemy.stateObject,
+							enemyStateObject,
 							usedAbilityData.castOnEnemyDestroyed!,
-							abilityLevel,
+							1, //abilityLevel,
 							globalTime,
 							1
 						);
@@ -215,11 +215,6 @@ export default class AbilityHelper {
 				getRelevantAbilityVersion(ability, abilityLevel, globalState.playerCharacter.comboCast)
 					.castingTime || CASTING_SPEED_MS;
 			globalState.playerCharacter.lastComboCast = globalState.playerCharacter.comboCast;
-			if (globalState.playerCharacter.comboCast >= 3) {
-				globalState.playerCharacter.comboCast = 1;
-			} else {
-				globalState.playerCharacter.comboCast++;
-			}
 			setTimeout(() => {
 				this.triggerAbility(
 					globalState.playerCharacter,
@@ -229,6 +224,11 @@ export default class AbilityHelper {
 					time,
 					globalState.playerCharacter.comboCast
 				);
+				if (globalState.playerCharacter.comboCast >= 3) {
+					globalState.playerCharacter.comboCast = 1;
+				} else {
+					globalState.playerCharacter.comboCast++;
+				}
 			}, castingTime * 0.67);
 			this.scene.keyboardHelper.lastCastingDuration = castingTime;
 		});

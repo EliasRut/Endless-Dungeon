@@ -461,21 +461,23 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayLayer.setScale(SCALE);
 
 		npcs.forEach((npc) => {
-			this.addNpc(
-				npc.id,
-				npc.type,
-				npc.x,
-				npc.y,
-				dungeonLevel.enemyLevel,
-				npc.facingX || 0,
-				npc.facingY || 0,
-				{
-					script: npc.script,
-					questGiverId: npc.questGiverId,
-					traderId: npc.traderId,
-					enemyData: npc.options,
-				}
-			);
+			if ((enemies[npc.id] && enemies[npc.id].health > 0) || !enemies[npc.id]) {
+				this.addNpc(
+					npc.id,
+					npc.type,
+					npc.x,
+					npc.y,
+					dungeonLevel.enemyLevel,
+					npc.facingX || 0,
+					npc.facingY || 0,
+					{
+						script: npc.script,
+						questGiverId: npc.questGiverId,
+						traderId: npc.traderId,
+						enemyData: npc.options,
+					}
+				);
+			}
 		});
 		// this.addNpc(
 		// 	"lichking",

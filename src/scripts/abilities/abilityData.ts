@@ -85,6 +85,7 @@ export interface AbilityData {
 	castOnEnemyDestroyed?: AbilityType;
 	spriteName?: string;
 	castingTime?: number;
+	useExactTargetVector?: boolean;
 }
 
 export const enum AbilityType {
@@ -488,8 +489,8 @@ export const Abilities: AbilityDataMap = {
 
 		projectileData: {
 			spread: [-1, 1],
-			velocity: 220,
-			drag: 0,
+			velocity: 200,
+			drag: 800,
 			xOffset: 0,
 			yOffset: 0,
 			projectileImage: 'empty-tile',
