@@ -17,8 +17,8 @@ import { RandomItemOptions } from '../../helpers/item';
 import Character, { updateStatus } from '../../worldstate/Character';
 import { findNextPathSegmentTo } from '../../helpers/pathfindingHelper';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
-import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
-import { EnemyData, EnemyCategory } from '../../enemies/enemyData';
+import { getFacing4Dir, getXYfromTotalSpeed, updateMovingState } from '../../helpers/movement';
+import { EnemyData, EnemyCategory, MeleeAttackType } from '../../enemies/enemyData';
 import { UneqippableItem } from '../../../items/itemData';
 
 const BODY_RADIUS = 8;
@@ -53,6 +53,9 @@ export default class EnemyToken extends CharacterToken {
 	lastTileY: number;
 	enemyData: EnemyData;
 	dead: boolean;
+	isCharging: boolean = false;
+	chargeX: number | undefined;
+	chargeY: number | undefined;
 
 	isWaitingToDealDamage: boolean = false;
 
@@ -228,21 +231,74 @@ export default class EnemyToken extends CharacterToken {
 	}
 
 	executeMeleeAttack(time: number) {
-		if (this.attackedAt! + this.stateObject.attackTime < time) {
-			const tx = this.targetStateObject!.x * SCALE;
-			const ty = this.targetStateObject!.y * SCALE;
-			const xSpeed = tx - this.x;
-			const ySpeed = ty - this.y;
-			const newFacing = getFacing4Dir(xSpeed, ySpeed);
+		switch (this.enemyData.meleeAttackData!.attackType) {
+			case MeleeAttackType.HIT: {
+				if (this.attackedAt + this.stateObject.attackTime < time) {
+					const tx = this.targetStateObject!.x * SCALE;
+					const ty = this.targetStateObject!.y * SCALE;
+					const xSpeed = tx - this.x;
+					const ySpeed = ty - this.y;
+					const newFacing = getFacing4Dir(xSpeed, ySpeed);
 
-			const attackAnimationName = `${this.tokenName}-attack-${facingToSpriteNameMap[newFacing]}`;
-			this.play({ key: attackAnimationName, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+					const attackAnimationName = `${this.tokenName}-${
+						this.enemyData.meleeAttackData!.animationName
+					}-${facingToSpriteNameMap[newFacing]}`;
+					this.play({ key: attackAnimationName, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 
-			this.setVelocityX(0);
-			this.setVelocityY(0);
-			this.stateObject.isWalking = false;
-			this.attackedAt = time;
-			this.isWaitingToDealDamage = true;
+					this.setVelocityX(0);
+					this.setVelocityY(0);
+					this.stateObject.isWalking = false;
+					this.attackedAt = time;
+					this.isWaitingToDealDamage = true;
+				}
+				break;
+			}
+			case MeleeAttackType.CHARGE: {
+				if (!this.isWaitingToDealDamage) {
+					this.attackedAt = time;
+					this.isWaitingToDealDamage = true;
+					this.setVelocityX(0);
+					this.setVelocityY(0);
+				}
+				const chargeTime = this.enemyData.meleeAttackData?.chargeTime || 1;
+				if (this.attackedAt + chargeTime > time) {
+					const tx = this.target.x * SCALE;
+					const ty = this.target.y * SCALE;
+					const xSpeed = tx - this.x;
+					const ySpeed = ty - this.y;
+					const newFacing = getFacing4Dir(xSpeed, ySpeed);
+					// 9 frames, so 9 frame rate for 1s.
+					if (this.attackedAt === time || this.stateObject.currentFacing !== newFacing) {
+						const attackAnimationName = `${this.tokenName}-${
+							this.enemyData.meleeAttackData!.animationName
+						}-${facingToSpriteNameMap[newFacing]}`;
+						this.play({ key: attackAnimationName, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+						this.anims.setProgress((time - this.attackedAt) / chargeTime);
+						this.stateObject.currentFacing = newFacing;
+					}
+				} else if (this.attackedAt + chargeTime <= time && !this.isCharging) {
+					const chargeSpeed =
+						this.enemyData.meleeAttackData?.chargeSpeed || this.enemyData.movementSpeed;
+					this.isCharging = true;
+					const tx = this.target.x * SCALE;
+					const ty = this.target.y * SCALE;
+					const speeds = getXYfromTotalSpeed(this.y - ty, this.x - tx);
+					const xSpeed = speeds[0] * chargeSpeed * this.stateObject.slowFactor * SCALE;
+					const ySpeed = speeds[1] * chargeSpeed * this.stateObject.slowFactor * SCALE;
+					const newFacing = getFacing4Dir(xSpeed, ySpeed);
+					const attackAnimationName = `${this.tokenName}-${
+						this.enemyData.meleeAttackData!.animationName
+					}-${facingToSpriteNameMap[newFacing]}`;
+					this.play({
+						key: attackAnimationName,
+						frameRate: NORMAL_ANIMATION_FRAME_RATE,
+						startFrame: 8,
+					});
+					this.chargeX = xSpeed;
+					this.chargeY = ySpeed;
+				}
+				break;
+			}
 		}
 	}
 
@@ -284,7 +340,10 @@ export default class EnemyToken extends CharacterToken {
 		);
 
 		// Deal damage for the currently running attack
-		if (this.isWaitingToDealDamage) {
+		if (
+			this.isWaitingToDealDamage &&
+			this.enemyData.meleeAttackData?.attackType === MeleeAttackType.HIT
+		) {
 			if (this.attackedAt + this.enemyData.meleeAttackData!.attackDamageDelay < time) {
 				this.dealMeleeDamage(distance);
 			}
@@ -345,6 +404,10 @@ export default class EnemyToken extends CharacterToken {
 		if (this.lastMovedTimestamp + KNOCKBACK_TIME > time) {
 			return;
 		}
+		// if (this.isCharging) {
+		// 	this.setVelocityX(this.chargeX!);
+		// 	this.setVelocityY(this.chargeY!);
+		// }
 
 		if (!this.checkLoS()) {
 			// If we no longer see the target, and the aggro linger time has passed, reset the target
@@ -418,5 +481,35 @@ export default class EnemyToken extends CharacterToken {
 		}
 		this.stateObject.x = this.body.x / SCALE;
 		this.stateObject.y = this.body.y / SCALE;
+	}
+
+	onCollide(withEnemy: boolean) {
+		if (this.isCharging) {
+			let stunDuration = this.enemyData.meleeAttackData?.wallCollisionStunDuration || 0;
+			if (withEnemy) {
+				stunDuration = this.enemyData.meleeAttackData?.enemyCollisionStunDuration || 0;
+				if (this.isWaitingToDealDamage && this.targetStateObject) {
+					const targetToken = this.scene.getTokenForStateObject(this.targetStateObject);
+					targetToken?.receiveStun(stunDuration);
+					targetToken?.takeDamage(this.stateObject.damage);
+					targetToken?.receiveHit();
+					this.isWaitingToDealDamage = false;
+				}
+			}
+			this.receiveStun(stunDuration);
+			const tx = this.target.x;
+			const ty = this.target.y;
+			const xSpeed = tx - this.x;
+			const ySpeed = ty - this.y;
+			const newFacing = getFacing4Dir(xSpeed, ySpeed);
+			const stunAnimation = `${this.tokenName}-stun-${facingToSpriteNameMap[newFacing]}`;
+			const recoverAnimation = `${this.tokenName}-shake-${facingToSpriteNameMap[newFacing]}`;
+			// 4 repeats per second, at currently 16 fps.
+			this.play({
+				key: stunAnimation,
+				frameRate: NORMAL_ANIMATION_FRAME_RATE,
+				repeat: Math.floor((4 * (stunDuration - 500)) / 1000),
+			}).chain({ key: recoverAnimation, repeat: 3 });
+		}
 	}
 }
