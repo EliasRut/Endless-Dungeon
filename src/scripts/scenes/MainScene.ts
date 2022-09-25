@@ -59,7 +59,6 @@ import QuestDetailsScreen from '../screens/QuestDetailsScreen';
 import ContentManagementScreen from '../screens/ContentManagementScreen';
 import EnchantIcon from '../drawables/ui/EnchantIcon';
 import FollowerToken from '../drawables/tokens/FollowerToken';
-import { AbilityType } from '../abilities/abilityData';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -428,6 +427,7 @@ export default class MainScene extends Phaser.Scene {
 
 	drawRoom() {
 		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];
+		const enemies = globalState.enemies;
 		if (!dungeonLevel) {
 			throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
 		}
@@ -549,31 +549,7 @@ export default class MainScene extends Phaser.Scene {
 			globalState.clearState();
 			location.reload();
 		}
-		if (this.keyboardHelper.isInventoryPressed(this.icons.backpackIcon.screens[0].visibility)) {
-			if (!this.scriptHelper.isScriptRunning())
-				if (globalState.gameTime - this.overlayPressed > 250) {
-					if (!this.icons.backpackIcon.open) {
-						this.closeAllIconScreens();
-						this.icons.backpackIcon.openScreen();
-					} else this.closeAllIconScreens();
-					//this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime);
-					this.overlayPressed = globalState.gameTime;
-				}
-		}
-		if (this.keyboardHelper.isSettingsPressed()) {
-			if (!this.scriptHelper.isScriptRunning()) {
-				if (globalState.gameTime - this.overlayPressed > 250) {
-					if (!this.icons.settingsIcon.open) {
-						this.closeAllIconScreens();
-						this.icons.settingsIcon.openScreen();
-					} else this.closeAllIconScreens();
-					this.overlayPressed = globalState.gameTime;
-				}
-			} else {
-				this.scriptHelper.handleScriptStep(globalState.gameTime, true);
-				return;
-			}
-		}
+
 		if (this.keyboardHelper.isEnterPressed()) {
 			if (this.scriptHelper.isScriptRunning()) {
 				this.scriptHelper.handleScriptStep(globalState.gameTime, true);
@@ -581,26 +557,51 @@ export default class MainScene extends Phaser.Scene {
 			}
 		}
 
-		if (this.keyboardHelper.isQuestsPressed()) {
-			if (!this.scriptHelper.isScriptRunning())
-				if (globalState.gameTime - this.overlayPressed > 250) {
-					if (!this.icons.questsIcon.open) {
-						this.closeAllIconScreens();
-						this.icons.questsIcon.openScreen();
-					} else this.closeAllIconScreens();
-					this.overlayPressed = globalState.gameTime;
+		let open = false;
+		Object.values(this.icons).forEach((icon) => {
+			if (icon.open) open = true;
+		});
+		if (this.keyboardHelper.isSettingsPressed(open)) {
+			if (!this.scriptHelper.isScriptRunning()) {
+				if (this.handleOverlayCooldown()) {
+					this.closeAllIconScreens();
+					if (!open) this.icons.settingsIcon.openScreen();
 				}
+			} else {
+				this.scriptHelper.handleScriptStep(globalState.gameTime, true);
+				return;
+			}
 		}
 
-		if (this.keyboardHelper.isEnchantPressed()) {
-			if (!this.scriptHelper.isScriptRunning())
-				if (globalState.gameTime - this.overlayPressed > 250) {
-					if (!this.icons.enchantIcon.open) {
-						this.closeAllIconScreens();
-						this.icons.enchantIcon.openScreen();
-					} else this.closeAllIconScreens();
-					this.overlayPressed = globalState.gameTime;
-				}
+		open = this.icons.backpackIcon.open;
+		if (
+			this.keyboardHelper.isInventoryPressed() &&
+			!this.scriptHelper.isScriptRunning() &&
+			this.handleOverlayCooldown()
+		) {
+			this.closeAllIconScreens();
+			if (!open) this.icons.backpackIcon.openScreen();
+		}
+		//this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime); // <= dunno what this is for, delete if no inventory bugs are found
+
+		open = this.icons.questsIcon.open;
+		if (
+			this.keyboardHelper.isQuestsPressed() &&
+			!this.scriptHelper.isScriptRunning() &&
+			this.handleOverlayCooldown()
+		) {
+			this.closeAllIconScreens();
+			if (!open) this.icons.questsIcon.openScreen();
+		}
+
+		open = this.icons.enchantIcon.open;
+		if (
+			this.keyboardHelper.isEnchantPressed() &&
+			!this.scriptHelper.isScriptRunning() &&
+			this.handleOverlayCooldown()
+		) {
+			this.closeAllIconScreens();
+			if (!open) this.icons.enchantIcon.openScreen();
 		}
 
 		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
@@ -869,9 +870,16 @@ export default class MainScene extends Phaser.Scene {
 
 	closeAllIconScreens() {
 		Object.values(this.icons).forEach((icon) => {
-			icon.closeScreen();
+			if (icon.open) icon.closeScreen();
 		});
 		this.resume();
+	}
+
+	handleOverlayCooldown() {
+		if (globalState.gameTime - this.overlayPressed > 250) {
+			this.overlayPressed = globalState.gameTime;
+			return true;
+		} else return false;
 	}
 
 	pause() {

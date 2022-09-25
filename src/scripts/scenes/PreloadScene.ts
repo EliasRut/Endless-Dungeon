@@ -80,6 +80,8 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('quest', 'assets/img/quest.png');
 
 		// GUI
+		this.load.scenePlugin('rexuiplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js', 'rexUI', 'rexUI');
+
 		this.load.image('quickselect-wheel', 'assets/img/quickselect-wheel.png');
 		this.load.image(
 			'quickselect-wheel-selection-large',
