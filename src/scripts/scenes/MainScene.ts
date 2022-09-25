@@ -57,6 +57,7 @@ import ContentManagementScreen from '../screens/ContentManagementScreen';
 import EnchantIcon from '../drawables/ui/EnchantIcon';
 import FollowerToken from '../drawables/tokens/FollowerToken';
 import { AbilityType } from '../abilities/abilityData';
+import { GameObjects } from 'phaser';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -416,6 +417,7 @@ export default class MainScene extends Phaser.Scene {
 
 	drawRoom() {
 		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];
+		const enemies = globalState.enemies;
 		if (!dungeonLevel) {
 			throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
 		}
@@ -449,20 +451,23 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayLayer.setScale(SCALE);
 
 		npcs.forEach((npc) => {
-			this.addNpc(
-				npc.id,
-				npc.type,
-				npc.x,
-				npc.y,
-				dungeonLevel.enemyLevel,
-				npc.facingX || 0,
-				npc.facingY || 0,
-				{
-					script: npc.script,
-					questGiverId: npc.questGiverId,
-					traderId: npc.traderId,
-				}
-			);
+			if (enemies[npc.id] && enemies[npc.id].health > 0) {
+				console.log('add npc');
+				this.addNpc(
+					npc.id,
+					npc.type,
+					npc.x,
+					npc.y,
+					dungeonLevel.enemyLevel,
+					npc.facingX || 0,
+					npc.facingY || 0,
+					{
+						script: npc.script,
+						questGiverId: npc.questGiverId,
+						traderId: npc.traderId,
+					}
+				);
+			}
 		});
 		// this.addNpc(
 		// 	"lichking",

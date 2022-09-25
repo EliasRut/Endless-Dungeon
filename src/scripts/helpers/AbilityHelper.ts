@@ -10,7 +10,7 @@ import CharacterToken from '../drawables/tokens/CharacterToken';
 import EnemyToken from '../drawables/tokens/EnemyToken';
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import MainScene from '../scenes/MainScene';
-import globalState from '../worldstate';
+import globalState, { WorldState } from '../worldstate';
 import Character from '../worldstate/Character';
 import { Facings, Faction, PossibleTargets, SCALE } from './constants';
 import { getFacing8Dir, getRotationInRadiansForFacing } from './movement';
@@ -156,6 +156,7 @@ export default class AbilityHelper {
 							globalTime
 						);
 					}
+					// delete globalState.enemies[enemy.id];
 				}
 				if (usedAbilityData.stun) {
 					enemy.receiveStun(usedAbilityData.stun!);
