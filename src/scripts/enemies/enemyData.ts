@@ -2,6 +2,7 @@ import { AbilityType } from '../abilities/abilityData';
 import { ColorsOfMagic } from '../helpers/constants';
 
 export interface EnemyData {
+	level: number;
 	startingHealth: number;
 	damage: number;
 	movementSpeed: number;
@@ -49,8 +50,6 @@ export interface RangedAttackData {
 	castTime?: number;
 	castRange: number;
 	animationName: string;
-
-	firedShot: boolean;
 
 	abilityType: AbilityType;
 }

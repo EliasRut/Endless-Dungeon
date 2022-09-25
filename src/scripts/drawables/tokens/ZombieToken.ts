@@ -42,13 +42,13 @@ export default class ZombieToken extends EnemyToken {
 	) {
 		super(scene, x, y, tokenName, id, enemyData);
 		// cool effects!
-		this.level = level;
+		this.stateObject.level = level;
 		// this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
 		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
 		this.attackExecuted = false;
-		this.startingHealth = BASE_HEALTH * (1 + this.level * 0.5);
+		this.startingHealth = BASE_HEALTH * (1 + this.stateObject.level * 0.5);
 		this.stateObject.health = this.startingHealth;
-		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
+		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.stateObject.level * 0.5);
 		this.color = ColorsOfMagic.FLUX;
 	}
 

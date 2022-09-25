@@ -31,6 +31,7 @@ export default class LichtKingToken extends EnemyToken {
 		super(scene, x, y, tokenName, id, {
 			startingHealth: 40 * level,
 			damage: 5 * level,
+			level,
 			movementSpeed: 100 * (1 + level * 0.1),
 			// attackRange: ATTACK_RANGE,
 			itemDropChance: 0,
@@ -43,7 +44,7 @@ export default class LichtKingToken extends EnemyToken {
 
 		this.setScale(2);
 		this.stateObject.attackTime = 4000;
-		this.level = level;
+		this.stateObject.level = level;
 
 		const particles = scene.add.particles('fire');
 		particles.setDepth(1);
@@ -146,7 +147,7 @@ export default class LichtKingToken extends EnemyToken {
 				this.stateObject,
 				this.stateObject,
 				AbilityType.ARCANE_BLADE,
-				this.level,
+				this.stateObject.level,
 				time
 			);
 		}

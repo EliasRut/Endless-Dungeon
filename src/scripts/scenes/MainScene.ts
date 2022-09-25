@@ -507,11 +507,17 @@ export default class MainScene extends Phaser.Scene {
 
 	renderDebugGraphics() {
 		// tslint:disable: no-magic-numbers
-		const debugGraphics = this.add.graphics().setAlpha(0.75);
-		this.tileLayer.renderDebug(debugGraphics, {
+		const tileDebugGraphics = this.add.graphics().setAlpha(0.75);
+		const decorationDebugGraphics = this.add.graphics().setAlpha(0.75);
+		this.tileLayer.renderDebug(tileDebugGraphics, {
 			tileColor: null, // Color of non-colliding tiles
 			collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255),
 			faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Color of colliding face edges
+		});
+		this.decorationLayer.renderDebug(decorationDebugGraphics, {
+			tileColor: null, // Color of non-colliding tiles
+			collidingTileColor: new Phaser.Display.Color(0, 134, 48, 255),
+			faceColor: new Phaser.Display.Color(0, 39, 37, 255), // Color of colliding face edges
 		});
 		// tslint:enable: no-magic-numbers
 	}

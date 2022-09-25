@@ -252,13 +252,13 @@ export const EnemyByColorOfMagicMap: { [color: string]: [number, string][] } = {
 		[1, 'pierre'],
 	],
 	[ColorsOfMagic.BLOOD]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
+		// [0.5, 'rich'],
+		// [0.85, 'jacques'],
 		[1, 'pierre'],
 	],
 	[ColorsOfMagic.DEATH]: [
-		[0.5, 'rich'],
-		[0.85, 'jacques'],
+		// [0.5, 'rich'],
+		// [0.85, 'jacques'],
 		[1, 'pierre'],
 	],
 	[ColorsOfMagic.PASSION]: [
@@ -397,4 +397,5 @@ export const convertEmitterDataToScaledValues = (
 };
 
 export const DEBUG_PHYSICS = false;
-export const DEBUG_PATHFINDING = true;
+export const DEBUG_PATHFINDING = false;
+export const DEBUG_ENEMY_AI = true;

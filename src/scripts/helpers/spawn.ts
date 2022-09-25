@@ -2,7 +2,6 @@ import MainScene from '../scenes/MainScene';
 import NpcToken from '../drawables/tokens/NpcToken';
 import { NpcOptions } from '../../../typings/custom';
 import LichKingToken from '../drawables/tokens/LichKing';
-import VampireToken from '../drawables/tokens/VampireEnemyToken';
 import FireElementalToken from '../drawables/tokens/FireElementalToken';
 import IceElementalToken from '../drawables/tokens/IceElementalToken';
 import ArcaneElementalToken from '../drawables/tokens/ArcaneElementalToken';
@@ -26,6 +25,7 @@ export const spawnNpc = (
 			return new EnemyToken(scene, posX, posY, type, id, {
 				startingHealth: 4 * (1 + level * 0.5),
 				damage: 3 * (1 + level * 0.5),
+				level,
 				movementSpeed: 80,
 				itemDropChance: 0,
 				healthPotionDropChance: 0.05,
@@ -42,15 +42,33 @@ export const spawnNpc = (
 			});
 		}
 		case 'jacques': {
-			return new VampireToken(scene, posX, posY, type, level, id);
+			return new EnemyToken(scene, posX, posY, type, id, {
+				startingHealth: 4 * (1 + level * 0.5),
+				damage: 3 * (1 + level * 0.5),
+				level,
+				movementSpeed: 80,
+				itemDropChance: 0,
+				healthPotionDropChance: 0.05,
+				category: EnemyCategory.NORMAL,
+				color: ColorsOfMagic.BLOOD,
+				isMeleeEnemy: true,
+				isRangedEnemy: false,
+				meleeAttackData: {
+					attackDamageDelay: 450,
+					attackType: MeleeAttackType.CHARGE,
+					attackRange: 75 * SCALE,
+					animationName: 'attack',
+					wallCollisionStunDuration: 2000,
+					enemyCollisionStunDuration: 1000,
+					chargeTime: 250,
+				},
+			});
 		}
-		// case 'pierre': {
-		// 	return new PierreToken(scene, posX, posY, type, level, id);
-		// }
 		case 'pierre': {
 			return new EnemyToken(scene, posX, posY, type, id, {
 				startingHealth: 4 * (1 + level * 0.5),
 				damage: 3 * (1 + level * 0.5),
+				level,
 				movementSpeed: 80,
 				itemDropChance: 0,
 				healthPotionDropChance: 0.05,
@@ -62,7 +80,6 @@ export const spawnNpc = (
 					castTime: 1000,
 					castRange: 75 * SCALE,
 					animationName: 'throw',
-					firedShot: false,
 					abilityType: AbilityType.BAT,
 				},
 			});
