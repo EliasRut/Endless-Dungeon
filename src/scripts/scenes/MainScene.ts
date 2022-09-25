@@ -449,7 +449,7 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayLayer.setScale(SCALE);
 
 		npcs.forEach((npc) => {
-			if (enemies[npc.id] && enemies[npc.id].health > 0) {
+			if ((enemies[npc.id] && enemies[npc.id].health > 0) || !enemies[npc.id]) {
 				console.log('add npc');
 				this.addNpc(
 					npc.id,
