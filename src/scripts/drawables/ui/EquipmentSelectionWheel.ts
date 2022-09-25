@@ -118,14 +118,14 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 				this.scene.overlayScreens.itemScreen.update();
 			}
 		} else {
-			console.log(enchantment)
+			console.log(enchantment);
 			attachEnchantmentItem(itemKey, enchantment);
 		}
 		this.scene.overlayScreens.inventory.update();
 		this.toggleVisibility();
 		this.selection?.setVisible(false);
 
-		if(enchantment !== 'None') {
+		if (enchantment !== 'None') {
 			this.scene.closeAllIconScreens();
 			this.scene.icons.enchantIcon.openScreen();
 		}
@@ -136,8 +136,39 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 	}
 
 	playItemAnimation(itemToken: Phaser.GameObjects.Sprite, itemName?: string) {
-		if (itemName === 'source-fire') {
-			itemToken.play({ key: 'source_fire1', frameRate: NORMAL_ANIMATION_FRAME_RATE, repeat: -1 });
+		switch (itemName) {
+			case 'source-fire': {
+				itemToken.play({
+					key: 'source_fire1',
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+					repeat: -1,
+				});
+				break;
+			}
+			case 'source-ice': {
+				itemToken.play({
+					key: 'source_ice1',
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+					repeat: -1,
+				});
+				break;
+			}
+			case 'source-necrotic': {
+				itemToken.play({
+					key: 'source_necrotic1',
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+					repeat: -1,
+				});
+				break;
+			}
+			case 'source-arcane': {
+				itemToken.play({
+					key: 'source_arcane1',
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+					repeat: -1,
+				});
+				break;
+			}
 		}
 	}
 

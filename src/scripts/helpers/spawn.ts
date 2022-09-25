@@ -2,7 +2,6 @@ import MainScene from '../scenes/MainScene';
 import NpcToken from '../drawables/tokens/NpcToken';
 import { NpcOptions } from '../../../typings/custom';
 import LichKingToken from '../drawables/tokens/LichKing';
-import PierreToken from '../drawables/tokens/PierreEnemyToken';
 import FireElementalToken from '../drawables/tokens/FireElementalToken';
 import IceElementalToken from '../drawables/tokens/IceElementalToken';
 import ArcaneElementalToken from '../drawables/tokens/ArcaneElementalToken';
@@ -10,6 +9,7 @@ import NecroticElementalToken from '../drawables/tokens/NecroticElementalToken';
 import EnemyToken from '../drawables/tokens/EnemyToken';
 import { EnemyCategory, MeleeAttackType } from '../enemies/enemyData';
 import { ColorsOfMagic, SCALE } from './constants';
+import { AbilityType } from '../abilities/abilityData';
 
 export const spawnNpc = (
 	scene: MainScene,
@@ -25,8 +25,8 @@ export const spawnNpc = (
 			return new EnemyToken(scene, posX, posY, type, id, {
 				startingHealth: 4 * (1 + level * 0.5),
 				damage: 3 * (1 + level * 0.5),
+				level,
 				movementSpeed: 80,
-				attackRange: 32 * SCALE,
 				itemDropChance: 0,
 				healthPotionDropChance: 0.05,
 				category: EnemyCategory.NORMAL,
@@ -36,6 +36,7 @@ export const spawnNpc = (
 				meleeAttackData: {
 					attackDamageDelay: 450,
 					attackType: MeleeAttackType.HIT,
+					attackRange: 32 * SCALE,
 					animationName: 'attack',
 				},
 			});
@@ -44,8 +45,8 @@ export const spawnNpc = (
 			return new EnemyToken(scene, posX, posY, type, id, {
 				startingHealth: 4 * (1 + level * 0.5),
 				damage: 3 * (1 + level * 0.5),
+				level,
 				movementSpeed: 80,
-				attackRange: 75 * SCALE,
 				itemDropChance: 0,
 				healthPotionDropChance: 0.05,
 				category: EnemyCategory.NORMAL,
@@ -55,6 +56,7 @@ export const spawnNpc = (
 				meleeAttackData: {
 					attackDamageDelay: 450,
 					attackType: MeleeAttackType.CHARGE,
+					attackRange: 75 * SCALE,
 					animationName: 'attack',
 					wallCollisionStunDuration: 2000,
 					enemyCollisionStunDuration: 1000,
@@ -63,7 +65,24 @@ export const spawnNpc = (
 			});
 		}
 		case 'pierre': {
-			return new PierreToken(scene, posX, posY, type, level, id);
+			return new EnemyToken(scene, posX, posY, type, id, {
+				startingHealth: 4 * (1 + level * 0.5),
+				damage: 3 * (1 + level * 0.5),
+				level,
+				movementSpeed: 80,
+				itemDropChance: 0,
+				healthPotionDropChance: 0.05,
+				category: EnemyCategory.NORMAL,
+				color: ColorsOfMagic.BLOOD,
+				isMeleeEnemy: false,
+				isRangedEnemy: true,
+				rangedAttackData: {
+					castTime: 1000,
+					castRange: 75 * SCALE,
+					animationName: 'throw',
+					abilityType: AbilityType.BAT,
+				},
+			});
 		}
 		case 'lich-king': {
 			return new LichKingToken(scene, posX, posY, 'rich', level, id);

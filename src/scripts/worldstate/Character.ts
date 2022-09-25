@@ -5,6 +5,7 @@ export default class Character {
 	public maxHealth: number;
 	public health: number;
 	public damage: number;
+	public level: number = 1;
 	public luck: number = 1;
 	public movementSpeed: number;
 	public slowFactor: number = 1;
@@ -53,6 +54,7 @@ export const DefaultCharacterData: Character = {
 	maxHealth: 100,
 	health: 100,
 	damage: 1,
+	level: 1,
 	luck: 1,
 	movementSpeed: 30,
 	slowFactor: 1,
