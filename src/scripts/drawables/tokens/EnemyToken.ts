@@ -476,7 +476,6 @@ export default class EnemyToken extends CharacterToken {
 			);
 
 			this.isCasting = false;
-			this.isWaitingToAttack = true;
 		}
 	}
 

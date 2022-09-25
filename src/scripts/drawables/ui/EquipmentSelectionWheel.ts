@@ -153,6 +153,14 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 				});
 				break;
 			}
+			case 'source-necrotic': {
+				itemToken.play({
+					key: 'source_necrotic1',
+					frameRate: NORMAL_ANIMATION_FRAME_RATE,
+					repeat: -1,
+				});
+				break;
+			}
 			case 'source-arcane': {
 				itemToken.play({
 					key: 'source_arcane1',

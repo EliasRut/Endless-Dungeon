@@ -143,12 +143,18 @@ export default class PreloadScene extends Phaser.Scene {
 			'assets/sprites/source_ice01.json'
 		);
 		this.load.aseprite(
+			'source-necrotic1',
+			'assets/sprites/source_necrotic01.png',
+			'assets/sprites/source_necrotic01.json'
+		);
+		this.load.aseprite(
 			'source-arcane1',
 			'assets/sprites/source_arcane01.png',
 			'assets/sprites/source_arcane01.json'
 		);
 		this.load.image('icon-source-fire1', 'assets/img/source_icon_flame01.png');
 		this.load.image('icon-source-ice1', 'assets/img/source_icon_ice01.png');
+		this.load.image('icon-source-necrotic1', 'assets/img/source_icon_necrotic01.png');
 		this.load.image('icon-source-arcane1', 'assets/img/source_icon_arcane01.png');
 
 		this.load.aseprite('essence', 'assets/sprites/essence.png', 'assets/sprites/essence.json');
@@ -326,6 +332,7 @@ export default class PreloadScene extends Phaser.Scene {
 		// Item animation
 		this.createAnimFromAseprite('source-fire1');
 		this.createAnimFromAseprite('source-ice1');
+		this.createAnimFromAseprite('source-necrotic1');
 		this.createAnimFromAseprite('source-arcane1');
 
 		// Essence animation

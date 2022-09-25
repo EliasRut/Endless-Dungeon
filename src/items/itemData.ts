@@ -402,8 +402,9 @@ export const UneqippableItemData = {
 
 export const getItemTexture = (name?: string) => {
 	if (name === 'source-fire') return 'icon-source-fire1';
-	if (name === 'source-arcane') return 'icon-source-arcane1';
 	if (name === 'source-ice') return 'icon-source-ice1';
+	if (name === 'source-necrotic') return 'icon-source-necrotic1';
+	if (name === 'source-arcane') return 'icon-source-arcane1';
 	return 'test-items-spritesheet';
 };
 
