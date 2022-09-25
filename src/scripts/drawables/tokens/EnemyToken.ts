@@ -7,6 +7,7 @@ import {
 	ColorsOfMagic,
 	DEBUG_PATHFINDING,
 	KNOCKBACK_TIME,
+	FadingLabelSize,
 } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
 import Enemy from '../../worldstate/Enemy';
@@ -20,6 +21,7 @@ import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import { getFacing4Dir, getXYfromTotalSpeed, updateMovingState } from '../../helpers/movement';
 import { EnemyData, EnemyCategory, MeleeAttackType } from '../../enemies/enemyData';
 import { UneqippableItem } from '../../../items/itemData';
+import { DEBUG_ENEMY_AI } from '../../helpers/constants';
 
 const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;
@@ -57,10 +59,11 @@ export default class EnemyToken extends CharacterToken {
 	chargeX: number | undefined;
 	chargeY: number | undefined;
 
+	isWaitingToAttack: boolean = false;
 	isWaitingToDealDamage: boolean = false;
 
 	protected showHealthbar() {
-		return !!this.scene.showHealthbars;
+		return !!this.scene?.showHealthbars;
 	}
 
 	constructor(
@@ -218,6 +221,9 @@ export default class EnemyToken extends CharacterToken {
 		this.play({ key: 'death_anim_small', frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.body.destroy();
 		this.on('animationcomplete', () => this.destroy());
+		if (DEBUG_ENEMY_AI) {
+			this.scene.addFadingLabel('Dying', FadingLabelSize.NORMAL, '#ff0000', this.x, this.y, 1000);
+		}
 	}
 
 	/**
@@ -234,6 +240,16 @@ export default class EnemyToken extends CharacterToken {
 		switch (this.enemyData.meleeAttackData!.attackType) {
 			case MeleeAttackType.HIT: {
 				if (this.attackedAt + this.stateObject.attackTime < time) {
+					if (DEBUG_ENEMY_AI) {
+						this.scene.addFadingLabel(
+							'Attacking',
+							FadingLabelSize.NORMAL,
+							'#ff0000',
+							this.x,
+							this.y,
+							1000
+						);
+					}
 					const tx = this.targetStateObject!.x * SCALE;
 					const ty = this.targetStateObject!.y * SCALE;
 					const xSpeed = tx - this.x;
@@ -254,16 +270,34 @@ export default class EnemyToken extends CharacterToken {
 				break;
 			}
 			case MeleeAttackType.CHARGE: {
-				if (!this.isWaitingToDealDamage) {
+				if (!this.isWaitingToAttack) {
 					this.attackedAt = time;
-					this.isWaitingToDealDamage = true;
+					this.isWaitingToAttack = true;
 					this.setVelocityX(0);
 					this.setVelocityY(0);
+					// this.scene.addFadingLabel(
+					// 	'Charge!',
+					// 	FadingLabelSize.NORMAL,
+					// 	'#ff0000',
+					// 	this.x,
+					// 	this.y,
+					// 	1000
+					// );
 				}
 				const chargeTime = this.enemyData.meleeAttackData?.chargeTime || 1;
-				if (this.attackedAt + chargeTime > time) {
-					const tx = this.target.x * SCALE;
-					const ty = this.target.y * SCALE;
+				if (this.attackedAt + chargeTime > time && !this.isCharging) {
+					if (DEBUG_ENEMY_AI) {
+						this.scene.addFadingLabel(
+							'Preparing Charge',
+							FadingLabelSize.NORMAL,
+							'#ff0000',
+							this.x,
+							this.y,
+							1000
+						);
+					}
+					const tx = this.targetStateObject!.x * SCALE;
+					const ty = this.targetStateObject!.y * SCALE;
 					const xSpeed = tx - this.x;
 					const ySpeed = ty - this.y;
 					const newFacing = getFacing4Dir(xSpeed, ySpeed);
@@ -276,12 +310,23 @@ export default class EnemyToken extends CharacterToken {
 						this.anims.setProgress((time - this.attackedAt) / chargeTime);
 						this.stateObject.currentFacing = newFacing;
 					}
-				} else if (this.attackedAt + chargeTime <= time && !this.isCharging) {
+					this.isCharging = true;
+					this.isWaitingToAttack = false;
+				} else if (this.attackedAt + chargeTime <= time && !this.isWaitingToDealDamage) {
+					if (DEBUG_ENEMY_AI) {
+						this.scene.addFadingLabel(
+							'Charging',
+							FadingLabelSize.NORMAL,
+							'#ff0000',
+							this.x,
+							this.y,
+							1000
+						);
+					}
 					const chargeSpeed =
 						this.enemyData.meleeAttackData?.chargeSpeed || this.enemyData.movementSpeed;
-					this.isCharging = true;
-					const tx = this.target.x * SCALE;
-					const ty = this.target.y * SCALE;
+					const tx = this.targetStateObject!.x * SCALE;
+					const ty = this.targetStateObject!.y * SCALE;
 					const speeds = getXYfromTotalSpeed(this.y - ty, this.x - tx);
 					const xSpeed = speeds[0] * chargeSpeed * this.stateObject.slowFactor * SCALE;
 					const ySpeed = speeds[1] * chargeSpeed * this.stateObject.slowFactor * SCALE;
@@ -296,6 +341,9 @@ export default class EnemyToken extends CharacterToken {
 					});
 					this.chargeX = xSpeed;
 					this.chargeY = ySpeed;
+					this.setVelocityX(xSpeed);
+					this.setVelocityY(ySpeed);
+					this.isWaitingToDealDamage = true;
 				}
 				break;
 			}
@@ -309,6 +357,16 @@ export default class EnemyToken extends CharacterToken {
 			const targetToken = this.scene.getTokenForStateObject(this.targetStateObject!);
 			targetToken?.takeDamage(this.stateObject.damage);
 			targetToken?.receiveHit();
+			if (DEBUG_ENEMY_AI) {
+				this.scene.addFadingLabel(
+					'Dealing Damage',
+					FadingLabelSize.NORMAL,
+					'#ff0000',
+					this.x,
+					this.y,
+					1000
+				);
+			}
 		}
 	}
 
@@ -394,8 +452,8 @@ export default class EnemyToken extends CharacterToken {
 			return;
 		}
 
-		// If enemy is charmed, let it get back to normal aggro pattern
 		if (this.charmedTime + 6000 < globalState.gameTime) {
+			// If enemy is charmed, let it get back to normal aggro pattern
 			this.faction = Faction.ENEMIES;
 			this.stateObject.faction = Faction.ENEMIES;
 		}
@@ -404,7 +462,10 @@ export default class EnemyToken extends CharacterToken {
 		if (this.lastMovedTimestamp + KNOCKBACK_TIME > time) {
 			return;
 		}
-		// if (this.isCharging) {
+		if (this.isCharging) {
+			this.executeMeleeAttack(time);
+			return;
+		}
 		// 	this.setVelocityX(this.chargeX!);
 		// 	this.setVelocityY(this.chargeY!);
 		// }
@@ -470,6 +531,16 @@ export default class EnemyToken extends CharacterToken {
 						Math.round(closestTarget.y / TILE_HEIGHT),
 						this.scene.navigationalMap
 					);
+					if (DEBUG_ENEMY_AI) {
+						this.scene.addFadingLabel(
+							'Pathfinding',
+							FadingLabelSize.NORMAL,
+							'#ff0000',
+							this.x,
+							this.y,
+							1000
+						);
+					}
 				}
 				this.targetStateObject = closestTarget;
 
@@ -484,7 +555,7 @@ export default class EnemyToken extends CharacterToken {
 	}
 
 	onCollide(withEnemy: boolean) {
-		if (this.isCharging) {
+		if (this.isCharging && this.isWaitingToDealDamage) {
 			let stunDuration = this.enemyData.meleeAttackData?.wallCollisionStunDuration || 0;
 			if (withEnemy) {
 				stunDuration = this.enemyData.meleeAttackData?.enemyCollisionStunDuration || 0;
@@ -497,19 +568,24 @@ export default class EnemyToken extends CharacterToken {
 				}
 			}
 			this.receiveStun(stunDuration);
-			const tx = this.target.x;
-			const ty = this.target.y;
+			const tx = this.targetStateObject?.x || 0;
+			const ty = this.targetStateObject?.y || 0;
 			const xSpeed = tx - this.x;
 			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			const stunAnimation = `${this.tokenName}-stun-${facingToSpriteNameMap[newFacing]}`;
 			const recoverAnimation = `${this.tokenName}-shake-${facingToSpriteNameMap[newFacing]}`;
+			this.setVelocity(0, 0);
 			// 4 repeats per second, at currently 16 fps.
 			this.play({
 				key: stunAnimation,
 				frameRate: NORMAL_ANIMATION_FRAME_RATE,
 				repeat: Math.floor((4 * (stunDuration - 500)) / 1000),
 			}).chain({ key: recoverAnimation, repeat: 3 });
+			this.isCharging = false;
+			this.attackedAt = -Infinity;
+			this.isWaitingToDealDamage = false;
+			this.isWaitingToAttack = false;
 		}
 	}
 }
