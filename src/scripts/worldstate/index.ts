@@ -87,7 +87,7 @@ export class WorldState {
 		localStorage.setItem(WorldState.CURRENTLEVEL, JSON.stringify(this.currentLevel));
 		localStorage.setItem(WorldState.ROOMASSIGNMENT, JSON.stringify(this.roomAssignment));
 		localStorage.setItem(WorldState.INVENTORY, JSON.stringify(this.inventory));
-		localStorage.setItem(WorldState.SAVEGAMENAME, 'test-save');
+		localStorage.setItem(WorldState.SAVEGAMENAME, '"test-save"');
 	}
 
 	loadState() {

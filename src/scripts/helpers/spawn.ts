@@ -1,18 +1,15 @@
-import MeleeEnemyToken from '../drawables/tokens/MeleeEnemyToken';
-import ZombieToken from '../drawables/tokens/ZombieToken';
-import RangedEnemyToken from '../drawables/tokens/RangedEnemyToken';
 import MainScene from '../scenes/MainScene';
 import NpcToken from '../drawables/tokens/NpcToken';
 import { NpcOptions } from '../../../typings/custom';
-import RedlingBossToken from '../drawables/tokens/RedlingBoss';
 import LichKingToken from '../drawables/tokens/LichKing';
-import VampireToken from '../drawables/tokens/VampireEnemyToken';
 import PierreToken from '../drawables/tokens/PierreEnemyToken';
-import ElementalToken from '../drawables/tokens/ElementalToken';
 import FireElementalToken from '../drawables/tokens/FireElementalToken';
 import IceElementalToken from '../drawables/tokens/IceElementalToken';
 import ArcaneElementalToken from '../drawables/tokens/ArcaneElementalToken';
 import NecroticElementalToken from '../drawables/tokens/NecroticElementalToken';
+import EnemyToken from '../drawables/tokens/EnemyToken';
+import { EnemyCategory, MeleeAttackType } from '../enemies/enemyData';
+import { ColorsOfMagic, SCALE } from './constants';
 
 export const spawnNpc = (
 	scene: MainScene,
@@ -24,23 +21,49 @@ export const spawnNpc = (
 	options?: NpcOptions
 ) => {
 	switch (type) {
-		case 'red-link': {
-			return new MeleeEnemyToken(scene, posX, posY, 'rich', id);
-		}
-		case 'red-ball': {
-			return new RangedEnemyToken(scene, posX, posY, type, id);
-		}
 		case 'rich': {
-			return new ZombieToken(scene, posX, posY, type, level, id);
+			return new EnemyToken(scene, posX, posY, type, id, {
+				startingHealth: 4 * (1 + level * 0.5),
+				damage: 3 * (1 + level * 0.5),
+				movementSpeed: 80,
+				attackRange: 32 * SCALE,
+				itemDropChance: 0,
+				healthPotionDropChance: 0.05,
+				category: EnemyCategory.NORMAL,
+				color: ColorsOfMagic.DEATH,
+				isMeleeEnemy: true,
+				isRangedEnemy: false,
+				meleeAttackData: {
+					attackDamageDelay: 450,
+					attackType: MeleeAttackType.HIT,
+					animationName: 'attack',
+				},
+			});
 		}
 		case 'jacques': {
-			return new VampireToken(scene, posX, posY, type, level, id);
+			return new EnemyToken(scene, posX, posY, type, id, {
+				startingHealth: 4 * (1 + level * 0.5),
+				damage: 3 * (1 + level * 0.5),
+				movementSpeed: 80,
+				attackRange: 75 * SCALE,
+				itemDropChance: 0,
+				healthPotionDropChance: 0.05,
+				category: EnemyCategory.NORMAL,
+				color: ColorsOfMagic.BLOOD,
+				isMeleeEnemy: true,
+				isRangedEnemy: false,
+				meleeAttackData: {
+					attackDamageDelay: 450,
+					attackType: MeleeAttackType.CHARGE,
+					animationName: 'attack',
+					wallCollisionStunDuration: 2000,
+					enemyCollisionStunDuration: 1000,
+					chargeTime: 250,
+				},
+			});
 		}
 		case 'pierre': {
 			return new PierreToken(scene, posX, posY, type, level, id);
-		}
-		case 'redling-boss': {
-			return new RedlingBossToken(scene, posX, posY, type, level, id);
 		}
 		case 'lich-king': {
 			return new LichKingToken(scene, posX, posY, 'rich', level, id);

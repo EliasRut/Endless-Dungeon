@@ -17,11 +17,9 @@ import {
 	SourceData,
 	CatalystData,
 	getItemTexture,
+	getCatalystAbility,
 } from '../../items/itemData';
-import PlayerCharacter, {
-	updateAbility,
-} from '../worldstate/PlayerCharacter';
-import { getCatalystAbility } from '../helpers/item';
+import PlayerCharacter, { updateAbility } from '../worldstate/PlayerCharacter';
 import EquipmentSelectionWheel from '../drawables/ui/EquipmentSelectionWheel';
 import {
 	getEquippedItems,
@@ -480,7 +478,7 @@ export default class InventoryScreen extends OverlayScreen {
 	// enchantment = undefined => erase all enchantment modifiers.
 	applyEnchantment(enchantment?: EnchantmentName) {
 		let enchantmentModifiers = globalState.playerCharacter.enchantmentModifiers;
-		if (enchantment === undefined) {			
+		if (enchantment === undefined) {
 			Object.entries(enchantmentModifiers).forEach((mod) => {
 				let stat = mod[0] as keyof typeof enchantmentModifiers;
 				globalState.playerCharacter[stat] -= mod[1];
@@ -521,7 +519,7 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 
 	modify(enchantment?: EnchantmentName): void {
-		if(enchantment !== undefined) this.currentEnchantment = enchantment;
+		if (enchantment !== undefined) this.currentEnchantment = enchantment;
 		else this.currentEnchantment = 'None';
 	}
 

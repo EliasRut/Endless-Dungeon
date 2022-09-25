@@ -397,4 +397,5 @@ export const convertEmitterDataToScaledValues = (
 };
 
 export const DEBUG_PHYSICS = false;
-export const DEBUG_PATHFINDING = true;
+export const DEBUG_PATHFINDING = false;
+export const DEBUG_ENEMY_AI = true;

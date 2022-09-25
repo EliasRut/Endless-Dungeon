@@ -8,10 +8,12 @@ import {
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import EnemyToken, { slainEnemy } from './EnemyToken';
+import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 import { AbilityType } from '../../abilities/abilityData';
 import Enemy from '../../worldstate/Enemy';
+import { UneqippableItem } from '../../../items/itemData';
+import { EnemyCategory } from '../../enemies/enemyData';
 
 const BASE_ATTACK_DAMAGE = 10;
 const REGULAR_ATTACK_RANGE = 75 * SCALE;
@@ -39,15 +41,21 @@ export default class PierreToken extends EnemyToken {
 		level: number,
 		id: string
 	) {
-		super(scene, x, y, tokenName, id);
+		super(scene, x, y, tokenName, id, {
+			startingHealth: BASE_HEALTH * (1 + level * 0.5),
+			damage: BASE_ATTACK_DAMAGE * (1 + level * 0.5),
+			movementSpeed: REGULAR_MOVEMENT_SPEED,
+			attackRange: REGULAR_ATTACK_RANGE,
+			itemDropChance: 0,
+			healthPotionDropChance: 0.05,
+			category: EnemyCategory.NORMAL,
+			color: ColorsOfMagic.BLOOD,
+			isMeleeEnemy: false,
+			isRangedEnemy: false,
+		});
 		// cool effects!
 		this.level = level;
-		this.attackRange = REGULAR_ATTACK_RANGE;
-		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
 		this.attacking = false;
-		this.startingHealth = BASE_HEALTH * (1 + this.level * 0.5);
-		this.stateObject.health = this.startingHealth;
-		this.stateObject.damage = BASE_ATTACK_DAMAGE * (1 + this.level * 0.5);
 		this.stateObject.attackTime = ATTACK_DURATION;
 		this.color = ColorsOfMagic.ROYAL;
 	}
@@ -63,11 +71,11 @@ export default class PierreToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropEquippableItem(this.level, slainEnemy.NORMAL);
+				this.maybeDropEquippableItem();
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
-				this.dropNonEquippableItem('health');
+				this.dropNonEquippableItem(UneqippableItem.HEALTH_POTION);
 			}
-			this.dropNonEquippableItem('essence');
+			this.dropNonEquippableItem(UneqippableItem.ESSENCE);
 			this.dead = true;
 			this.die();
 			return;

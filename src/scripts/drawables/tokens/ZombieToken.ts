@@ -9,9 +9,11 @@ import {
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import EnemyToken, { slainEnemy } from './EnemyToken';
+import EnemyToken from './EnemyToken';
 import { updateStatus } from '../../worldstate/Character';
 import { TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
+import { EnemyCategory, EnemyData } from '../../enemies/enemyData';
+import { UneqippableItem } from '../../../items/itemData';
 
 const BASE_ATTACK_DAMAGE = 3;
 const REGULAR_ATTACK_RANGE = 25;
@@ -35,9 +37,10 @@ export default class ZombieToken extends EnemyToken {
 		y: number,
 		tokenName: string,
 		level: number,
-		id: string
+		id: string,
+		enemyData: EnemyData
 	) {
-		super(scene, x, y, tokenName, id);
+		super(scene, x, y, tokenName, id, enemyData);
 		// cool effects!
 		this.level = level;
 		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
@@ -60,11 +63,11 @@ export default class ZombieToken extends EnemyToken {
 		// check death
 		if (this.stateObject.health <= 0 && !this.dead) {
 			if (Math.random() < ITEM_DROP_CHANCE) {
-				this.dropEquippableItem(this.level, slainEnemy.NORMAL);
+				this.maybeDropEquippableItem();
 			} else if (Math.random() < HEALTH_DROP_CHANCE) {
-				this.dropNonEquippableItem('health');
+				this.dropNonEquippableItem(UneqippableItem.HEALTH_POTION);
 			}
-			this.dropNonEquippableItem('essence');
+			this.dropNonEquippableItem(UneqippableItem.ESSENCE);
 			this.dead = true;
 			this.die();
 			return;
@@ -150,7 +153,9 @@ export default class ZombieToken extends EnemyToken {
 			const ySpeed = ty - this.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 
-			const attackAnimationName = `${this.tokenName}-attack-${facingToSpriteNameMap[newFacing]}`;
+			const attackAnimationName = `${this.tokenName}-${
+				this.enemyData.meleeAttackData!.animationName
+			}-${facingToSpriteNameMap[newFacing]}`;
 			this.play({ key: attackAnimationName, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 
 			this.setVelocityX(0);
