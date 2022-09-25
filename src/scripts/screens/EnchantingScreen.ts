@@ -1,3 +1,4 @@
+import { FixWidthSizer, Label, RoundRectangle, ScrollablePanel } from 'phaser3-rex-plugins/templates/ui/ui-components';
 import { Enchantment, EnchantmentName } from '../../items/enchantmentData';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import {
@@ -33,6 +34,10 @@ const ESSENCE_START_Y = (SCREEN_START_Y + 175) * UI_SCALE;
 const ESSENCE_SEPARATOR = 50 * UI_SCALE;
 const ESSENCE_NUMBER_OFFSET = 15 * UI_SCALE;
 
+const COLOR_PRIMARY = 0x4e342e;
+const COLOR_LIGHT = 0x7b5e57;
+const COLOR_DARK = 0x260e04;
+
 export default class EnchantingScreen extends OverlayScreen {
 	title: Phaser.GameObjects.Text;
 	bear: Phaser.GameObjects.Text;
@@ -49,6 +54,7 @@ export default class EnchantingScreen extends OverlayScreen {
 	essenceNumbers: Phaser.GameObjects.Text[] = [];
 	enchantmentName: Phaser.GameObjects.Text;
 	enchantmentModifier: Phaser.GameObjects.Text;
+	scrollablePanel: ScrollablePanel;
 
 
 	scene: MainScene;
@@ -83,6 +89,9 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.title.setScrollFactor(0);
 		this.title.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(this.title, true);
+
+		this.scrollablePanel = this.createScrollableList(scene);
+		this.add(this.scrollablePanel, true);
 		//-------------------------------------------------------------------------------------
 		//-------------------------------------------------------------------------------------
 		//-------------------------------------------------------------------------------------
@@ -401,6 +410,106 @@ export default class EnchantingScreen extends OverlayScreen {
 		let enchantment = Enchantment[this.selectedAdjective + this.selectedNoun as EnchantmentName];		
 		this.enchantmentName.setText(`${enchantment?.name}`);
 		this.enchantmentModifier.setText(`${statDisplayNames[enchantment!.affectedStat!.stat]}: `.padEnd(18) + `${enchantment?.affectedStat?.value}`);
+	}
+
+	createScrollableList(scene: Phaser.Scene) {
+		
+		var panel = new ScrollablePanel(scene, {
+			x: ADJECTIVE_START_X + (SCREEN_WIDTH / 2 / 2),
+			y: ADJECTIVE_START_Y + (SCREEN_HEIGHT / 2),
+			width: SCREEN_WIDTH / 2,
+			height: SCREEN_HEIGHT,
+			
+			scrollMode: 0,
+
+			background: new RoundRectangle(scene, 0, 0, 2, 2, 10, COLOR_PRIMARY),
+
+			panel: {
+				child: this.createGrid(scene),
+				mask: {
+					padding: 0,
+				},
+			},
+
+			slider: {
+				track: new RoundRectangle(scene, 0, 0, 20, 10, 10, COLOR_DARK),
+				thumb: new RoundRectangle(scene, 0, 0, 0, 0, 13, COLOR_LIGHT),
+				// position: 'left'
+			},
+
+			mouseWheelScroller: {
+				focus: false,
+				speed: 0.1,
+			},
+
+			header: new Label(scene, {
+				height: 30,
+
+				orientation: 0,
+				background: new RoundRectangle(scene, 0, 0, 20, 20, 0, COLOR_DARK),
+				text: scene.add.text(0, 0, 'Header'),
+			}),
+
+			footer: new Label(scene, {
+				height: 30,
+
+				orientation: 0,
+				background: new RoundRectangle(scene, 0, 0, 20, 20, 0, COLOR_DARK),
+				text: scene.add.text(0, 0, 'Footer'),
+			}),
+
+			space: {
+				left: 10,
+				right: 10,
+				top: 10,
+				bottom: 10,
+
+				panel: 10,
+				header: 10,
+				footer: 10,
+			},
+		}).layout();
+
+		panel.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+		panel.setScrollFactor(0);
+		panel.setOrigin(0);
+		panel.setScale(UI_SCALE);
+		panel.setVisible(false);
+		return panel;
+	}
+	createGrid (scene: Phaser.Scene) {
+		// Create table body
+		var sizer = new FixWidthSizer(scene, {
+			space: {
+				left: 3,
+				right: 3,
+				top: 3,
+				bottom: 3,
+				item: 8,
+				line: 8,
+			},
+		})
+			.addBackground(new RoundRectangle(scene, 0, 0, 10, 10, 0, COLOR_DARK))
+	
+		for (var i = 0; i < 30; i++) {
+			sizer.add(new Label(scene, {
+				width: 30, height: 30,
+	
+				background: new RoundRectangle(scene, 0, 0, 0, 0, 14, COLOR_LIGHT),
+				text: scene.add.text(0, 0, `${i}`, {
+					fontSize: `${12 * UI_SCALE}`
+				}),
+	
+				align: 'center',
+				space: {
+					left: 5,
+					right: 5,
+					top: 5,
+					bottom: 5,
+				}
+			}));
+		}		
+		return sizer;
 	}
 }
 // let enchantment = (adjective + this.selectedNoun) as EnchantmentName;

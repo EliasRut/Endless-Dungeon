@@ -1,7 +1,7 @@
 import { Abilities, AbilityType } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { AbilityKey } from './constants';
-import { CASTING_SPEED_MS } from '../scenes/MainScene';
+import MainScene, { CASTING_SPEED_MS } from '../scenes/MainScene';
 
 const AXIS_MOVEMENT_THRESHOLD = 0.4;
 
@@ -45,8 +45,8 @@ export default class KeyboardHelper {
 	isAbility2Pressed: () => boolean;
 	isAbility3Pressed: () => boolean;
 	isAbility4Pressed: () => boolean;
-	isInventoryPressed: (inventoryOpen: boolean) => boolean; // <= bool for gamepad: if inventory is open, B button closes it as well, not just inventory button
-	isSettingsPressed: () => boolean;
+	isInventoryPressed: () => boolean;
+	isSettingsPressed: (overlayOpen: boolean) => boolean; // <= bool for gamepad: if overlay is open, B button is also classified as "settings pressed", i.e. modify button assignment based on Mainscene info
 	isQuestsPressed: () => boolean;
 	isEnterPressed: () => boolean;
 	isSpacePressed: () => boolean;
@@ -111,25 +111,25 @@ export default class KeyboardHelper {
 				return false;
 			}
 		};
-		this.isInventoryPressed = (inventoryOpen: boolean) => {
+		this.isInventoryPressed = () => {
 			if (this.inventoryKey.isDown) {
 				return true;
 			}
 			try {
-				if (inventoryOpen) {
-					const eitherPressed = !!this.gamepad?.isButtonDown(9) || !!this.gamepad?.B;
-					return eitherPressed;
-				} else return !!this.gamepad?.isButtonDown(9);
+				return !!this.gamepad?.isButtonDown(9);
 			} catch (err) {
 				return false;
 			}
 		};
-		this.isSettingsPressed = () => {
+		this.isSettingsPressed = (overlayOpen: boolean) => {
 			if (this.settingsKey.isDown) {
 				return true;
 			}
 			try {
-				return !!this.gamepad?.isButtonDown(8);
+				if (overlayOpen) {
+					const eitherPressed = !!this.gamepad?.isButtonDown(8) || !!this.gamepad?.B;
+					return eitherPressed;
+				} else return !!this.gamepad?.isButtonDown(8);
 			} catch (err) {
 				return false;
 			}
