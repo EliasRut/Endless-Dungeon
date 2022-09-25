@@ -361,27 +361,30 @@ export type ColorEffectValue =
 			blueDiff: number;
 	  };
 
-export const multiplyParticleValueByScale = (value: SimpleParticleEffectValue) => {
+export const multiplyParticleValueByScale = (
+	value: SimpleParticleEffectValue,
+	effectScale: number
+) => {
 	if (value === undefined) {
 		return undefined;
 	}
 	if (typeof value === 'number') {
 		const valueAsAny = value as any;
-		return valueAsAny * SCALE;
+		return valueAsAny * effectScale * SCALE;
 	}
 	if (typeof value === 'object') {
 		const valueAsAny = value as any;
 		return {
 			...(valueAsAny.min !== undefined && valueAsAny.max !== undefined
 				? {
-						min: valueAsAny.min * SCALE,
-						max: valueAsAny.max * SCALE,
+						min: valueAsAny.min * effectScale * SCALE,
+						max: valueAsAny.max * effectScale * SCALE,
 				  }
 				: {}),
 			...(valueAsAny.start !== undefined && valueAsAny.end !== undefined
 				? {
-						start: valueAsAny.start * SCALE,
-						end: valueAsAny.end * SCALE,
+						start: valueAsAny.start * effectScale * SCALE,
+						end: valueAsAny.end * effectScale * SCALE,
 				  }
 				: {}),
 		};
@@ -391,10 +394,13 @@ export const multiplyParticleValueByScale = (value: SimpleParticleEffectValue) =
 const ScaledValueKeys = ['scale', 'speed'];
 
 export const convertEmitterDataToScaledValues = (
-	config: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig
+	config: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig,
+	effectScale: number
 ) => {
 	return Object.entries(config).reduce((obj, [key, value]) => {
-		obj[key] = ScaledValueKeys.includes(key) ? multiplyParticleValueByScale(value) : value;
+		obj[key] = ScaledValueKeys.includes(key)
+			? multiplyParticleValueByScale(value, effectScale)
+			: value;
 		return obj;
 	}, {} as any) as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig;
 };

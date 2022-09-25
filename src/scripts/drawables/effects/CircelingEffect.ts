@@ -156,7 +156,8 @@ export default class CircelingEffect extends AbilityEffect {
 					},
 					this.attackAbility,
 					1,
-					time
+					time,
+					1
 				);
 			}
 		}

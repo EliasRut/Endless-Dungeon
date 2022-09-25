@@ -52,7 +52,7 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 		super(scene, x, y, projectileData.projectileImage || 'empty-tile', facing, projectileData);
 		scene.add.existing(this);
 		this.setDepth(UiDepths.TOKEN_FOREGROUND_LAYER);
-		this.setScale(SCALE);
+		this.setScale(SCALE * (projectileData.effectScale || 1));
 		scene.physics.add.existing(this);
 
 		const bodyOffset = getBodyOffset(facing);
@@ -74,7 +74,7 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 		} as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig;
 		const tintData = projectileData.particleData?.tint;
 		this.emitter = this.particles.createEmitter({
-			...convertEmitterDataToScaledValues(emitterData),
+			...convertEmitterDataToScaledValues(emitterData, projectileData.effectScale || 1),
 			...(typeof tintData === 'object'
 				? {
 						tint: {
@@ -106,11 +106,12 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 			this.emitter.setEmitterAngle({ min: -180, max: 180 });
 			this.emitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
 			this.emitter.setSpeed(
-				multiplyParticleValueByScale(this.projectileData?.explosionData?.speed || 70) as any
+				multiplyParticleValueByScale(
+					this.projectileData?.explosionData?.speed || 70,
+					this.projectileData.effectScale || 1
+				) as any
 			);
-			this.emitter.setLifespan(
-				multiplyParticleValueByScale(this.projectileData?.explosionData?.lifespan || 300) as any
-			);
+			this.emitter.setLifespan(this.projectileData?.explosionData?.lifespan || 300);
 			this.emitter.explode(
 				this.projectileData?.explosionData?.particles || 20,
 				this.body.x + 6 * SCALE,

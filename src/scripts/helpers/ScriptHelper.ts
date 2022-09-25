@@ -211,7 +211,8 @@ export default class ScriptHelper {
 					globalState.playerCharacter,
 					currentStep.ability,
 					1,
-					globalTime
+					globalTime,
+					1
 				);
 				break;
 			}

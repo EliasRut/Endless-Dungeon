@@ -42,11 +42,12 @@ export default class AbilityHelper {
 		type: AbilityType,
 		abilityLevel: number,
 		globalTime: number,
+		comboCast: number,
 		abilityData?: AbilityData
 	) {
 		// We allow for multiple projectiles per ability.
 		// Let's get the data for ability projectiles first.
-		const usedAbilityData = abilityData || getRelevantAbilityVersion(type, abilityLevel);
+		const usedAbilityData = abilityData || getRelevantAbilityVersion(type, abilityLevel, comboCast);
 		const projectileData = usedAbilityData.projectileData;
 		// Since we're allowing projectiles to have a spread, we'll be using radians for easier math
 		const facingRotation = getRotationInRadiansForFacing(pointOfOrigin.currentFacing);
@@ -153,7 +154,8 @@ export default class AbilityHelper {
 							enemy.stateObject,
 							usedAbilityData.castOnEnemyDestroyed!,
 							abilityLevel,
-							globalTime
+							globalTime,
+							1
 						);
 					}
 				}
@@ -209,14 +211,22 @@ export default class AbilityHelper {
 	update(time: number, castAbilities: [AbilityType, number][]) {
 		castAbilities.forEach(([ability, abilityLevel]) => {
 			const castingTime =
-				getRelevantAbilityVersion(ability, abilityLevel).castingTime || CASTING_SPEED_MS;
+				getRelevantAbilityVersion(ability, abilityLevel, globalState.playerCharacter.comboCast)
+					.castingTime || CASTING_SPEED_MS;
+			globalState.playerCharacter.lastComboCast = globalState.playerCharacter.comboCast;
+			if (globalState.playerCharacter.comboCast >= 3) {
+				globalState.playerCharacter.comboCast = 1;
+			} else {
+				globalState.playerCharacter.comboCast++;
+			}
 			setTimeout(() => {
 				this.triggerAbility(
 					globalState.playerCharacter,
 					globalState.playerCharacter,
 					ability,
 					abilityLevel,
-					time
+					time,
+					globalState.playerCharacter.comboCast
 				);
 			}, castingTime * 0.67);
 			this.scene.keyboardHelper.lastCastingDuration = castingTime;

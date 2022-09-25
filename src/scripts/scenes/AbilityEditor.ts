@@ -219,6 +219,7 @@ export default class AbilityEditor extends Phaser.Scene {
 				AbilityType.FIREBALL,
 				1,
 				globalTime,
+				1,
 				{
 					...Abilities[AbilityType.FIREBALL],
 					projectiles: data.projectiles,

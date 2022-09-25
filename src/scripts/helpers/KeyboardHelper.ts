@@ -1,4 +1,4 @@
-import { Abilities, AbilityType } from '../abilities/abilityData';
+import { Abilities, AbilityType, getRelevantAbilityVersion } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { AbilityKey } from './constants';
 import { CASTING_SPEED_MS } from '../scenes/MainScene';
@@ -305,24 +305,41 @@ export default class KeyboardHelper {
 		}
 	}
 
-	getCastedAbilities(gameTime: number) {
+	getAbilityLevelForAbilityKey(abilityKey: AbilityKey) {
 		const inventory = globalState.inventory;
+		switch (abilityKey) {
+			case AbilityKey.ONE:
+				return inventory.equippedSource ? inventory.sources[inventory.equippedSource].level : 0;
+			case AbilityKey.TWO:
+				return inventory.equippedCatalyst
+					? inventory.catalysts[inventory.equippedCatalyst].level
+					: 0;
+			case AbilityKey.THREE:
+				return inventory.equippedLeftRing ? inventory.rings[inventory.equippedLeftRing].level : 0;
+			case AbilityKey.FOUR:
+				return inventory.equippedRightRing ? inventory.rings[inventory.equippedRightRing].level : 0;
+			default:
+				return 0;
+		}
+	}
+
+	getCastedAbilities(gameTime: number) {
 		return [
 			[
 				this.castIfPressed(AbilityKey.ONE, gameTime),
-				inventory.equippedSource ? inventory.sources[inventory.equippedSource].level : 0,
+				this.getAbilityLevelForAbilityKey(AbilityKey.ONE),
 			],
 			[
 				this.castIfPressed(AbilityKey.TWO, gameTime),
-				inventory.equippedCatalyst ? inventory.catalysts[inventory.equippedCatalyst].level : 0,
+				this.getAbilityLevelForAbilityKey(AbilityKey.TWO),
 			],
 			[
 				this.castIfPressed(AbilityKey.THREE, gameTime),
-				inventory.equippedLeftRing ? inventory.rings[inventory.equippedLeftRing].level : 0,
+				this.getAbilityLevelForAbilityKey(AbilityKey.THREE),
 			],
 			[
 				this.castIfPressed(AbilityKey.FOUR, gameTime),
-				inventory.equippedRightRing ? inventory.rings[inventory.equippedRightRing].level : 0,
+				this.getAbilityLevelForAbilityKey(AbilityKey.FOUR),
 			],
 			[this.castIfPressed(AbilityKey.SPACE, gameTime), 1],
 		].filter(([ability]) => !!ability) as [AbilityType, number][];
@@ -330,7 +347,12 @@ export default class KeyboardHelper {
 
 	getAbilityCooldown(abilityKey: AbilityKey, gameTime: number) {
 		const ability = globalState.playerCharacter.abilityKeyMapping[abilityKey] as AbilityType;
-		const abilityData = Abilities[ability];
+		const abilityData = getRelevantAbilityVersion(
+			ability,
+			this.getAbilityLevelForAbilityKey(abilityKey),
+			globalState.playerCharacter.lastComboCast || 0
+		);
+		// console.log(`Using ${abilityData.abilityName} with ${abilityData.cooldownMs}ms cooldown`);
 		const lastCasted = globalState.playerCharacter.abilityCastTime[abilityKey];
 		const readyAt = lastCasted + (abilityData.cooldownMs || 0);
 		if (readyAt <= gameTime) {
@@ -372,7 +394,11 @@ export default class KeyboardHelper {
 			return false;
 		}
 		const ability = globalState.playerCharacter.abilityKeyMapping[abilityKey] as AbilityType;
-		const abilityData = Abilities[ability];
+		const abilityData = getRelevantAbilityVersion(
+			ability,
+			this.getAbilityLevelForAbilityKey(abilityKey),
+			globalState.playerCharacter.lastComboCast || 0
+		);
 		const lastCasted = globalState.playerCharacter.abilityCastTime[abilityKey];
 		const readyAt = lastCasted + (abilityData.cooldownMs || 0);
 		if (readyAt > gameTime) {

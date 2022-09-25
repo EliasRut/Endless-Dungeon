@@ -480,7 +480,8 @@ export default class EnemyToken extends CharacterToken {
 				this.stateObject,
 				this.enemyData.rangedAttackData!.abilityType,
 				this.stateObject.level,
-				time
+				time,
+				1
 			);
 
 			this.isCasting = false;

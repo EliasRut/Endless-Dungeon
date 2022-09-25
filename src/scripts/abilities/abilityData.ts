@@ -333,7 +333,7 @@ export const Abilities: AbilityDataMap = {
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
 		cooldownMs: 1500,
-		damageMultiplier: 0.2,
+		damageMultiplier: 0.8,
 		abilityName: `Fire Cone`,
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
@@ -895,7 +895,11 @@ export const Abilities: AbilityDataMap = {
 	},
 };
 
-export const getRelevantAbilityVersion = (abilityType: AbilityType, abilityLevel: number) => {
+export const getRelevantAbilityVersion = (
+	abilityType: AbilityType,
+	abilityLevel: number,
+	comboCast: number
+) => {
 	const options = globalState.abilityData[abilityType] || [{ data: Abilities[abilityType] }];
 	return options.find((option) => {
 		return (
@@ -906,6 +910,8 @@ export const getRelevantAbilityVersion = (abilityType: AbilityType, abilityLevel
 						return abilityLevel >= conditionValue;
 					case 'maximumLevel':
 						return abilityLevel <= conditionValue;
+					case 'comboCastNumber':
+						return comboCast === conditionValue;
 					default:
 						return true;
 				}

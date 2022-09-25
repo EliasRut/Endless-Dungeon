@@ -441,7 +441,7 @@ export default class InventoryScreen extends OverlayScreen {
 	) {
 		const [iconX, iconY] = ITEM_ABILITY_COORDINATES[slotKey];
 		const itemLevel = getEquipmentDataForSlot(slotKey)?.level ?? 0;
-		const relevantAbility = getRelevantAbilityVersion(ability, itemLevel);
+		const relevantAbility = getRelevantAbilityVersion(ability, itemLevel, 1);
 		const abilityText = new Phaser.GameObjects.Text(
 			this.scene,
 			(iconX + 28) * UI_SCALE,
