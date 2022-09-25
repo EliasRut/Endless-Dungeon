@@ -20,6 +20,7 @@ import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import { getFacing4Dir, getXYfromTotalSpeed, updateMovingState } from '../../helpers/movement';
 import { EnemyData, EnemyCategory, MeleeAttackType } from '../../enemies/enemyData';
 import { UneqippableItem } from '../../../items/itemData';
+import { AbilityType } from '../../abilities/abilityData';
 
 const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;
@@ -39,7 +40,6 @@ const dropType = {
 export default class EnemyToken extends CharacterToken {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 	tokenName: string;
-	attackRange: number;
 	attackedAt: number = -Infinity;
 	lastUpdate: number = -Infinity;
 	aggroLinger: number = 3000;
@@ -87,7 +87,6 @@ export default class EnemyToken extends CharacterToken {
 		this.target = new Phaser.Geom.Point(0, 0);
 		this.faction = Faction.ENEMIES;
 		this.enemyData = enemyData;
-		this.attackRange = enemyData.attackRange;
 		this.color = enemyData.color;
 	}
 
@@ -230,6 +229,27 @@ export default class EnemyToken extends CharacterToken {
 		super.destroy();
 	}
 
+	handleTokenMovement() {
+		// If target is out of attack range, charge at it and stop when the token is in the proximity.
+		// Enemy follows target only if close enough
+		if (this.targetStateObject!.health > 0 && this.aggro) {
+			this.walkToWaypoint();
+		} else {
+			// If token does not have aggro, or is already in attack range, stop walking
+			this.setVelocityX(0);
+			this.setVelocityY(0);
+			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
+			if (animation) {
+				if (this.scene.game.anims.exists(animation)) {
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+				} else {
+					console.log(`Animation ${animation} does not exist.`);
+					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+				}
+			}
+		}
+	}
+
 	executeMeleeAttack(time: number) {
 		switch (this.enemyData.meleeAttackData!.attackType) {
 			case MeleeAttackType.HIT: {
@@ -305,31 +325,10 @@ export default class EnemyToken extends CharacterToken {
 	dealMeleeDamage(distance: number) {
 		this.isWaitingToDealDamage = false;
 		// If target is in attack range, attack and deal damage
-		if (distance < this.attackRange) {
+		if (distance < this.enemyData.meleeAttackData!.attackRange) {
 			const targetToken = this.scene.getTokenForStateObject(this.targetStateObject!);
 			targetToken?.takeDamage(this.stateObject.damage);
 			targetToken?.receiveHit();
-		}
-	}
-
-	handleTokenMovement() {
-		// If target is out of attack range, charge at it and stop when the token is in the proximity.
-		// Enemy follows target only if close enough
-		if (this.targetStateObject!.health > 0 && this.aggro) {
-			this.walkToWaypoint();
-		} else {
-			// If token does not have aggro, or is already in attack range, stop walking
-			this.setVelocityX(0);
-			this.setVelocityY(0);
-			const animation = updateMovingState(this.stateObject, false, this.stateObject.currentFacing);
-			if (animation) {
-				if (this.scene.game.anims.exists(animation)) {
-					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
-				} else {
-					console.log(`Animation ${animation} does not exist.`);
-					this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
-				}
-			}
 		}
 	}
 
@@ -356,9 +355,85 @@ export default class EnemyToken extends CharacterToken {
 		}
 
 		// When token is in the proximity of the target, and target is alive, attack
-		if (distance <= this.attackRange && this.targetStateObject!.health > 0) {
+		if (
+			distance <= this.enemyData.meleeAttackData!.attackRange &&
+			this.targetStateObject!.health > 0
+		) {
 			this.executeMeleeAttack(time);
 		} else {
+			// Handle moving the token towards the enemy
+			this.handleTokenMovement();
+		}
+	}
+
+	executeRangedAttack(time: number) {
+		if (!this.isWaitingToDealDamage) {
+			this.attackedAt = time;
+			this.isWaitingToDealDamage = true;
+			this.setVelocityX(0);
+			this.setVelocityY(0);
+		}
+
+		const castTime = this.enemyData.rangedAttackData?.castTime || 1;
+		if (this.attackedAt + castTime > time) {
+			const tx = this.target.x * SCALE;
+			const ty = this.target.y * SCALE;
+			const xSpeed = tx - this.x;
+			const ySpeed = ty - this.y;
+			const newFacing = getFacing4Dir(xSpeed, ySpeed);
+			// 9 frames, so 9 frame rate for 1s.
+			if (this.attackedAt === time || this.stateObject.currentFacing !== newFacing) {
+				const attackAnimationName = `${this.tokenName}-${
+					this.enemyData.rangedAttackData!.animationName
+				}-${facingToSpriteNameMap[newFacing]}`;
+				this.play({ key: attackAnimationName, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+				this.anims.setProgress((time - this.attackedAt) / castTime);
+				this.stateObject.currentFacing = newFacing;
+			}
+		} else if (!this.enemyData.rangedAttackData?.firedShot) {
+			this.enemyData.rangedAttackData!.firedShot = true;
+			this.setVelocityX(0);
+			this.setVelocityY(0);
+			this.scene.abilityHelper.triggerAbility(
+				this.stateObject,
+				this.stateObject,
+				this.enemyData.rangedAttackData!.abilityType,
+				this.level,
+				time
+			);
+		}
+	}
+
+	dealRangedDamage(distance: number) {
+		this.isWaitingToDealDamage = false;
+		// If target is in attack range, attack and deal damage
+		if (distance < this.enemyData.rangedAttackData!.castRange) {
+			const targetToken = this.scene.getTokenForStateObject(this.targetStateObject!);
+			targetToken?.takeDamage(this.stateObject.damage);
+			targetToken?.receiveHit();
+		}
+	}
+
+	handleRangedAttack(time: number) {
+		const distance = this.getDistanceToWorldStatePosition(
+			this.targetStateObject!.x,
+			this.targetStateObject!.y
+		);
+
+		// If we are still in the cooldown period of the current attack, do nothing
+		if (this.attackedAt + this.stateObject.attackTime >= time) {
+			return;
+		}
+
+		// When token is in the proximity of the target, and target is alive, attack
+		if (
+			distance <= this.enemyData.rangedAttackData!.castRange &&
+			this.targetStateObject!.health > 0
+		) {
+			this.executeRangedAttack(time);
+		} else {
+			this.isWaitingToDealDamage = false;
+			this.enemyData.rangedAttackData!.firedShot = false;
 			// Handle moving the token towards the enemy
 			this.handleTokenMovement();
 		}
@@ -476,6 +551,11 @@ export default class EnemyToken extends CharacterToken {
 				// If token has melee type, make melee attack
 				if (this.enemyData.isMeleeEnemy === true) {
 					this.handleMeleeAttack(time);
+				}
+
+				// If token has ranged type, make ranged attack
+				if (this.enemyData.isRangedEnemy === true) {
+					this.handleRangedAttack(time);
 				}
 			}
 		}

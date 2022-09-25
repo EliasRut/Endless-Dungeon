@@ -32,7 +32,7 @@ export default class LichtKingToken extends EnemyToken {
 			startingHealth: 40 * level,
 			damage: 5 * level,
 			movementSpeed: 100 * (1 + level * 0.1),
-			attackRange: ATTACK_RANGE,
+			// attackRange: ATTACK_RANGE,
 			itemDropChance: 0,
 			healthPotionDropChance: 0.05,
 			category: EnemyCategory.BOSS,
@@ -100,7 +100,10 @@ export default class LichtKingToken extends EnemyToken {
 		const newFacing = getFacing8Dir(xSpeed, ySpeed);
 
 		if (this.aggro) {
-			if (this.attackedAt + this.stateObject.attackTime < time && this.attackRange < distance) {
+			if (
+				this.attackedAt + this.stateObject.attackTime < time &&
+				this.enemyData.meleeAttackData!.attackRange < distance
+			) {
 				this.setVelocityX(xSpeed);
 				this.setVelocityY(ySpeed);
 				const animation = updateMovingState(this.stateObject, true, newFacing);
@@ -123,7 +126,7 @@ export default class LichtKingToken extends EnemyToken {
 				this.stateObject.currentFacing = newFacing;
 			}
 
-			if (distance <= this.attackRange && this.checkLoS()) {
+			if (distance <= this.enemyData.meleeAttackData!.attackRange && this.checkLoS()) {
 				this.attack(time);
 			}
 

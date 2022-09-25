@@ -43,7 +43,7 @@ export default class ZombieToken extends EnemyToken {
 		super(scene, x, y, tokenName, id, enemyData);
 		// cool effects!
 		this.level = level;
-		this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
+		// this.attackRange = REGULAR_ATTACK_RANGE * SCALE;
 		this.stateObject.movementSpeed = REGULAR_MOVEMENT_SPEED;
 		this.attackExecuted = false;
 		this.startingHealth = BASE_HEALTH * (1 + this.level * 0.5);
@@ -116,7 +116,7 @@ export default class ZombieToken extends EnemyToken {
 			this.targetStateObject.health > 0 &&
 			this.aggro &&
 			this.attackedAt + this.stateObject.attackTime < time &&
-			this.attackRange < distance
+			this.enemyData.meleeAttackData!.attackRange < distance
 		) {
 			super.walkToWaypoint();
 			// Just stand around and do nothing, otherwise
@@ -134,7 +134,7 @@ export default class ZombieToken extends EnemyToken {
 			}
 		}
 		if (
-			distance <= this.attackRange &&
+			distance <= this.enemyData.meleeAttackData!.attackRange &&
 			this.targetStateObject &&
 			this.targetStateObject.health > 0
 		) {
@@ -175,7 +175,7 @@ export default class ZombieToken extends EnemyToken {
 		const ty = target.y;
 		const distance = this.getDistanceToWorldStatePosition(tx, ty);
 
-		if (distance < this.attackRange) {
+		if (distance < this.enemyData.meleeAttackData!.attackRange) {
 			const targetToken = this.scene.getTokenForStateObject(target);
 			targetToken?.takeDamage(this.stateObject.damage);
 			targetToken?.receiveHit();

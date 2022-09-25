@@ -1,10 +1,10 @@
+import { AbilityType } from '../abilities/abilityData';
 import { ColorsOfMagic } from '../helpers/constants';
 
 export interface EnemyData {
 	startingHealth: number;
 	damage: number;
 	movementSpeed: number;
-	attackRange: number;
 	itemDropChance: number;
 	healthPotionDropChance: number;
 
@@ -16,6 +16,9 @@ export interface EnemyData {
 
 	// Melee Attack Data
 	meleeAttackData?: MeleeAttackData;
+
+	// Ranged Attack Data
+	rangedAttackData?: RangedAttackData;
 }
 
 export enum EnemyCategory {
@@ -32,6 +35,7 @@ export enum MeleeAttackType {
 export interface MeleeAttackData {
 	attackDamageDelay: number;
 	attackType: MeleeAttackType;
+	attackRange: number;
 	animationName: string;
 
 	chargeTime?: number;
@@ -39,4 +43,14 @@ export interface MeleeAttackData {
 
 	wallCollisionStunDuration?: number;
 	enemyCollisionStunDuration?: number;
+}
+
+export interface RangedAttackData {
+	castTime?: number;
+	castRange: number;
+	animationName: string;
+
+	firedShot: boolean;
+
+	abilityType: AbilityType;
 }

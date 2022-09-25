@@ -49,7 +49,6 @@ export default class VampireToken extends EnemyToken {
 			startingHealth: BASE_HEALTH * (1 + level * 0.5),
 			damage: BASE_ATTACK_DAMAGE * (1 + level * 0.5),
 			movementSpeed: REGULAR_MOVEMENT_SPEED,
-			attackRange: REGULAR_ATTACK_RANGE,
 			itemDropChance: 0,
 			healthPotionDropChance: 0.05,
 			category: EnemyCategory.NORMAL,
@@ -59,6 +58,7 @@ export default class VampireToken extends EnemyToken {
 			meleeAttackData: {
 				attackDamageDelay: 450,
 				attackType: MeleeAttackType.CHARGE,
+				attackRange: REGULAR_ATTACK_RANGE,
 				animationName: 'attack',
 				wallCollisionStunDuration: WALL_COLLISION_STUN,
 				enemyCollisionStunDuration: COLLISION_STUN,
