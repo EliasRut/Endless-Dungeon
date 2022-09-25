@@ -10,6 +10,7 @@ export default class Enemy extends Character {
 	constructor(
 		id: string,
 		animationBase: string,
+		level: number,
 		health: number = 100,
 		damage: number = 10,
 		movementSpeed: number = 100
@@ -17,5 +18,6 @@ export default class Enemy extends Character {
 		super(id, animationBase, health, damage, movementSpeed);
 
 		this.faction = Faction.ENEMIES;
+		this.level = level;
 	}
 }
