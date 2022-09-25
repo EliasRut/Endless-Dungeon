@@ -19,9 +19,9 @@ export const enum Source {
 	FIRE = 'source-fire',
 	ICE = 'source-ice',
 	NECROTIC = 'source-necrotic',
-	FORCE = 'source-force',
+	ARCANE = 'source-arcane',
 }
-export type SourceKey = 'source-fire' | 'source-ice' | 'source-necrotic' | 'source-force';
+export type SourceKey = 'source-fire' | 'source-ice' | 'source-necrotic' | 'source-arcane';
 
 export const SourceData: Record<Source, AbilityLinkedItem> = {
 	[Source.FIRE]: {
@@ -43,9 +43,9 @@ export const SourceData: Record<Source, AbilityLinkedItem> = {
 		description: 'Use the power of decay to make your enemies fall apart bit by bit. Yuk!',
 		iconFrame: 25,
 	} as AbilityLinkedItem,
-	[Source.FORCE]: {
+	[Source.ARCANE]: {
 		ability: AbilityType.ARCANE_BOLT,
-		name: 'Force Source',
+		name: 'Arcane Source',
 		description:
 			`Invisible forces batter your enemies and throws them back. ` +
 			`They won't even see what's coming.`,
@@ -402,7 +402,8 @@ export const UneqippableItemData = {
 
 export const getItemTexture = (name?: string) => {
 	if (name === 'source-fire') return 'icon-source-fire1';
-	if (name === 'source-force') return 'icon-source-force1';
+	if (name === 'source-arcane') return 'icon-source-arcane1';
+	if (name === 'source-ice') return 'icon-source-ice1';
 	return 'test-items-spritesheet';
 };
 
