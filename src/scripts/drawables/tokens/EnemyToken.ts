@@ -63,7 +63,7 @@ export default class EnemyToken extends CharacterToken {
 	isWaitingToDealDamage: boolean = false;
 
 	protected showHealthbar() {
-		return !!this.scene.showHealthbars;
+		return !!this.scene?.showHealthbars;
 	}
 
 	constructor(

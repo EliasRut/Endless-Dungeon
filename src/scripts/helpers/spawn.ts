@@ -2,7 +2,6 @@ import MainScene from '../scenes/MainScene';
 import NpcToken from '../drawables/tokens/NpcToken';
 import { NpcOptions } from '../../../typings/custom';
 import LichKingToken from '../drawables/tokens/LichKing';
-import VampireToken from '../drawables/tokens/VampireEnemyToken';
 import PierreToken from '../drawables/tokens/PierreEnemyToken';
 import FireElementalToken from '../drawables/tokens/FireElementalToken';
 import IceElementalToken from '../drawables/tokens/IceElementalToken';
@@ -42,7 +41,26 @@ export const spawnNpc = (
 			});
 		}
 		case 'jacques': {
-			return new VampireToken(scene, posX, posY, type, level, id);
+			return new EnemyToken(scene, posX, posY, type, id, {
+				startingHealth: 4 * (1 + level * 0.5),
+				damage: 3 * (1 + level * 0.5),
+				movementSpeed: 80,
+				attackRange: 75 * SCALE,
+				itemDropChance: 0,
+				healthPotionDropChance: 0.05,
+				category: EnemyCategory.NORMAL,
+				color: ColorsOfMagic.BLOOD,
+				isMeleeEnemy: true,
+				isRangedEnemy: false,
+				meleeAttackData: {
+					attackDamageDelay: 450,
+					attackType: MeleeAttackType.CHARGE,
+					animationName: 'attack',
+					wallCollisionStunDuration: 2000,
+					enemyCollisionStunDuration: 1000,
+					chargeTime: 250,
+				},
+			});
 		}
 		case 'pierre': {
 			return new PierreToken(scene, posX, posY, type, level, id);
