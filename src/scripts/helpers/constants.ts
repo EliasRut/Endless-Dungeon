@@ -396,5 +396,5 @@ export const convertEmitterDataToScaledValues = (
 	}, {} as any) as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig;
 };
 
-export const DEBUG_PHYSICS = false;
+export const DEBUG_PHYSICS = true;
 export const DEBUG_PATHFINDING = true;
