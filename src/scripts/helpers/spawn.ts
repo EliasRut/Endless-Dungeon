@@ -9,7 +9,7 @@ import IceElementalToken from '../drawables/tokens/IceElementalToken';
 import ArcaneElementalToken from '../drawables/tokens/ArcaneElementalToken';
 import NecroticElementalToken from '../drawables/tokens/NecroticElementalToken';
 import EnemyToken from '../drawables/tokens/EnemyToken';
-import { EnemyCategory } from '../enemies/enemyData';
+import { EnemyCategory, MeleeAttackType } from '../enemies/enemyData';
 import { ColorsOfMagic, SCALE } from './constants';
 
 export const spawnNpc = (
@@ -36,6 +36,8 @@ export const spawnNpc = (
 				isRangedEnemy: false,
 				meleeAttackData: {
 					attackDamageDelay: 450,
+					attackType: MeleeAttackType.HIT,
+					animationName: 'attack',
 				},
 			});
 		}

@@ -24,6 +24,19 @@ export enum EnemyCategory {
 	NORMAL = 'normal',
 }
 
+export enum MeleeAttackType {
+	CHARGE = 'charge',
+	HIT = 'hit',
+}
+
 export interface MeleeAttackData {
 	attackDamageDelay: number;
+	attackType: MeleeAttackType;
+	animationName: string;
+
+	chargeTime?: number;
+	chargeSpeed?: number;
+
+	wallCollisionStunDuration?: number;
+	enemyCollisionStunDuration?: number;
 }
