@@ -419,7 +419,7 @@ export default class EnemyToken extends CharacterToken {
 	}
 
 	executeRangedAttack(time: number) {
-		if (!this.isWaitingToAttack) {
+		if (!this.isWaitingToAttack && !this.isCasting) {
 			this.attackedAt = time;
 			this.isWaitingToAttack = true;
 			this.setVelocityX(0);
