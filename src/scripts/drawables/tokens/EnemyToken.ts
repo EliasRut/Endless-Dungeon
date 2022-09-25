@@ -27,12 +27,6 @@ const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;
 const BODY_Y_OFFSET = 16;
 
-const ENEMY_DAMAGE = 5;
-const ENEMY_HEALTH = 4;
-const ENEMY_SPEED = 35;
-
-const GREEN_DIFF = 0x003300;
-
 const dropType = {
 	BOSS: { ringWeight: 1, amuletWeight: 1 } as Partial<RandomItemOptions>,
 	ELITE: { sourceWeight: 1, armorWeight: 1, catalystWeight: 1 } as Partial<RandomItemOptions>,
@@ -427,7 +421,7 @@ export default class EnemyToken extends CharacterToken {
 	}
 
 	executeRangedAttack(time: number) {
-		if (!this.isWaitingToAttack) {
+		if (!this.isWaitingToAttack && !this.isCasting) {
 			this.attackedAt = time;
 			this.isWaitingToAttack = true;
 			this.setVelocityX(0);
@@ -485,7 +479,6 @@ export default class EnemyToken extends CharacterToken {
 			);
 
 			this.isCasting = false;
-			this.isWaitingToAttack = true;
 		}
 	}
 

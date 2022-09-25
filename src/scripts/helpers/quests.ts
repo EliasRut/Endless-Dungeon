@@ -145,7 +145,7 @@ let questScripts: { [name: string]: QuestScripts } = {
 				type: 'spawnItem',
 				atPlayerPosition: true,
 				itemOptions: {
-					sourceTypes: [Source.FORCE],
+					sourceTypes: [Source.ARCANE],
 					level: 5,
 					sourceWeight: 1,
 					catalystWeight: 0,
