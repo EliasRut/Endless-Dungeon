@@ -565,7 +565,7 @@ export default class MapEditor extends Phaser.Scene {
 		if (wasNewClicked) {
 			this.roomNameElement.value = '';
 		} else {
-			this.roomNameElement.value = this.fileData.name || '';
+			this.roomNameElement.value = this.roomName || '';
 		}
 	}
 
@@ -1643,6 +1643,7 @@ export default class MapEditor extends Phaser.Scene {
 			layout: JSON.stringify(this.roomLayout),
 			decorations: JSON.stringify(this.roomDecorationLayout),
 			overlays: JSON.stringify(this.roomOverlayLayout),
+			team: getCachedUserData()?.team,
 		};
 		return data;
 	}

@@ -49,6 +49,7 @@ export default class PreloadScene extends Phaser.Scene {
 	preload() {
 		// Empty tile
 		this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
+		this.load.image('empty-tile-large-portrait', 'assets/img/empty_32x48_tile.png');
 		this.load.image('search-icon', 'assets/img/search-icon.png');
 
 		// Prepare aseprite data for player, npcs, enemies
@@ -138,6 +139,14 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png', {
 			frameWidth: 16,
 			frameHeight: 16,
+		});
+		this.load.spritesheet('armor-spritesheet', 'assets/img/armor-icons.png', {
+			frameWidth: 32,
+			frameHeight: 48,
+		});
+		this.load.spritesheet('catalyst-spritesheet', 'assets/img/catalyst-icons.png', {
+			frameWidth: 32,
+			frameHeight: 48,
 		});
 		this.load.aseprite(
 			'source-fire1',
