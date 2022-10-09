@@ -74,7 +74,10 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 				'bookshop-D',
 				'COM-death-B',
 				'COM-death-D',
-				'COM-death-O'
+				'COM-death-O',
+				'COM-wild-B',
+				'COM-wild-D',
+				'COM-wild-O'
 			);
 		}
 
