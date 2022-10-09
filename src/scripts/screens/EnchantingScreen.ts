@@ -1,4 +1,5 @@
 import {
+	Buttons,
 	FixWidthSizer,
 	Label,
 	RoundRectangle,
@@ -94,7 +95,14 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.title.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(this.title, true);
 
-		this.scrollablePanel = this.createScrollableList(scene);
+		// this.scrollablePanel = this.createScrollableList(scene);
+		var options = [
+            'A', 'BB', 'CCC', 'DDDD',
+            '1', '22', '333', '4444',
+            'A', 'BB', 'CCC', 'DDDD',
+            '1', '22', '333', '4444'
+        ];
+		this.scrollablePanel = this.CreatePopupList(scene,ADJECTIVE_START_X + SCREEN_WIDTH / 2 / 2,ADJECTIVE_START_Y + SCREEN_HEIGHT / 2,SCREEN_HEIGHT/2,options,() =>{});
 		this.add(this.scrollablePanel, true);
 		//-------------------------------------------------------------------------------------
 		//-------------------------------------------------------------------------------------
@@ -435,10 +443,7 @@ export default class EnchantingScreen extends OverlayScreen {
 			background: new RoundRectangle(scene, 0, 0, 2, 2, 10, COLOR_PRIMARY),
 
 			panel: {
-				child: this.createGrid(scene),
-				mask: {
-					padding: 0,
-				},
+				child: this.createGrid(scene)
 			},
 
 			slider: {
@@ -523,6 +528,84 @@ export default class EnchantingScreen extends OverlayScreen {
 		}
 		return sizer;
 	}
+
+	CreatePopupList(scene: Phaser.Scene, x: number, y: number, height: number, options: Array<string>, onClick: (button: any)=>any) {
+		var items = options.map(function (option) { return { label: option } });
+		const notSelf = this;
+		// Note: Buttons and scrolling are at different touch targets
+		scene.input.topOnly = false;
+		var buttonSizer = new Buttons(scene, {
+			orientation: 'y',
+			buttons: items.map(function (item) {
+				return notSelf.CreateButton(scene, item);
+			}),
+		})
+			.on('button.over', function (button: any) {
+				button.getElement('background').setStrokeStyle(1, 0xffffff);
+			})
+			.on('button.out', function (button: any) {
+				button.getElement('background').setStrokeStyle();
+			})
+			.on('button.click', function (button: any) {
+				onClick(button);
+			})
+			.layout();			
+
+		var menu = new ScrollablePanel(scene, {
+			x: x,
+			y: y,
+			width: buttonSizer.width,
+			height: Math.min(height, buttonSizer.height),
+			scrollMode: 'v',
+
+			panel: {
+				child: buttonSizer,
+			},
+			mouseWheelScroller: {
+				focus: false,
+				speed: 0.1,
+			},
+			slider: {
+				track: new RoundRectangle(scene, 0, 0, 20, 10, 10, COLOR_DARK).setOrigin(0),
+				thumb: new RoundRectangle(scene, 0, 0, 0, 0, 13, COLOR_LIGHT).setOrigin(0),
+				// position: 'left'
+			},
+
+			clamplChildOY: false,
+
+		}).layout();
+			//.popUp(100, 'y')
+	
+			menu.setDepth(UiDepths.UI_BACKGROUND_LAYER);
+			menu.setScrollFactor(0);
+			menu.setOrigin(0);
+			menu.setScale(UI_SCALE);
+			menu.setVisible(false);
+		return menu;
+	}
+	
+	CreateButton(scene: Phaser.Scene, item: {label: string}) {
+		const space = 2 * UI_SCALE;
+		return new Label(scene, {
+			background: new RoundRectangle(scene, 0, 0, space, space, 0, COLOR_DARK),
+	
+			text: this.CreateTextObject(scene, item.label),
+	
+			space: {
+				left: space,
+				right: space,
+				top: space,
+				bottom: space,
+				icon: space
+			}
+		})
+	}
+	CreateTextObject(scene: Phaser.Scene, text: string) {
+		var textObject = scene.add.text(0, 0, text, {
+			fontSize: `${12 * UI_SCALE}`
+		})
+		return textObject;
+	}	
 }
 // let enchantment = (adjective + this.selectedNoun) as EnchantmentName;
 // this.scene.closeAllIconScreens();
