@@ -195,6 +195,10 @@ export default class AbilityEditor extends Phaser.Scene {
 		this.reactBridge = bridge;
 	};
 
+	getTokenForStateObject: (...params: any[]) => CharacterToken | undefined = () => {
+		return undefined;
+	};
+
 	update(globalTime: number, delta: number) {
 		// const projectileData = Abilities[AbilityType.FIREBALL].projectileData;
 		const projectileData = Abilities[AbilityType.FIREBALL].projectileData;

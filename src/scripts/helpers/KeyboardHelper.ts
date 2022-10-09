@@ -10,6 +10,10 @@ export default class KeyboardHelper {
 	downKey: Phaser.Input.Keyboard.Key;
 	leftKey: Phaser.Input.Keyboard.Key;
 	rightKey: Phaser.Input.Keyboard.Key;
+	wKey: Phaser.Input.Keyboard.Key;
+	aKey: Phaser.Input.Keyboard.Key;
+	sKey: Phaser.Input.Keyboard.Key;
+	dKey: Phaser.Input.Keyboard.Key;
 	kKey: Phaser.Input.Keyboard.Key;
 	abilityKey1: Phaser.Input.Keyboard.Key;
 	abilityKey2: Phaser.Input.Keyboard.Key;
@@ -59,6 +63,10 @@ export default class KeyboardHelper {
 		this.downKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
 		this.leftKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
 		this.rightKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+		this.wKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+		this.aKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+		this.sKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+		this.dKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 		this.kKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
 		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
 		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
@@ -73,12 +81,18 @@ export default class KeyboardHelper {
 			if (this.upKey.isDown) {
 				return true;
 			}
+			if (this.wKey.isDown) {
+				return true;
+			}
 			const axis = this.gamepad?.axes[1];
 			const axisValue = axis ? axis.getValue() : 0;
 			return !!this.gamepad?.up || axisValue < -AXIS_MOVEMENT_THRESHOLD;
 		};
 		this.isMoveDownPressed = () => {
 			if (this.downKey.isDown) {
+				return true;
+			}
+			if (this.sKey.isDown) {
 				return true;
 			}
 			const axis = this.gamepad?.axes[1];
@@ -89,12 +103,18 @@ export default class KeyboardHelper {
 			if (this.leftKey.isDown) {
 				return true;
 			}
+			if (this.aKey.isDown) {
+				return true;
+			}
 			const axis = this.gamepad?.axes[0];
 			const axisValue = axis ? axis.getValue() : 0;
 			return !!this.gamepad?.left || axisValue < -AXIS_MOVEMENT_THRESHOLD;
 		};
 		this.isMoveRightPressed = () => {
 			if (this.rightKey.isDown) {
+				return true;
+			}
+			if (this.dKey.isDown) {
 				return true;
 			}
 			const axis = this.gamepad?.axes[0];

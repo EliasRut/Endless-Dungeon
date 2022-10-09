@@ -15,6 +15,7 @@ export default class PlayerCharacter extends Character {
 	public height = 8;
 	public comboCast = 0;
 	public lastComboCast = 0;
+	public lastComboCastTime = Infinity;
 
 	// Stats are increased by this amount, given by enchantments
 	public enchantmentModifiers = {

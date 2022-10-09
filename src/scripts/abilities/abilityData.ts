@@ -89,6 +89,10 @@ export interface AbilityData {
 	useExactTargetVector?: boolean;
 	increaseComboCast?: boolean;
 	resetComboCast?: boolean;
+	dashSpeed?: number;
+	dashDuration?: number;
+	dashInvulnerability?: boolean;
+	delayProjectiles?: number;
 }
 
 export const enum AbilityType {
@@ -177,18 +181,31 @@ export const Abilities: AbilityDataMap = {
 			velocity: 450,
 			xOffset: 0,
 			yOffset: 0,
-			effect: ArcaneBoltEffect,
+			projectileImage: 'empty-tile',
+			particleData: {
+				particleImage: 'rock',
+				alpha: { start: 1, end: 0 },
+				scale: { start: 1, end: 0.2 },
+				speed: 20,
+				rotate: { min: -180, max: 180 },
+				lifespan: 100,
+			},
+			effect: TrailingParticleProjectileEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
+			spriteScale: 0.5,
+			effectScale: 0.5,
 			knockback: 120,
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
 			explodeOnDestruction: true,
 		},
+		increaseComboCast: true,
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
-		cooldownMs: 250,
-		damageMultiplier: 0.8,
+		cooldownMs: 350,
+		castingTime: 200,
+		damageMultiplier: 0.6,
 		abilityName: 'Arcane Bolt',
 		flavorText: `Shooting magic missiles!`,
 		icon: ['icon-abilities', 1],

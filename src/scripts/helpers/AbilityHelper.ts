@@ -13,11 +13,25 @@ import MainScene from '../scenes/MainScene';
 import globalState, { WorldState } from '../worldstate';
 import Character from '../worldstate/Character';
 import { Facings, Faction, PossibleTargets, SCALE } from './constants';
-import { getFacing8Dir, getRotationInRadiansForFacing } from './movement';
+import { getFacing8Dir, getRotationInRadiansForFacing, getVelocitiesForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
 import Enemy from '../worldstate/Enemy';
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
 import { CASTING_SPEED_MS } from '../scenes/MainScene';
+
+export interface SimplePointOfOrigin {
+	currentFacing: Facings;
+	x: number;
+	y: number;
+	exactTargetXFactor?: number;
+	exactTargetYFactor?: number;
+	width?: number;
+	height?: number;
+}
+
+export interface PointOfOrigin extends SimplePointOfOrigin {
+	getUpdatedData?: () => SimplePointOfOrigin;
+}
 
 export default class AbilityHelper {
 	scene: MainScene;
@@ -30,15 +44,7 @@ export default class AbilityHelper {
 
 	triggerAbility(
 		caster: Character,
-		pointOfOrigin: {
-			currentFacing: Facings;
-			x: number;
-			y: number;
-			exactTargetXFactor?: number;
-			exactTargetYFactor?: number;
-			width?: number;
-			height?: number;
-		},
+		pointOfOrigin: PointOfOrigin,
 		type: AbilityType,
 		abilityLevel: number,
 		globalTime: number,
@@ -53,6 +59,9 @@ export default class AbilityHelper {
 		const facingRotation = getRotationInRadiansForFacing(pointOfOrigin.currentFacing);
 		const numProjectiles = usedAbilityData.projectiles || 0;
 		const fireProjectile = (projectileIndex: number) => {
+			const usedPointOfOrigin = pointOfOrigin.getUpdatedData
+				? pointOfOrigin.getUpdatedData()
+				: pointOfOrigin;
 			// Spread multiple projectiles over an arc on a circle
 			const spread: SpreadData = projectileData?.spread ? projectileData!.spread : [0, 0];
 			// The total arc we want to cover
@@ -67,16 +76,26 @@ export default class AbilityHelper {
 			// We want to combine the arc position with the characters facing to allow cone-like effects
 			let yMultiplier = -Math.cos(currentSpread * Math.PI + facingRotation);
 			let xMultiplier = Math.sin(currentSpread * Math.PI + facingRotation);
-			if (usedAbilityData.useExactTargetVector && pointOfOrigin.exactTargetXFactor !== undefined) {
-				xMultiplier = pointOfOrigin.exactTargetXFactor;
+			if (
+				usedAbilityData.useExactTargetVector &&
+				usedPointOfOrigin.exactTargetXFactor !== undefined
+			) {
+				xMultiplier = usedPointOfOrigin.exactTargetXFactor;
 			}
-			if (usedAbilityData.useExactTargetVector && pointOfOrigin.exactTargetYFactor !== undefined) {
-				yMultiplier = pointOfOrigin.exactTargetYFactor;
+			if (
+				usedAbilityData.useExactTargetVector &&
+				usedPointOfOrigin.exactTargetYFactor !== undefined
+			) {
+				yMultiplier = usedPointOfOrigin.exactTargetYFactor;
 			}
 			const effect = new (projectileData!.effect || TrailingParticleProjectileEffect)(
 				this.scene,
-				pointOfOrigin.x + (pointOfOrigin.width || 0) / 2 + xMultiplier * projectileData!.xOffset,
-				pointOfOrigin.y + (pointOfOrigin.height || 0) / 2 + yMultiplier * projectileData!.yOffset,
+				usedPointOfOrigin.x +
+					(usedPointOfOrigin.width || 0) / 2 +
+					xMultiplier * projectileData!.xOffset,
+				usedPointOfOrigin.y +
+					(usedPointOfOrigin.height || 0) / 2 +
+					yMultiplier * projectileData!.yOffset,
 				usedAbilityData.spriteName || '',
 				getFacing8Dir(xMultiplier, yMultiplier),
 				projectileData
@@ -207,13 +226,40 @@ export default class AbilityHelper {
 		// Go through all projectiles the ability should launch
 		for (let i = 0; i < numProjectiles; i++) {
 			// If the ability uses time delayed casting, use a timeout for each of them
-			if (projectileData?.delay) {
-				setTimeout(() => fireProjectile(i), i * projectileData.delay);
+			if (usedAbilityData.delayProjectiles || projectileData?.delay) {
+				setTimeout(
+					() => fireProjectile(i),
+					(usedAbilityData.delayProjectiles || 0) + i * (projectileData?.delay || 0)
+				);
 			} else {
 				// If not, we can cast them immediately
 				fireProjectile(i);
 			}
 		}
+		if (usedAbilityData.dashSpeed && usedAbilityData.dashDuration) {
+			const casterToken = this.scene.getTokenForStateObject(caster);
+			if (casterToken) {
+				const rotationFactors = getVelocitiesForFacing(caster.currentFacing);
+				const velocity = casterToken.body.velocity;
+				casterToken.setVelocity(
+					usedAbilityData.dashSpeed * SCALE * rotationFactors.x,
+					usedAbilityData.dashSpeed * SCALE * rotationFactors.y
+				);
+				if (usedAbilityData.dashInvulnerability) {
+					casterToken.body.checkCollision.none = true;
+					caster.dashing = true;
+					casterToken.alpha = 0.2;
+				}
+
+				setTimeout(() => {
+					casterToken.setVelocity(velocity.x, velocity.y);
+					caster.dashing = false;
+					casterToken.body.checkCollision.none = false;
+					casterToken.alpha = 1;
+				}, usedAbilityData.dashDuration);
+			}
+		}
+
 		// We just want to play the ability sound once, not once for each projectile
 		if (usedAbilityData.sound) {
 			this.scene.sound.play(usedAbilityData.sound!, { volume: usedAbilityData.sfxVolume! });
@@ -231,7 +277,10 @@ export default class AbilityHelper {
 			setTimeout(() => {
 				this.triggerAbility(
 					globalState.playerCharacter,
-					globalState.playerCharacter,
+					{
+						...globalState.playerCharacter,
+						getUpdatedData: () => globalState.playerCharacter,
+					},
 					ability,
 					abilityLevel,
 					time,
@@ -241,7 +290,7 @@ export default class AbilityHelper {
 					globalState.playerCharacter.comboCast = 1;
 				} else if (relevantAbility.increaseComboCast) {
 					globalState.playerCharacter.comboCast++;
-					globalState.playerCharacter.lastComboCast = time;
+					globalState.playerCharacter.lastComboCastTime = time;
 				}
 				console.log(`Current combo cast: ${globalState.playerCharacter.comboCast}`);
 			}, castingTime * 0.67);
