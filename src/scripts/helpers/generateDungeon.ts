@@ -351,7 +351,7 @@ export default class DungeonGenerator {
 				let targetRoom = connection.targetRoom;
 				if (targetMap === 'NEXT_LEVEL') {
 					targetMap = `dungeonLevel${this.dungeonLevel + 1}`;
-					targetRoom = 'COM-death-connection-up';
+					targetRoom = `COM-${levelData.style.toLowerCase()}-connection-up`;
 					targetX = 12;
 					targetY = 5;
 				} else if (targetMap === 'PREVIOUS_LEVEL') {
@@ -362,7 +362,7 @@ export default class DungeonGenerator {
 						targetY = 45;
 					} else {
 						targetMap = `dungeonLevel${this.dungeonLevel - 1}`;
-						targetRoom = 'COM-death-connection-down';
+						targetRoom = `COM-${levelData.style.toLowerCase()}-connection-down`;
 						targetX = 11;
 						targetY = 6;
 					}
