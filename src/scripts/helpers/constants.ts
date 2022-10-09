@@ -229,7 +229,7 @@ export const colorOfMagicToTilesetMap = {
 	[ColorsOfMagic.BLOOD]: 'COM-death-B',
 	[ColorsOfMagic.DEATH]: 'COM-death-B',
 	[ColorsOfMagic.PASSION]: 'COM-death-B',
-	[ColorsOfMagic.WILD]: 'COM-death-B',
+	[ColorsOfMagic.WILD]: 'COM-wild-B',
 	[ColorsOfMagic.ROYAL]: 'COM-death-B',
 };
 
