@@ -1194,12 +1194,14 @@ export default class MapEditor extends Phaser.Scene {
 					return;
 				}
 				this.addNpc(tileX, tileY);
+				return;
 			}
 			if (this.activeLayerDropdownElement.value === 'items') {
 				if (this.selectedLibraryItemIndex === 0) {
 					return;
 				}
 				this.addItem(tileX, tileY);
+				return;
 			}
 			if (this.shiftKey.isDown) {
 				this.selectionStartPoint = [tileX, tileY];
