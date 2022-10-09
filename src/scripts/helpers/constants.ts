@@ -411,3 +411,4 @@ export const DEBUG_PHYSICS = false;
 export const DEBUG_PATHFINDING = false;
 export const DEBUG_ENEMY_AI = false;
 export const FPS_DEBUG = false;
+export const COMBO_CAST_RESET_DELAY = 2000;

@@ -21,6 +21,7 @@ import {
 } from '../helpers/movement';
 import {
 	BaseFadingLabelFontSize,
+	COMBO_CAST_RESET_DELAY,
 	DEBUG_PHYSICS,
 	Faction,
 	FadingLabelData,
@@ -661,6 +662,9 @@ export default class MainScene extends Phaser.Scene {
 			if (globalState.playerCharacter.stunned === true) {
 				this.mainCharacter.setVelocity(0, 0);
 				return;
+			}
+			if (globalTime < globalState.playerCharacter.lastComboCast + COMBO_CAST_RESET_DELAY) {
+				// globalState.playerCharacter.comboCast = 0;
 			}
 			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
 			const castingDuration = this.keyboardHelper.getLastCastingDuration();
