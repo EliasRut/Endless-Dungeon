@@ -210,7 +210,12 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		const levelTexts: Phaser.GameObjects.Image[] = [];
 		Object.entries(itemMap).map(([itemKey, equipmentData], itemIndex) => {
 			const itemData = getItemDataForName(itemKey);
-			const frame = getItemTexture(itemKey) === 'test-items-spritesheet' ? itemData.iconFrame : 0;
+			if (!itemData) {
+				console.log(`No data for item key ${itemKey}`);
+				return;
+			}
+			const texture = getItemTexture(itemKey) || 'empty-tile';
+			const frame = texture.startsWith('empty-tile') ? 0 : itemData.iconFrame || 0;
 			const [xOffset, yOffset] = useEightImages
 				? EIGHT_ITEMS_OFFSETS[itemIndex]
 				: FOUR_ITEMS_OFFSETS[itemIndex];

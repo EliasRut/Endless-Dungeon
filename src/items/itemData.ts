@@ -66,25 +66,25 @@ export const CatalystData: Record<Catalyst, CatalystItem> = {
 		catalystType: Catalyst.CONE,
 		name: 'Cone Catalyst',
 		description: 'Pushes your power out in front of you in a directed blast.',
-		iconFrame: 32,
+		iconFrame: 0,
 	} as CatalystItem,
 	[Catalyst.NOVA]: {
 		catalystType: Catalyst.NOVA,
 		name: 'Nova Catalyst',
 		description: 'Releases your energy in wave, streaming out in all directions.',
-		iconFrame: 33,
+		iconFrame: 1,
 	} as CatalystItem,
 	[Catalyst.STORM]: {
 		catalystType: Catalyst.STORM,
 		name: 'Storm Catalyst',
 		description: 'Homing projectiles shoot out of your source and hunt your enemies.',
-		iconFrame: 34,
+		iconFrame: 2,
 	} as CatalystItem,
 	[Catalyst.SUMMON]: {
 		catalystType: Catalyst.SUMMON,
 		name: 'Summon Catalyst',
 		description: 'Summons your energy into a self containing force, lending you a helping hand.',
-		iconFrame: 35,
+		iconFrame: 3,
 	} as CatalystItem,
 };
 
@@ -315,22 +315,22 @@ export const ChestPieceData: Record<ChestPiece, ItemData> = {
 	[ChestPiece.ROBE]: {
 		name: 'Robe',
 		description: 'A set of robes inscribed with runes to increase your casting speed.',
-		iconFrame: 12,
+		iconFrame: 0,
 	} as ItemData,
 	[ChestPiece.ARMOR]: {
 		name: 'Armor',
 		description: 'Heavy armor to allow you to take that extra hit without dying.',
-		iconFrame: 7,
+		iconFrame: 1,
 	} as ItemData,
 	[ChestPiece.CLOAK]: {
 		name: 'Cloak',
 		description: 'A set of clothing made for the modern explorer.',
-		iconFrame: 5,
+		iconFrame: 2,
 	} as ItemData,
 	[ChestPiece.GARB]: {
 		name: 'Garb',
 		description: 'A garment full of runes to ward off hostile magic.',
-		iconFrame: 14,
+		iconFrame: 3,
 	} as ItemData,
 };
 
@@ -405,6 +405,8 @@ export const getItemTexture = (name?: string) => {
 	if (name === 'source-ice') return 'icon-source-ice1';
 	if (name === 'source-necrotic') return 'icon-source-necrotic1';
 	if (name === 'source-arcane') return 'icon-source-arcane1';
+	if (name?.startsWith('chestpiece')) return 'armor-spritesheet';
+	if (name?.startsWith('catalyst')) return 'catalyst-spritesheet';
 	return 'test-items-spritesheet';
 };
 

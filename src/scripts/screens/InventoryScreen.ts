@@ -84,6 +84,24 @@ const EQUIPMENT_SLOT_COORDINATES = {
 	[EquipmentSlot.LEFT_RING]: [INVENTORY_START_X + 144, INVENTORY_START_Y + 100],
 };
 
+const EQUIPMENT_SLOT_SCALES = {
+	[EquipmentSlot.SOURCE]: [2, 3],
+	[EquipmentSlot.CATALYST]: [2, 3],
+	[EquipmentSlot.CHESTPIECE]: [2, 3],
+	[EquipmentSlot.AMULET]: [1, 1],
+	[EquipmentSlot.RIGHT_RING]: [1, 1],
+	[EquipmentSlot.LEFT_RING]: [1, 1],
+};
+
+const EQUIPMENT_SLOT_SPRITESHEETS = {
+	[EquipmentSlot.SOURCE]: 'empty-tile-large-portrait',
+	[EquipmentSlot.CATALYST]: 'catalyst-spritesheet',
+	[EquipmentSlot.CHESTPIECE]: 'armor-spritesheet',
+	[EquipmentSlot.AMULET]: 'test-items-spritesheet',
+	[EquipmentSlot.RIGHT_RING]: 'test-items-spritesheet',
+	[EquipmentSlot.LEFT_RING]: 'test-items-spritesheet',
+};
+
 const COORDINATES_TO_SLOT: { [id: string]: EquipmentSlot } = {
 	'0_0': EquipmentSlot.SOURCE,
 	'1_0': EquipmentSlot.AMULET,
@@ -227,10 +245,12 @@ export default class InventoryScreen extends OverlayScreen {
 	createItemToken(slotName: EquipmentSlot, x: number, y: number) {
 		const itemName = getItemKeyForEquipmentSlot(slotName);
 		const itemData = itemName ? getItemDataForName(itemName) : undefined;
+
 		const itemToken = new InventoryItemToken(
 			this.scene,
 			x * UI_SCALE,
 			y * UI_SCALE,
+			EQUIPMENT_SLOT_SPRITESHEETS[slotName] || 'empty-tile',
 			itemData?.iconFrame || -1
 		);
 
@@ -283,6 +303,10 @@ export default class InventoryScreen extends OverlayScreen {
 			const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotName];
 			this.inventorySelection.setX(x * UI_SCALE);
 			this.inventorySelection.setY(y * UI_SCALE);
+			this.inventorySelection.setScale(
+				EQUIPMENT_SLOT_SCALES[slotName][0] * UI_SCALE,
+				EQUIPMENT_SLOT_SCALES[slotName][1] * UI_SCALE
+			);
 		}
 	}
 

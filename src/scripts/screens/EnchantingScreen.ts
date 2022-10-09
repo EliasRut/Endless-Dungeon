@@ -1,4 +1,9 @@
-import { FixWidthSizer, Label, RoundRectangle, ScrollablePanel } from 'phaser3-rex-plugins/templates/ui/ui-components';
+import {
+	FixWidthSizer,
+	Label,
+	RoundRectangle,
+	ScrollablePanel,
+} from 'phaser3-rex-plugins/templates/ui/ui-components';
 import { Enchantment, EnchantmentName } from '../../items/enchantmentData';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import {
@@ -18,7 +23,7 @@ const SCALED_WINDOW_HEIGHT = window.innerHeight / UI_SCALE;
 
 const SCREEN_WIDTH = 500;
 const SCREEN_HEIGHT = 300;
-const SCREEN_START_X = (SCALED_WINDOW_WIDTH - SCREEN_WIDTH ) / 2;
+const SCREEN_START_X = (SCALED_WINDOW_WIDTH - SCREEN_WIDTH) / 2;
 const SCREEN_START_Y = (SCALED_WINDOW_HEIGHT - SCREEN_HEIGHT) / 2;
 
 const ELEMENT_SEPARATOR_X = 75 * UI_SCALE;
@@ -55,7 +60,6 @@ export default class EnchantingScreen extends OverlayScreen {
 	enchantmentName: Phaser.GameObjects.Text;
 	enchantmentModifier: Phaser.GameObjects.Text;
 	scrollablePanel: ScrollablePanel;
-
 
 	scene: MainScene;
 
@@ -296,7 +300,7 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.mighty.setShadow(0, 1 * UI_SCALE, 'black');
 		this.mighty.on('pointerdown', () => {
 			if (this.selectedNoun !== undefined) {
-				this.selectedAdjective = 'Mighty';				
+				this.selectedAdjective = 'Mighty';
 				this.update();
 			}
 		});
@@ -305,16 +309,17 @@ export default class EnchantingScreen extends OverlayScreen {
 		scene.add.existing(this);
 		this.setVisible(false);
 		this.visibility = false;
-		//-------------------------------------------------------------------------------------
-		//-------------------------------------------------------------------------------------
-		//-------------------------------------------------------------------------------------
-		//-------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------
 		let counter = 0;
 		essenceNames.forEach((essence) => {
 			const essenceToken = new InventoryItemToken(
 				this.scene,
 				ESSENCE_START_X + ESSENCE_SEPARATOR * (counter % (essenceNames.length / 2)),
 				ESSENCE_START_Y + ESSENCE_SEPARATOR * Math.round(counter / essenceNames.length),
+				'empty-tile',
 				-1
 			);
 
@@ -326,13 +331,15 @@ export default class EnchantingScreen extends OverlayScreen {
 			this.add(essenceToken, true);
 			counter++;
 		});
-		//-------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------
 		counter = 0;
 		essenceNames.forEach((essence) => {
 			this.essenceNumbers[counter] = new Phaser.GameObjects.Text(
 				this.scene,
 				ESSENCE_START_X + ESSENCE_SEPARATOR * (counter % (essenceNames.length / 2)),
-				ESSENCE_START_Y + ESSENCE_SEPARATOR * Math.round(counter / essenceNames.length) + ESSENCE_NUMBER_OFFSET,
+				ESSENCE_START_Y +
+					ESSENCE_SEPARATOR * Math.round(counter / essenceNames.length) +
+					ESSENCE_NUMBER_OFFSET,
 				`${globalState.inventory.essences[essence as ColorsOfMagic]}`,
 				{
 					color: 'white',
@@ -349,9 +356,9 @@ export default class EnchantingScreen extends OverlayScreen {
 			this.add(this.essenceNumbers[counter], true);
 			counter++;
 		});
-		//-------------------------------------------------------------------------------------
-		let currentEnchantment = this.selectedAdjective + this.selectedNoun as EnchantmentName;
-		let enchantment = Enchantment[currentEnchantment];		
+		// -------------------------------------------------------------------------------------
+		let currentEnchantment = (this.selectedAdjective + this.selectedNoun) as EnchantmentName;
+		let enchantment = Enchantment[currentEnchantment];
 		this.enchantmentName = new Phaser.GameObjects.Text(
 			scene,
 			ADJECTIVE_START_X,
@@ -365,18 +372,19 @@ export default class EnchantingScreen extends OverlayScreen {
 			}
 		);
 		this.enchantmentName.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-		this.enchantmentName.setScrollFactor(0);		
+		this.enchantmentName.setScrollFactor(0);
 		this.enchantmentName.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(this.enchantmentName, true);
 		scene.add.existing(this);
 		this.setVisible(false);
 		this.visibility = false;
-		//-------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------
 		this.enchantmentModifier = new Phaser.GameObjects.Text(
 			scene,
 			ADJECTIVE_START_X,
 			ESSENCE_START_Y + ESSENCE_NUMBER_OFFSET,
-			`${statDisplayNames[enchantment!.affectedStat!.stat]}: `.padEnd(18) + `${enchantment?.affectedStat?.value}`,
+			`${statDisplayNames[enchantment!.affectedStat!.stat]}: `.padEnd(18) +
+				`${enchantment?.affectedStat?.value}`,
 			{
 				color: 'white',
 				fontSize: `${12 * UI_SCALE}pt`,
@@ -385,7 +393,7 @@ export default class EnchantingScreen extends OverlayScreen {
 			}
 		);
 		this.enchantmentModifier.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-		this.enchantmentModifier.setScrollFactor(0);		
+		this.enchantmentModifier.setScrollFactor(0);
 		this.enchantmentModifier.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(this.enchantmentModifier, true);
 		scene.add.existing(this);
@@ -406,20 +414,22 @@ export default class EnchantingScreen extends OverlayScreen {
 		essenceNames.forEach((essence) => {
 			this.essenceNumbers[counter].setText(`${essences[essence as ColorsOfMagic]}`);
 			counter++;
-		});		
-		let enchantment = Enchantment[this.selectedAdjective + this.selectedNoun as EnchantmentName];		
+		});
+		let enchantment = Enchantment[(this.selectedAdjective + this.selectedNoun) as EnchantmentName];
 		this.enchantmentName.setText(`${enchantment?.name}`);
-		this.enchantmentModifier.setText(`${statDisplayNames[enchantment!.affectedStat!.stat]}: `.padEnd(18) + `${enchantment?.affectedStat?.value}`);
+		this.enchantmentModifier.setText(
+			`${statDisplayNames[enchantment!.affectedStat!.stat]}: `.padEnd(18) +
+				`${enchantment?.affectedStat?.value}`
+		);
 	}
 
 	createScrollableList(scene: Phaser.Scene) {
-		
 		var panel = new ScrollablePanel(scene, {
-			x: ADJECTIVE_START_X + (SCREEN_WIDTH / 2 / 2),
-			y: ADJECTIVE_START_Y + (SCREEN_HEIGHT / 2),
+			x: ADJECTIVE_START_X + SCREEN_WIDTH / 2 / 2,
+			y: ADJECTIVE_START_Y + SCREEN_HEIGHT / 2,
 			width: SCREEN_WIDTH / 2,
 			height: SCREEN_HEIGHT,
-			
+
 			scrollMode: 0,
 
 			background: new RoundRectangle(scene, 0, 0, 2, 2, 10, COLOR_PRIMARY),
@@ -477,7 +487,7 @@ export default class EnchantingScreen extends OverlayScreen {
 		panel.setVisible(false);
 		return panel;
 	}
-	createGrid (scene: Phaser.Scene) {
+	createGrid(scene: Phaser.Scene) {
 		// Create table body
 		var sizer = new FixWidthSizer(scene, {
 			space: {
@@ -488,27 +498,29 @@ export default class EnchantingScreen extends OverlayScreen {
 				item: 8,
 				line: 8,
 			},
-		})
-			.addBackground(new RoundRectangle(scene, 0, 0, 10, 10, 0, COLOR_DARK))
-	
+		}).addBackground(new RoundRectangle(scene, 0, 0, 10, 10, 0, COLOR_DARK));
+
 		for (var i = 0; i < 30; i++) {
-			sizer.add(new Label(scene, {
-				width: 30, height: 30,
-	
-				background: new RoundRectangle(scene, 0, 0, 0, 0, 14, COLOR_LIGHT),
-				text: scene.add.text(0, 0, `${i}`, {
-					fontSize: `${12 * UI_SCALE}`
-				}),
-	
-				align: 'center',
-				space: {
-					left: 5,
-					right: 5,
-					top: 5,
-					bottom: 5,
-				}
-			}));
-		}		
+			sizer.add(
+				new Label(scene, {
+					width: 30,
+					height: 30,
+
+					background: new RoundRectangle(scene, 0, 0, 0, 0, 14, COLOR_LIGHT),
+					text: scene.add.text(0, 0, `${i}`, {
+						fontSize: `${12 * UI_SCALE}`,
+					}),
+
+					align: 'center',
+					space: {
+						left: 5,
+						right: 5,
+						top: 5,
+						bottom: 5,
+					},
+				})
+			);
+		}
 		return sizer;
 	}
 }
