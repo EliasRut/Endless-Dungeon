@@ -86,7 +86,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 			let cnt: number = 0;
 			while (cnt < 3) {
 				cnt++;
-				const genericRoom = roomGen.generateRoom('dungeon');
+				const genericRoom = roomGen.generateRoom('dungeon', ColorsOfMagic.DEATH);
 				// globalState.availableRooms[genericRoom.name] = genericRoom;
 				globalState.roomAssignment[requestedRoomId].rooms.push(genericRoom.name);
 				this.usedRooms.push(genericRoom.name);

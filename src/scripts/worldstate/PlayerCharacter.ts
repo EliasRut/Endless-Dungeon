@@ -16,6 +16,7 @@ export default class PlayerCharacter extends Character {
 	public comboCast = 0;
 	public lastComboCast = 0;
 	public lastComboCastTime = Infinity;
+	public reverseDashDirectionTime = -Infinity;
 
 	// Stats are increased by this amount, given by enchantments
 	public enchantmentModifiers = {

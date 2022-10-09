@@ -22,6 +22,7 @@ import { getFacing4Dir, getXYfromTotalSpeed, updateMovingState } from '../../hel
 import { EnemyData, EnemyCategory, MeleeAttackType } from '../../enemies/enemyData';
 import { UneqippableItem } from '../../../items/itemData';
 import { DEBUG_ENEMY_AI } from '../../helpers/constants';
+import { getClosestTarget } from '../../helpers/targetingHelpers';
 
 const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;
@@ -216,6 +217,7 @@ export default class EnemyToken extends CharacterToken {
 		this.play({ key: 'death_anim_small', frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.body.destroy();
 		this.on('animationcomplete', () => this.destroy());
+		console.log(`Enemy ${this.id} died.`);
 		if (DEBUG_ENEMY_AI) {
 			this.scene.addFadingLabel('Dying', FadingLabelSize.NORMAL, '#ff0000', this.x, this.y, 1000);
 		}
@@ -606,25 +608,7 @@ export default class EnemyToken extends CharacterToken {
 			this.handleTokenMovement();
 		} else {
 			// Find closest target from all possible targets available
-			let possibleTargets: Character[];
-			if (this.faction === Faction.ALLIES) {
-				possibleTargets = [...Object.values(globalState.enemies)].filter(
-					(character) => character.health > 0 && character.faction === Faction.ENEMIES
-				);
-			} else {
-				possibleTargets = [
-					globalState.playerCharacter,
-					...(globalState.activeFollower
-						? [globalState.followers[globalState.activeFollower]]
-						: []),
-				].filter((character) => character.health > 0);
-			}
-			const sortedTargets = possibleTargets.sort((left, right) => {
-				const distanceLeft = this.getDistanceToWorldStatePosition(left.x, left.y);
-				const distanceRight = this.getDistanceToWorldStatePosition(right.x, right.y);
-				return distanceLeft - distanceRight;
-			});
-			const closestTarget = sortedTargets[0];
+			const closestTarget = getClosestTarget(this.faction, this.x, this.y);
 
 			// If target is in vision, set aggro and update target
 			const distanceToClosestTarget = closestTarget
@@ -638,16 +622,16 @@ export default class EnemyToken extends CharacterToken {
 				if (
 					this.lastTileX !== currentTileX ||
 					this.lastTileY !== currentTileY ||
-					this.targetStateObject?.x !== closestTarget.x ||
-					this.targetStateObject?.y !== closestTarget.y
+					this.targetStateObject?.x !== closestTarget!.x ||
+					this.targetStateObject?.y !== closestTarget!.y
 				) {
 					this.lastTileX = currentTileX;
 					this.lastTileY = currentTileY;
 					this.nextWaypoint = findNextPathSegmentTo(
 						currentTileX,
 						currentTileY,
-						Math.round(closestTarget.x / TILE_WIDTH),
-						Math.round(closestTarget.y / TILE_HEIGHT),
+						Math.round(closestTarget!.x / TILE_WIDTH),
+						Math.round(closestTarget!.y / TILE_HEIGHT),
 						this.scene.navigationalMap
 					);
 					if (DEBUG_ENEMY_AI) {

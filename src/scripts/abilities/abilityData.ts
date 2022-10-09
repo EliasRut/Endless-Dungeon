@@ -66,10 +66,15 @@ export interface ProjectileData {
 	destroyOnWallContact: boolean;
 	explodeOnDestruction?: boolean;
 	passThroughEnemies?: boolean;
+	acquisitionSpeed?: number;
+	acquisitionDistance?: number;
+	seekingSpeed?: number;
+	seekingTimeOffset?: number;
 	shape?: 'source' | 'storm' | 'cone' | 'nova';
 }
 
 export interface AbilityData {
+	stopDashBeforeEnemyCollision?: boolean;
 	projectiles?: number;
 	projectileData?: ProjectileData;
 	sound?: string;
@@ -93,6 +98,7 @@ export interface AbilityData {
 	dashDuration?: number;
 	dashInvulnerability?: boolean;
 	delayProjectiles?: number;
+	reverseDash?: boolean;
 }
 
 export const enum AbilityType {
@@ -163,6 +169,8 @@ export const Abilities: AbilityDataMap = {
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
 			explodeOnDestruction: true,
+			targeting: true,
+			seekingSpeed: 0,
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
@@ -189,6 +197,14 @@ export const Abilities: AbilityDataMap = {
 				speed: 20,
 				rotate: { min: -180, max: 180 },
 				lifespan: 100,
+				tint: {
+					blueDiff: 7,
+					blueMin: 170,
+					greenDiff: 70,
+					greenMin: 170,
+					redDiff: 70,
+					redMin: 0,
+				},
 			},
 			effect: TrailingParticleProjectileEffect,
 			collisionSound: 'sound-fireball-explosion',
@@ -199,12 +215,14 @@ export const Abilities: AbilityDataMap = {
 			destroyOnEnemyContact: true,
 			destroyOnWallContact: true,
 			explodeOnDestruction: true,
+			targeting: true,
+			seekingSpeed: 0,
 		},
 		increaseComboCast: true,
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
 		cooldownMs: 350,
-		castingTime: 200,
+		castingTime: 300,
 		damageMultiplier: 0.6,
 		abilityName: 'Arcane Bolt',
 		flavorText: `Shooting magic missiles!`,
@@ -367,17 +385,35 @@ export const Abilities: AbilityDataMap = {
 			drag: 700,
 			xOffset: 0,
 			yOffset: 0,
-			effect: ArcaneBoltEffect,
+			projectileImage: 'empty-tile',
+			particleData: {
+				particleImage: 'rock',
+				alpha: { start: 1, end: 0 },
+				scale: { start: 1, end: 0.2 },
+				speed: 20,
+				rotate: { min: -180, max: 180 },
+				lifespan: 300,
+				tint: {
+					blueDiff: 7,
+					blueMin: 170,
+					greenDiff: 70,
+					greenMin: 170,
+					redDiff: 70,
+					redMin: 0,
+				},
+			},
+			effect: TrailingParticleProjectileEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			timeToLive: 500,
-			effectScale: 1.2,
+			spriteScale: 0.5,
+			effectScale: 0.5,
 			targeting: false,
 			destroyOnWallContact: false,
 			destroyOnEnemyContact: false,
 			explodeOnDestruction: false,
 			passThroughEnemies: true,
-			knockback: 100,
+			knockback: 500,
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,
@@ -549,17 +585,35 @@ export const Abilities: AbilityDataMap = {
 			drag: 700,
 			xOffset: 0,
 			yOffset: 0,
-			effect: ArcaneBoltEffect,
+			projectileImage: 'empty-tile',
+			particleData: {
+				particleImage: 'rock',
+				alpha: { start: 1, end: 0 },
+				scale: { start: 1, end: 0.2 },
+				speed: 20,
+				rotate: { min: -180, max: 180 },
+				lifespan: 300,
+				tint: {
+					blueDiff: 7,
+					blueMin: 170,
+					greenDiff: 70,
+					greenMin: 170,
+					redDiff: 70,
+					redMin: 0,
+				},
+			},
+			effect: TrailingParticleProjectileEffect,
 			collisionSound: 'sound-fireball-explosion',
 			sfxVolume: 0.2,
 			timeToLive: 500,
-			effectScale: 1.2,
+			spriteScale: 0.5,
+			effectScale: 0.5,
 			targeting: false,
 			destroyOnWallContact: false,
 			destroyOnEnemyContact: false,
 			explodeOnDestruction: false,
 			passThroughEnemies: true,
-			knockback: 100,
+			knockback: 500,
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,

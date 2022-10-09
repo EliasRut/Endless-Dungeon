@@ -18,6 +18,7 @@ import TargetingEffect from '../drawables/effects/TargetingEffect';
 import Enemy from '../worldstate/Enemy';
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
 import { CASTING_SPEED_MS } from '../scenes/MainScene';
+import { getAbsoluteDistancesToWorldStatePosition, getClosestTarget } from './targetingHelpers';
 
 export interface SimplePointOfOrigin {
 	currentFacing: Facings;
@@ -241,14 +242,46 @@ export default class AbilityHelper {
 			if (casterToken) {
 				const rotationFactors = getVelocitiesForFacing(caster.currentFacing);
 				const velocity = casterToken.body.velocity;
-				casterToken.setVelocity(
-					usedAbilityData.dashSpeed * SCALE * rotationFactors.x,
-					usedAbilityData.dashSpeed * SCALE * rotationFactors.y
-				);
+				const dashVelocityX = usedAbilityData.dashSpeed * SCALE * rotationFactors.x;
+				const dashVelocityY = usedAbilityData.dashSpeed * SCALE * rotationFactors.y;
+				casterToken.setVelocity(dashVelocityX, dashVelocityY);
 				if (usedAbilityData.dashInvulnerability) {
 					casterToken.body.checkCollision.none = true;
 					caster.dashing = true;
 					casterToken.alpha = 0.2;
+				}
+
+				let maximumDashDuration = Infinity;
+
+				if (usedAbilityData.stopDashBeforeEnemyCollision) {
+					const closestTaget = getClosestTarget(
+						casterToken.faction,
+						casterToken.x,
+						casterToken.y,
+						caster.currentFacing
+					);
+
+					if (closestTaget) {
+						const distances = getAbsoluteDistancesToWorldStatePosition(
+							casterToken.x,
+							casterToken.y,
+							closestTaget.x,
+							closestTaget.y
+						);
+						maximumDashDuration =
+							Math.min(
+								dashVelocityX
+									? Math.max(0, distances[0] - 16 * SCALE) / Math.abs(dashVelocityX)
+									: Infinity,
+								dashVelocityY
+									? Math.max(0, distances[1] - 16 * SCALE) / Math.abs(dashVelocityY)
+									: Infinity
+							) * 1000;
+						console.log(
+							`Found closest target ${closestTaget.id} at distances ${distances.join(', ')} ` +
+								`going to dash a max of ${maximumDashDuration} milliseconds`
+						);
+					}
 				}
 
 				setTimeout(() => {
@@ -256,8 +289,11 @@ export default class AbilityHelper {
 					caster.dashing = false;
 					casterToken.body.checkCollision.none = false;
 					casterToken.alpha = 1;
-				}, usedAbilityData.dashDuration);
+				}, Math.min(maximumDashDuration, usedAbilityData.dashDuration));
 			}
+		}
+		if (usedAbilityData.reverseDash) {
+			globalState.playerCharacter.reverseDashDirectionTime = globalTime;
 		}
 
 		// We just want to play the ability sound once, not once for each projectile
@@ -292,7 +328,6 @@ export default class AbilityHelper {
 					globalState.playerCharacter.comboCast++;
 					globalState.playerCharacter.lastComboCastTime = time;
 				}
-				console.log(`Current combo cast: ${globalState.playerCharacter.comboCast}`);
 			}, castingTime * 0.67);
 			this.scene.keyboardHelper.lastCastingDuration = castingTime;
 		});

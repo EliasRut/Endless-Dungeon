@@ -1,3 +1,4 @@
+import { EnumDictionary } from '../../../typings/custom';
 import { EnemyData } from '../enemies/enemyData';
 export const enum Facings {
 	SOUTH,
@@ -412,3 +413,45 @@ export const DEBUG_PATHFINDING = false;
 export const DEBUG_ENEMY_AI = false;
 export const FPS_DEBUG = false;
 export const COMBO_CAST_RESET_DELAY = 2000;
+export const DASH_REVERSE_DELAY = 1500;
+
+export const replacementTiles: EnumDictionary<
+	ColorsOfMagic,
+	{ [tileId: number]: [number, number][] }
+> = {
+	[ColorsOfMagic.DEATH]: {
+		2: [[0.9, 13]],
+		32: [
+			[0.995, 72],
+			[0.98, 33],
+		],
+		42: [[0.9, 53]],
+	},
+	[ColorsOfMagic.WILD]: {
+		32: [
+			[0.995, 33],
+			[0.99, 34],
+			[0.985, 35],
+			[0.98, 36],
+			[0.975, 37],
+			[0.97, 72],
+			[0.965, 73],
+			[0.96, 74],
+			[0.955, 75],
+			[0.95, 76],
+			[0.945, 77],
+			[0.94, 78],
+			[0.935, 79],
+			[0.82, 118],
+			[0.79, 119],
+			[0.76, 158],
+			[0.73, 159],
+		],
+	},
+	[ColorsOfMagic.ROYAL]: {},
+	[ColorsOfMagic.METAL]: {},
+	[ColorsOfMagic.PASSION]: {},
+	[ColorsOfMagic.FLUX]: {},
+	[ColorsOfMagic.CHANGE]: {},
+	[ColorsOfMagic.BLOOD]: {},
+};

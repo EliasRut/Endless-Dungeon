@@ -9,8 +9,14 @@ import { DungeonLevelData } from '../models/DungeonRunData';
 import globalState from '../worldstate';
 import Door from '../worldstate/Door';
 import DungeonLevel from '../worldstate/DungeonLevel';
-import { colorOfMagicToTilesetMap, enemyBudgetCost, EnemyByColorOfMagicMap } from './constants';
-import RoomGenerator from './generateRoom';
+import {
+	colorOfMagicToTilesetMap,
+	enemyBudgetCost,
+	EnemyByColorOfMagicMap,
+	replacementTiles,
+} from './constants';
+import RoomGenerator, { translateLayoutToStyle } from './generateRoom';
+import { ColorsOfMagic } from './constants';
 
 export const BLOCK_SIZE = 8;
 export const TILE_WIDTH = 16;
@@ -198,6 +204,7 @@ const CORRIDOR_LAYOUTS = {
 
 export default class DungeonGenerator {
 	tilesUsed: boolean[][];
+	allowReplacement: boolean[][];
 	rooms: Room[];
 	startRoomIndex: number;
 	roomOffsets: [number, number][];
@@ -245,7 +252,7 @@ export default class DungeonGenerator {
 
 		while (levelData.numberOfRooms > this.rooms.length) {
 			const roomGen = new RoomGenerator();
-			const genericRoom = roomGen.generateRoom(this.fillerTilest);
+			const genericRoom = roomGen.generateRoom(this.fillerTilest, levelData.style);
 			this.rooms.push(genericRoom);
 			globalState.availableRooms[genericRoom.name] = genericRoom;
 		}
@@ -298,16 +305,19 @@ export default class DungeonGenerator {
 		// At this point, we have a valid room placement
 
 		// Reset the combined layout which holds the actual tileset data
+		this.allowReplacement = [];
 		this.combinedLayout = [];
 		this.decorationLayout = [];
 		this.overlayLayout = [];
 		this.topLayout = [];
 		for (let y = 0; y < this.dungeonHeight; y++) {
+			this.allowReplacement[y] = [];
 			this.combinedLayout[y] = [];
 			this.decorationLayout[y] = [];
 			this.overlayLayout[y] = [];
 			this.topLayout[y] = [];
 			for (let x = 0; x < this.dungeonWidth; x++) {
+				this.allowReplacement[y][x] = false;
 				this.combinedLayout[y][x] = -1;
 				this.decorationLayout[y][x] = -1;
 				this.overlayLayout[y][x] = -1;
@@ -321,7 +331,7 @@ export default class DungeonGenerator {
 
 		this.drawRooms();
 
-		this.drawTilesForPaths();
+		this.drawTilesForPaths(levelData.style);
 
 		const [cameraOffsetX, cameraOffsetY] = this.getStartRoomCameraOffsets();
 
@@ -474,6 +484,7 @@ export default class DungeonGenerator {
 
 		// Replace default fields with decorated ones
 		if (levelData.isDungeon) {
+			const relevantReplacements = replacementTiles[levelData.style];
 			for (let y = 0; y < this.combinedLayout.length; y++) {
 				for (let x = 0; x < this.combinedLayout[0].length; x++) {
 					const tileId = this.combinedLayout[y][x];
@@ -482,22 +493,15 @@ export default class DungeonGenerator {
 					}
 					const baseTileId = tileId % 1000;
 					const tileSetBase = Math.floor(tileId / 1000) * 1000;
-					if (baseTileId === 32) {
+					const replacementOptions = relevantReplacements[baseTileId];
+					if (replacementOptions) {
 						const rnd = Math.random();
-						if (rnd > 0.995) {
-							this.combinedLayout[y][x] = tileSetBase + 72;
-						} else if (rnd > 0.98) {
-							this.combinedLayout[y][x] = tileSetBase + 33;
-						}
-					} else if (baseTileId === 2) {
-						const rnd = Math.random();
-						if (rnd > 0.9) {
-							this.combinedLayout[y][x] = tileSetBase + 13;
-						}
-					} else if (baseTileId === 42) {
-						const rnd = Math.random();
-						if (rnd > 0.9) {
-							this.combinedLayout[y][x] = tileSetBase + 53;
+						for (let i = 0; i < replacementOptions.length; i++) {
+							const [chance, replacement] = replacementOptions[i];
+							if (rnd >= chance) {
+								this.combinedLayout[y][x] = tileSetBase + replacement;
+								break;
+							}
 						}
 					}
 				}
@@ -664,6 +668,7 @@ export default class DungeonGenerator {
 				if (roomLayout[y][x] > 0) {
 					const actualY = y + roomYBlockOffset * BLOCK_SIZE;
 					const actualX = x + roomXBlockOffset * BLOCK_SIZE;
+					this.allowReplacement[actualY][actualX] = !!room.allowTileReplacement;
 					this.combinedLayout[actualY][actualX] = gid + roomLayout[y][x];
 					this.topLayout[actualY][actualX] = roomLayout[y][x] >= 120 ? roomLayout[y][x] : -1;
 				}
@@ -924,17 +929,19 @@ export default class DungeonGenerator {
 		}
 	}
 
-	private drawTilesForPaths() {
+	private drawTilesForPaths(style: ColorsOfMagic) {
 		for (let blockY = 0; blockY < this.dungeonBlocksY; blockY++) {
 			for (let blockX = 0; blockX < this.dungeonBlocksX; blockX++) {
 				if (this.blocksUsed[blockY][blockX]) {
 					const corridorLayoutId = this.blocksUsed[blockY][blockX] as keyof typeof CORRIDOR_LAYOUTS;
-					const blockLayout = CORRIDOR_LAYOUTS[corridorLayoutId];
+					const blockLayout = translateLayoutToStyle(CORRIDOR_LAYOUTS[corridorLayoutId], style);
 					for (let y = 0; y < BLOCK_SIZE; y++) {
 						for (let x = 0; x < BLOCK_SIZE; x++) {
 							const tileY = blockY * BLOCK_SIZE + y;
 							const tileX = blockX * BLOCK_SIZE + x;
 							this.combinedLayout[tileY][tileX] = blockLayout[y][x];
+							this.allowReplacement[tileY][tileX] = true;
+
 							this.topLayout[tileY][tileX] = blockLayout[y][x] >= 120 ? blockLayout[y][x] : -1;
 							if (blockLayout[y][x] === 32) {
 								this.potentialEnemyFields.push({ x: tileX, y: tileY });

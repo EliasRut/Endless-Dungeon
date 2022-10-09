@@ -1,6 +1,7 @@
 import { AbilityType, ProjectileData } from '../../abilities/abilityData';
 import {
 	AbilityKey,
+	DASH_REVERSE_DELAY,
 	Facings,
 	FadingLabelSize,
 	PossibleTargets,
@@ -23,7 +24,8 @@ import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 const RED_DIFF = 0x010000;
 const GREEN_DIFF = 0x000100;
-const TELEPORT_VELOCITY = 600;
+const TELEPORT_DURATION = 200;
+const TELEPORT_VELOCITY = 400;
 
 export default class TeleportEffect extends AbilityEffect {
 	constructor(
@@ -44,10 +46,17 @@ export default class TeleportEffect extends AbilityEffect {
 
 		const playerToken = (this.scene as MainScene).mainCharacter;
 		const velocity = playerToken.body.velocity;
-		playerToken.setVelocity(
-			TELEPORT_VELOCITY * SCALE * rotationFactors.x,
-			TELEPORT_VELOCITY * SCALE * rotationFactors.y
-		);
+		if (playerCharacter.reverseDashDirectionTime + DASH_REVERSE_DELAY > globalState.gameTime) {
+			playerToken.setVelocity(
+				-TELEPORT_VELOCITY * SCALE * rotationFactors.x,
+				-TELEPORT_VELOCITY * SCALE * rotationFactors.y
+			);
+		} else {
+			playerToken.setVelocity(
+				TELEPORT_VELOCITY * SCALE * rotationFactors.x,
+				TELEPORT_VELOCITY * SCALE * rotationFactors.y
+			);
+		}
 		playerToken.body.checkCollision.none = true;
 		playerCharacter.dashing = true;
 		playerToken.alpha = 0.2;
@@ -84,6 +93,6 @@ export default class TeleportEffect extends AbilityEffect {
 			playerToken.body.checkCollision.none = false;
 			playerToken.alpha = 1;
 			trailEmitter.stopFollow();
-		}, 200);
+		}, TELEPORT_DURATION);
 	}
 }

@@ -32,6 +32,7 @@ export default class DungeonDoorScene extends Phaser.Scene {
 		console.log('entering dungeon');
 		await this.contentDataLibraryUpdatePromise;
 		const dungeonRun = generateDungeonRun(runeAssignment);
+		globalState.enemies = {};
 		globalState.dungeon.levels = {};
 		globalState.doors = {};
 		const newScriptState: { [id: string]: SingleScriptState } = {};

@@ -258,6 +258,7 @@ export interface DatabaseRoom {
 }
 
 export interface Room {
+	allowTileReplacement?: boolean;
 	startRoom?: boolean;
 	tileset: string;
 	decorationTileset?: string;
