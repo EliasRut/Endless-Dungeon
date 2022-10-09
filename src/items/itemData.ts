@@ -370,6 +370,8 @@ export const enum UneqippableItem {
 	MYSTIC_BOOK = 'mysticBook',
 	HEALTH_POTION = 'health',
 	ESSENCE = 'essence',
+	EURALIAE_SEEDS = 'euraliaeSeeds',
+	PLANTLING_ROOT = 'plantlingRoot',
 }
 
 export const UneqippableItemData = {
@@ -397,6 +399,16 @@ export const UneqippableItemData = {
 		name: 'Essence',
 		description: 'Essence for crafting.',
 		iconFrame: 0,
+	} as ItemData,
+	[UneqippableItem.EURALIAE_SEEDS]: {
+		name: 'Euraliae Seeds',
+		description: 'Quest Item.',
+		iconFrame: 9,
+	} as ItemData,
+	[UneqippableItem.PLANTLING_ROOT]: {
+		name: 'Plantling root',
+		description: 'Quest Item.',
+		iconFrame: 49,
 	} as ItemData,
 };
 
