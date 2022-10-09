@@ -175,7 +175,7 @@ export default class KeyboardHelper {
 				return true;
 			}
 			try {
-				return !!this.gamepad?.L2;
+				return !!this.gamepad?.R2;
 			} catch (err) {
 				return false;
 			}
@@ -190,7 +190,7 @@ export default class KeyboardHelper {
 				return true;
 			}
 			try {
-				return !!this.gamepad?.R2;
+				return !!this.gamepad?.L2;
 			} catch (err) {
 				return false;
 			}
@@ -205,7 +205,7 @@ export default class KeyboardHelper {
 				return true;
 			}
 			try {
-				return !!this.gamepad?.L1;
+				return !!this.gamepad?.R1;
 			} catch (err) {
 				return false;
 			}
@@ -220,7 +220,7 @@ export default class KeyboardHelper {
 				return true;
 			}
 			try {
-				return !!this.gamepad?.R1;
+				return !!this.gamepad?.L1;
 			} catch (err) {
 				return false;
 			}
