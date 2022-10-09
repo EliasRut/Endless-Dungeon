@@ -145,6 +145,17 @@ export default class AbilityHelper {
 				const damage = caster.damage * usedAbilityData.damageMultiplier * abilityLevel;
 				const prevHealth = enemy.stateObject.health;
 				enemy.takeDamage(damage);
+				if (usedAbilityData.castOnEnemyHit) {
+					const enemyStateObject = { ...enemy.stateObject };
+					this.triggerAbility(
+						caster,
+						enemyStateObject,
+						usedAbilityData.castOnEnemyHit!,
+						caster.level,
+						globalTime,
+						1
+					);
+				}
 				if (prevHealth > 0 && enemy.stateObject.health <= 0) {
 					// Enemy died from this attack
 					if (usedAbilityData.castOnEnemyDestroyed) {
@@ -153,12 +164,11 @@ export default class AbilityHelper {
 							caster,
 							enemyStateObject,
 							usedAbilityData.castOnEnemyDestroyed!,
-							1, //abilityLevel,
+							caster.level,
 							globalTime,
 							1
 						);
 					}
-					// delete globalState.enemies[enemy.id];
 				}
 				if (usedAbilityData.stun) {
 					enemy.receiveStun(usedAbilityData.stun!);
@@ -211,9 +221,12 @@ export default class AbilityHelper {
 	}
 	update(time: number, castAbilities: [AbilityType, number][]) {
 		castAbilities.forEach(([ability, abilityLevel]) => {
-			const castingTime =
-				getRelevantAbilityVersion(ability, abilityLevel, globalState.playerCharacter.comboCast)
-					.castingTime || CASTING_SPEED_MS;
+			const relevantAbility = getRelevantAbilityVersion(
+				ability,
+				abilityLevel,
+				globalState.playerCharacter.comboCast
+			);
+			const castingTime = relevantAbility?.castingTime || CASTING_SPEED_MS;
 			globalState.playerCharacter.lastComboCast = globalState.playerCharacter.comboCast;
 			setTimeout(() => {
 				this.triggerAbility(
@@ -224,11 +237,13 @@ export default class AbilityHelper {
 					time,
 					globalState.playerCharacter.comboCast
 				);
-				if (globalState.playerCharacter.comboCast >= 3) {
+				if (relevantAbility.resetComboCast) {
 					globalState.playerCharacter.comboCast = 1;
-				} else {
+				} else if (relevantAbility.increaseComboCast) {
 					globalState.playerCharacter.comboCast++;
+					globalState.playerCharacter.lastComboCast = time;
 				}
+				console.log(`Current combo cast: ${globalState.playerCharacter.comboCast}`);
 			}, castingTime * 0.67);
 			this.scene.keyboardHelper.lastCastingDuration = castingTime;
 		});

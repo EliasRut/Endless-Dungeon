@@ -83,9 +83,12 @@ export interface AbilityData {
 	necroticStacks?: number;
 	iceStacks?: number;
 	castOnEnemyDestroyed?: AbilityType;
+	castOnEnemyHit?: AbilityType;
 	spriteName?: string;
 	castingTime?: number;
 	useExactTargetVector?: boolean;
+	increaseComboCast?: boolean;
+	resetComboCast?: boolean;
 }
 
 export const enum AbilityType {
@@ -165,8 +168,8 @@ export const Abilities: AbilityDataMap = {
 		abilityName: 'Fireball',
 		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
 		icon: ['icon-abilities', 0],
-		castOnEnemyDestroyed: AbilityType.EXPLODING_CORPSE,
 		castingTime: 250,
+		increaseComboCast: true,
 	},
 	[AbilityType.ARCANE_BOLT]: {
 		projectiles: 1,
