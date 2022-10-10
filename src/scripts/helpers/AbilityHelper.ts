@@ -277,10 +277,6 @@ export default class AbilityHelper {
 									? Math.max(0, distances[1] - 16 * SCALE) / Math.abs(dashVelocityY)
 									: Infinity
 							) * 1000;
-						console.log(
-							`Found closest target ${closestTaget.id} at distances ${distances.join(', ')} ` +
-								`going to dash a max of ${maximumDashDuration} milliseconds`
-						);
 					}
 				}
 
