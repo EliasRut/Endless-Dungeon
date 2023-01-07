@@ -1,5 +1,6 @@
 import 'phaser';
 import React, { useEffect, useRef } from 'react';
+import { startAudioGeneration } from '../../scripts/audiogen/app';
 import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
 
@@ -14,6 +15,7 @@ export const Game = () => {
 		setActiveMode(MODE.GAME);
 		const config = getGameConfig(phaserRef.current!, MODE.GAME);
 		const game = new Phaser.Game(config);
+		startAudioGeneration();
 	}, [showGame]);
 
 	return <div className="game__container" ref={phaserRef} />;

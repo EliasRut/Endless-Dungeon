@@ -314,12 +314,12 @@ export default class MainScene extends Phaser.Scene {
 		this.abilityHelper = new AbilityHelper(this);
 		this.scriptHelper = new ScriptHelper(this);
 
-		this.sound.stopAll();
-		if (globalState.currentLevel === 'town') {
-			this.sound.play('score-town', { volume: 0.05, loop: true });
-		} else {
-			this.sound.play('score-dungeon', { volume: 0.08, loop: true });
-		}
+		// this.sound.stopAll();
+		// if (globalState.currentLevel === 'town') {
+		// 	this.sound.play('score-town', { volume: 0.05, loop: true });
+		// } else {
+		// 	this.sound.play('score-dungeon', { volume: 0.08, loop: true });
+		// }
 
 		if (DEBUG_PHYSICS) {
 			this.renderDebugGraphics();
