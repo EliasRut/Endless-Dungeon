@@ -152,9 +152,9 @@ async function NineOhUnit(audio: AudioT): Promise<NineOhMachine> {
 }
 
 function DelayUnit(audio: AudioT): DelayUnit {
-	const dryWet = parameter('Dry/Wet', [0, 0.5], 0.5);
-	const feedback = parameter('Feedback', [0, 0.9], 0.3);
-	const delayTime = parameter('Time', [0, 2], 0.3);
+	const dryWet = parameter('Dry/Wet', [0, 0.0], 0);
+	const feedback = parameter('Feedback', [0, 0.0], 0);
+	const delayTime = parameter('Time', [0, 0], 0);
 	const delay = audio.DelayInsert(delayTime.value, dryWet.value, feedback.value);
 	dryWet.subscribe((w) => (delay.wet.value = w));
 	feedback.subscribe((f) => (delay.feedback.value = f));
@@ -172,8 +172,8 @@ function AutoPilot(state: ProgramState): AutoPilotUnit {
 	const nextMeasure = parameter('upcomingMeasure', [0, Infinity], 0);
 	const currentMeasure = parameter('measure', [0, Infinity], 0);
 	const patternEnabled = genericParameter('Alter Patterns', true);
-	const dialsEnabled = genericParameter('Twiddle With Knobs', true);
-	const mutesEnabled = genericParameter('Mute Drum Parts', true);
+	const dialsEnabled = genericParameter('Twiddle With Knobs', false);
+	const mutesEnabled = genericParameter('Mute Drum Parts', false);
 	state.clock.currentStep.subscribe((step) => {
 		if (step === 4) {
 			nextMeasure.value = nextMeasure.value + 1;
@@ -246,7 +246,7 @@ function ClockUnit(): ClockUnit {
 	};
 }
 
-export async function startAudioGeneration() {
+export async function startAudioGeneration(uiControlContainer?: HTMLElement) {
 	const audio = Audio();
 	const clock = ClockUnit();
 	const delay = DelayUnit(audio);
@@ -255,8 +255,10 @@ export async function startAudioGeneration() {
 	const gen = ThreeOhGen();
 	const programState: ProgramState = {
 		notes: [
-			ThreeOhUnit(audio, 'sawtooth', delay.inputNode, gen),
-			ThreeOhUnit(audio, 'square', delay.inputNode, gen),
+			ThreeOhUnit(audio, 'triangle', delay.inputNode, gen),
+			// ThreeOhUnit(audio, 'triangle', delay.inputNode, gen),
+			// ThreeOhUnit(audio, 'triangle', delay.inputNode, gen),
+			// ThreeOhUnit(audio, 'sine', delay.inputNode, gen),
 			// ThreeOhUnit(audio, 'sine', delay.inputNode, gen),
 		],
 		drums: await NineOhUnit(audio),
@@ -274,8 +276,10 @@ export async function startAudioGeneration() {
 		[...programState.notes, programState.drums].forEach((d) => d.step(step))
 	);
 	const autoPilot = AutoPilot(programState);
-	// const ui = UI(programState, autoPilot, audio.master.analyser);
-	// document.body.append(ui);
+	if (uiControlContainer) {
+		const ui = UI(programState, autoPilot, audio.master.analyser);
+		uiControlContainer.append(ui);
+	}
 }
 
 // pressToStart(

@@ -305,7 +305,6 @@ function AudioMeter(analyser: AnalyserNode) {
 export function UI(state: ProgramState, autoPilot: AutoPilotUnit, analyser: AnalyserNode) {
 	const ui = document.createElement('div');
 	ui.id = 'ui';
-	ui.style.opacity = '0.3';
 
 	const otherControls = controls(
 		AutopilotControls(autoPilot),
