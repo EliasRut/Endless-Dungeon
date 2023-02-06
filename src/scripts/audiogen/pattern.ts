@@ -23,25 +23,27 @@ export function ThreeOhGen(): NoteGenerator {
 	const density = 1.0;
 
 	const offsetChoices = [
-		// [0, 0, 12, 24, 27],
-		// [0, 0, 0, 12, 10, 19, 26, 27],
-		// [0, 1, 7, 10, 12, 13],
+		[0, 0, 12, 24, 27],
+		[0, 0, 0, 12, 10, 19, 26, 27],
+		[0, 1, 7, 10, 12, 13],
 		// [0],
 		// [0, 0, 0, 12],
-		// [0, 0, 12, 14, 15, 19],
-		// [0, 0, 0, 0, 12, 13, 16, 19, 22, 24, 25],
-		// [0, 0, 0, 7, 12, 15, 17, 20, 24],
-		[0, 0, 1, 1, 2, 2],
-		[0, 0, 8, 8, 16, 16],
+		[0, 0, 12, 14, 15, 19],
+		[0, 0, 0, 0, 12, 13, 16, 19, 22, 24, 25],
+		[0, 0, 0, 7, 12, 15, 17, 20, 24],
+		// [0, 0, 1, 1, 2, 2],
+		// [0, 0, 8, 8, 16, 16],
 	];
 
 	function changeNotes() {
-		const root = rndInt(15) + 16;
+		const root = rndInt(4) + 42;
+		// const root = rndInt(15) + 16;
+		// const root = rndInt(15);
 		const offsets: number[] = choose(offsetChoices);
 		noteSet.value = offsets.map((o) => midiNoteToText(o + root));
 	}
 
-	function createPattern(): Pattern {
+	function createPattern(useFixed: boolean): Pattern {
 		if (newNotes.value == true) {
 			changeNotes();
 			newNotes.value = false;
@@ -65,6 +67,26 @@ export function ThreeOhGen(): NoteGenerator {
 			}
 		}
 
+		if (useFixed) {
+			return [
+				{ note: 'C4', accent: false, glide: false },
+				{ note: '-', accent: false, glide: false },
+				{ note: 'D4', accent: false, glide: false },
+				{ note: '-', accent: false, glide: false },
+				{ note: 'C4', accent: false, glide: false },
+				{ note: '-', accent: false, glide: false },
+				{ note: 'G4', accent: false, glide: false },
+				{ note: '-', accent: false, glide: false },
+				{ note: 'A#4', accent: false, glide: false },
+				{ note: '-', accent: false, glide: false },
+				{ note: 'G4', accent: false, glide: false },
+				{ note: '-', accent: false, glide: false },
+				{ note: 'C4', accent: false, glide: false },
+				{ note: '-', accent: false, glide: false },
+				{ note: 'D4', accent: false, glide: false },
+				{ note: '-', accent: false, glide: false },
+			];
+		}
 		return pattern;
 	}
 	return {

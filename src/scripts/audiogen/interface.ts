@@ -52,7 +52,7 @@ export type NineOhMachine = {
 export type NoteGenerator = {
 	noteSet: GeneralisedParameter<FullNote[]>;
 	newNotes: Trigger;
-	createPattern: () => Pattern;
+	createPattern: (useFixedPattern: boolean) => Pattern;
 };
 
 export type DelayUnit = {

@@ -10,6 +10,16 @@ export type MyNote = 'A' | 'A#' | 'B' | 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F
 export type Octave = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
 export type FullNote = string; //`${MyNote}${Octave}`;
 
+const NOTE_LENGTH = 0.3;
+const ATTACK_TIME = 0.15;
+const RELEASE_TIME = 0.85;
+const SUSTAIN_LEVEL = 0.2;
+
+// const NOTE_LENGTH = 0.15;
+// const ATTACK_TIME = 0.04;
+// const RELEASE_TIME = 0.12;
+// const SUSTAIN_LEVEL = 0.4;
+
 const lookupTable: Map<MyNote, number> = new Map<MyNote, number>();
 const revLook: Map<number, MyNote> = new Map<number, MyNote>();
 (() => {
@@ -64,7 +74,7 @@ export function Audio(
 ) {
 	function masterChannel() {
 		const gain = au.createGain();
-		gain.gain.value = 0.5;
+		gain.gain.value = 0.3;
 		const limiter = au.createDynamicsCompressor();
 		limiter.attack.value = 0.005;
 		limiter.release.value = 0.1;
@@ -74,7 +84,7 @@ export function Audio(
 
 		const analyser = au.createAnalyser();
 		analyser.fftSize = 2048;
-		limiter.connect(analyser);
+		// limiter.connect(analyser);
 
 		gain.connect(limiter);
 		limiter.connect(au.destination);
@@ -153,7 +163,7 @@ export function Audio(
 		gain.connect(panner);
 		panner.connect(destination);
 
-		// gain.gain.linearRampToValueAtTime(0.1, au.currentTime + attack);
+		gain.gain.linearRampToValueAtTime(0.1, au.currentTime + attack);
 
 		await time(sustain + attack);
 		gain.gain.setValueAtTime(0.1, au.currentTime);
@@ -195,9 +205,10 @@ export function Audio(
 		delayGain.gain.value = wet;
 		delayNode.connect(delayGain);
 		delayGain.connect(destination);
+
 		const synthOut = au.createGain();
 		synthOut.gain.value = 1.0;
-		synthOut.connect(delayNode);
+		// synthOut.connect(delayNode);
 		synthOut.connect(destination);
 		return {
 			in: synthOut,
@@ -240,39 +251,66 @@ export function Audio(
 		const vca = au.createGain();
 		vca.gain.value = 0.0;
 
-		osc.connect(vca);
-		vca.connect(filter);
-		filter.connect(out);
+		const masterVolume = au.createGain();
+		masterVolume.connect(au.destination);
+		masterVolume.gain.value = 0.2;
+
+		// osc.connect(vca);
+		// vca.connect(filter);
+		// filter.connect(out);
 
 		function noteOn(note: FullNote, accent: boolean = false, glide: boolean = false) {
-			if (accent) {
-				env.offset.cancelScheduledValues(au.currentTime);
-				//env.offset.setTargetAtTime(1.0,au.currentTime, 0.001);
-				env.offset.setValueAtTime(1.0, au.currentTime);
-				env.offset.exponentialRampToValueAtTime(0.01, au.currentTime + pDecay.value / 3);
-			} else {
-				env.offset.cancelScheduledValues(au.currentTime);
-				//env.offset.setTargetAtTime(1.0,au.currentTime, 0.001);
-				env.offset.setValueAtTime(1.0, au.currentTime);
-				env.offset.exponentialRampToValueAtTime(0.01, au.currentTime + pDecay.value);
-			}
-			osc.frequency.cancelScheduledValues(au.currentTime);
-			osc.frequency.setTargetAtTime(
-				midiNoteToFrequency(textNoteToNumber(note)),
-				au.currentTime,
-				glide ? 0.02 : 0.002
-			);
-			vca.gain.cancelScheduledValues(au.currentTime);
-			vca.gain.setValueAtTime(accent ? 0.2 : 0.15, au.currentTime);
-			//vca.gain.setTargetAtTime(accent ? 0.5 : 0.3,au.currentTime, 0.001);
-			//vca.gain.setValueAtTime(0.2, au.currentTime);
-			vca.gain.linearRampToValueAtTime(0.1, au.currentTime + 0.2);
+			// if (accent) {
+			// 	env.offset.cancelScheduledValues(au.currentTime);
+			// 	//env.offset.setTargetAtTime(1.0,au.currentTime, 0.001);
+			// 	env.offset.setValueAtTime(1.0, au.currentTime);
+			// 	env.offset.exponentialRampToValueAtTime(0.01, au.currentTime + pDecay.value / 3);
+			// } else {
+			// 	env.offset.cancelScheduledValues(au.currentTime);
+			// 	//env.offset.setTargetAtTime(1.0,au.currentTime, 0.001);
+			// 	env.offset.setValueAtTime(1.0, au.currentTime);
+			// 	env.offset.exponentialRampToValueAtTime(0.01, au.currentTime + pDecay.value);
+			// }
+			// This is the original version
+			// osc.frequency.cancelScheduledValues(au.currentTime);
+			// osc.frequency.setTargetAtTime(
+			// 	midiNoteToFrequency(textNoteToNumber(note)),
+			// 	au.currentTime,
+			// 	glide ? 0.02 : 0.002
+			// );
+			// vca.gain.cancelScheduledValues(au.currentTime);
+			// vca.gain.setValueAtTime(accent ? 0.2 : 0.15, au.currentTime);
+			////vca.gain.setTargetAtTime(accent ? 0.5 : 0.3,au.currentTime, 0.001);
+			////vca.gain.setValueAtTime(0.2, au.currentTime);
+			// vca.gain.linearRampToValueAtTime(0.1, au.currentTime + 0.2);
+
+			const osc = au.createOscillator();
+			const noteGain = au.createGain();
+
+			noteGain.gain.setValueAtTime(0, au.currentTime);
+			noteGain.gain.linearRampToValueAtTime(
+				SUSTAIN_LEVEL,
+				au.currentTime + NOTE_LENGTH * ATTACK_TIME
+			); //
+			noteGain.gain.setValueAtTime(
+				SUSTAIN_LEVEL,
+				au.currentTime + NOTE_LENGTH - NOTE_LENGTH * RELEASE_TIME
+			); //
+			noteGain.gain.linearRampToValueAtTime(0, au.currentTime + NOTE_LENGTH);
+
+			osc.type = 'square';
+			osc.frequency.setValueAtTime(midiNoteToFrequency(textNoteToNumber(note)), 0);
+			osc.start(0);
+			osc.stop(au.currentTime + NOTE_LENGTH);
+			osc.connect(noteGain);
+
+			noteGain.connect(masterVolume);
 			trigger();
 		}
 
 		function noteOff() {
-			vca.gain.cancelScheduledValues(au.currentTime);
-			vca.gain.setTargetAtTime(0.0, au.currentTime, 0.01);
+			// vca.gain.cancelScheduledValues(au.currentTime);
+			// vca.gain.setTargetAtTime(0.0, au.currentTime, 0.01);
 		}
 
 		return {

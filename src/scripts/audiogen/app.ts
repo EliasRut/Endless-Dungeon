@@ -69,7 +69,8 @@ function ThreeOhUnit(
 	waveform: OscillatorType,
 	output: AudioNode,
 	gen: NoteGenerator,
-	patternLength: number = 16
+	patternLength: number = 16,
+	useFixedPattern: boolean = false
 ): ThreeOhMachine {
 	const synth = audio.ThreeOh(waveform, output);
 	const pattern = genericParameter<Pattern>('Pattern', []);
@@ -81,7 +82,7 @@ function ThreeOhUnit(
 
 	function step(index: number) {
 		if ((index === 0 && newPattern.value == true) || pattern.value.length == 0) {
-			pattern.value = gen.createPattern();
+			pattern.value = gen.createPattern(useFixedPattern);
 			newPattern.value = false;
 		}
 
@@ -115,10 +116,14 @@ function ThreeOhUnit(
 
 async function NineOhUnit(audio: AudioT): Promise<NineOhMachine> {
 	const drums = await audio.SamplerDrumMachine([
-		'assets/sounds/score/909BD.mp3',
-		'assets/sounds/score/909OH.mp3',
-		'assets/sounds/score/909CH.mp3',
-		'assets/sounds/score/909SD.mp3',
+		// 'assets/sounds/score/909BD.mp3',
+		// 'assets/sounds/score/909OH.mp3',
+		// 'assets/sounds/score/909CH.mp3',
+		// 'assets/sounds/score/909SD.mp3',
+		'assets/sounds/score/frame_drum_0.mp3',
+		'assets/sounds/score/frame_drum_1.mp3',
+		'assets/sounds/score/metalShaker3.mp3',
+		'assets/sounds/score/cabassa1.mp3',
 	]);
 	const pattern = genericParameter<DrumPattern>('Drum Pattern', []);
 	const mutes = [
@@ -154,11 +159,11 @@ async function NineOhUnit(audio: AudioT): Promise<NineOhMachine> {
 function DelayUnit(audio: AudioT): DelayUnit {
 	const dryWet = parameter('Dry/Wet', [0, 0.0], 0);
 	const feedback = parameter('Feedback', [0, 0.0], 0);
-	const delayTime = parameter('Time', [0, 0], 0);
+	const delayTime = parameter('Time', [0, 1], 0.5);
 	const delay = audio.DelayInsert(delayTime.value, dryWet.value, feedback.value);
-	dryWet.subscribe((w) => (delay.wet.value = w));
-	feedback.subscribe((f) => (delay.feedback.value = f));
-	delayTime.subscribe((t) => (delay.delayTime.value = t));
+	// dryWet.subscribe((w) => (delay.wet.value = w));
+	// feedback.subscribe((f) => (delay.feedback.value = f));
+	// delayTime.subscribe((t) => (delay.delayTime.value = t));
 
 	return {
 		dryWet,
@@ -255,7 +260,11 @@ export async function startAudioGeneration(uiControlContainer?: HTMLElement) {
 	const gen = ThreeOhGen();
 	const programState: ProgramState = {
 		notes: [
-			ThreeOhUnit(audio, 'triangle', delay.inputNode, gen),
+			ThreeOhUnit(audio, 'square', delay.inputNode, gen, 16, true),
+			ThreeOhUnit(audio, 'square', delay.inputNode, gen),
+			// ThreeOhUnit(audio, 'square', delay.inputNode, gen),
+			// ThreeOhUnit(audio, 'triangle', delay.inputNode, gen),
+			// ThreeOhUnit(audio, 'sawtooth', delay.inputNode, gen),
 			// ThreeOhUnit(audio, 'triangle', delay.inputNode, gen),
 			// ThreeOhUnit(audio, 'triangle', delay.inputNode, gen),
 			// ThreeOhUnit(audio, 'sine', delay.inputNode, gen),
