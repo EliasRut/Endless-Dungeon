@@ -9,6 +9,7 @@ import { Provider } from 'react-redux';
 import { uiStore } from '../uiStore/uiStore';
 import { activeScreenSlice, UIScreen } from '../uiStore/activeScrenSlice';
 import '../App.css';
+import { setActiveDialog } from '../uiStore/dialogSlice';
 
 const showGame = true;
 
@@ -19,6 +20,7 @@ export const Game = () => {
 		setActiveMode(MODE.GAME);
 		const config = getGameConfig(phaserRef.current!, MODE.GAME);
 		const game = new Phaser.Game(config);
+		uiStore.dispatch(setActiveDialog('xH9R7Y7YTm4sHvFMwxk8'));
 		uiStore.dispatch(activeScreenSlice.actions.setActiveScreen(UIScreen.DIALOG));
 		startAudioGeneration();
 

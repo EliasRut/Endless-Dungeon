@@ -8,7 +8,6 @@ import FpsText from '../drawables/ui/FpsText';
 
 import StatScreen from '../screens/StatScreen';
 import InventoryScreen from '../screens/InventoryScreen';
-import { DialogScreen } from '../screens/DialogScreen';
 import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';

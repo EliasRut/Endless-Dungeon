@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import ContentManagementScreen from '../../scripts/screens/ContentManagementScreen';
-import { DialogScreen } from '../../scripts/screens/DialogScreen';
+import DialogScreen from '../../scripts/screens/DialogScreen';
 import EnchantingScreen from '../../scripts/screens/EnchantingScreen';
 import InventoryScreen from '../../scripts/screens/InventoryScreen';
 import QuestLogScreen from '../../scripts/screens/QuestLogScreen';

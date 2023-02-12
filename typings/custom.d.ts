@@ -338,6 +338,23 @@ export interface Quest {
 	scripts?: QuestScripts;
 }
 
+export interface DialogStep {
+	leftSpeakerName?: string;
+	rightSpeakerName?: string;
+	leftSpeakerPortrait?: string;
+	rightSpeakerPortrait?: string;
+	textBlocks: Array<{
+		isLeftSpeaker: boolean;
+		text: string;
+	}>;
+}
+
+export interface Dialog {
+	id: string;
+	name?: string;
+	steps: Array<DialogStep>;
+}
+
 export interface ItemWithCount {
 	id: string;
 	count: number;

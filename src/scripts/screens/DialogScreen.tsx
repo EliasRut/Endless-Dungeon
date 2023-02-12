@@ -1,38 +1,129 @@
 import styled from 'styled-components';
 import React, { useEffect, useRef } from 'react';
 import { AspectAwareImage } from '../../site/components/AspectAwareImage';
+import firebase from 'firebase';
+import { Dialog } from '../../../typings/custom';
+import { connect } from 'react-redux';
+import { RootState } from '../../site/uiStore/uiStore';
 
-export const DialogScreen = () => {
-	const SCALING_FACTOR_PORTRAIT = 6;
+const SCALING_FACTOR_PORTRAIT = 6;
 
-	return (
-		<DialogContainer>
-			<LeftImageContainer>
-				<AspectAwareImage
-					imageName="portrait_hilda.png"
-					width={64 * SCALING_FACTOR_PORTRAIT}
-					height={96 * SCALING_FACTOR_PORTRAIT}
-				/>
-			</LeftImageContainer>
-			<DialogBoxesContainer>
-				<SpeechBubble>
-					Look who the cat dragged in. I assume you two decided to ''complete'' yesterday's mission?
-				</SpeechBubble>
-				<SpeechBubbleRight>
-					Come on, you won't complain about a few plantlings leaves and a little dirt. I have looked
-					worse.
-				</SpeechBubbleRight>
-			</DialogBoxesContainer>
-			<RightImageContainer>
-				<AspectAwareImage
-					imageName="portrait_agnes.png"
-					width={64 * SCALING_FACTOR_PORTRAIT}
-					height={96 * SCALING_FACTOR_PORTRAIT}
-				/>
-			</RightImageContainer>
-		</DialogContainer>
-	);
-};
+export interface DialogScreenProps {
+	activeDialogId: string | undefined;
+}
+
+export interface DialogState {
+	dialogName?: string;
+	leftSpeakerName?: string;
+	rightSpeakerName?: string;
+	leftSpeakerPortrait?: string;
+	rightSpeakerPortrait?: string;
+	textBlocks: Array<{
+		isLeftSpeaker: boolean;
+		text: string;
+	}>;
+	dialogBlockIndex: number;
+	dialogTextIndex: number;
+}
+
+export interface DialogScreenProps {}
+
+class DialogScreen extends React.Component<DialogScreenProps, DialogState> {
+	state: DialogState = {
+		// id: 'xH9R7Y7YTm4sHvFMwxk8',
+		textBlocks: [],
+		dialogBlockIndex: 0,
+		dialogTextIndex: 0,
+	};
+
+	async loadDialog() {
+		if (!this.props.activeDialogId) {
+			return;
+		}
+		const dialogDoc = await firebase
+			.firestore()
+			.collection('dialogs')
+			.doc(this.props.activeDialogId)
+			.get();
+		const dialog: Dialog = dialogDoc.data() as Dialog;
+
+		const dialogId = dialog.id;
+		let dialogStep;
+		const dialogSteps = dialog.steps;
+		for (dialogStep of dialogSteps) {
+			const dialogStepState = {
+				leftSpeakerName: dialogStep.leftSpeakerName,
+				rightSpeakerName: dialogStep.rightSpeakerName,
+				leftSpeakerPortrait: dialogStep.leftSpeakerPortrait,
+				rightSpeakerPortrait: dialogStep.rightSpeakerPortrait,
+				textBlocks: dialogStep.textBlocks,
+			};
+			const dialogState = {
+				id: dialogId,
+				...dialogStepState,
+				dialogBlockIndex: 0,
+				dialogTextIndex: 0,
+			} as DialogState;
+			this.setState(dialogState);
+		}
+	}
+
+	componentDidUpdate(prevProps: Readonly<DialogScreenProps>): void {
+		if (prevProps.activeDialogId !== this.props.activeDialogId) {
+			this.loadDialog();
+		}
+	}
+
+	componentDidMount() {
+		this.loadDialog();
+	}
+
+	render() {
+		return (
+			<DialogContainer>
+				<LeftImageContainer>
+					<AspectAwareImage
+						imageName={`${this.state.leftSpeakerPortrait}.png`}
+						width={64 * SCALING_FACTOR_PORTRAIT}
+						height={96 * SCALING_FACTOR_PORTRAIT}
+					/>
+				</LeftImageContainer>
+				<DialogBoxesContainer>
+					{this.state.textBlocks.map((textBlock) => {
+						if (textBlock.isLeftSpeaker) {
+							return (
+								<BubbleLeftContainer>
+									<ArrowSpeechBubbleLeft />
+									<ArrowSpeechBubbleOutlineLeft />
+									<SpeechBubbleLeft>{textBlock.text}</SpeechBubbleLeft>
+								</BubbleLeftContainer>
+							);
+						} else {
+							return (
+								<BubbleRightContainer>
+									<SpeechBubbleRight>{textBlock.text}</SpeechBubbleRight>
+									<ArrowSpeechBubbleRight />
+									<ArrowSpeechBubbleOutlineRight />
+								</BubbleRightContainer>
+							);
+						}
+					})}
+				</DialogBoxesContainer>
+				<RightImageContainer>
+					<AspectAwareImage
+						imageName={`${this.state.rightSpeakerPortrait}.png`}
+						width={64 * SCALING_FACTOR_PORTRAIT}
+						height={96 * SCALING_FACTOR_PORTRAIT}
+					/>
+				</RightImageContainer>
+			</DialogContainer>
+		);
+	}
+}
+
+export default connect((state: RootState) => ({
+	activeDialogId: state.dialog.activeDialogId,
+}))(DialogScreen);
 
 const DialogContainer = styled.div`
 	display: flex;
@@ -48,7 +139,6 @@ const DialogContainer = styled.div`
 const LeftImageContainer = styled.div`
 	display: flex;
 	justify-content: center;
-	/* width: 20%; */
 `;
 
 const DialogBoxesContainer = styled.div`
@@ -60,51 +150,88 @@ const DialogBoxesContainer = styled.div`
 const RightImageContainer = styled.div`
 	display: flex;
 	justify-content: center;
-	/* width: 20%; */
 `;
 
-const SpeechBubble = styled.div`
+const BubbleLeftContainer = styled.div`
+	display: flex;
+	justify-content: left;
+`;
+
+const ArrowSpeechBubbleOutlineLeft = styled.div`
+	width: 0;
+	height: 0;
+	border-top: 13px solid #00000000;
+	border-bottom: 13px solid #00000000;
+	border-right: 23px solid #ffae00;
+	margin-top: 0.75em;
+`;
+
+const ArrowSpeechBubbleLeft = styled.div`
+	width: 0;
+	height: 0;
+	border-top: 10px solid #00000000;
+	border-bottom: 10px solid #00000000;
+	border-right: 22px solid #000000f2;
+	margin-top: calc(0.75em + 3px);
+	position: absolute;
+	margin-left: 4px;
+`;
+
+const SpeechBubbleLeft = styled.div`
 	font-family: 'endlessDungeon';
-	font-size: 1.5em;
+	font-size: 2em;
 	line-height: 1.2em;
-	width: 300px;
+	width: 360px;
 	background: #000000eb;
 	border-radius: 5px;
-	border: 3px double #999;
-	box-shadow: 2px 2px 2px 2px #4b4949b5;
-	padding: 1em;
+	border: 3px solid #ffae00;
+	box-shadow: 2px 2px 2px 0 #4b4949b5;
+	padding: 0.5em;
 	text-align: center;
 	color: #fff;
 	height: fit-content;
+	margin: 0 8em 2em 0;
+`;
+
+const BubbleRightContainer = styled.div`
+	display: flex;
+	justify-content: right;
+`;
+
+const ArrowSpeechBubbleOutlineRight = styled.div`
+	width: 0;
+	height: 0;
+	border-top: 13px solid #00000000;
+	border-bottom: 13px solid #00000000;
+	border-left: 23px solid #ffae00;
+	margin-top: 0.75em;
+`;
+
+const ArrowSpeechBubbleRight = styled.div`
+	width: 0;
+	height: 0;
+	border-top: 10px solid #00000000;
+	border-bottom: 10px solid #00000000;
+	border-left: 22px solid #000000f2;
+	margin-top: calc(0.75em + 3px);
+	position: absolute;
+	margin-right: 4px;
 `;
 
 const SpeechBubbleRight = styled.div`
 	font-family: 'endlessDungeon';
-	font-size: 1.5em;
+	font-size: 2em;
 	line-height: 1.2em;
-	width: 300px;
+	width: 360px;
 	background: #000000eb;
 	border-radius: 5px;
-	border: 3px double #999;
+	border: 3px solid #ffae00;
 	box-shadow: 2px 2px 2px 2px #4b4949b5;
-	padding: 1em;
+	padding: 0.5em;
 	text-align: center;
 	color: #fff;
-	margin: 0 0 2em 8em;
 	height: fit-content;
 `;
-
-// const SpeechBubble = styled.div`
-// 	width: 0px;
-// 	height: 0px;
-// 	position: absolute;
-// 	border-left: 24px solid #fff;
-// 	border-right: 12px solid transparent;
-// 	border-top: 12px solid #fff;
-// 	border-bottom: 20px solid transparent;
-// 	left: 32px;
-// 	bottom: -24px;
-// `;
 
 // export default class DialogScreen extends OverlayScreen {
 // 	// dialogText: Phaser.GameObjects.BitmapText;
