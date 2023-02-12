@@ -251,9 +251,9 @@ export function Audio(
 		const vca = au.createGain();
 		vca.gain.value = 0.0;
 
-		const masterVolume = au.createGain();
-		masterVolume.connect(au.destination);
-		masterVolume.gain.value = 0.2;
+		// const masterVolume = au.createGain();
+		// masterVolume.connect(au.destination);
+		// masterVolume.gain.value = 0.2;
 
 		// osc.connect(vca);
 		// vca.connect(filter);
@@ -304,7 +304,7 @@ export function Audio(
 			osc.stop(au.currentTime + NOTE_LENGTH);
 			osc.connect(noteGain);
 
-			noteGain.connect(masterVolume);
+			noteGain.connect(out);
 			trigger();
 		}
 

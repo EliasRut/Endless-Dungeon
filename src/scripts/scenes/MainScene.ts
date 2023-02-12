@@ -80,6 +80,10 @@ const FADING_LABEL_X_DISTANCE = 16;
 
 const MINIMUM_CASTING_TIME_MS = 80;
 
+const TILE_ANIMATION_STEP_TIME = (1000 / NORMAL_ANIMATION_FRAME_RATE) * 8;
+
+let LAST_ANIMATION_AVERAGES: number[] = [];
+
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
 	fpsText?: Phaser.GameObjects.Text;
@@ -142,6 +146,7 @@ export default class MainScene extends Phaser.Scene {
 	lastStepLeft: number | undefined;
 
 	lastScriptUnpausing: number = Date.now();
+	lastTileAnimationStep: number = Date.now();
 	lastPlayerPosition: { x: number; y: number } | undefined;
 
 	hasCasted: boolean = false;
@@ -841,14 +846,46 @@ export default class MainScene extends Phaser.Scene {
 
 		this.scriptHelper.handleScripts(globalState.gameTime);
 
+		const now = Date.now();
+		// Animate all tiles taht should be animated
+
+		if (now - this.lastTileAnimationStep > TILE_ANIMATION_STEP_TIME) {
+			this.lastTileAnimationStep = now;
+
+			const lowestRelevantX = Math.max(0, Math.floor(playerX / 16) - 26);
+			const highestRelevantX = Math.max(0, Math.floor(playerX / 16) + 26);
+			const lowestRelevantY = Math.max(0, Math.floor(playerY / 16) - 14);
+			const highestRelevantY = Math.max(0, Math.floor(playerY / 16) + 14);
+
+			for (let animatedX = lowestRelevantX; animatedX < highestRelevantX; animatedX++) {
+				for (let animatedY = lowestRelevantY; animatedY < highestRelevantY; animatedY++) {
+					const tile = this.tileLayer.getTileAt(animatedX, animatedY);
+					if (tile) {
+						const tileThousands = Math.floor(tile.index / 1000);
+						const modTileIndex = tile.index % 1000;
+
+						if (modTileIndex === 73) {
+							tile.index = tileThousands * 1000 + 74;
+						} else if (modTileIndex === 74) {
+							tile.index = tileThousands * 1000 + 193;
+						} else if (modTileIndex === 193) {
+							tile.index = tileThousands * 1000 + 194;
+						} else if (modTileIndex === 194) {
+							tile.index = tileThousands * 1000 + 73;
+						}
+					}
+				}
+			}
+		}
+
 		// tslint:disable-next-line: no-magic-numbers
-		if (Date.now() - this.lastSave > 10 * 1000) {
-			this.lastSave = Date.now();
+		if (now - this.lastSave > 10 * 1000) {
+			this.lastSave = now;
 			globalState.storeState();
 		}
 
 		// tslint:disable-next-line: no-magic-numbers
-		if (Date.now() - this.lastScriptUnpausing > 1000) {
+		if (now - this.lastScriptUnpausing > 1000) {
 			this.scriptHelper.resumePausedScripts();
 		}
 	}

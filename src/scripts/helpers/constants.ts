@@ -65,6 +65,8 @@ export const enum UiDepths {
 	UI_STICK_LAYER = 14,
 }
 
+export const COLUMNS_PER_TILESET = 44;
+
 export const TARGETABLE_TILE_TINT = 0x888888;
 export const VISITED_TILE_TINT = 0x333333;
 export const DEFAULT_TILE_TINT = 0xffffff;
@@ -411,7 +413,7 @@ export const MOBILE_INTERACTION_OFFSETS = 96;
 export const DEBUG_PHYSICS = false;
 export const DEBUG_PATHFINDING = false;
 export const DEBUG_ENEMY_AI = false;
-export const FPS_DEBUG = false;
+export const FPS_DEBUG = true;
 export const COMBO_CAST_RESET_DELAY = 2000;
 export const DASH_REVERSE_DELAY = 1500;
 
