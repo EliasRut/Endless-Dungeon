@@ -54,7 +54,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.visibility = true;
 	}
 
-	toggleVisibility() {
+	toggleVisibility() {		
 		this.toggleVisible();
 		this.visibility = !this.visibility;
 		this.selection?.setVisible(false);
@@ -101,7 +101,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		}
 	}
 
-	executeSelection(enchantment: EnchantmentName = 'None') {
+	executeSelection(enchantment?: EnchantmentName) {
 		if (this.selectedItem === -1 || this.selectedItem === undefined) {
 			this.toggleVisibility();
 			this.selection?.setVisible(false);
@@ -109,7 +109,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		}
 
 		const itemKey = Object.keys(this.itemMap)[this.selectedItem!] as EquipmentKey;
-		if (enchantment === 'None') {
+		if (!enchantment) {
 			const [itemData, equipmentData] = getFullDataForItemKey(itemKey);
 			if (equipmentData.level > 0) {
 				equipItem(this.equipmentSlot!, itemKey);
@@ -118,14 +118,14 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 				this.scene.overlayScreens.itemScreen.update();
 			}
 		} else {
-			console.log(enchantment);
+			console.log("APPLYING ENCHANTMENT: ", enchantment);
 			attachEnchantmentItem(itemKey, enchantment);
 		}
 		this.scene.overlayScreens.inventory.update();
 		this.toggleVisibility();
 		this.selection?.setVisible(false);
 
-		if (enchantment !== 'None') {
+		if (enchantment) {
 			this.scene.closeAllIconScreens();
 			this.scene.icons.enchantIcon.openScreen();
 		}
@@ -192,9 +192,6 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 			centerY * UI_SCALE,
 			'quickselect-wheel'
 		);
-		backgroundImage.on('pointerdown', () => {
-			this.toggleVisibility();
-		});
 		backgroundImage.setInteractive();
 		backgroundImage.setScale(UI_SCALE);
 		this.selection = new Phaser.GameObjects.Image(
@@ -234,7 +231,8 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 				itemImage.on('pointerover', () => {
 					this.selectedItem = itemIndex;
 					const [itemData, equipmentData] = getFullDataForItemKey(itemKey as EquipmentKey);
-					this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+					this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);					
+					// this.scene.overlayScreens.inventory.focusedSlot = equipmentSlot;
 					this.selection?.setVisible(true);
 					this.selection?.setRotation((itemIndex / numItems) * Math.PI * 2);
 				});

@@ -133,7 +133,7 @@ export default class InventoryScreen extends OverlayScreen {
 	inventorySelection: Phaser.GameObjects.Image;
 	equipmentSelectionWheel: EquipmentSelectionWheel;
 	isEquipmentSelectionWheelShown: boolean;
-	currentEnchantment: EnchantmentName = 'None';
+	currentEnchantment?: EnchantmentName;
 
 	constructor(scene: Phaser.Scene) {
 		// tslint:disable: no-magic-numbers
@@ -254,7 +254,7 @@ export default class InventoryScreen extends OverlayScreen {
 			itemData?.iconFrame || -1
 		);
 
-		itemToken.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		itemToken.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 		itemToken.setScrollFactor(0);
 		itemToken.setInteractive();
 		itemToken.setVisible(this.visibility);
@@ -262,7 +262,19 @@ export default class InventoryScreen extends OverlayScreen {
 		itemToken.setScale(UI_SCALE);
 		this.add(itemToken, true);
 		itemToken.on('pointerdown', () => {
-			this.handleEquipmentSlotInteraction(slotName);
+			this.interactInventory(['enter'], globalState.gameTime);
+		});
+		itemToken.on('pointerover', () => {
+			if(!this.equipmentSelectionWheel.visibility) {
+				Object.entries(COORDINATES_TO_SLOT).forEach(pair => {
+					if(pair[1] == slotName) {
+						const [x,y] = pair[0].split('_');
+						this.currentXY[0] = Number(x);
+						this.currentXY[1] = Number(y);
+					}
+				});
+				this.interactInventory(['mouse'], globalState.gameTime);
+			}
 		});
 		return itemToken;
 	}
@@ -278,6 +290,7 @@ export default class InventoryScreen extends OverlayScreen {
 		if (!this.focusedSlot) {
 			return;
 		}
+		
 		const [centerX, centerY] = EQUIPMENT_SLOT_COORDINATES[this.focusedSlot];
 		this.equipmentSelectionWheel.toggleVisibility();
 		this.equipmentSelectionWheel.update(
@@ -286,28 +299,6 @@ export default class InventoryScreen extends OverlayScreen {
 			this.focusedSlot,
 			getEquipmentDataRecordForEquipmentSlot(this.focusedSlot)
 		);
-	}
-
-	handleEquipmentSlotInteraction(slotName: EquipmentSlot) {
-		if (this.focusedSlot === slotName) {
-			if (this.equipmentSelectionWheel.visibility) {
-				this.equipmentSelectionWheel.toggleVisibility();
-				this.equipmentSelectionWheel.closeSelection();
-			} else {
-				this.showEquipmentSelectionWheel();
-			}
-		} else {
-			this.focusedSlot = slotName;
-			const [itemData, equipmentData] = getFullDataForEquipmentSlot(slotName);
-			this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
-			const [x, y] = EQUIPMENT_SLOT_COORDINATES[slotName];
-			this.inventorySelection.setX(x * UI_SCALE);
-			this.inventorySelection.setY(y * UI_SCALE);
-			this.inventorySelection.setScale(
-				EQUIPMENT_SLOT_SCALES[slotName][0] * UI_SCALE,
-				EQUIPMENT_SLOT_SCALES[slotName][1] * UI_SCALE
-			);
-		}
 	}
 
 	// select next item in bag. Handles cd for key press
@@ -326,10 +317,10 @@ export default class InventoryScreen extends OverlayScreen {
 		}
 
 		if (globalTime - this.keyLastPressed > this.keyCD) this.keyLastPressed = globalTime;
-		else return;
+		else if (!directions.includes('mouse')) return;
 		if (directions.includes('enter') && this.focusedSlot) {
 			if (this.equipmentSelectionWheel.visibility) {
-			} else {
+			} else {				
 				this.showEquipmentSelectionWheel();
 			}
 			return;
@@ -347,6 +338,7 @@ export default class InventoryScreen extends OverlayScreen {
 		} else if (directions.includes('right')) {
 			this.currentXY[0] = x === 2 ? 0 : x + 1;
 		}
+
 		this.focusedSlot = COORDINATES_TO_SLOT[`${this.currentXY[0]}_${this.currentXY[1]}`];
 		const [itemData, equipmentData] = getFullDataForEquipmentSlot(this.focusedSlot);
 		this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
@@ -354,6 +346,10 @@ export default class InventoryScreen extends OverlayScreen {
 
 		this.inventorySelection.setX(selectionPos[0] * UI_SCALE);
 		this.inventorySelection.setY(selectionPos[1] * UI_SCALE);
+		this.inventorySelection.setScale(
+			EQUIPMENT_SLOT_SCALES[this.focusedSlot][0] * UI_SCALE,
+			EQUIPMENT_SLOT_SCALES[this.focusedSlot][1] * UI_SCALE
+		);
 	}
 
 	// hard coded for inventory highlighting, special cases when 0 > y
@@ -543,8 +539,7 @@ export default class InventoryScreen extends OverlayScreen {
 	}
 
 	modify(enchantment?: EnchantmentName): void {
-		if (enchantment !== undefined) this.currentEnchantment = enchantment;
-		else this.currentEnchantment = 'None';
+		this.currentEnchantment = enchantment;
 	}
 
 	setVisible(value: boolean, index?: number, direction?: number): this {

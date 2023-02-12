@@ -9,8 +9,7 @@ import {
 import { Enchantment, EnchantmentName } from '../../items/enchantmentData';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import {
-	ColorsOfMagic,
-	essenceNames,
+	ColorsOfMagic,	
 	NORMAL_ANIMATION_FRAME_RATE,
 	statDisplayNames,
 	UiDepths,
@@ -28,16 +27,13 @@ const SCREEN_HEIGHT = 300;
 const SCREEN_START_X = (SCALED_WINDOW_WIDTH - SCREEN_WIDTH) / 2;
 const SCREEN_START_Y = (SCALED_WINDOW_HEIGHT - SCREEN_HEIGHT) / 2;
 
-const ELEMENT_SEPARATOR_X = 75 * UI_SCALE;
-const ELEMENT_SEPARATOR_Y = 30 * UI_SCALE;
 const NOUN_START_X = (SCREEN_START_X + 300) * UI_SCALE;
 const NOUN_START_Y = (SCREEN_START_Y + 50) * UI_SCALE;
 
-const ADJECTIVE_START_X = (SCREEN_START_X + 70) * UI_SCALE;
-const ADJECTIVE_START_Y = (SCREEN_START_Y + 50) * UI_SCALE;
-
 const LIST_START_X = (SCREEN_START_X + 25) * UI_SCALE;
 const LIST_START_Y = (SCREEN_START_Y + 50) * UI_SCALE;
+const LIST_WIDTH = (SCREEN_WIDTH / 2) * UI_SCALE;
+const LIST_HEIGHT = SCREEN_HEIGHT * UI_SCALE - (LIST_START_Y - SCREEN_START_Y) - (30 * UI_SCALE);
 
 const ESSENCE_START_X = (SCREEN_START_X + 300) * UI_SCALE;
 const ESSENCE_START_Y = (SCREEN_START_Y + 175) * UI_SCALE;
@@ -57,6 +53,8 @@ export default class EnchantingScreen extends OverlayScreen {
 	scrollablePanel: ScrollablePanel;
 	enchantments: EnchantmentName[];
 	selectedEnchantment: EnchantmentName = 'None';
+	enchantmentButton: Phaser.GameObjects.Text;
+	enchantmentBlocked: boolean = true;
 
 	scene: MainScene;
 
@@ -83,8 +81,7 @@ export default class EnchantingScreen extends OverlayScreen {
 				fontSize: `${12 * UI_SCALE}pt`,
 				fontFamily: 'endlessDungeon',
 				align: 'center',
-				fixedWidth: (SCREEN_WIDTH - 28) * UI_SCALE,
-				backgroundColor: 'black',
+				fixedWidth: (SCREEN_WIDTH - 28) * UI_SCALE,				
 			}
 		);
 		this.title.setDepth(UiDepths.UI_FOREGROUND_LAYER);
@@ -92,24 +89,51 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.title.setShadow(0, 1 * UI_SCALE, 'black');
 		this.add(this.title, true);
 
+		this.enchantmentButton = new Phaser.GameObjects.Text(
+			scene,
+			NOUN_START_X,
+			NOUN_START_Y + ESSENCE_SEPARATOR,
+			'Enchant',
+			{
+				color: 'white',
+				fontSize: `${12 * UI_SCALE}pt`,
+				fontFamily: 'endlessDungeon',
+				align: 'center',
+				backgroundColor: 'black',
+			}
+		);
+		this.enchantmentButton.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.enchantmentButton.setScrollFactor(0);
+		this.enchantmentButton.setShadow(0, 1 * UI_SCALE, 'black');
+		this.enchantmentButton.setInteractive();
+		this.enchantmentButton.on('pointerdown', () => {
+			if(this.enchantmentBlocked) {
+				console.log("NOT ENOUGH RESOURCES!");
+				return;
+			}
+			this.scene.closeAllIconScreens();
+			this.scene.icons.backpackIcon.openScreen(this.selectedEnchantment);
+		});
+		this.add(this.enchantmentButton, true);
+
 		this.enchantments = this.getEnchantments();
 		this.scrollablePanel = this.createList(
 			scene,
 			LIST_START_X,
 			LIST_START_Y,
-			SCREEN_HEIGHT * UI_SCALE - (LIST_START_Y - SCREEN_START_Y),
-			(SCREEN_WIDTH / 2) * UI_SCALE,
+			LIST_HEIGHT,
+			LIST_WIDTH,
 			this.enchantments,
 			() => {}
 		);
 		this.add(this.scrollablePanel, true);
 		// ----------------------------------------------------------------------------------------
 		let counter = 0;
-		essenceNames.forEach((essence) => {
+		Object.values(ColorsOfMagic).forEach((essence) => {
 			const essenceToken = new InventoryItemToken(
 				this.scene,
-				ESSENCE_START_X + ESSENCE_SEPARATOR * (counter % (essenceNames.length / 2)),
-				ESSENCE_START_Y + ESSENCE_SEPARATOR * Math.round(counter / essenceNames.length),
+				ESSENCE_START_X + ESSENCE_SEPARATOR * (counter % (Object.values(ColorsOfMagic).length / 2)),
+				ESSENCE_START_Y + ESSENCE_SEPARATOR * Math.round(counter / Object.values(ColorsOfMagic).length),
 				'empty-tile',
 				-1
 			);
@@ -124,14 +148,14 @@ export default class EnchantingScreen extends OverlayScreen {
 		});
 		// -------------------------------------------------------------------------------------
 		counter = 0;
-		essenceNames.forEach((essence) => {
+		Object.values(ColorsOfMagic).forEach((essence) => {
 			this.essenceNumbers[counter] = new Phaser.GameObjects.Text(
 				this.scene,
-				ESSENCE_START_X + ESSENCE_SEPARATOR * (counter % (essenceNames.length / 2)),
+				ESSENCE_START_X + ESSENCE_SEPARATOR * (counter % (Object.values(ColorsOfMagic).length / 2)),
 				ESSENCE_START_Y +
-					ESSENCE_SEPARATOR * Math.round(counter / essenceNames.length) +
+					ESSENCE_SEPARATOR * Math.round(counter / Object.values(ColorsOfMagic).length) +
 					ESSENCE_NUMBER_OFFSET,
-				`${globalState.inventory.essences[essence as ColorsOfMagic]}`,
+				`${globalState.inventory.essences[essence]}`,
 				{
 					color: 'white',
 					// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
@@ -202,15 +226,32 @@ export default class EnchantingScreen extends OverlayScreen {
 		}
 	}
 
-	update() {
+	update() {		
 		const essences = globalState.inventory.essences;
-		let counter = 0;
-		essenceNames.forEach((essence) => {
-			this.essenceNumbers[counter].setText(`${essences[essence as ColorsOfMagic]}`);
-			counter++;
-		});
-		// let enchantment = Enchantment[(this.selectedAdjective + this.selectedNoun) as EnchantmentName];
 		const enchantment = Enchantment[this.selectedEnchantment];
+		let counter = 0;
+		let blocking = false;
+		Object.values(ColorsOfMagic).forEach((essence) => {
+			const available = essences[essence];
+			let required = 0;
+			if (enchantment && enchantment.cost) {
+				enchantment.cost.forEach(cost => {
+					if(cost.essence == essence) required = cost.amount;
+				});
+			}
+			let text = `${available}`;
+			if (required > 0) {
+				text += `(${required})`;
+				if (required > available) {
+					blocking = true;
+					this.essenceNumbers[counter].setColor('red');
+				}
+				else this.essenceNumbers[counter].setColor('green');
+			} else this.essenceNumbers[counter].setColor('white');
+			this.enchantmentBlocked = blocking;
+			this.essenceNumbers[counter].setText(text);
+			counter++;
+		});		
 		this.enchantmentName.setText(`${enchantment?.name}`);
 		const stat = enchantment!.affectedStat;
 		const modifierText = stat
@@ -229,7 +270,7 @@ export default class EnchantingScreen extends OverlayScreen {
 		enchants: EnchantmentName[],
 		onClick: (button: any) => any
 	) {
-		const items = enchants.map((enchant) => {
+		const enchantmentNames = enchants.map((enchant) => {
 			return { label: Enchantment[enchant]!.name };
 		});
 		const notSelf = this;
@@ -237,8 +278,8 @@ export default class EnchantingScreen extends OverlayScreen {
 		scene.input.topOnly = false;
 		const buttonSizer = new Buttons(scene, {
 			orientation: 'y',
-			buttons: items.map((item) => {
-				return notSelf.createButton(scene, item);
+			buttons: enchantmentNames.map((enchantment) => {
+				return notSelf.createButton(scene, enchantment);
 			}),
 		})
 			.on('button.over', (button: any) => {
@@ -317,6 +358,3 @@ export default class EnchantingScreen extends OverlayScreen {
 		return result;
 	}
 }
-// let enchantment = (adjective + this.selectedNoun) as EnchantmentName;
-// this.scene.closeAllIconScreens();
-// this.scene.icons.backpackIcon.openScreen(enchantment);
