@@ -18,7 +18,7 @@ import { EquippedItemData, EquippedItemRecords, EquippedItems } from '../worldst
 import Item from '../worldstate/Item';
 import { EquipmentSlot, BAG_BOXES_X, BAG_BOXES_Y } from './constants';
 import { ItemData, CatalystKey, AmuletKey } from '../../items/itemData';
-import { EnchantmentName } from '../../items/enchantmentData';
+import { Enchantment, EnchantmentName } from '../../items/enchantmentData';
 
 const BASE_HEALTH = 100;
 const BASE_MOVEMENT_SPEED = 200;
@@ -119,6 +119,18 @@ export const attachEnchantmentItem: (
 	itemKey: EquipmentKey,
 	enchantment: EnchantmentName
 ) => void = (itemKey, enchantment) => {
+	if (Enchantment[enchantment]?.cost) {
+		const required = Enchantment[enchantment]?.cost!;
+		required.forEach((cost) => {
+			if (globalState.inventory.essences[cost.essence] < cost.amount) {
+				console.log('NOT ENOOUGH RESOURCES');
+				return;
+			}
+		});
+		required.forEach((cost) => {
+			globalState.inventory.essences[cost.essence] -= cost.amount;
+		});
+	}
 	const prefix = itemKey.split('-')[0];
 	switch (prefix) {
 		case 'source':

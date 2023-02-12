@@ -3,7 +3,6 @@ import {
 	NUM_DIRECTIONS,
 	npcTypeToFileMap,
 	FacingRange,
-	essenceNames,
 	ColorsOfMagic,
 	activeMode,
 	MODE,
@@ -421,7 +420,7 @@ export default class PreloadScene extends Phaser.Scene {
 		});
 
 		// Prepare essence animations
-		essenceNames.forEach((name, index) => {
+		Object.values(ColorsOfMagic).forEach((name, index) => {
 			this.anims.create({
 				key: `essence-${name}`,
 				frames: this.anims.generateFrameNumbers('items-essence', {
