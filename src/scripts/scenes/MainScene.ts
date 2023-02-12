@@ -60,6 +60,7 @@ import QuestDetailsScreen from '../screens/QuestDetailsScreen';
 import ContentManagementScreen from '../screens/ContentManagementScreen';
 import EnchantIcon from '../drawables/ui/EnchantIcon';
 import FollowerToken from '../drawables/tokens/FollowerToken';
+import { COLUMNS_PER_TILESET } from '../helpers/constants';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -79,6 +80,10 @@ const FADING_LABEL_Y_DISTANCE = 64;
 const FADING_LABEL_X_DISTANCE = 16;
 
 const MINIMUM_CASTING_TIME_MS = 80;
+
+const TILE_ANIMATION_STEP_TIME = (1000 / NORMAL_ANIMATION_FRAME_RATE) * 8;
+
+let LAST_ANIMATION_AVERAGES: number[] = [];
 
 // The main scene handles the actual game play.
 export default class MainScene extends Phaser.Scene {
@@ -142,6 +147,7 @@ export default class MainScene extends Phaser.Scene {
 	lastStepLeft: number | undefined;
 
 	lastScriptUnpausing: number = Date.now();
+	lastTileAnimationStep: number = Date.now();
 	lastPlayerPosition: { x: number; y: number } | undefined;
 
 	hasCasted: boolean = false;
@@ -314,12 +320,12 @@ export default class MainScene extends Phaser.Scene {
 		this.abilityHelper = new AbilityHelper(this);
 		this.scriptHelper = new ScriptHelper(this);
 
-		this.sound.stopAll();
-		if (globalState.currentLevel === 'town') {
-			this.sound.play('score-town', { volume: 0.05, loop: true });
-		} else {
-			this.sound.play('score-dungeon', { volume: 0.08, loop: true });
-		}
+		// this.sound.stopAll();
+		// if (globalState.currentLevel === 'town') {
+		// 	this.sound.play('score-town', { volume: 0.05, loop: true });
+		// } else {
+		// 	this.sound.play('score-dungeon', { volume: 0.08, loop: true });
+		// }
 
 		if (DEBUG_PHYSICS) {
 			this.renderDebugGraphics();
@@ -841,14 +847,49 @@ export default class MainScene extends Phaser.Scene {
 
 		this.scriptHelper.handleScripts(globalState.gameTime);
 
+		const now = Date.now();
+
+		// Animate all tiles that should be animated
+		if (now - this.lastTileAnimationStep > TILE_ANIMATION_STEP_TIME) {
+			this.lastTileAnimationStep = now;
+
+			const lowestRelevantX = Math.max(0, Math.floor(playerX / 16) - 26);
+			const highestRelevantX = Math.max(0, Math.floor(playerX / 16) + 26);
+			const lowestRelevantY = Math.max(0, Math.floor(playerY / 16) - 14);
+			const highestRelevantY = Math.max(0, Math.floor(playerY / 16) + 14);
+
+			for (let animatedX = lowestRelevantX; animatedX < highestRelevantX; animatedX++) {
+				for (let animatedY = lowestRelevantY; animatedY < highestRelevantY; animatedY++) {
+					const tile = this.tileLayer.getTileAt(animatedX, animatedY);
+					if (tile) {
+						const tileThousands = Math.floor(tile.index / 1000);
+						const modTileIndex = tile.index % 1000;
+
+						const tileRowNumber = Math.floor(modTileIndex / COLUMNS_PER_TILESET);
+						const tileColumnNumber = modTileIndex % COLUMNS_PER_TILESET;
+
+						if (tileColumnNumber === 41) {
+							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 42;
+						} else if (modTileIndex === 42) {
+							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 43;
+						} else if (modTileIndex === 43) {
+							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 44;
+						} else if (modTileIndex === 44) {
+							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 41;
+						}
+					}
+				}
+			}
+		}
+
 		// tslint:disable-next-line: no-magic-numbers
-		if (Date.now() - this.lastSave > 10 * 1000) {
-			this.lastSave = Date.now();
+		if (now - this.lastSave > 10 * 1000) {
+			this.lastSave = now;
 			globalState.storeState();
 		}
 
 		// tslint:disable-next-line: no-magic-numbers
-		if (Date.now() - this.lastScriptUnpausing > 1000) {
+		if (now - this.lastScriptUnpausing > 1000) {
 			this.scriptHelper.resumePausedScripts();
 		}
 	}

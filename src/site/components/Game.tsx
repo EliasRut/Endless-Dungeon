@@ -1,5 +1,6 @@
 import 'phaser';
 import React, { useEffect, useRef } from 'react';
+import { startAudioGeneration } from '../../scripts/audiogen/app';
 import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
 import styled from 'styled-components';
@@ -19,6 +20,7 @@ export const Game = () => {
 		const config = getGameConfig(phaserRef.current!, MODE.GAME);
 		const game = new Phaser.Game(config);
 		uiStore.dispatch(activeScreenSlice.actions.setActiveScreen(UIScreen.DIALOG));
+		startAudioGeneration();
 
 		// setTimeout(() => {
 		// 	uiStore.dispatch(activeScreenSlice.actions.setActiveScreen(UIScreen.DIALOG));

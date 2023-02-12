@@ -1,5 +1,12 @@
 import Character from '../worldstate/Character';
-import { ANIMATION_IDLE, ANIMATION_WALK, Facings, facingToSpriteNameMap, SCALE } from './constants';
+import {
+	ANIMATION_IDLE,
+	ANIMATION_WALK,
+	Facings,
+	facingToSpriteNameMap,
+	SCALE,
+	COLUMNS_PER_TILESET,
+} from './constants';
 
 const ROTATION_THRESHOLD = 3;
 
@@ -129,22 +136,13 @@ export const updateMovingState = (
 	return `${char.animationBase}-${animationType}-${newDirection}`;
 };
 
-export const COLLIDING_TILE_RANGES = [
-	// [-1, -1],
-	// tslint:disable: no-magic-numbers
-	[0, 31],
-	[40, 71],
-	[80, 111],
-	[120, 151],
-	[160, 191],
-	[200, 231],
-	[240, 271],
-	[280, 311],
-	[320, 351],
-	[360, 391],
-	[400, 431],
+export const COLLIDING_TILE_RANGES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(
+	(index) =>
+		// [-1, -1],
+		// tslint:disable: no-magic-numbers
+		[0 + index * COLUMNS_PER_TILESET, 31 + index * COLUMNS_PER_TILESET]
 	// tslint:enable
-];
+);
 
 export const isCollidingTile = (tileNumber: number) => {
 	// tslint:disable-next-line: no-magic-numbers

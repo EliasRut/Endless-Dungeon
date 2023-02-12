@@ -3,6 +3,37 @@ import { BLOCK_SIZE, TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDunge
 import MainScene from '../../scenes/MainScene';
 import { UiDepths, UI_SCALE } from '../../helpers/constants';
 
+import {
+	EMPTY,
+	DCR_L,
+	DCR_M,
+	DCR_R,
+	W_LTE,
+	W_MTE,
+	W_RTE,
+	W_LBE,
+	W_MBE,
+	W_RBE,
+	W_LTD,
+	W_LBD,
+	W_MTD,
+	W_MBD,
+	W_RTD,
+	W_RBD,
+	B_LFT,
+	B_RGT,
+	B_TOP,
+	B_BOT,
+	IC_BR,
+	IC_BL,
+	IC_TR,
+	IC_TL,
+	OC_TL,
+	OC_TR,
+	OC_BL,
+	OC_BR,
+} from '../../helpers/cells';
+
 const X_POSITION = 10;
 const Y_POSITION = 160;
 
@@ -63,13 +94,13 @@ export default class Minimap extends Phaser.GameObjects.Text {
 
 				if (!isTileVisible(topLeftTile)) {
 					marker = ' ';
-				} else if (topLeftTile.index % 1000 === 164) {
+				} else if (topLeftTile.index % 1000 === IC_TL) {
 					marker = '┌';
-				} else if (topLeftTile.index % 1000 === 202) {
+				} else if (topLeftTile.index % 1000 === OC_TL) {
 					marker = '┘';
-				} else if (topLeftTile.index % 1000 === 201) {
+				} else if (topLeftTile.index % 1000 === B_TOP) {
 					marker = '─';
-				} else if (topLeftTile.index % 1000 === 162) {
+				} else if (topLeftTile.index % 1000 === B_LFT) {
 					marker = '|';
 				} else {
 					marker = ' ';
@@ -77,7 +108,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 
 				if (!isTileVisible(topMiddleTile)) {
 					marker += ' ';
-				} else if (topMiddleTile.index % 1000 === 201) {
+				} else if (topMiddleTile.index % 1000 === B_TOP) {
 					marker += '─';
 				} else {
 					marker += ' ';
@@ -85,13 +116,13 @@ export default class Minimap extends Phaser.GameObjects.Text {
 
 				if (!isTileVisible(topRightTile)) {
 					marker += ' ';
-				} else if (topRightTile.index % 1000 === 163) {
+				} else if (topRightTile.index % 1000 === IC_TR) {
 					marker += '┐';
-				} else if (topRightTile.index % 1000 === 200) {
+				} else if (topRightTile.index % 1000 === OC_TR) {
 					marker += '└';
-				} else if (topRightTile.index % 1000 === 201) {
+				} else if (topRightTile.index % 1000 === B_TOP) {
 					marker += '─';
-				} else if (topRightTile.index % 1000 === 160) {
+				} else if (topRightTile.index % 1000 === B_RGT) {
 					marker += '|';
 				} else {
 					marker += ' ';
@@ -104,7 +135,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 
 				if (!isTileVisible(middleLeftTile)) {
 					marker = ' ';
-				} else if (middleLeftTile.index % 1000 === 162) {
+				} else if (middleLeftTile.index % 1000 === B_LFT) {
 					marker = '|';
 				} else {
 					marker = ' ';
@@ -122,7 +153,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 
 				if (!isTileVisible(middleRightTile)) {
 					marker += ' ';
-				} else if (middleRightTile.index % 1000 === 160) {
+				} else if (middleRightTile.index % 1000 === B_RGT) {
 					marker += '|';
 				} else {
 					marker += ' ';
@@ -135,13 +166,13 @@ export default class Minimap extends Phaser.GameObjects.Text {
 
 				if (!isTileVisible(bottomLeftTile)) {
 					marker = ' ';
-				} else if (bottomLeftTile.index % 1000 === 124) {
+				} else if (bottomLeftTile.index % 1000 === IC_BL) {
 					marker = '└';
-				} else if (bottomLeftTile.index % 1000 === 122) {
+				} else if (bottomLeftTile.index % 1000 === OC_BL) {
 					marker = '┐';
-				} else if (bottomLeftTile.index % 1000 === 162) {
+				} else if (bottomLeftTile.index % 1000 === B_LFT) {
 					marker = '|';
-				} else if (bottomLeftTile.index % 1000 === 121) {
+				} else if (bottomLeftTile.index % 1000 === B_BOT) {
 					marker = '─';
 				} else {
 					marker = ' ';
@@ -149,7 +180,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 
 				if (!isTileVisible(bottomMiddleTile)) {
 					marker += ' ';
-				} else if (bottomMiddleTile.index % 1000 === 121) {
+				} else if (bottomMiddleTile.index % 1000 === B_BOT) {
 					marker += '─';
 				} else {
 					marker += ' ';
@@ -157,13 +188,13 @@ export default class Minimap extends Phaser.GameObjects.Text {
 
 				if (!isTileVisible(bottomRightTile)) {
 					marker += ' ';
-				} else if (bottomRightTile.index % 1000 === 120) {
+				} else if (bottomRightTile.index % 1000 === OC_BR) {
 					marker += '┌';
-				} else if (bottomRightTile.index % 1000 === 123) {
+				} else if (bottomRightTile.index % 1000 === IC_BR) {
 					marker += '┘';
-				} else if (bottomRightTile.index % 1000 === 121) {
+				} else if (bottomRightTile.index % 1000 === B_BOT) {
 					marker += '─';
-				} else if (bottomRightTile.index % 1000 === 160) {
+				} else if (bottomRightTile.index % 1000 === B_RGT) {
 					marker += '|';
 				} else {
 					marker += ' ';

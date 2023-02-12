@@ -2,6 +2,37 @@ import { NpcPositioning, Opening, Room, Scripting } from '../../../typings/custo
 import { ColorsOfMagic } from './constants';
 import { generateTilemap } from './drawDungeon';
 
+import {
+	EMPTY,
+	DCR_L,
+	DCR_M,
+	DCR_R,
+	W_LTE,
+	W_MTE,
+	W_RTE,
+	W_LBE,
+	W_MBE,
+	W_RBE,
+	W_LTD,
+	W_LBD,
+	W_MTD,
+	W_MBD,
+	W_RTD,
+	W_RBD,
+	B_LFT,
+	B_RGT,
+	B_TOP,
+	B_BOT,
+	IC_BR,
+	IC_BL,
+	IC_TR,
+	IC_TL,
+	OC_TL,
+	OC_TR,
+	OC_BL,
+	OC_BR,
+} from './cells';
+
 export const BLOCK_SIZE = 8;
 export const TILE_SIZE = 4;
 export const FLOOR = 32;
@@ -16,129 +47,129 @@ export const BOTTOM = 'bottom';
 
 // tslint:disable: no-magic-numbers
 const TILED_FLOOR = [
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
 ];
 
 const LEFT_WALL = [
-	[162, 32, 32, 32],
-	[162, 32, 32, 32],
-	[162, 32, 32, 32],
-	[162, 32, 32, 32],
+	[B_LFT, EMPTY, EMPTY, EMPTY],
+	[B_LFT, EMPTY, EMPTY, EMPTY],
+	[B_LFT, EMPTY, EMPTY, EMPTY],
+	[B_LFT, EMPTY, EMPTY, EMPTY],
 ];
 
 const RIGHT_WALL = [
-	[32, 32, 32, 160],
-	[32, 32, 32, 160],
-	[32, 32, 32, 160],
-	[32, 32, 32, 160],
+	[EMPTY, EMPTY, EMPTY, B_RGT],
+	[EMPTY, EMPTY, EMPTY, B_RGT],
+	[EMPTY, EMPTY, EMPTY, B_RGT],
+	[EMPTY, EMPTY, EMPTY, B_RGT],
 ];
 
 const BOTTOM_WALL = [
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[121, 121, 121, 121],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[B_BOT, B_BOT, B_BOT, B_BOT],
 ];
 
 const TOP_WALL = [
-	[201, 201, 201, 201],
-	[2, 8, 2, 2],
-	[42, 48, 42, 42],
-	[32, 38, 32, 32],
+	[B_TOP, B_TOP, B_TOP, B_TOP],
+	[W_RTE, W_MTD, W_MTE, W_MTE],
+	[W_RBE, W_MBD, W_MBE, W_MBE],
+	[EMPTY, DCR_M, EMPTY, EMPTY],
 ];
 
 const TOP_OPENING_LEFT = [
-	[202, 32, 32, 32],
-	[3, 32, 32, 32],
-	[43, 32, 32, 32],
-	[32, 32, 32, 32],
+	[OC_TR, EMPTY, EMPTY, EMPTY],
+	[W_RTE, EMPTY, EMPTY, EMPTY],
+	[W_RBE, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
 ];
 
 const TOP_OPENING_RIGHT = [
-	[32, 32, 32, 200],
-	[32, 32, 32, 1],
-	[32, 32, 32, 41],
-	[32, 32, 32, 32],
+	[EMPTY, EMPTY, EMPTY, OC_TR],
+	[EMPTY, EMPTY, EMPTY, W_LTE],
+	[EMPTY, EMPTY, EMPTY, W_MTE],
+	[EMPTY, EMPTY, EMPTY, DCR_L],
 ];
 
 const LEFT_OPENING_UPPER = [
-	[202, 32, 32, 32],
-	[3, 32, 32, 32],
-	[43, 32, 32, 32],
-	[32, 32, 32, 32],
+	[OC_TR, EMPTY, EMPTY, EMPTY],
+	[W_RTE, EMPTY, EMPTY, EMPTY],
+	[W_RBE, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
 ];
 
 const LEFT_OPENING_LOWER = [
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[122, 32, 32, 32],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[OC_BL, EMPTY, EMPTY, EMPTY],
 ];
 
 const RIGHT_OPENING_UPPER = [
-	[32, 32, 32, 200],
-	[32, 32, 32, 1],
-	[32, 32, 32, 41],
-	[32, 32, 32, 32],
+	[EMPTY, EMPTY, EMPTY, OC_TR],
+	[EMPTY, EMPTY, EMPTY, W_LTE],
+	[EMPTY, EMPTY, EMPTY, W_MTE],
+	[EMPTY, EMPTY, EMPTY, DCR_L],
 ];
 
 const RIGHT_OPENING_LOWER = [
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[32, 32, 32, 120],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, OC_BR],
 ];
 
 const BOTTOM_OPENING_LEFT = [
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[122, 32, 32, 32],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[OC_BL, EMPTY, EMPTY, EMPTY],
 ];
 
 const BOTTOM_OPENING_RIGHT = [
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[32, 32, 32, 32],
-	[32, 32, 32, 120],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, EMPTY],
+	[EMPTY, EMPTY, EMPTY, OC_BR],
 ];
 
 const TOP_LEFT_CORNER = [
-	[164, 201, 201, 201],
-	[162, 7, 2, 2],
-	[162, 47, 42, 42],
-	[162, 37, 32, 32],
+	[IC_TL, B_TOP, B_TOP, B_TOP],
+	[B_LFT, W_LTD, W_MTE, W_MTE],
+	[B_LFT, W_LBD, W_MBE, W_MBE],
+	[B_LFT, DCR_L, EMPTY, EMPTY],
 ];
 
 const TOP_RIGHT_CORNER = [
-	[201, 201, 201, 163],
-	[2, 2, 9, 160],
-	[42, 42, 49, 160],
-	[32, 32, 39, 160],
+	[B_TOP, B_TOP, B_TOP, IC_TR],
+	[W_MTE, W_MTE, W_RTD, B_RGT],
+	[W_MBE, W_MBE, W_RBD, B_RGT],
+	[EMPTY, EMPTY, DCR_R, B_RGT],
 ];
 
 const BOTTOM_RIGHT_CORNER = [
-	[32, 32, 32, 160],
-	[32, 32, 32, 160],
-	[32, 32, 32, 160],
-	[121, 121, 121, 123],
+	[EMPTY, EMPTY, EMPTY, B_RGT],
+	[EMPTY, EMPTY, EMPTY, B_RGT],
+	[EMPTY, EMPTY, EMPTY, B_RGT],
+	[B_BOT, B_BOT, B_BOT, IC_BR],
 ];
 
 const BOTTOM_LEFT_CORNER = [
-	[162, 32, 32, 32],
-	[162, 32, 32, 32],
-	[162, 32, 32, 32],
-	[124, 121, 121, 121],
+	[B_LFT, EMPTY, EMPTY, EMPTY],
+	[B_LFT, EMPTY, EMPTY, EMPTY],
+	[B_LFT, EMPTY, EMPTY, EMPTY],
+	[IC_BL, B_BOT, B_BOT, B_BOT],
 ];
 
 export const translateLayoutBlockToStyle = (block: number, style: ColorsOfMagic) => {
 	switch (style) {
 		case ColorsOfMagic.WILD:
 			if (block === 7 || block === 8) return 2;
-			if (block === 47 || block === 48) return 42;
+			if (block === 51 || block === 52) return 46;
 			if (block === 37 || block === 38) return 32;
 		case ColorsOfMagic.DEATH:
 		default:
@@ -303,18 +334,18 @@ export default class RoomGenerator {
 		console.log('Creating ' + roomName + ' of size ' + roomHeight + h1 + 'x' + roomWidth + w1);
 		// end Console output
 
-		// let debugOutput = '';
-		// for(let i=0;i<room.length;i++) {
-		// 	for(let j=0;j<room[i].length;j++) {
-		// 		if(room[i][j] < 10) {
-		// 			debugOutput += ' ';
-		// 		}
-		// 		debugOutput += room[i][j];
-		// 	}
-		// 	debugOutput += '\n';
-		// }
+		let debugOutput = '';
+		for (let i = 0; i < room.length; i++) {
+			for (let j = 0; j < room[i].length; j++) {
+				if (room[i][j] < 10) {
+					debugOutput += ' ';
+				}
+				debugOutput += room[i][j];
+			}
+			debugOutput += '\n';
+		}
 
-		// console.log(debugOutput);
+		console.log(debugOutput);
 
 		const ret: Room = {
 			allowTileReplacement: true,
