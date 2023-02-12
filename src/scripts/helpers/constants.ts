@@ -65,6 +65,8 @@ export const enum UiDepths {
 	UI_STICK_LAYER = 14,
 }
 
+export const COLUMNS_PER_TILESET = 44;
+
 export const TARGETABLE_TILE_TINT = 0x888888;
 export const VISITED_TILE_TINT = 0x333333;
 export const DEFAULT_TILE_TINT = 0xffffff;
@@ -400,7 +402,7 @@ export const MOBILE_INTERACTION_OFFSETS = 96;
 export const DEBUG_PHYSICS = false;
 export const DEBUG_PATHFINDING = false;
 export const DEBUG_ENEMY_AI = false;
-export const FPS_DEBUG = false;
+export const FPS_DEBUG = true;
 export const COMBO_CAST_RESET_DELAY = 2000;
 export const DASH_REVERSE_DELAY = 1500;
 
@@ -411,10 +413,10 @@ export const replacementTiles: EnumDictionary<
 	[ColorsOfMagic.DEATH]: {
 		2: [[0.9, 13]],
 		32: [
-			[0.995, 72],
+			[0.995, 76],
 			[0.98, 33],
 		],
-		42: [[0.9, 53]],
+		42: [[0.9, 57]],
 	},
 	[ColorsOfMagic.WILD]: {
 		32: [
@@ -423,18 +425,18 @@ export const replacementTiles: EnumDictionary<
 			[0.985, 35],
 			[0.98, 36],
 			[0.975, 37],
-			[0.97, 72],
-			[0.965, 73],
-			[0.96, 74],
-			[0.955, 75],
-			[0.95, 76],
-			[0.945, 77],
-			[0.94, 78],
-			[0.935, 79],
-			[0.82, 118],
-			[0.79, 119],
-			[0.76, 158],
-			[0.73, 159],
+			[0.97, 76],
+			[0.965, 77],
+			[0.96, 78],
+			[0.955, 79],
+			[0.95, 80],
+			[0.945, 81],
+			[0.94, 82],
+			[0.935, 83],
+			[0.82, 122],
+			[0.79, 123],
+			[0.76, 162],
+			[0.73, 163],
 		],
 	},
 	[ColorsOfMagic.ROYAL]: {},
