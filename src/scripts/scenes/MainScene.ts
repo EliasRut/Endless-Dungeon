@@ -60,6 +60,7 @@ import QuestDetailsScreen from '../screens/QuestDetailsScreen';
 import ContentManagementScreen from '../screens/ContentManagementScreen';
 import EnchantIcon from '../drawables/ui/EnchantIcon';
 import FollowerToken from '../drawables/tokens/FollowerToken';
+import { COLUMNS_PER_TILESET } from '../helpers/constants';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -847,8 +848,8 @@ export default class MainScene extends Phaser.Scene {
 		this.scriptHelper.handleScripts(globalState.gameTime);
 
 		const now = Date.now();
-		// Animate all tiles taht should be animated
 
+		// Animate all tiles that should be animated
 		if (now - this.lastTileAnimationStep > TILE_ANIMATION_STEP_TIME) {
 			this.lastTileAnimationStep = now;
 
@@ -864,14 +865,17 @@ export default class MainScene extends Phaser.Scene {
 						const tileThousands = Math.floor(tile.index / 1000);
 						const modTileIndex = tile.index % 1000;
 
-						if (modTileIndex === 73) {
-							tile.index = tileThousands * 1000 + 74;
-						} else if (modTileIndex === 74) {
-							tile.index = tileThousands * 1000 + 193;
-						} else if (modTileIndex === 193) {
-							tile.index = tileThousands * 1000 + 194;
-						} else if (modTileIndex === 194) {
-							tile.index = tileThousands * 1000 + 73;
+						const tileRowNumber = Math.floor(modTileIndex / COLUMNS_PER_TILESET);
+						const tileColumnNumber = modTileIndex % COLUMNS_PER_TILESET;
+
+						if (tileColumnNumber === 41) {
+							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 42;
+						} else if (modTileIndex === 42) {
+							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 43;
+						} else if (modTileIndex === 43) {
+							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 44;
+						} else if (modTileIndex === 44) {
+							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 41;
 						}
 					}
 				}
