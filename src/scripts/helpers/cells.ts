@@ -1,6 +1,6 @@
 import { COLUMNS_PER_TILESET } from './constants';
 
-const getTileIndex = (row: number, col: number) => row * COLUMNS_PER_TILESET + col;
+export const getTileIndex = (row: number, col: number) => row * COLUMNS_PER_TILESET + col;
 
 // Ground tiles
 export const EMPTY = getTileIndex(0, 32);
@@ -44,3 +44,23 @@ export const OC_TL = getTileIndex(5, 2);
 export const OC_TR = getTileIndex(5, 0);
 export const OC_BL = getTileIndex(3, 2);
 export const OC_BR = getTileIndex(3, 0);
+
+export const updateAnimatedTile: (tile: Phaser.Tilemaps.Tile | undefined) => void = (tile) => {
+	if (tile) {
+		const tileThousands = Math.floor(tile.index / 1000);
+		const modTileIndex = tile.index % 1000;
+
+		const tileRowNumber = Math.floor(modTileIndex / COLUMNS_PER_TILESET);
+		const tileColumnNumber = modTileIndex % COLUMNS_PER_TILESET;
+
+		if (tileColumnNumber === 40) {
+			tile.index = tileRowNumber * COLUMNS_PER_TILESET + tileThousands * 1000 + 41;
+		} else if (tileColumnNumber === 41) {
+			tile.index = tileRowNumber * COLUMNS_PER_TILESET + tileThousands * 1000 + 42;
+		} else if (tileColumnNumber === 42) {
+			tile.index = tileRowNumber * COLUMNS_PER_TILESET + tileThousands * 1000 + 43;
+		} else if (tileColumnNumber === 43) {
+			tile.index = tileRowNumber * COLUMNS_PER_TILESET + tileThousands * 1000 + 40;
+		}
+	}
+};

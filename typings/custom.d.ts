@@ -255,9 +255,11 @@ export interface DatabaseRoom {
 	doors?: Door[];
 	team?: string;
 	package?: string;
+	lightingSources: LightingSource[];
 }
 
 export interface Room {
+	lightingSources: LightingSource[];
 	allowTileReplacement?: boolean;
 	startRoom?: boolean;
 	tileset: string;
@@ -357,4 +359,15 @@ export interface ConditionalAbilityListing {
 export interface ConditionalAbilityData {
 	conditions?: AbilityListingConditions;
 	data: AbilityData;
+}
+
+export interface LightingSource {
+	x: number;
+	y: number;
+	strength?: number;
+	radius: number;
+	minStrength?: number;
+	maxStrength?: number;
+	frequency?: number;
+	seed?: number;
 }

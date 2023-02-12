@@ -71,6 +71,8 @@ export interface ProjectileData {
 	seekingSpeed?: number;
 	seekingTimeOffset?: number;
 	shape?: 'source' | 'storm' | 'cone' | 'nova';
+	lightingStrength?: number;
+	lightingRadius?: number;
 }
 
 export interface AbilityData {
@@ -171,6 +173,8 @@ export const Abilities: AbilityDataMap = {
 			explodeOnDestruction: true,
 			targeting: true,
 			seekingSpeed: 0,
+			lightingStrength: 8,
+			lightingRadius: 6,
 		},
 		sound: 'sound-fireball',
 		sfxVolume: 0.1,

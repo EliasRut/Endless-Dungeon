@@ -143,6 +143,7 @@ export default class AbilityEditor extends Phaser.Scene {
 			title: 'Ability Editor Room',
 			colorOfMagic: ColorsOfMagic.DEATH,
 			noRandomEnemies: true,
+			lightingSources: [],
 		};
 		const level = generator.generateLevel('abilityEditorDungeon', 1, {
 			title: 'Ability Editor',

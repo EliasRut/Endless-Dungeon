@@ -13,6 +13,7 @@ import fixedItems from '../../items/fixedItems.json';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import { getItemDataForName, UneqippableItem } from '../../items/itemData';
 import { getCachedUserData } from '../helpers/userHelpers';
+import { COLUMNS_PER_TILESET } from '../helpers/constants';
 
 const SCALE = 2;
 
@@ -486,14 +487,14 @@ export default class MapEditor extends Phaser.Scene {
 		this.npcLibraryLayer.add(npcCursorToken, true);
 		npcKeys.forEach((key, index) => {
 			const token = new Phaser.GameObjects.Image(this, 0, 0, key);
-			token.setPosition((index + 1) * 40 * SCALE, 0);
+			token.setPosition((index + 1) * COLUMNS_PER_TILESET * SCALE, 0);
 			token.setScale(SCALE);
 			token.setOrigin(0);
 			token.setScrollFactor(0);
 			token.setDepth(100);
 			token.addListener('pointerdown', () => {
 				this.selectedLibraryNpcIndex = index + 1;
-				this.highlightingX = (index + 1) * 40 * SCALE;
+				this.highlightingX = (index + 1) * COLUMNS_PER_TILESET * SCALE;
 				this.highlightingY = 0;
 				this.mapEditorHighlighting.setPosition(token.x, token.y);
 			});
@@ -535,14 +536,14 @@ export default class MapEditor extends Phaser.Scene {
 				'test-items-spritesheet',
 				item.iconFrame
 			);
-			token.setPosition((index + 1) * 40 * SCALE + 12, 10 * SCALE);
+			token.setPosition((index + 1) * COLUMNS_PER_TILESET * SCALE + 12, 10 * SCALE);
 			token.setOrigin(0);
 			token.setScale(SCALE);
 			token.setScrollFactor(0);
 			token.setDepth(100);
 			token.addListener('pointerdown', () => {
 				this.selectedLibraryItemIndex = index + 1;
-				this.highlightingX = (index + 1) * 40 * SCALE;
+				this.highlightingX = (index + 1) * COLUMNS_PER_TILESET * SCALE;
 				this.highlightingY = 0;
 				this.mapEditorHighlighting.setPosition(token.x - 4 * SCALE, token.y - 4 * SCALE);
 			});
@@ -1483,14 +1484,18 @@ export default class MapEditor extends Phaser.Scene {
 		this.npcLibraryTokens.forEach((token, index) => {
 			token.setScale((1 / this.zoomFactor) * SCALE);
 			token.setPosition(
-				newX + index * 40 * (1 / this.zoomFactor) * SCALE + (index === 0 ? 4 * SCALE : 0),
+				newX +
+					index * COLUMNS_PER_TILESET * (1 / this.zoomFactor) * SCALE +
+					(index === 0 ? 4 * SCALE : 0),
 				newY + (index === 0 ? 4 * SCALE : 0)
 			);
 		});
 		this.itemLibraryTokens.forEach((token, index) => {
 			token.setScale((1 / this.zoomFactor) * SCALE * (index === 0 ? 1 : 1.5));
 			token.setPosition(
-				newX + index * 40 * (1 / this.zoomFactor) * SCALE + (index === 0 ? 4 * SCALE : 4),
+				newX +
+					index * COLUMNS_PER_TILESET * (1 / this.zoomFactor) * SCALE +
+					(index === 0 ? 4 * SCALE : 4),
 				newY + (index === 0 ? 4 * SCALE : 4)
 			);
 		});

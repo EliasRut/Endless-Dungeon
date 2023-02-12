@@ -252,6 +252,9 @@ export default class EnemyToken extends CharacterToken {
 				}
 			}
 		}
+
+		this.stateObject.x = this.body.x / SCALE;
+		this.stateObject.y = this.body.y / SCALE;
 	}
 
 	executeMeleeAttack(time: number) {

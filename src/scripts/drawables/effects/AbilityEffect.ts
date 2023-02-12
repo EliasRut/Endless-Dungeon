@@ -37,6 +37,8 @@ export default class AbilityEffect extends Phaser.Physics.Arcade.Sprite {
 
 		this.explodeOnDestruction = !!projectileData?.explodeOnDestruction;
 		this.effectScale = projectileData?.effectScale || 1;
+		// this.lightingStrength = projectileData?.lightingStrength || undefined;
+		// this.lightingRadius = projectileData?.lightingRadius || undefined;
 
 		const mainScene = scene as MainScene;
 

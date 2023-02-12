@@ -10,7 +10,7 @@ export type MyNote = 'A' | 'A#' | 'B' | 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F
 export type Octave = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
 export type FullNote = string; //`${MyNote}${Octave}`;
 
-const NOTE_LENGTH = 0.3;
+const NOTE_LENGTH = 0.6;
 const ATTACK_TIME = 0.15;
 const RELEASE_TIME = 0.85;
 const SUSTAIN_LEVEL = 0.2;

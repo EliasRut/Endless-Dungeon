@@ -1,5 +1,6 @@
 import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
+import { B_BOT, B_LFT, B_RGT, B_TOP, getTileIndex } from './cells';
 import { DEFAULT_TILE_TINT, VISITED_TILE_TINT } from './constants';
 import { GID_MULTIPLE, TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import { isCollidingTile } from './movement';
@@ -10,9 +11,55 @@ const lightRadius = 10;
 const TEN_SECONDS_IN_FRAMES = 600;
 const LIGHTRAY_PRECISION = 10000;
 
-const lightPassingTileIds = [
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56,
-	57, 58, 59, 60, 61, 62, 88, 89, 90, 94, 95, 96, 99, 100, 101, 102,
+const enum Directions {
+	CENTER = -1,
+	NORTH = 0,
+	NORTH_EAST = 1,
+	EAST = 2,
+	SOUTH_EAST = 3,
+	SOUTH = 4,
+	SOUTH_WEST = 5,
+	WEST = 6,
+	NORTH_WEST = 7,
+}
+
+const directionFromXY: Directions[][] = [
+	[Directions.NORTH_WEST, Directions.WEST, Directions.SOUTH_WEST],
+	[Directions.NORTH, Directions.CENTER, Directions.SOUTH],
+	[Directions.NORTH_EAST, Directions.EAST, Directions.SOUTH],
+];
+
+const lightPassingTileIds: number[] = [
+	// First row cells
+	...Array.from(Array(24).keys()).map((i) => getTileIndex(0, i)),
+	...Array.from(Array(24).keys()).map((i) => getTileIndex(1, i)),
+	...Array.from(Array(24).keys()).map((i) => getTileIndex(2, i)),
+	// B_LFT,
+	// B_RGT,
+	// B_TOP,
+	// B_BOT,
+	//1, 	2, 	3, 	4, 	5, 	6, 	7, 	8, 	9, 	10, 	11, 	12, 	13, 	14, 	15, 	45, 	46, 	47, 	48, 	49, 	50, 	51, 	52, 	53, 	54, 	55, 	56, 	57, 	58, 	59, 	60, 	61, 	62, 	88, 	89, 	90, 	94, 	95, 	96, 	99, 	100, 	101, 	102,
+];
+
+// const lightPassingTileIdsByDirection: number[][] = [
+// 	/*NORTH: */ [...lightPassingTileIds, B_LFT, B_RGT],
+// 	/*NORTH_EAST: */ [...lightPassingTileIds, B_LFT, B_TOP],
+// 	/*EAST: */ [...lightPassingTileIds, B_TOP, B_BOT],
+// 	/*SOUTH_EAST: */ [...lightPassingTileIds, B_LFT, B_BOT],
+// 	/*SOUTH: */ [...lightPassingTileIds, B_LFT, B_RGT],
+// 	/*SOUTH_WEST: */ [...lightPassingTileIds, B_RGT, B_BOT],
+// 	/*WEST: */ [...lightPassingTileIds, B_TOP, B_BOT],
+// 	/*NORTH_WEST: */ [...lightPassingTileIds, B_RGT, B_BOT],
+// ];
+const lightPassingTileIdsByDirection: number[][] = [
+	/*NORTH: */ [...lightPassingTileIds], //, B_LFT, B_RGT],
+	/*NORTH_EAST: */ [...lightPassingTileIds], //, B_LFT, B_TOP],
+	/*EAST: */ [...lightPassingTileIds, B_TOP, B_BOT],
+	/*SOUTH_EAST: */ [...lightPassingTileIds], //, B_LFT, B_BOT],
+	/*SOUTH: */ [...lightPassingTileIds], //, B_LFT, B_RGT],
+	/*SOUTH_WEST: */ [...lightPassingTileIds], //, B_RGT, B_BOT],
+	/*WEST: */ [...lightPassingTileIds, B_TOP, B_BOT],
+	/*NORTH_WEST: */ [...lightPassingTileIds], //, B_RGT, B_BOT],
 ];
 
 const addHexColors = (color1: number, color2: number, intensity: number) => {
@@ -21,17 +68,6 @@ const addHexColors = (color1: number, color2: number, intensity: number) => {
 	const b = Math.min(255, Math.round(color1 & 0xff) + (color2 & 0xff) * intensity);
 	return (r << 16) + (g << 8) + b;
 };
-
-export interface LightingSource {
-	x: number;
-	y: number;
-	strength?: number;
-	radius: number;
-	minStrength?: number;
-	maxStrength?: number;
-	frequency?: number;
-	seed?: number;
-}
 
 export default class DynamicLightingHelper {
 	// This is an array of arrays of arrays, where the first array is the radius,
@@ -45,7 +81,7 @@ export default class DynamicLightingHelper {
 	overlayLayer: Phaser.Tilemaps.TilemapLayer;
 	lastLightLevel: number = 255;
 
-	isBlockingTile: boolean[][] = [];
+	isBlockingTile: boolean[][][] = [];
 	updatedTiles: [number, number][] = [];
 	visitedTiles: number[][] = [];
 	visibleTiles: boolean[][] = [];
@@ -77,19 +113,29 @@ export default class DynamicLightingHelper {
 		this.tileLayer.forEachTile((tile) => (tile.tint = 0x000000));
 		this.decorationLayer.forEachTile((tile) => (tile.tint = 0x000000));
 		this.overlayLayer.forEachTile((tile) => (tile.tint = 0x000000));
+		for (let direction = 0; direction < 8; direction++) {
+			this.isBlockingTile[direction] = [];
+		}
 		for (let x = 0; x < dungeonWidth; x++) {
-			this.isBlockingTile[x] = [];
+			for (let direction = 0; direction < 8; direction++) {
+				this.isBlockingTile[direction][x] = [];
+			}
 			this.visitedTiles[x] = [];
 			for (let y = 0; y < dungeonHeight; y++) {
 				this.visitedTiles[x][y] = 0;
 				const tile = this.tileLayer.getTileAt(x, y);
 				if (!tile) {
-					this.isBlockingTile[x][y] = true;
+					for (let direction = 0; direction < 8; direction++) {
+						this.isBlockingTile[direction][x][y] = true;
+					}
 				} else {
 					const tileIdNormalized = tile.index % GID_MULTIPLE;
 					// tslint:disable: no-magic-numbers
-					this.isBlockingTile[x][y] =
-						isCollidingTile(tile.index) && !lightPassingTileIds.includes(tileIdNormalized);
+					for (let direction = 0; direction < 8; direction++) {
+						this.isBlockingTile[direction][x][y] =
+							isCollidingTile(tile.index) &&
+							!lightPassingTileIdsByDirection[direction].includes(tileIdNormalized);
+					}
 					// tileIdNormalized < 15 || (tileIdNormalized >= 45 && tileIdNormalized < 60);
 					// tslint:enable: no-magic-numbers
 				}
@@ -100,7 +146,7 @@ export default class DynamicLightingHelper {
 		const maxLightDistance = lightRadius * TILE_HEIGHT;
 		for (let x = 0; x < (sightRadius + 2) * TILE_HEIGHT; x++) {
 			this.lightingLevels[x] = [];
-			for (let y = 0; y < (maxLightDistance + 2) * TILE_HEIGHT; y++) {
+			for (let y = 0; y < (sightRadius + 2) * TILE_HEIGHT; y++) {
 				// Good old pythagoras for getting actual distance to the tile
 				const distance = Math.hypot(x, y);
 				// This will be a factor between 0 and 1
@@ -138,9 +184,9 @@ export default class DynamicLightingHelper {
 			}
 		}
 
-		for (let x = 0; x < 2 * sightRadius; x++) {
+		for (let x = 0; x < 2 * sightRadius + 2; x++) {
 			this.visibleTiles[x] = [];
-			for (let y = 0; y < 2 * sightRadius; y++) {
+			for (let y = 0; y < 2 * sightRadius + 2; y++) {
 				this.visibleTiles[x][y] = false;
 			}
 		}
@@ -169,10 +215,10 @@ export default class DynamicLightingHelper {
 		const playerTileX = Math.round(playerTokenX / TILE_WIDTH);
 		const playerTileY = Math.round(playerTokenY / TILE_HEIGHT);
 		// We calculate darkness values for 32x32 tiles, seems to be enough visually speaking
-		const lowerBoundX = Math.min(sightRadius, playerTileX) * -1;
-		const upperBoundX = Math.min(sightRadius, dungeonWidth - 1 - playerTileX);
-		const lowerBoundY = Math.min(sightRadius, playerTileY) * -1;
-		const upperBoundY = Math.min(sightRadius, dungeonHeight - 1 - playerTileY);
+		const lowerBoundX = Math.min(sightRadius - 1, playerTileX) * -1;
+		const upperBoundX = Math.min(sightRadius - 1, dungeonWidth - 1 - playerTileX);
+		const lowerBoundY = Math.min(sightRadius - 1, playerTileY) * -1;
+		const upperBoundY = Math.min(sightRadius - 1, dungeonHeight - 1 - playerTileY);
 
 		// The player character tile is always fully lit
 		const playerTile = this.tileLayer.getTileAt(playerTileX, playerTileY);
@@ -183,7 +229,7 @@ export default class DynamicLightingHelper {
 			const tile = this.tileLayer.getTileAt(tileX, tileY);
 			const decorationTile = this.decorationLayer.getTileAt(tileX, tileY);
 			const overlayTile = this.overlayLayer.getTileAt(tileX, tileY);
-			2;
+
 			if (tile) {
 				tile.tint = this.visitedTiles[tileX][tileY];
 			}
@@ -196,11 +242,22 @@ export default class DynamicLightingHelper {
 		});
 		this.fieldsToUpdate = [];
 
-		for (let x = 0; x < 2 * sightRadius; x++) {
-			for (let y = 0; y < 2 * sightRadius; y++) {
+		for (let x = 0; x < 2 * sightRadius + 2; x++) {
+			for (let y = 0; y < 2 * sightRadius + 2; y++) {
 				this.visibleTiles[x][y] = false;
 			}
 		}
+
+		// for (let x = -sightRadius - 1; x < sightRadius + 2; x++) {
+		// 	for (let y = -sightRadius - 2; y < sightRadius + 2; y++) {
+		// 		const tileX = playerTileX + x;
+		// 		const tileY = playerTileY + y;
+		// 		const tile = this.tileLayer.getTileAt(tileX, tileY);
+		// 		if (tile) {
+		// 			tile.tint = 0x00ff00;
+		// 		}
+		// 	}
+		// }
 
 		for (let xVect = -sightRadius; xVect < sightRadius; xVect++) {
 			for (let yVect = -sightRadius; yVect < sightRadius; yVect++) {
@@ -245,7 +302,8 @@ export default class DynamicLightingHelper {
 							(this.visibleTiles[x + sightRadius][y + sightRadius] as unknown as number) *
 								this.lightingLevels[distanceX][distanceY],
 							this.visitedTiles[tileX][tileY] +
-								(this.visibleTiles[x + sightRadius][y + sightRadius] as unknown as number)
+								(this.visibleTiles[x + sightRadius][y + sightRadius] as unknown as number),
+							0x010101
 						);
 						if (tile) {
 							tile.tint = tint;
@@ -319,6 +377,9 @@ export default class DynamicLightingHelper {
 			console.log(`Dynamic lighting took on avg ${avg} ms`);
 			this.dynamicLightingTimes = [];
 		}
+
+		// if (DEBUG_VISIBILITY) {
+		// }
 	}
 
 	// This is a bit performance optimized :D
@@ -340,6 +401,7 @@ export default class DynamicLightingHelper {
 		const yStepDiff = vectorY < 0 ? -1 : 1;
 		const vectorXAbs = Math.abs(Math.round(vectorX * LIGHTRAY_PRECISION));
 		const vectorYAbs = Math.abs(Math.round(vectorY * LIGHTRAY_PRECISION));
+		const direction = directionFromXY[xStepDiff + 1][yStepDiff + 1];
 		// We don't want to multiply if we can prevent it, but we want to have if statements even less
 		// So what we end up doing is using the boolean-as-a-number trick and multiply where we have to
 		for (let i = 1; i <= steps; i++) {
@@ -351,7 +413,7 @@ export default class DynamicLightingHelper {
 			yDelta -= ((yDelta >= yThreshold) as unknown as number) * yThreshold;
 
 			this.visibleTiles[x + sightRadius][y + sightRadius] = true;
-			if (this.isBlockingTile[x + originX][y + originY]) {
+			if (this.isBlockingTile[direction][x + originX][y + originY]) {
 				// Break actually stops this ray from being casted
 				break;
 			}

@@ -22,6 +22,7 @@ import {
 	DelayUnit,
 	ClockUnit,
 	AutoPilotUnit,
+	GeneralisedParameter,
 } from './interface';
 
 function WanderingParameter(param: NumericParameter, scaleFactor = 1 / 400) {
@@ -114,6 +115,13 @@ function ThreeOhUnit(
 	};
 }
 
+let isDrumMuted: [
+	GeneralisedParameter<boolean>,
+	GeneralisedParameter<boolean>,
+	GeneralisedParameter<boolean>,
+	GeneralisedParameter<boolean>
+];
+
 async function NineOhUnit(audio: AudioT): Promise<NineOhMachine> {
 	const drums = await audio.SamplerDrumMachine([
 		// 'assets/sounds/score/909BD.mp3',
@@ -126,11 +134,11 @@ async function NineOhUnit(audio: AudioT): Promise<NineOhMachine> {
 		'assets/sounds/score/cabassa1.mp3',
 	]);
 	const pattern = genericParameter<DrumPattern>('Drum Pattern', []);
-	const mutes = [
-		genericParameter('Mute BD', false),
-		genericParameter('Mute OH', false),
-		genericParameter('Mute CH', false),
-		genericParameter('Mute SD', false),
+	isDrumMuted = [
+		genericParameter('Mute BD', true),
+		genericParameter('Mute OH', true),
+		genericParameter('Mute CH', true),
+		genericParameter('Mute SD', true),
 	];
 	const newPattern = trigger('New Pattern Trigger', true);
 	const gen = NineOhGen();
@@ -142,7 +150,7 @@ async function NineOhUnit(audio: AudioT): Promise<NineOhMachine> {
 		}
 		for (let i in pattern.value) {
 			const entry = pattern.value[i][index % pattern.value[i].length];
-			if (entry && !mutes[i].value) {
+			if (entry && !isDrumMuted[i].value) {
 				drums.triggers[i].play(entry);
 			}
 		}
@@ -151,7 +159,7 @@ async function NineOhUnit(audio: AudioT): Promise<NineOhMachine> {
 	return {
 		step,
 		pattern,
-		mutes,
+		mutes: isDrumMuted,
 		newPattern,
 	};
 }
@@ -251,8 +259,10 @@ function ClockUnit(): ClockUnit {
 	};
 }
 
+let audio: AudioT | undefined;
+
 export async function startAudioGeneration(uiControlContainer?: HTMLElement) {
-	const audio = Audio();
+	audio = Audio();
 	const clock = ClockUnit();
 	const delay = DelayUnit(audio);
 	clock.bpm.subscribe((b) => (delay.delayTime.value = (3 / 4) * (60 / b)));
@@ -261,7 +271,7 @@ export async function startAudioGeneration(uiControlContainer?: HTMLElement) {
 	const programState: ProgramState = {
 		notes: [
 			ThreeOhUnit(audio, 'square', delay.inputNode, gen, 16, true),
-			ThreeOhUnit(audio, 'square', delay.inputNode, gen),
+			// ThreeOhUnit(audio, 'square', delay.inputNode, gen),
 			// ThreeOhUnit(audio, 'square', delay.inputNode, gen),
 			// ThreeOhUnit(audio, 'triangle', delay.inputNode, gen),
 			// ThreeOhUnit(audio, 'sawtooth', delay.inputNode, gen),
@@ -278,7 +288,7 @@ export async function startAudioGeneration(uiControlContainer?: HTMLElement) {
 	};
 
 	programState.masterVolume.subscribe((newVolume) => {
-		audio.master.in.gain.value = newVolume;
+		audio!.master.in.gain.value = newVolume;
 	});
 
 	clock.currentStep.subscribe((step) =>
@@ -290,6 +300,12 @@ export async function startAudioGeneration(uiControlContainer?: HTMLElement) {
 		uiControlContainer.append(ui);
 	}
 }
+
+export const getAudio = () => audio;
+
+export const setDrumMute = (index: number, value: boolean) => {
+	isDrumMuted[index]!.value = value;
+};
 
 // pressToStart(
 //   start,

@@ -34,7 +34,7 @@ import {
 	UI_SCALE,
 } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
-import DynamicLightingHelper, { LightingSource } from '../helpers/DynamicLightingHelper';
+import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import PlayerCharacterAvatar from '../drawables/ui/PlayerCharacterAvatar';
 import NPCAvatar from '../drawables/ui/NPCAvatar';
 import ScriptHelper from '../helpers/ScriptHelper';
@@ -43,7 +43,7 @@ import BackpackIcon from '../drawables/ui/BackpackIcon';
 import SettingsIcon from '../drawables/ui/SettingsIcon';
 import { spawnNpc } from '../helpers/spawn';
 import CharacterToken from '../drawables/tokens/CharacterToken';
-import { NpcOptions } from '../../../typings/custom';
+import { NpcOptions, LightingSource } from '../../../typings/custom';
 import WorldItemToken from '../drawables/tokens/WorldItemToken';
 import SettingsScreen from '../screens/SettingsScreen';
 import EnchantingScreen from '../screens/EnchantingScreen';
@@ -61,6 +61,9 @@ import ContentManagementScreen from '../screens/ContentManagementScreen';
 import EnchantIcon from '../drawables/ui/EnchantIcon';
 import FollowerToken from '../drawables/tokens/FollowerToken';
 import { COLUMNS_PER_TILESET } from '../helpers/constants';
+import { updateAnimatedTile } from '../helpers/cells';
+import { getAudio, setDrumMute } from '../audiogen/app';
+import { getClosestTarget, getDistanceToWorldStatePosition } from '../helpers/targetingHelpers';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -153,6 +156,8 @@ export default class MainScene extends Phaser.Scene {
 	hasCasted: boolean = false;
 
 	showHealthbars: boolean = true;
+
+	lightingSources: LightingSource[] = [];
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -439,7 +444,13 @@ export default class MainScene extends Phaser.Scene {
 			throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
 		}
 
-		const { startPositionX, startPositionY, npcs, doors, items } = dungeonLevel;
+		const isDungeon = globalState.currentLevel.startsWith('dungeonLevel');
+		setDrumMute(0, true);
+		setDrumMute(1, true);
+		setDrumMute(2, true);
+		setDrumMute(3, !isDungeon);
+
+		const { startPositionX, startPositionY, npcs, doors, items, lightingSources } = dungeonLevel;
 
 		const [tileLayer, decorationLayer, overlayLayer] = generateTilemap(this, dungeonLevel);
 
@@ -502,6 +513,14 @@ export default class MainScene extends Phaser.Scene {
 
 		items.forEach((item) => {
 			this.addFixedItem(item.id, item.x * SCALE, item.y * SCALE);
+		});
+
+		lightingSources.forEach((lightingSource: LightingSource) => {
+			this.lightingSources.push({
+				...lightingSource,
+				x: lightingSource.x / TILE_WIDTH,
+				y: lightingSource.y / TILE_HEIGHT,
+			});
 		});
 
 		// console.log(`Dropping item at ${startPositionX}, ${startPositionY}`);
@@ -860,24 +879,9 @@ export default class MainScene extends Phaser.Scene {
 
 			for (let animatedX = lowestRelevantX; animatedX < highestRelevantX; animatedX++) {
 				for (let animatedY = lowestRelevantY; animatedY < highestRelevantY; animatedY++) {
-					const tile = this.tileLayer.getTileAt(animatedX, animatedY);
-					if (tile) {
-						const tileThousands = Math.floor(tile.index / 1000);
-						const modTileIndex = tile.index % 1000;
-
-						const tileRowNumber = Math.floor(modTileIndex / COLUMNS_PER_TILESET);
-						const tileColumnNumber = modTileIndex % COLUMNS_PER_TILESET;
-
-						if (tileColumnNumber === 41) {
-							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 42;
-						} else if (modTileIndex === 42) {
-							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 43;
-						} else if (modTileIndex === 43) {
-							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 44;
-						} else if (modTileIndex === 44) {
-							tile.index = tileRowNumber + COLUMNS_PER_TILESET + tileThousands * 1000 + 41;
-						}
-					}
+					updateAnimatedTile(this.tileLayer.getTileAt(animatedX, animatedY));
+					updateAnimatedTile(this.decorationLayer.getTileAt(animatedX, animatedY));
+					updateAnimatedTile(this.overlayLayer.getTileAt(animatedX, animatedY));
 				}
 			}
 		}
@@ -891,6 +895,34 @@ export default class MainScene extends Phaser.Scene {
 		// tslint:disable-next-line: no-magic-numbers
 		if (now - this.lastScriptUnpausing > 1000) {
 			this.scriptHelper.resumePausedScripts();
+		}
+
+		// Update drum state based on distance to enemy
+		const closestEnemy = getClosestTarget(
+			Faction.PLAYER,
+			this.mainCharacter.x,
+			this.mainCharacter.y
+		);
+		if (closestEnemy) {
+			const distanceToEnemy = Math.hypot(
+				globalState.playerCharacter.x - closestEnemy.x,
+				globalState.playerCharacter.y - closestEnemy.y
+			);
+
+			// console.log(`Distance to enemy: ${distanceToEnemy}}`);
+			// if (distanceToEnemy < 1000) {
+			// setDrumMute(1, false);
+			// setDrumMute(2, false);
+			// setDrumMute(3, false);
+			// } else {
+			setDrumMute(0, distanceToEnemy > 400);
+			setDrumMute(1, distanceToEnemy > 600);
+			setDrumMute(2, distanceToEnemy > 800);
+			// }
+		} else {
+			setDrumMute(0, true);
+			setDrumMute(1, true);
+			setDrumMute(2, true);
 		}
 	}
 
@@ -979,24 +1011,27 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	getLightingSources(): LightingSource[] {
-		return this.abilityHelper.abilityEffects.map((abilityEffect) => {
-			return {
-				x: Math.round(abilityEffect.x / TILE_WIDTH / SCALE),
-				y: Math.round(abilityEffect.y / TILE_HEIGHT / SCALE),
-				radius: abilityEffect.lightingRadius || 2,
-				strength:
-					abilityEffect.lightingStrength !== undefined
-						? abilityEffect.lightingStrength || 2
-						: undefined,
-				...(abilityEffect.lightingMinStrength !== undefined
-					? {
-							minStrength: abilityEffect.lightingMinStrength,
-							maxStrength: abilityEffect.lightingMaxStrength,
-							frequency: abilityEffect.lightingFrequency,
-							seed: abilityEffect.lightingSeed,
-					  }
-					: {}),
-			};
-		});
+		return [
+			...this.abilityHelper.abilityEffects.map((abilityEffect) => {
+				return {
+					x: Math.round(abilityEffect.x / TILE_WIDTH / SCALE),
+					y: Math.round(abilityEffect.y / TILE_HEIGHT / SCALE),
+					radius: abilityEffect.lightingRadius || 2,
+					strength:
+						abilityEffect.lightingStrength !== undefined
+							? abilityEffect.lightingStrength || 2
+							: undefined,
+					...(abilityEffect.lightingMinStrength !== undefined
+						? {
+								minStrength: abilityEffect.lightingMinStrength,
+								maxStrength: abilityEffect.lightingMaxStrength,
+								frequency: abilityEffect.lightingFrequency,
+								seed: abilityEffect.lightingSeed,
+						  }
+						: {}),
+				};
+			}),
+			...this.lightingSources,
+		];
 	}
 }

@@ -1,4 +1,9 @@
-import { ItemsPositioning, MapConnection, NpcPositioning } from '../../../typings/custom';
+import {
+	LightingSource,
+	ItemsPositioning,
+	MapConnection,
+	NpcPositioning,
+} from '../../../typings/custom';
 import Door from './Door';
 import RoomPositioning from './RoomPositioning';
 
@@ -16,6 +21,7 @@ export default class DungeonLevel {
 	npcs: NpcPositioning[];
 	connections: MapConnection[];
 	doors: Door[];
+	lightingSources: LightingSource[];
 	items: ItemsPositioning[];
 	enemyLevel: number;
 	name: string;

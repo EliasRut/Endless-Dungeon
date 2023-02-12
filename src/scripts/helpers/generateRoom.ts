@@ -354,6 +354,7 @@ export default class RoomGenerator {
 			openings: orientation.slice(1) as Opening[],
 			name: roomName,
 			scripts: {} as Scripting,
+			lightingSources: [],
 			// npcs,
 			// usedNpcTypes: ['rich']
 		};

@@ -1,5 +1,6 @@
 import {
 	ItemsPositioning,
+	LightingSource,
 	MapConnection,
 	NpcPositioning,
 	OpeningDirection,
@@ -451,6 +452,20 @@ export default class DungeonGenerator {
 			});
 		});
 
+		const lightingSources: LightingSource[] = [];
+		this.rooms.forEach((room, index) => {
+			(room.lightingSources || []).forEach((lightingSource) => {
+				const y = lightingSource.y + this.roomOffsets[index][0] * BLOCK_SIZE;
+				const x = lightingSource.x + this.roomOffsets[index][1] * BLOCK_SIZE;
+
+				lightingSources.push({
+					...lightingSource,
+					x: x * TILE_WIDTH,
+					y: y * TILE_HEIGHT,
+				});
+			});
+		});
+
 		this.rooms.forEach((room, index) => {
 			if (room.noRandomEnemies) {
 				return;
@@ -553,6 +568,7 @@ export default class DungeonGenerator {
 			connections,
 			doors,
 			items,
+			lightingSources,
 			enemyLevel: dungeonLevel,
 			name: levelData.title,
 			dynamicLighting: levelData.isDungeon && false,
