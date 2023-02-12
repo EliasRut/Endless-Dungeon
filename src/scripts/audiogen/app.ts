@@ -270,7 +270,7 @@ export async function startAudioGeneration(uiControlContainer?: HTMLElement) {
 	const gen = ThreeOhGen();
 	const programState: ProgramState = {
 		notes: [
-			ThreeOhUnit(audio, 'square', delay.inputNode, gen, 16, true),
+			// ThreeOhUnit(audio, 'square', delay.inputNode, gen, 16, true),
 			// ThreeOhUnit(audio, 'square', delay.inputNode, gen),
 			// ThreeOhUnit(audio, 'square', delay.inputNode, gen),
 			// ThreeOhUnit(audio, 'triangle', delay.inputNode, gen),
