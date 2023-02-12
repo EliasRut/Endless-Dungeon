@@ -8,7 +8,7 @@ import FpsText from '../drawables/ui/FpsText';
 
 import StatScreen from '../screens/StatScreen';
 import InventoryScreen from '../screens/InventoryScreen';
-import DialogScreen from '../screens/DialogScreen';
+import { DialogScreen } from '../screens/DialogScreen';
 import ItemScreen from '../screens/ItemScreen';
 
 import KeyboardHelper from '../helpers/KeyboardHelper';
@@ -101,7 +101,7 @@ export default class MainScene extends Phaser.Scene {
 	overlayScreens: {
 		inventory: InventoryScreen;
 		statScreen: StatScreen;
-		dialogScreen: DialogScreen;
+		// dialogScreen: DialogScreen;
 		settingsScreen: SettingsScreen;
 		questLogScreen: QuestLogScreen;
 		questDetailsScreen: QuestDetailsScreen;
@@ -298,7 +298,7 @@ export default class MainScene extends Phaser.Scene {
 			itemScreen: new ItemScreen(this),
 			statScreen: new StatScreen(this),
 			inventory: new InventoryScreen(this),
-			dialogScreen: new DialogScreen(this),
+			// dialogScreen: new DialogScreen(this),
 			settingsScreen: new SettingsScreen(this),
 			questLogScreen: new QuestLogScreen(this),
 			questDetailsScreen: new QuestDetailsScreen(this),

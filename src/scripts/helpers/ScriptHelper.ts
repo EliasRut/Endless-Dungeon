@@ -99,33 +99,33 @@ export default class ScriptHelper {
 				}
 				break;
 			}
-			case 'dialog': {
-				if (!globalState.scripts.scriptStepStartMs) {
-					this.scene.pause();
-					globalState.scripts.scriptStepStartMs = globalTime;
-					globalState.scripts.scriptSubStep = 0;
-					this.scene.overlayScreens.dialogScreen.setText(
-						currentStep.text[globalState.scripts.scriptSubStep!]
-					);
-					this.scene.overlayScreens.dialogScreen.setVisible(true);
-				} else if (
-					globalState.scripts.scriptStepStartMs + DIALOG_TEXT_TIME_MS < globalTime ||
-					userCancelled
-				) {
-					globalState.scripts.scriptSubStep = globalState.scripts.scriptSubStep! + 1;
-					if (currentStep.text.length <= globalState.scripts.scriptSubStep) {
-						this.scene.overlayScreens.dialogScreen.setVisible(false);
-						cleanUpStep = true;
-						this.scene.resume();
-					} else {
-						this.scene.overlayScreens.dialogScreen.setText(
-							currentStep.text[globalState.scripts.scriptSubStep!]
-						);
-						globalState.scripts.scriptStepStartMs = globalTime;
-					}
-				}
-				break;
-			}
+			// case 'dialog': {
+			// 	if (!globalState.scripts.scriptStepStartMs) {
+			// 		this.scene.pause();
+			// 		globalState.scripts.scriptStepStartMs = globalTime;
+			// 		globalState.scripts.scriptSubStep = 0;
+			// 		this.scene.overlayScreens.dialogScreen.setText(
+			// 			currentStep.text[globalState.scripts.scriptSubStep!]
+			// 		);
+			// 		this.scene.overlayScreens.dialogScreen.setVisible(true);
+			// 	} else if (
+			// 		globalState.scripts.scriptStepStartMs + DIALOG_TEXT_TIME_MS < globalTime ||
+			// 		userCancelled
+			// 	) {
+			// 		globalState.scripts.scriptSubStep = globalState.scripts.scriptSubStep! + 1;
+			// 		if (currentStep.text.length <= globalState.scripts.scriptSubStep) {
+			// 			this.scene.overlayScreens.dialogScreen.setVisible(false);
+			// 			cleanUpStep = true;
+			// 			this.scene.resume();
+			// 		} else {
+			// 			this.scene.overlayScreens.dialogScreen.setText(
+			// 				currentStep.text[globalState.scripts.scriptSubStep!]
+			// 			);
+			// 			globalState.scripts.scriptStepStartMs = globalTime;
+			// 		}
+			// 	}
+			// 	break;
+			// }
 			case 'animation': {
 				if (!globalState.scripts.scriptStepStartMs) {
 					this.scene.pause();
