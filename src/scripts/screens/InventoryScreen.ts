@@ -262,13 +262,13 @@ export default class InventoryScreen extends OverlayScreen {
 		itemToken.setScale(UI_SCALE);
 		this.add(itemToken, true);
 		itemToken.on('pointerdown', () => {
-			this.interactInventory(['enter'], globalState.gameTime);
+			this.interactInventory(['enter', 'mouse'], globalState.gameTime);
 		});
 		itemToken.on('pointerover', () => {
-			if(!this.equipmentSelectionWheel.visibility) {
-				Object.entries(COORDINATES_TO_SLOT).forEach(pair => {
-					if(pair[1] == slotName) {
-						const [x,y] = pair[0].split('_');
+			if (!this.equipmentSelectionWheel.visibility) {
+				Object.entries(COORDINATES_TO_SLOT).forEach((pair) => {
+					if (pair[1] == slotName) {
+						const [x, y] = pair[0].split('_');
 						this.currentXY[0] = Number(x);
 						this.currentXY[1] = Number(y);
 					}
@@ -290,7 +290,7 @@ export default class InventoryScreen extends OverlayScreen {
 		if (!this.focusedSlot) {
 			return;
 		}
-		
+
 		const [centerX, centerY] = EQUIPMENT_SLOT_COORDINATES[this.focusedSlot];
 		this.equipmentSelectionWheel.toggleVisibility();
 		this.equipmentSelectionWheel.update(
@@ -320,7 +320,7 @@ export default class InventoryScreen extends OverlayScreen {
 		else if (!directions.includes('mouse')) return;
 		if (directions.includes('enter') && this.focusedSlot) {
 			if (this.equipmentSelectionWheel.visibility) {
-			} else {				
+			} else {
 				this.showEquipmentSelectionWheel();
 			}
 			return;
