@@ -47,7 +47,9 @@ export default class Minimap extends Phaser.GameObjects.Text {
 		super(scene, X_POSITION * UI_SCALE, Y_POSITION * UI_SCALE, '', {
 			color: 'white',
 			fontSize: `${4 * UI_SCALE}pt`,
+			fontStyle: 'bold',
 		});
+		this.setLineSpacing(-1 * UI_SCALE);
 		this.setScrollFactor(0);
 		scene.add.existing(this);
 		this.setOrigin(0);
@@ -101,7 +103,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 				} else if (topLeftTile.index % 1000 === B_TOP) {
 					marker = '─';
 				} else if (topLeftTile.index % 1000 === B_LFT) {
-					marker = '|';
+					marker = '│';
 				} else {
 					marker = ' ';
 				}
@@ -123,7 +125,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 				} else if (topRightTile.index % 1000 === B_TOP) {
 					marker += '─';
 				} else if (topRightTile.index % 1000 === B_RGT) {
-					marker += '|';
+					marker += '│';
 				} else {
 					marker += ' ';
 				}
@@ -136,7 +138,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 				if (!isTileVisible(middleLeftTile)) {
 					marker = ' ';
 				} else if (middleLeftTile.index % 1000 === B_LFT) {
-					marker = '|';
+					marker = '│';
 				} else {
 					marker = ' ';
 				}
@@ -144,9 +146,9 @@ export default class Minimap extends Phaser.GameObjects.Text {
 				if (!isTileVisible(middleMiddleTile)) {
 					marker += ' ';
 				} else if (y === yyPos && x === xxPos) {
-					marker += 'O';
+					marker += 'o';
 				} else if (middleMiddleTile.index % 1000 !== -1) {
-					marker += '.';
+					marker += ' ';
 				} else {
 					marker += ' ';
 				}
@@ -154,7 +156,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 				if (!isTileVisible(middleRightTile)) {
 					marker += ' ';
 				} else if (middleRightTile.index % 1000 === B_RGT) {
-					marker += '|';
+					marker += '│';
 				} else {
 					marker += ' ';
 				}
@@ -171,7 +173,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 				} else if (bottomLeftTile.index % 1000 === OC_BL) {
 					marker = '┐';
 				} else if (bottomLeftTile.index % 1000 === B_LFT) {
-					marker = '|';
+					marker = '│';
 				} else if (bottomLeftTile.index % 1000 === B_BOT) {
 					marker = '─';
 				} else {
@@ -195,7 +197,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 				} else if (bottomRightTile.index % 1000 === B_BOT) {
 					marker += '─';
 				} else if (bottomRightTile.index % 1000 === B_RGT) {
-					marker += '|';
+					marker += '│';
 				} else {
 					marker += ' ';
 				}
