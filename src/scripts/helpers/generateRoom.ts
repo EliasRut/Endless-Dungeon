@@ -82,7 +82,7 @@ const TOP_WALL = [
 ];
 
 const TOP_OPENING_LEFT = [
-	[OC_TR, EMPTY, EMPTY, EMPTY],
+	[OC_TL, EMPTY, EMPTY, EMPTY],
 	[W_RTE, EMPTY, EMPTY, EMPTY],
 	[W_RBE, EMPTY, EMPTY, EMPTY],
 	[EMPTY, EMPTY, EMPTY, EMPTY],
@@ -96,7 +96,7 @@ const TOP_OPENING_RIGHT = [
 ];
 
 const LEFT_OPENING_UPPER = [
-	[OC_TR, EMPTY, EMPTY, EMPTY],
+	[OC_TL, EMPTY, EMPTY, EMPTY],
 	[W_RTE, EMPTY, EMPTY, EMPTY],
 	[W_RBE, EMPTY, EMPTY, EMPTY],
 	[EMPTY, EMPTY, EMPTY, EMPTY],
@@ -113,7 +113,7 @@ const RIGHT_OPENING_UPPER = [
 	[EMPTY, EMPTY, EMPTY, OC_TR],
 	[EMPTY, EMPTY, EMPTY, W_LTE],
 	[EMPTY, EMPTY, EMPTY, W_MTE],
-	[EMPTY, EMPTY, EMPTY, DCR_L],
+	[EMPTY, EMPTY, EMPTY, DCR_R],
 ];
 
 const RIGHT_OPENING_LOWER = [
@@ -337,10 +337,7 @@ export default class RoomGenerator {
 		let debugOutput = '';
 		for (let i = 0; i < room.length; i++) {
 			for (let j = 0; j < room[i].length; j++) {
-				if (room[i][j] < 10) {
-					debugOutput += ' ';
-				}
-				debugOutput += room[i][j];
+				debugOutput += `${room[i][j]}`.padStart(3, ' ');
 			}
 			debugOutput += '\n';
 		}
