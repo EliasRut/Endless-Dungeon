@@ -66,6 +66,7 @@ export const enum UiDepths {
 }
 
 export const COLUMNS_PER_TILESET = 44;
+export const getTileIndex = (row: number, col: number) => row * COLUMNS_PER_TILESET + col;
 
 export const TARGETABLE_TILE_TINT = 0x888888;
 export const VISITED_TILE_TINT = 0x333333;
@@ -306,7 +307,7 @@ export const CHARACTER_SPRITE_WIDTH = 320;
 export const CHARACTER_SPRITE_HEIGHT = 240;
 
 export const SCALE = 3;
-export const UI_SCALE = (window.innerWidth >= 1900 && window.innerHeight) >= 840 ? 3 : 2;
+export const UI_SCALE = window.innerWidth >= 1900 && window.innerHeight >= 840 ? 3 : 2;
 
 export enum SUMMONING_TYPE {
 	FIRE_ELEMENTAL = 'fire_elemental',
@@ -411,32 +412,32 @@ export const replacementTiles: EnumDictionary<
 	{ [tileId: number]: [number, number][] }
 > = {
 	[ColorsOfMagic.DEATH]: {
-		2: [[0.9, 13]],
-		32: [
-			[0.995, 76],
-			[0.98, 33],
+		[getTileIndex(0, 2)]: [[0.9, getTileIndex(0, 13)]],
+		[getTileIndex(0, 32)]: [
+			[0.995, getTileIndex(1, 36)],
+			[0.98, getTileIndex(0, 33)],
 		],
-		42: [[0.9, 57]],
+		[getTileIndex(1, 2)]: [[0.9, getTileIndex(1, 13)]],
 	},
 	[ColorsOfMagic.WILD]: {
-		32: [
-			[0.995, 33],
-			[0.99, 34],
-			[0.985, 35],
-			[0.98, 36],
-			[0.975, 37],
-			[0.97, 76],
-			[0.965, 77],
-			[0.96, 78],
-			[0.955, 79],
-			[0.95, 80],
-			[0.945, 81],
-			[0.94, 82],
-			[0.935, 83],
-			[0.82, 122],
-			[0.79, 123],
-			[0.76, 162],
-			[0.73, 163],
+		[getTileIndex(0, 32)]: [
+			[0.995, getTileIndex(0, 33)],
+			[0.99, getTileIndex(0, 34)],
+			[0.985, getTileIndex(0, 35)],
+			[0.98, getTileIndex(0, 36)],
+			[0.975, getTileIndex(0, 37)],
+			[0.97, getTileIndex(1, 32)],
+			[0.965, getTileIndex(1, 33)],
+			[0.96, getTileIndex(1, 34)],
+			[0.955, getTileIndex(1, 35)],
+			[0.95, getTileIndex(1, 36)],
+			[0.945, getTileIndex(1, 37)],
+			[0.94, getTileIndex(1, 38)],
+			[0.935, getTileIndex(1, 39)],
+			[0.82, getTileIndex(2, 38)],
+			[0.79, getTileIndex(2, 39)],
+			[0.76, getTileIndex(3, 38)],
+			[0.73, getTileIndex(3, 39)],
 		],
 	},
 	[ColorsOfMagic.ROYAL]: {},
@@ -446,3 +447,33 @@ export const replacementTiles: EnumDictionary<
 	[ColorsOfMagic.CHANGE]: {},
 	[ColorsOfMagic.BLOOD]: {},
 };
+
+// [ColorsOfMagic.DEATH]: {
+// 	2: [[0.9, getTileIndex(0, 13)]],
+// 	32: [
+// 		[0.995, getTileIndex(1, 34)],
+// 		[0.98, getTileIndex(0, 33)],
+// 	],
+// 	42: [[0.9, getTileIndex(1, 17)]],
+// },
+// [ColorsOfMagic.WILD]: {
+// 	32: [
+// 		[0.995, getTileIndex(0, 33)],
+// 		[0.99, getTileIndex(0, 34)],
+// 		[0.985, getTileIndex(0, 35)],
+// 		[0.98, getTileIndex(0, 36)],
+// 		[0.975, getTileIndex(0, 37)],
+// 		[0.97, getTileIndex(1, 33)],
+// 		[0.965, getTileIndex(1, 34)],
+// 		[0.96, getTileIndex(1, 35)],
+// 		[0.955, getTileIndex(1, 36)],
+// 		[0.95, getTileIndex(1, 37)],
+// 		[0.945, getTileIndex(1, 38)],
+// 		[0.94, getTileIndex(1, 39)],
+// 		[0.935, getTileIndex(1, 34)],
+// 		[0.82, getTileIndex(2, 33)],
+// 		[0.79, getTileIndex(2, 34)],
+// 		[0.76, getTileIndex(3, 33)],
+// 		[0.73, getTileIndex(3, 34)],
+// 	],
+// },

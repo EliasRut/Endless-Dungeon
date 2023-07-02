@@ -1,7 +1,9 @@
+import DoorToken from '../drawables/tokens/DoorToken';
 import MainScene from '../scenes/MainScene';
 import globalState from '../worldstate';
-import { B_BOT, B_LFT, B_RGT, B_TOP, getTileIndex } from './cells';
-import { DEFAULT_TILE_TINT, VISITED_TILE_TINT } from './constants';
+import Door from '../worldstate/Door';
+import { B_BOT, B_LFT, B_RGT, B_TOP } from './cells';
+import { DEFAULT_TILE_TINT, SCALE, VISITED_TILE_TINT, getTileIndex } from './constants';
 import { GID_MULTIPLE, TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import { isCollidingTile } from './movement';
 
@@ -85,6 +87,8 @@ export default class DynamicLightingHelper {
 	updatedTiles: [number, number][] = [];
 	visitedTiles: number[][] = [];
 	visibleTiles: boolean[][] = [];
+	isClosedDoorTile: boolean[][] = [];
+	doors: Record<string, DoorToken>;
 	fieldsToUpdate: [number, number][] = [];
 
 	mainScene: MainScene;
@@ -93,17 +97,32 @@ export default class DynamicLightingHelper {
 		tileLayer: Phaser.Tilemaps.TilemapLayer,
 		decorationLayer: Phaser.Tilemaps.TilemapLayer,
 		overlayLayer: Phaser.Tilemaps.TilemapLayer,
+		doors: Record<string, DoorToken>,
 		mainScene: MainScene
 	) {
 		this.tileLayer = tileLayer;
 		this.decorationLayer = decorationLayer;
 		this.overlayLayer = overlayLayer;
 		this.mainScene = mainScene;
+		this.doors = doors;
 		this.prepareDynamicLighting();
 	}
 
 	getCurrentLevel() {
 		return globalState.roomAssignment[globalState.currentLevel];
+	}
+
+	updateDoorState() {
+		for (let doorToken of Object.values(this.doors)) {
+			const door = globalState.doors[doorToken.id];
+			const doorXTile = Math.round(door.x / TILE_WIDTH / SCALE);
+			const doorYTile = Math.round(door.y / TILE_HEIGHT / SCALE);
+			for (let x = doorXTile - 3; x < doorXTile + door.width + 3; x++) {
+				for (let y = doorYTile - 2; y < doorYTile + door.height - 2; y++) {
+					this.isClosedDoorTile[x][y] = !door.open;
+				}
+			}
+		}
 	}
 
 	prepareDynamicLighting() {
@@ -141,6 +160,15 @@ export default class DynamicLightingHelper {
 				}
 			}
 		}
+
+		for (let x = 0; x < dungeonWidth; x++) {
+			this.isClosedDoorTile[x] = [];
+			for (let y = 0; y < dungeonHeight; y++) {
+				this.isClosedDoorTile[x][y] = false;
+			}
+		}
+
+		this.updateDoorState();
 
 		// Prepare the player character specific lighting levels
 		const maxLightDistance = lightRadius * TILE_HEIGHT;
@@ -368,6 +396,21 @@ export default class DynamicLightingHelper {
 			}
 		}
 
+		Object.values(this.doors).forEach((doorToken) => {
+			const door = globalState.doors[doorToken.id];
+			const doorXTile = Math.round(door.x / TILE_WIDTH / SCALE);
+			const doorYTile = Math.round(door.y / TILE_HEIGHT / SCALE);
+			const baseTile = this.tileLayer.getTileAt(doorXTile, doorYTile);
+			for (let x = doorXTile - 3; x < doorXTile + door.width + 3; x++) {
+				for (let y = doorYTile - 2; y < doorYTile + door.height - 2; y++) {
+					const overlayTile = this.overlayLayer.getTileAt(x, y);
+					if (overlayTile) {
+						overlayTile.tint = baseTile.tint;
+					}
+				}
+			}
+		});
+
 		this.dynamicLightingTimes.push(window.performance.now() - beforeDynamicLighting);
 		if (this.dynamicLightingTimes.length >= TEN_SECONDS_IN_FRAMES) {
 			const avg =
@@ -413,7 +456,10 @@ export default class DynamicLightingHelper {
 			yDelta -= ((yDelta >= yThreshold) as unknown as number) * yThreshold;
 
 			this.visibleTiles[x + sightRadius][y + sightRadius] = true;
-			if (this.isBlockingTile[direction][x + originX][y + originY]) {
+			if (
+				this.isBlockingTile[direction][x + originX][y + originY] ||
+				this.isClosedDoorTile[x + originX][y + originY]
+			) {
 				// Break actually stops this ray from being casted
 				break;
 			}

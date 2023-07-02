@@ -590,9 +590,6 @@ export default class EnemyToken extends CharacterToken {
 			this.executeMeleeAttack(time);
 			return;
 		}
-		// 	this.setVelocityX(this.chargeX!);
-		// 	this.setVelocityY(this.chargeY!);
-		// }
 
 		if (!this.checkLoS()) {
 			// If we no longer see the target, and the aggro linger time has passed, reset the target

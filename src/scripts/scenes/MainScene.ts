@@ -32,6 +32,7 @@ import {
 	SCALE,
 	UiDepths,
 	UI_SCALE,
+	Facings,
 } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
@@ -154,6 +155,7 @@ export default class MainScene extends Phaser.Scene {
 	lastPlayerPosition: { x: number; y: number } | undefined;
 
 	hasCasted: boolean = false;
+	lastCastingAnimation: string | undefined;
 
 	showHealthbars: boolean = true;
 
@@ -188,6 +190,7 @@ export default class MainScene extends Phaser.Scene {
 				this.tileLayer,
 				this.decorationLayer,
 				this.overlayLayer,
+				this.doorMap,
 				this
 			);
 		}
@@ -402,18 +405,28 @@ export default class MainScene extends Phaser.Scene {
 		return npc;
 	}
 
-	addDoor(id: string, type: string, x: number, y: number, open: boolean) {
+	addDoor(
+		id: string,
+		type: string,
+		x: number,
+		y: number,
+		width: number,
+		height: number,
+		open: boolean
+	) {
 		if (!globalState.doors[id]) {
 			globalState.doors[id] = {
 				id,
 				type,
 				x,
 				y,
+				width,
+				height,
 				open,
 			};
 		}
 		this.doorMap[id] = new DoorToken(this, x, y, type, id);
-		this.doorMap[id].setDepth(UiDepths.TOP_TILE_LAYER);
+		this.doorMap[id].setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
 		this.physics.add.collider(this.doorMap[id], this.mainCharacter);
 		Object.values(this.npcMap).forEach((npc) => {
 			this.physics.add.collider(this.doorMap[id], npc);
@@ -508,7 +521,15 @@ export default class MainScene extends Phaser.Scene {
 		// )
 
 		doors.forEach((door) => {
-			this.addDoor(door.id, door.type, door.x * SCALE, door.y * SCALE, door.open);
+			this.addDoor(
+				door.id,
+				door.type,
+				door.x * SCALE,
+				door.y * SCALE,
+				door.width,
+				door.height,
+				door.open
+			);
 		});
 
 		items.forEach((item) => {
@@ -686,95 +707,113 @@ export default class MainScene extends Phaser.Scene {
 		if (!this.blockUserInteraction) {
 			if (globalState.playerCharacter.stunned === true) {
 				this.mainCharacter.setVelocity(0, 0);
-				return;
-			}
-			if (
-				globalState.playerCharacter.comboCast > 0 &&
-				globalState.gameTime >
-					globalState.playerCharacter.lastComboCastTime + COMBO_CAST_RESET_DELAY
-			) {
-				globalState.playerCharacter.comboCast = 0;
-			}
-			const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
-			const castingDuration = this.keyboardHelper.getLastCastingDuration();
-			const isCasting = msSinceLastCast < castingDuration;
-
-			if (!globalState.playerCharacter.dashing) {
-				const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
-					this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackground!.x : 0,
-					this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackground!.y : 0
-				);
-				const newFacing = getFacing8Dir(xFacing, yFacing);
-
-				// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
-				const hasMoved = xFacing !== 0 || yFacing !== 0;
-				let playerAnimation = updateMovingState(
-					globalState.playerCharacter,
-					hasMoved,
-					newFacing,
-					this.hasCasted && hasMoved
-				);
-				const isWalking =
-					isCasting ||
-					(this.mobilePadStick
-						? Math.abs(this.mobilePadStick.x - this.mobilePadBackground!.x) < 40 &&
-						  Math.abs(this.mobilePadStick.y - this.mobilePadBackground!.y) < 40
-						: false);
-				if (isCasting && !this.hasCasted) {
-					playerAnimation = `player-cast-${getTwoLetterFacingName(
-						globalState.playerCharacter.currentFacing
-					)}`;
-				} else if (isCasting && this.hasCasted) {
-					playerAnimation = false;
+			} else {
+				if (
+					globalState.playerCharacter.comboCast > 0 &&
+					globalState.gameTime >
+						globalState.playerCharacter.lastComboCastTime + COMBO_CAST_RESET_DELAY
+				) {
+					globalState.playerCharacter.comboCast = 0;
 				}
-				if (playerAnimation) {
-					this.mainCharacter.play({
-						key: playerAnimation,
-						// duration: 5,
-						frameRate: isCasting
-							? NORMAL_ANIMATION_FRAME_RATE * (MINIMUM_CASTING_TIME_MS / castingDuration)
-							: isWalking
-							? NORMAL_ANIMATION_FRAME_RATE / 2
-							: NORMAL_ANIMATION_FRAME_RATE,
-						repeat: -1,
-					});
-				}
-				if (hasMoved) {
-					const shouldPlayLeftStepSfx =
-						!this.lastStepLeft || globalState.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
+				const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
+				const castingDuration = this.keyboardHelper.getLastCastingDuration();
+				const isCasting = msSinceLastCast < castingDuration;
 
-					if (shouldPlayLeftStepSfx) {
-						this.sound.play('sound-step-grass-l', { volume: 0.25 });
-						this.lastStepLeft = globalState.gameTime;
+				if (!globalState.playerCharacter.dashing) {
+					const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
+						this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackground!.x : 0,
+						this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackground!.y : 0
+					);
+					const newFacing = getFacing8Dir(xFacing, yFacing);
+
+					// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
+					const hasMoved = xFacing !== 0 || yFacing !== 0;
+					const facingBeforeUpdate = globalState.playerCharacter.currentFacing;
+					let playerAnimation = updateMovingState(
+						globalState.playerCharacter,
+						hasMoved,
+						newFacing,
+						this.hasCasted && hasMoved
+					);
+					const isWalking =
+						isCasting ||
+						(this.mobilePadStick
+							? Math.abs(this.mobilePadStick.x - this.mobilePadBackground!.x) < 40 &&
+							  Math.abs(this.mobilePadStick.y - this.mobilePadBackground!.y) < 40
+							: false);
+					let potentialCastingAnmiation = undefined;
+					if (isCasting) {
+						potentialCastingAnmiation = `player-cast-${getTwoLetterFacingName(
+							globalState.playerCharacter.currentFacing
+						)}`;
 					}
-				} else {
-					this.lastStepLeft = undefined;
+					if (
+						potentialCastingAnmiation &&
+						potentialCastingAnmiation !== this.lastCastingAnimation
+					) {
+						console.log(
+							`Casting animation is ${potentialCastingAnmiation}, last casting animation was ${this.lastCastingAnimation}`
+						);
+						playerAnimation = potentialCastingAnmiation;
+						this.lastCastingAnimation = potentialCastingAnmiation;
+					} else if (isCasting) {
+						playerAnimation = false;
+					} else {
+						this.lastCastingAnimation = undefined;
+					}
+
+					if (playerAnimation) {
+						this.mainCharacter.play({
+							key: playerAnimation,
+							// duration: 5,
+							frameRate: isCasting
+								? NORMAL_ANIMATION_FRAME_RATE * (MINIMUM_CASTING_TIME_MS / castingDuration)
+								: isWalking
+								? NORMAL_ANIMATION_FRAME_RATE / 2
+								: NORMAL_ANIMATION_FRAME_RATE,
+							startFrame:
+								isCasting && this.hasCasted
+									? this.mainCharacter.anims.currentFrame?.index - 1 || 0
+									: 0,
+							repeat: -1,
+						});
+					}
+					if (hasMoved) {
+						const shouldPlayLeftStepSfx =
+							!this.lastStepLeft || globalState.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
+
+						if (shouldPlayLeftStepSfx) {
+							this.sound.play('sound-step-grass-l', { volume: 0.25 });
+							this.lastStepLeft = globalState.gameTime;
+						}
+					} else {
+						this.lastStepLeft = undefined;
+					}
+
+					if (!isCasting) {
+						this.hasCasted = false;
+					} else {
+						this.hasCasted = true;
+					}
+
+					const speed = isCasting
+						? 0
+						: isWalking
+						? getCharacterSpeed(globalState.playerCharacter) / 2
+						: getCharacterSpeed(globalState.playerCharacter);
+
+					this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
+					this.mainCharacter.body.velocity.normalize().scale(speed);
 				}
+			}
+			globalState.playerCharacter.x = Math.round(this.mainCharacter.x / SCALE);
+			globalState.playerCharacter.y = Math.round(this.mainCharacter.y / SCALE);
 
-				if (!isCasting) {
-					this.hasCasted = false;
-				} else {
-					this.hasCasted = true;
-				}
-
-				const speed = isCasting
-					? 0
-					: isWalking
-					? getCharacterSpeed(globalState.playerCharacter) / 2
-					: getCharacterSpeed(globalState.playerCharacter);
-
-				this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
-				this.mainCharacter.body.velocity.normalize().scale(speed);
+			if (!this.blockUserInteraction) {
+				const castAbilities = this.keyboardHelper.getCastedAbilities(globalState.gameTime);
+				this.abilityHelper.update(globalState.gameTime, castAbilities);
 			}
 		}
-		globalState.playerCharacter.x = Math.round(this.mainCharacter.x / SCALE);
-		globalState.playerCharacter.y = Math.round(this.mainCharacter.y / SCALE);
-
-		if (!this.blockUserInteraction) {
-			const castAbilities = this.keyboardHelper.getCastedAbilities(globalState.gameTime);
-			this.abilityHelper.update(globalState.gameTime, castAbilities);
-		}
-
 		const cooldowns = this.keyboardHelper.getAbilityCooldowns(globalState.gameTime);
 		this.playerCharacterAvatar.update(cooldowns);
 

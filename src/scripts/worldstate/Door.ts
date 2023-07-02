@@ -3,5 +3,7 @@ export default interface Door {
 	type: string;
 	x: number;
 	y: number;
+	width: number;
+	height: number;
 	open: boolean;
 }

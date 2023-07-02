@@ -20,6 +20,9 @@ import {
 } from '../../../typings/custom';
 import '../App.css';
 import { UserInformation } from '../../scripts/helpers/UserInformation';
+import { AppLayout } from '../components/AppLayout';
+import { DropdownMenu, DropdownMenuOption } from '../components/DropdownMenu';
+import { ToolsBar } from '../components/ToolsBar';
 
 export interface MapEditorScreenProps {
 	user: UserInformation;
@@ -84,50 +87,40 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 	}, [showGame]);
 
 	return (
-		<PageContainer>
-			<NavigationWrapper>
-				<StyledLink to="/mapEditor">Map Editor</StyledLink>
-				<StyledLink to="/npcEditor">NPC Editor</StyledLink>
-				<StyledLink to="/questEditor">Quest Editor</StyledLink>
-				<StyledLink to="/abilityEditor">Ability Editor</StyledLink>
-				<StyledLink to="/game">Game</StyledLink>
-			</NavigationWrapper>
+		<AppLayout>
+			<ToolsBar>
+				<DropdownMenu
+					text="File"
+					contentWidth={240}
+					options={[
+						<DropdownMenuOption id="createNewButton">Create New</DropdownMenuOption>,
+						<div>
+							<LoadRoomHeader>Load Room</LoadRoomHeader>
+							<div>
+								<Dropdown id="roomDropdown">
+									<option>Loading...</option>
+								</Dropdown>
+								<StyledButton id="loadRoomButton">Load</StyledButton>
+								<StyledButton id="loadFromAutosaveRoomButton">Load from Autosave</StyledButton>
+							</div>
+						</div>,
+						<DropdownMenuOption id="exportButton">Save</DropdownMenuOption>,
+						<DropdownMenuOption id="showDetailsButton">Show Details</DropdownMenuOption>,
+					]}
+				/>
+				<SelectionWrapper>
+					<SelectedLayerHeader>Selected Layer</SelectedLayerHeader>
+					<Dropdown id="activeLayerDropdown">
+						<option value="base">1 - Base Layer</option>
+						<option value="decoration">2 - Decoration Layer</option>
+						<option value="overlay">3 - Overlay Layer</option>
+						<option value="npcs">4 - NPC Placement</option>
+						<option value="items">5 - Item Placement</option>
+					</Dropdown>
+				</SelectionWrapper>
+			</ToolsBar>
 			<PageWrapper>
-				<MenueWrapper id="mapEditorMenu">
-					<div>
-						<ButtonWrapper>
-							<StyledButton id="createNewButton">Create New</StyledButton>
-						</ButtonWrapper>
-						<LoadRoomHeader>Load Room</LoadRoomHeader>
-						<Dropdown id="roomDropdown">
-							<option>Loading...</option>
-						</Dropdown>
-						<ButtonWrapper>
-							<StyledButton id="loadRoomButton">Load</StyledButton>
-						</ButtonWrapper>
-						<ButtonWrapper>
-							<StyledButton id="loadFromAutosaveRoomButton">Load from Autosave</StyledButton>
-						</ButtonWrapper>
-					</div>
-					<SelectionWrapper>
-						<ButtonWrapper>
-							<StyledButton id="showDetailsButton">Show Details</StyledButton>
-						</ButtonWrapper>
-					</SelectionWrapper>
-					<SelectionWrapper>
-						<div>Selected Layer</div>
-						<Dropdown id="activeLayerDropdown">
-							<option value="base">1 - Base Layer</option>
-							<option value="decoration">2 - Decoration Layer</option>
-							<option value="overlay">3 - Overlay Layer</option>
-							<option value="npcs">4 - NPC Placement</option>
-							<option value="items">5 - Item Placement</option>
-						</Dropdown>
-					</SelectionWrapper>
-					<ExportButtonWrapper>
-						<StyledButton id="exportButton">Save</StyledButton>
-					</ExportButtonWrapper>
-				</MenueWrapper>
+				<MenueWrapper id="mapEditorMenu"></MenueWrapper>
 				<GameWrapper ref={phaserRef}></GameWrapper>
 			</PageWrapper>
 			<NpcDetailsDialog id="npcDetailsDialog" isVisible={isNpcDialogVisible}>
@@ -264,7 +257,7 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 				</TwoColumnLayout>
 			</MapDetailsDialog>
 			<DownloadAnker id="downloadAnchorElem"></DownloadAnker>
-		</PageContainer>
+		</AppLayout>
 	);
 };
 
@@ -282,32 +275,6 @@ const PageContainer = styled.div`
 
 const LoadRoomHeader = styled.div`
 	margin-top: 16px;
-`;
-
-const StyledLink = styled(NavLink)`
-	& {
-		font-family: 'endlessDungeon';
-		font-size: 2rem;
-		padding: 6px 24px;
-		cursor: pointer;
-		text-decoration: none;
-		color: black;
-		background-color: #ffffff;
-		border-style: solid;
-		border-radius: 0.5rem;
-		margin: 0 24px;
-	}
-	&.active {
-		background-color: #a09f9f;
-	}
-`;
-
-const NavigationWrapper = styled.div`
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-content: center;
-	padding: 24px 0;
 `;
 
 const PageWrapper = styled.div`
@@ -352,9 +319,12 @@ const StyledRedButton = styled(StyledButton)`
 `;
 
 const SelectionWrapper = styled.div`
-	margin-top: 48px;
 	display: flex;
 	flex-direction: column;
+`;
+
+const SelectedLayerHeader = styled.div`
+	font-size: 1.2rem;
 `;
 
 const InputWrapper = styled.div`

@@ -9,5 +9,5 @@ const FormattedDropdown = styled.select`
 	width: 100%;
 	box-sizing: border-box;
 	font-family: 'endlessDungeon';
-	font-size: 1.5rem;
+	font-size: 1.3rem;
 `;

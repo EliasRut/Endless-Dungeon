@@ -434,6 +434,8 @@ export default class DungeonGenerator {
 					open: door.open,
 					type: door.type,
 					id: `${id}_${room.name}_${door.id}`,
+					width: 2,
+					height: 2,
 				});
 			});
 		});

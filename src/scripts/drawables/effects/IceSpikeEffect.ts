@@ -8,9 +8,10 @@ import { ProjectileData } from '../../abilities/abilityData';
 import TargetingEffect from './TargetingEffect';
 
 const VISIBILITY_DELAY = 50;
-const SPRITE_SCALE = 0.4;
-const BODY_RADIUS = 14;
-const BODY_Y_OFFSET = 6;
+const SPRITE_SCALE = 1;
+const BODY_RADIUS = 3;
+const BODY_X_OFFSET = 5;
+const BODY_Y_OFFSET = 5;
 const PARTICLE_START_X_OFFSET = -8;
 const PARTICLE_START_Y_OFFSET = -8;
 const EFFECT_DESTRUCTION_TIMEOUT_MS = 2000;
@@ -31,22 +32,20 @@ export default class IceSpikeEffect extends TargetingEffect {
 	) {
 		super(scene, x, y, 'ice', facing, projectileData);
 		this.setScale(SPRITE_SCALE * (projectileData.spriteScale || 1) * SCALE);
-		this.setRotation(getRotationInRadiansForFacing(facing));
 		scene.add.existing(this);
 		this.setDepth(1);
 		scene.physics.add.existing(this);
-		this.body.setCircle(BODY_RADIUS, 0, BODY_Y_OFFSET);
+		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 		this.body.setMass(1);
 
 		const facingVectors = getVelocitiesForFacing(facing);
-		this.setRotation(getRotationInRadiansForFacing(facing));
 
 		const snowParticles = scene.add.particles('snow');
 		snowParticles.setDepth(1);
 		this.snowEmitter = snowParticles.createEmitter({
 			alpha: { start: 1, end: 0.4 },
 			// scale: { start: 0.3, end: 0.05 },
-			scale: { start: 0.2 * (projectileData.effectScale || 1) * SCALE, end: 0.1 * SCALE },
+			scale: { start: 0.3 * (projectileData.effectScale || 1) * SCALE, end: 0.15 * SCALE },
 			// tint: 0x3366ff,//{ start: 0xff945e, end: 0x660000 }, //0x663300
 			speed: { min: 60 * SCALE, max: 100 * SCALE },
 			// accelerationY: -300,
@@ -64,7 +63,7 @@ export default class IceSpikeEffect extends TargetingEffect {
 		iceParticles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		this.spikeEmitter = iceParticles.createEmitter({
 			alpha: { start: 1, end: 0.4 },
-			scale: { start: 0.2 * (projectileData.effectScale || 1) * SCALE, end: 0 },
+			scale: { start: 0.3 * (projectileData.effectScale || 1) * SCALE, end: 0 },
 			speed: { min: 60 * SCALE, max: 100 * SCALE },
 			angle: { min: -180, max: 180 },
 			rotate: { min: -180, max: 180 },
@@ -90,8 +89,8 @@ export default class IceSpikeEffect extends TargetingEffect {
 		this.wasStuckToEnemy = true;
 		this.stuckEnemy = enemy.body as Phaser.Physics.Arcade.Body;
 		this.stuckEnemyOffset = {
-			x: this.stuckEnemy.position.x - this.body.x,
-			y: this.stuckEnemy.position.y - this.body.y,
+			x: this.stuckEnemy.position.x - this.body.x - this.body.velocity.x,
+			y: this.stuckEnemy.position.y - this.body.y - this.body.velocity.y,
 		};
 	}
 
@@ -130,7 +129,8 @@ export default class IceSpikeEffect extends TargetingEffect {
 
 		if (this.body.velocity.x || this.body.velocity.y) {
 			this.setRotation(
-				getRotationInRadiansForFacing(getFacing8Dir(this.body.velocity.x, this.body.velocity.y))
+				getRotationInRadiansForFacing(getFacing8Dir(this.body.velocity.x, this.body.velocity.y)) -
+					0.5 * Math.PI
 			);
 		}
 		if (time - this.castTime > VISIBILITY_DELAY && !this.isStarted) {
@@ -143,8 +143,8 @@ export default class IceSpikeEffect extends TargetingEffect {
 		if (this.wasStuckToEnemy) {
 			if (this.stuckEnemy) {
 				this.setPosition(
-					this.stuckEnemy.position.x - this.stuckEnemyOffset!.x * SCALE,
-					this.stuckEnemy.position.y - this.stuckEnemyOffset!.y * SCALE
+					this.stuckEnemy.position.x - this.stuckEnemyOffset!.x,
+					this.stuckEnemy.position.y - this.stuckEnemyOffset!.y
 				);
 			} else {
 				this.spikeEmitter.stop();

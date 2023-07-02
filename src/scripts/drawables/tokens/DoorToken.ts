@@ -55,6 +55,7 @@ export default class DoorToken extends Phaser.Physics.Arcade.Sprite {
 		this.play({ key: `${this.doorName}_open`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.on('animationcomplete', () => {
 			this.body.checkCollision.none = true as any;
+			(this.scene as MainScene).dynamicLightingHelper?.updateDoorState();
 		});
 	}
 
@@ -63,6 +64,7 @@ export default class DoorToken extends Phaser.Physics.Arcade.Sprite {
 		door.open = false;
 		this.play({ key: `${this.doorName}_c`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.body.checkCollision.none = false as any;
+		(this.scene as MainScene).dynamicLightingHelper?.updateDoorState();
 	}
 
 	update(scene: MainScene) {

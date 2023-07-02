@@ -1,6 +1,4 @@
-import { COLUMNS_PER_TILESET } from './constants';
-
-export const getTileIndex = (row: number, col: number) => row * COLUMNS_PER_TILESET + col;
+import { COLUMNS_PER_TILESET, getTileIndex } from './constants';
 
 // Ground tiles
 export const EMPTY = getTileIndex(0, 32);
