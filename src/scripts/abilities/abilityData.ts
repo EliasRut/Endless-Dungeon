@@ -24,6 +24,7 @@ import {
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
 import { ConditionalAbilityData, EnumDictionary } from '../../../typings/custom';
 import globalState from '../worldstate/index';
+import BloodDrainEffect from '../drawables/effects/BloodDrainEffect';
 
 export type SpreadData = [number, number, ((factor: number) => number)?];
 
@@ -60,6 +61,7 @@ export interface ProjectileData {
 	sfxVolume?: number;
 	delay?: number;
 	targeting?: boolean;
+	inverseAllowedTargets?: boolean;
 	knockback?: number;
 	timeToLive?: number;
 	destroyOnEnemyContact: boolean;
@@ -76,6 +78,7 @@ export interface ProjectileData {
 }
 
 export interface AbilityData {
+	castEffect?: typeof AbilityEffect;
 	stopDashBeforeEnemyCollision?: boolean;
 	projectiles?: number;
 	projectileData?: ProjectileData;
@@ -85,7 +88,8 @@ export interface AbilityData {
 	abilityName: string;
 	flavorText: string;
 	icon?: [string, number];
-	damageMultiplier: number;
+	damageMultiplier?: number;
+	healingMultiplier?: number;
 	stun?: number;
 	necroticStacks?: number;
 	iceStacks?: number;
@@ -125,6 +129,8 @@ export const enum AbilityType {
 	EXPLODING_CORPSE = 'explodingCorpse',
 	BAT = 'bat',
 	CONDEMN = 'Condemn',
+	BLOOD_DRIN = 'BloodDrain',
+	BLOOD_DRAIN_PROJECTILE = 'BloodDrainProjectile',
 	FIRE_SUMMON_CIRCELING = 'fireSummonCirceling',
 	FIRE_SUMMON_ELEMENTAL = 'fireSummonElemental',
 	ICE_SUMMON_CIRCELING = 'iceSummonCirceling',
@@ -745,6 +751,56 @@ export const Abilities: AbilityDataMap = {
 		abilityName: 'Condemn',
 		flavorText: `An angry shout against your enemy.`,
 		icon: ['icon-abilities', 1],
+	},
+	[AbilityType.BLOOD_DRIN]: {
+		sound: 'sound-icespike',
+		castEffect: BloodDrainEffect,
+		sfxVolume: 0.3,
+		cooldownMs: 800,
+		damageMultiplier: 0.5,
+		stun: 4000,
+		abilityName: 'Blood Drain',
+		flavorText: `Suck out an enemies blood.`,
+		icon: ['icon-abilities', 1],
+	},
+	[AbilityType.BLOOD_DRAIN_PROJECTILE]: {
+		projectiles: 1,
+		projectileData: {
+			velocity: 500,
+			xOffset: 0,
+			yOffset: 0,
+			projectileImage: 'empty-tile',
+			particleData: {
+				particleImage: 'fire',
+				alpha: { start: 0.4, end: 0 },
+				scale: { start: 1, end: 0.2 },
+				speed: 20,
+				rotate: { min: -180, max: 180 },
+				lifespan: { min: 200, max: 400 },
+			},
+			effect: TrailingParticleProjectileEffect,
+			collisionSound: 'sound-fireball-explosion',
+			sfxVolume: 0.2,
+			destroyOnEnemyContact: true,
+			destroyOnWallContact: false,
+			explodeOnDestruction: false,
+			passThroughEnemies: true,
+			targeting: true,
+			inverseAllowedTargets: true,
+			seekingSpeed: 300,
+			lightingStrength: 8,
+			lightingRadius: 6,
+		},
+		sound: 'sound-fireball',
+		sfxVolume: 0.1,
+		cooldownMs: 500,
+		healingMultiplier: 1,
+		abilityName: 'Fireball',
+		flavorText: `A big ol' fireball. A classic in every Mage's arsenal, it is typically used to incinerate your enemies. More advanced mages can control it enough to boil water, or cook food!`,
+		icon: ['icon-abilities', 0],
+		castingTime: 250,
+		useExactTargetVector: true,
+		increaseComboCast: false,
 	},
 	[AbilityType.FIRE_SUMMON_CIRCELING]: {
 		projectiles: 1,

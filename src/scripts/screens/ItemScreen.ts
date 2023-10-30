@@ -196,7 +196,8 @@ export default class ItemScreen extends OverlayScreen {
 		const itemLevel = getEquipmentDataForSlot(slotKey)?.level ?? 0;
 		const relevantAbility = getRelevantAbilityVersion(ability, itemLevel, 1);
 
-		const damageValue = relevantAbility.damageMultiplier * globalState.playerCharacter.damage;
+		const damageValue =
+			(relevantAbility.damageMultiplier || 0) * globalState.playerCharacter.damage;
 		this.lableEnchantmentValue.setText(`${damageValue.toFixed(2)}`);
 		this.lableLevel.setText(`Level 1`);
 		// this.lableMovSpeedValue.setText(`${0}`);

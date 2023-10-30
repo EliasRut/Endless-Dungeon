@@ -39,6 +39,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	tokenName: string;
 	healthbar: Phaser.GameObjects.Image;
 	charmedTime: number;
+	healedTime: number;
 
 	isSpawning: boolean = false;
 
@@ -90,6 +91,13 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 				});
 			}
 		}
+	}
+	public receiveHealing() {
+		if (this.isSpawning) {
+			return;
+		}
+		this.tint = 0x00ff00;
+		this.healedTime = globalState.gameTime;
 	}
 	public receiveStun(duration: number) {
 		if (this.isSpawning) {
@@ -150,6 +158,21 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		}
 	}
 
+	public healDamage(healing: number) {
+		this.scene.addFadingLabel(
+			`${Math.round(healing)}`,
+			FadingLabelSize.NORMAL,
+			'#00FF00',
+			this.x,
+			this.y - this.body.height,
+			1000
+		);
+		this.stateObject.health += healing;
+		if (this.showHealthbar()) {
+			this.updateHealthbar();
+		}
+	}
+
 	destroy(fromScene?: boolean) {
 		if (this.showHealthbar()) {
 			this.healthbar.destroy(fromScene);
@@ -204,6 +227,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 				if (hasHealthbar) {
 					this.healthbar.tint = 0xffcccc;
 				}
+			} else if (this.healedTime + 300 >= time) {
+				this.tint = 0x00ff00;
 			} else if (this.necroticEffectStacks > 0) {
 				// Color the token green and deal damage over time
 				this.tint = DOT_TINT[this.necroticEffectStacks - 1];

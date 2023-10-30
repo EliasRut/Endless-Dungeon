@@ -221,7 +221,7 @@ export const RingData: Record<Ring, AbilityLinkedItem> = {
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.BLOOD]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.BLOOD_DRIN,
 		name: 'Ring of Blood',
 		description: 'A ring giving you power associated with the color of magic: Blood',
 		iconFrame: 56,

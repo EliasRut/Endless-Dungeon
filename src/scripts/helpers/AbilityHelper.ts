@@ -102,10 +102,13 @@ export default class AbilityHelper {
 				projectileData
 			);
 			if (projectileData?.targeting) {
-				(effect as TargetingEffect).allowedTargets =
-					caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
-						? PossibleTargets.ENEMIES
-						: PossibleTargets.PLAYER;
+				(effect as TargetingEffect).allowedTargets = projectileData.inverseAllowedTargets
+					? caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
+						? PossibleTargets.PLAYER
+						: PossibleTargets.ENEMIES
+					: caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
+					? PossibleTargets.ENEMIES
+					: PossibleTargets.PLAYER;
 			}
 			effect.setVelocity(xMultiplier * SCALE, yMultiplier * SCALE);
 			effect.setMaxVelocity(projectileData!.velocity * SCALE);
@@ -149,10 +152,20 @@ export default class AbilityHelper {
 				}
 			});
 
-			const targetTokens =
-				caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
-					? Object.values(this.scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES)
-					: [this.scene.mainCharacter, ...(this.scene.follower ? [this.scene.follower] : [])];
+			const enemyNpcs = Object.values(this.scene.npcMap).filter(
+				(npc) => npc.faction === Faction.ENEMIES
+			);
+			const friendlyNpcs = [
+				this.scene.mainCharacter,
+				...(this.scene.follower ? [this.scene.follower] : []),
+			];
+			const targetTokens = projectileData?.inverseAllowedTargets
+				? caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
+					? friendlyNpcs
+					: enemyNpcs
+				: caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
+				? enemyNpcs
+				: friendlyNpcs;
 			const collidingCallback = (collidingEffect: AbilityEffect, enemy: CharacterToken) => {
 				if (collidingEffect.hitEnemyTokens.includes(enemy)) {
 					return;
@@ -162,19 +175,26 @@ export default class AbilityHelper {
 					collidingEffect.destroy();
 				}
 				effect.hitEnemyTokens.push(enemy);
-				const damage = caster.damage * usedAbilityData.damageMultiplier * abilityLevel;
 				const prevHealth = enemy.stateObject.health;
-				enemy.takeDamage(damage);
-				if (usedAbilityData.castOnEnemyHit) {
-					const enemyStateObject = { ...enemy.stateObject };
-					this.triggerAbility(
-						caster,
-						enemyStateObject,
-						usedAbilityData.castOnEnemyHit!,
-						caster.level,
-						globalTime,
-						1
-					);
+
+				if (usedAbilityData.damageMultiplier) {
+					const damage = caster.damage * usedAbilityData.damageMultiplier * abilityLevel;
+					enemy.takeDamage(damage);
+					if (usedAbilityData.castOnEnemyHit) {
+						const enemyStateObject = { ...enemy.stateObject };
+						this.triggerAbility(
+							caster,
+							enemyStateObject,
+							usedAbilityData.castOnEnemyHit!,
+							caster.level,
+							globalTime,
+							1
+						);
+					}
+				}
+				if (usedAbilityData.healingMultiplier) {
+					const healing = caster.damage * usedAbilityData.healingMultiplier * abilityLevel;
+					enemy.healDamage(healing);
 				}
 				if (prevHealth > 0 && enemy.stateObject.health <= 0) {
 					// Enemy died from this attack
@@ -194,7 +214,12 @@ export default class AbilityHelper {
 					enemy.receiveStun(usedAbilityData.stun!);
 				}
 
-				enemy.receiveHit();
+				if (usedAbilityData.damageMultiplier) {
+					enemy.receiveHit();
+				}
+				if (usedAbilityData.healingMultiplier) {
+					enemy.receiveHealing();
+				}
 				if (usedAbilityData.necroticStacks) {
 					enemy.lastNecroticEffectTimestamp = globalTime;
 					enemy.necroticEffectStacks += usedAbilityData.necroticStacks!;
@@ -290,6 +315,22 @@ export default class AbilityHelper {
 		}
 		if (usedAbilityData.reverseDash) {
 			globalState.playerCharacter.reverseDashDirectionTime = globalTime;
+		}
+		if (usedAbilityData.castEffect) {
+			const effect = new usedAbilityData.castEffect(
+				this.scene,
+				pointOfOrigin.x,
+				pointOfOrigin.y,
+				usedAbilityData.spriteName || '',
+				pointOfOrigin.currentFacing,
+				projectileData,
+				{
+					damage: caster.damage * (usedAbilityData.damageMultiplier || 0) * abilityLevel,
+					caster,
+					abilityLevel,
+				}
+			);
+			this.abilityEffects.push(effect);
 		}
 
 		// We just want to play the ability sound once, not once for each projectile

@@ -28,7 +28,8 @@ export default class AbilityEffect extends Phaser.Physics.Arcade.Sprite {
 		y: number,
 		spriteName: string,
 		facing: Facings,
-		projectileData?: ProjectileData
+		projectileData?: ProjectileData,
+		effectData?: any
 	) {
 		super(scene, x * SCALE, y * SCALE, spriteName);
 		this.castTime = globalState.gameTime;

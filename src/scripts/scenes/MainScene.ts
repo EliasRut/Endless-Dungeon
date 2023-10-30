@@ -822,6 +822,7 @@ export default class MainScene extends Phaser.Scene {
 		}
 
 		// Updated npcs
+		this.mainCharacter.update(globalState.gameTime, delta);
 		Object.values(this.npcMap).forEach((curNpc) => {
 			curNpc.update(globalState.gameTime, delta);
 		});
