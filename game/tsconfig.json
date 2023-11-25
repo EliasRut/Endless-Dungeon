@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"jsx": "react",
+		"target": "es5",
+		"module": "commonjs",
+		"strict": true,
+		"noImplicitAny": true,
+		"esModuleInterop": true,
+		"allowUnreachableCode": false,
+		"sourceMap": true,
+		"strictPropertyInitialization": false,
+		"lib": ["dom", "es5", "esnext"],
+		"resolveJsonModule": true,
+		"allowSyntheticDefaultImports": true,
+		"paths": {
+			"shared/*": ["../shared/*"]
+		}
+	},
+	"exclude": ["**/__tests__"],
+	"include": ["src", "../shared/"]
+}

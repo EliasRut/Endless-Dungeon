@@ -1,0 +1,10 @@
+[11/25/2023, 5:32:29 PM] @colyseus/loadtest
+endpoint: ws://localhost:2567
+roomName: dungeon
+numClients: 4
+logLevel: all
+output: /home/elias/Code/Endless-Dungeon/server/loadtest.log
+[11/25/2023, 5:36:24 PM] Finished. Summary:
+    Successful connections: 0
+    Failed connections: 0
+    Total errors: 0
