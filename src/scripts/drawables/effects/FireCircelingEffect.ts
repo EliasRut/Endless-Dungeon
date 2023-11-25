@@ -21,7 +21,7 @@ export default class FireCircelingEffect extends CircelingEffect {
 			SUMMONING_TYPE.FIRE_ELEMENTAL,
 			AbilityType.FIRE_SUMMON_CIRCELING,
 			AbilityType.FIRE_SUMMON_ELEMENTAL,
-			AbilityType.FIREBALL
+			AbilityType.FIRE_BOLT
 		);
 	}
 }

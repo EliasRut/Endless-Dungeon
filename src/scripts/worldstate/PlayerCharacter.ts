@@ -37,7 +37,7 @@ export default class PlayerCharacter extends Character {
 	}
 
 	public abilityKeyMapping = {
-		[AbilityKey.ONE]: AbilityType.FIREBALL,
+		[AbilityKey.ONE]: AbilityType.FIRE_BOLT,
 		[AbilityKey.TWO]: AbilityType.NOTHING,
 		[AbilityKey.THREE]: AbilityType.NOTHING,
 		[AbilityKey.FOUR]: AbilityType.NOTHING,

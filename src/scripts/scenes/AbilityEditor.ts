@@ -202,7 +202,7 @@ export default class AbilityEditor extends Phaser.Scene {
 
 	update(globalTime: number, delta: number) {
 		// const projectileData = Abilities[AbilityType.FIREBALL].projectileData;
-		const projectileData = Abilities[AbilityType.FIREBALL].projectileData;
+		const projectileData = Abilities[AbilityType.FIRE_BOLT].projectileData;
 
 		const data = this.reactBridge?.getData() || DefaultAbilityData;
 
@@ -221,12 +221,12 @@ export default class AbilityEditor extends Phaser.Scene {
 					y: this.startY,
 					currentFacing: Facings.EAST,
 				},
-				AbilityType.FIREBALL,
+				AbilityType.FIRE_BOLT,
 				1,
 				globalTime,
 				1,
 				{
-					...Abilities[AbilityType.FIREBALL],
+					...Abilities[AbilityType.FIRE_BOLT],
 					projectiles: data.projectiles,
 					projectileData: {
 						...projectileData!,

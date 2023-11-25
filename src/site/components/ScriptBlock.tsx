@@ -135,7 +135,7 @@ export const ScriptBlock: (props: ScriptBlockProps) => JSX.Element = ({
 							movementSpeed: 0,
 							abilityCastTime: [-Infinity, -Infinity, -Infinity, -Infinity],
 							level: 0,
-							ability: AbilityType.FIREBALL,
+							ability: AbilityType.FIRE_BOLT,
 							...scriptBlock.follower,
 						},
 						type: 'setFollowerData',

@@ -332,9 +332,8 @@ export default class AbilityHelper {
 			);
 			this.abilityEffects.push(effect);
 		}
-
-		// We just want to play the ability sound once, not once for each projectile
 		if (usedAbilityData.sound) {
+			// We just want to play the ability sound once, not once for each projectile
 			this.scene.sound.play(usedAbilityData.sound!, { volume: usedAbilityData.sfxVolume! });
 		}
 	}

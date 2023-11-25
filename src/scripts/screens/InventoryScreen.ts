@@ -379,9 +379,9 @@ export default class InventoryScreen extends OverlayScreen {
 				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 				if (this.abilityTextMap[slotKey]) this.abilityTextMap[slotKey].destroy();
 				if (slotKey === EquipmentSlot.SOURCE) {
-					updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
+					updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIRE_BOLT);
 					const newAbilityIcon = this.createAbilityIcon();
-					this.handleIconOptions(newAbilityIcon, AbilityType.FIREBALL, slotKey);
+					this.handleIconOptions(newAbilityIcon, AbilityType.FIRE_BOLT, slotKey);
 					this.abilityIconMap[EquipmentSlot.SOURCE] = newAbilityIcon;
 					const newAbilityText = this.createAbilityText();
 					this.abilityTextMap[slotKey] = newAbilityText;
@@ -400,7 +400,7 @@ export default class InventoryScreen extends OverlayScreen {
 				const sourceType = globalState.inventory.equippedSource;
 				const catalystType = globalState.inventory.equippedCatalyst;
 
-				const sourceAbility = sourceType ? SourceData[sourceType].ability : AbilityType.FIREBALL;
+				const sourceAbility = sourceType ? SourceData[sourceType].ability : AbilityType.FIRE_BOLT;
 				const catalystData = catalystType ? CatalystData[catalystType] : undefined;
 				ability = catalystData ? getCatalystAbility(sourceAbility, catalystData) : undefined;
 			} else {
@@ -433,7 +433,7 @@ export default class InventoryScreen extends OverlayScreen {
 
 	createAbilityIcon(
 		slotKey: EquipmentSlot = EquipmentSlot.SOURCE,
-		ability: AbilityType = AbilityType.FIREBALL
+		ability: AbilityType = AbilityType.FIRE_BOLT
 	) {
 		const [iconX, iconY] = ITEM_ABILITY_COORDINATES[slotKey];
 		const abilityIcon = new Phaser.GameObjects.Image(
@@ -457,7 +457,7 @@ export default class InventoryScreen extends OverlayScreen {
 
 	createAbilityText(
 		slotKey: EquipmentSlot = EquipmentSlot.SOURCE,
-		ability: AbilityType = AbilityType.FIREBALL
+		ability: AbilityType = AbilityType.FIRE_BOLT
 	) {
 		const [iconX, iconY] = ITEM_ABILITY_COORDINATES[slotKey];
 		const itemLevel = getEquipmentDataForSlot(slotKey)?.level ?? 0;

@@ -25,14 +25,14 @@ export type SourceKey = 'source-fire' | 'source-ice' | 'source-necrotic' | 'sour
 
 export const SourceData: Record<Source, AbilityLinkedItem> = {
 	[Source.FIRE]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.FIRE_BOLT,
 		name: 'Fire Source',
 		description:
 			'Channel the power of flame to deal high amounts of instant damage to your enemies.',
 		iconFrame: 24,
 	} as AbilityLinkedItem,
 	[Source.ICE]: {
-		ability: AbilityType.ICESPIKE,
+		ability: AbilityType.ICE_BOLT,
 		name: 'Ice Source',
 		description: 'Freeze your foes solid with the power of ice. Very cool!',
 		iconFrame: 26,
@@ -97,10 +97,10 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			case AbilityType.NECROTIC_BOLT: {
 				return AbilityType.NECROTIC_CONE;
 			}
-			case AbilityType.ICESPIKE: {
+			case AbilityType.ICE_BOLT: {
 				return AbilityType.ICE_CONE;
 			}
-			case AbilityType.FIREBALL:
+			case AbilityType.FIRE_BOLT:
 			default: {
 				return AbilityType.FIRE_CONE;
 			}
@@ -114,10 +114,10 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			case AbilityType.NECROTIC_BOLT: {
 				return AbilityType.NECROTIC_NOVA;
 			}
-			case AbilityType.ICESPIKE: {
+			case AbilityType.ICE_BOLT: {
 				return AbilityType.ICE_NOVA;
 			}
-			case AbilityType.FIREBALL:
+			case AbilityType.FIRE_BOLT:
 			default: {
 				return AbilityType.FIRE_NOVA;
 			}
@@ -131,17 +131,17 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			case AbilityType.NECROTIC_BOLT: {
 				return AbilityType.NECROTIC_SUMMON_CIRCELING;
 			}
-			case AbilityType.ICESPIKE: {
+			case AbilityType.ICE_BOLT: {
 				return AbilityType.ICE_SUMMON_CIRCELING;
 			}
-			case AbilityType.FIREBALL:
+			case AbilityType.FIRE_BOLT:
 			default: {
 				return AbilityType.FIRE_SUMMON_CIRCELING;
 			}
 		}
 	}
 	switch (baseAbility) {
-		case AbilityType.ICESPIKE: {
+		case AbilityType.ICE_BOLT: {
 			return AbilityType.HAIL_OF_ICE;
 		}
 		case AbilityType.ARCANE_BOLT: {
@@ -150,7 +150,7 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 		case AbilityType.NECROTIC_BOLT: {
 			return AbilityType.HAIL_OF_DEATH;
 		}
-		case AbilityType.FIREBALL:
+		case AbilityType.FIRE_BOLT:
 		default: {
 			return AbilityType.HAIL_OF_FLAMES;
 		}
@@ -179,7 +179,7 @@ export type RingKey =
 
 export const RingData: Record<Ring, AbilityLinkedItem> = {
 	[Ring.WILD]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.FIRE_BOLT,
 		name: 'Ring of Wild',
 		description: 'A ring giving you power associated with the color of magic: Wild',
 		iconFrame: 56,
@@ -191,7 +191,7 @@ export const RingData: Record<Ring, AbilityLinkedItem> = {
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.METAL]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.FIRE_BOLT,
 		name: 'Ring of Metal',
 		description: 'A ring giving you power associated with the color of magic: Metal',
 		iconFrame: 56,
@@ -203,25 +203,25 @@ export const RingData: Record<Ring, AbilityLinkedItem> = {
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.FLUX]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.FIRE_BOLT,
 		name: 'Ring of Flux',
 		description: 'A ring giving you power associated with the color of magic: Flux',
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.DEATH]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.FIRE_BOLT,
 		name: 'Ring of Death',
 		description: 'A ring giving you power associated with the color of magic: Death',
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.CHANGE]: {
-		ability: AbilityType.FIREBALL,
+		ability: AbilityType.FIRE_BOLT,
 		name: 'Ring of Change',
 		description: 'A ring giving you power associated with the color of magic: Change',
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.BLOOD]: {
-		ability: AbilityType.BLOOD_DRIN,
+		ability: AbilityType.BLOOD_DRAIN,
 		name: 'Ring of Blood',
 		description: 'A ring giving you power associated with the color of magic: Blood',
 		iconFrame: 56,
