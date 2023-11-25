@@ -15,6 +15,7 @@ export default config({
      */
     gameServer.define("world", WorldRoom);
     gameServer.define("dungeon", DungeonRoom);
+    gameServer.define("dungeon", DungeonRoom, { level: "town" });
   },
 
   initializeExpress: (app) => {

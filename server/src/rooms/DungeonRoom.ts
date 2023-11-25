@@ -27,22 +27,20 @@ export class DungeonRoom extends Room<DungeonState> {
       })
     );
 
-    this.onMessage<UpdateCharacterPosition[]>(
-      "registerEntities",
-      (_client, entities) =>
-        entities.forEach((entity) => {
-          if (this.state.entities.get(entity[0])) {
-            return;
-          }
-          const character = new CharacterState();
-          character.x = entity[1];
-          character.y = entity[2];
-          character.velocityX = entity[3];
-          character.velocityY = entity[4];
-          character.facing = entity[5];
-          character.health = entity[6];
-          this.state.entities.set(entity[0], character);
-        })
+    this.onMessage<RegisterEntity[]>("registerEntities", (_client, entities) =>
+      entities.forEach((entity) => {
+        if (this.state.entities.get(entity[0])) {
+          return;
+        }
+        const character = new CharacterState();
+        character.x = entity[1];
+        character.y = entity[2];
+        character.velocityX = entity[3];
+        character.velocityY = entity[4];
+        character.facing = entity[5];
+        character.health = entity[6];
+        this.state.entities.set(entity[0], character);
+      })
     );
   }
 

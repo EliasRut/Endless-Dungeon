@@ -30,9 +30,9 @@ export default class PlayerCharacter extends Character {
 
 	public activeSummons: { id: string; summoningType: string }[] = [];
 
-	constructor() {
+	constructor(id: string) {
 		// tslint:disable-next-line: no-magic-numbers
-		super('player', 'player', DEFAULT_HEALTH, DEFAULT_DAMAGE, DEFAULT_MOVEMENTSPEED);
+		super(id, 'player', DEFAULT_HEALTH, DEFAULT_DAMAGE, DEFAULT_MOVEMENTSPEED);
 		this.faction = Faction.PLAYER;
 	}
 

@@ -42,6 +42,8 @@ export class WorldState {
 	public itemList: Item[];
 	public abilityData: ConditionalAbilityDataMap = {} as ConditionalAbilityDataMap;
 
+	public playerId: string = '';
+
 	public static readonly CONTENTPACKAGE: string = 'contentPackages';
 	public static readonly PLAYERCHARACTER: string = 'playerCharacter';
 	public static readonly GAMETIME: string = 'gameTime';
@@ -60,13 +62,20 @@ export class WorldState {
 	public static readonly ROOMASSIGNMENT: string = 'roomAssignment';
 	public static readonly INVENTORY: string = 'inventory';
 	public static readonly SAVEGAMENAME: string = 'saveGameName';
+	public static readonly PLAYERID: string = 'playerId';
 
 	constructor() {
-		this.playerCharacter = new PlayerCharacter();
 		this.dungeon = new Dungeon();
 		this.inventory = { ...EmptyInventory };
 		this.itemList = [];
 		this.gameTime = 0;
+
+		// Randomize the player id.
+		this.playerId = 'player';
+		for (let i = 0; i < 10; i++) {
+			this.playerId += `${Math.floor(Math.random() * 10)}`;
+		}
+		this.playerCharacter = new PlayerCharacter(this.playerId);
 	}
 
 	storeState() {
@@ -87,6 +96,7 @@ export class WorldState {
 		localStorage.setItem(WorldState.CURRENTLEVEL, JSON.stringify(this.currentLevel));
 		localStorage.setItem(WorldState.ROOMASSIGNMENT, JSON.stringify(this.roomAssignment));
 		localStorage.setItem(WorldState.INVENTORY, JSON.stringify(this.inventory));
+		localStorage.setItem(WorldState.PLAYERID, this.playerId);
 		localStorage.setItem(WorldState.SAVEGAMENAME, '"test-save"');
 	}
 
@@ -120,6 +130,7 @@ export class WorldState {
 		this.currentLevel = JSON.parse(localStorage.getItem(WorldState.CURRENTLEVEL) || '{}');
 		this.roomAssignment = JSON.parse(localStorage.getItem(WorldState.ROOMASSIGNMENT) || '{}');
 		this.inventory = JSON.parse(localStorage.getItem(WorldState.INVENTORY) || '{}');
+		this.playerId = localStorage.getItem(WorldState.PLAYERID) || '';
 		// Reset cast times.
 		this.playerCharacter.abilityCastTime = [
 			-Infinity,

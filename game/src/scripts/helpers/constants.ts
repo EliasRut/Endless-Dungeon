@@ -477,3 +477,9 @@ export const replacementTiles: EnumDictionary<
 // 		[0.73, getTileIndex(3, 34)],
 // 	],
 // },
+
+let isMultiplayer = true;
+export const setIsMultiplayer = (value: boolean) => {
+	isMultiplayer = value;
+};
+export const getIsMultiplayer = () => isMultiplayer;

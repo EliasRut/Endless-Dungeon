@@ -33,6 +33,7 @@ import {
 	UiDepths,
 	UI_SCALE,
 	Facings,
+	getIsMultiplayer,
 } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
@@ -88,7 +89,7 @@ const MINIMUM_CASTING_TIME_MS = 80;
 
 const TILE_ANIMATION_STEP_TIME = (1000 / NORMAL_ANIMATION_FRAME_RATE) * 8;
 
-const MS_BETWEEN_PLAYER_POSITION_UPDATES = 100;
+const MS_BETWEEN_PLAYER_POSITION_UPDATES = 40;
 
 let LAST_ANIMATION_AVERAGES: number[] = [];
 
@@ -165,7 +166,7 @@ export default class MainScene extends Phaser.Scene {
 
 	lightingSources: LightingSource[] = [];
 
-	room?: Room;
+	serverRoom?: Room;
 
 	constructor() {
 		super({ key: 'MainScene' });
@@ -184,27 +185,33 @@ export default class MainScene extends Phaser.Scene {
 		};
 
 		const client = new Client(endpoint);
-		this.room = await client.joinOrCreate(options.roomName, {
-			// your join options here...
+		this.serverRoom = await client.joinOrCreate(options.roomName, {
+			level: globalState.currentLevel,
 		});
 
 		console.log('joined room "dungeon" successfully!');
 
-		this.room.onMessage('message-type', (payload) => {
+		this.serverRoom.onMessage('message-type', (payload) => {
 			// logic
 		});
 
-		this.room.onStateChange((state) => {
+		this.serverRoom.onStateChange((state) => {
 			state.entities.forEach((entity: any, entityId: string) => {
 				if (this.npcMap[entityId]) {
 					console.log(`Moving ${entityId} to ${entity.x}, ${entity.y}`);
-					this.npcMap[entityId].x = entity.x;
-					this.npcMap[entityId].y = entity.y;
+					const npc = this.npcMap[entityId];
+
+					npc.x = entity.x;
+					npc.y = entity.y;
+					npc.setVelocity(entity.velocityX, entity.velocityY);
+				} else if (entityId !== globalState.playerId && entityId.startsWith('player')) {
+					console.log(`Spawning player ${entityId} at ${entity.x}, ${entity.y}`);
+					this.addNpc(entityId, 'player', entity.x, entity.y, 1, 0, 0);
 				}
 			});
 		});
 
-		this.room.onLeave((code) => {
+		this.serverRoom.onLeave((code) => {
 			console.log('left');
 		});
 
@@ -255,35 +262,38 @@ export default class MainScene extends Phaser.Scene {
 		this.mainCharacter = new PlayerCharacterToken(
 			this,
 			globalState.playerCharacter.x || startX,
-			globalState.playerCharacter.y || startY
+			globalState.playerCharacter.y || startY,
+			globalState.playerId
 		);
 
-		if (this.room) {
-			const entitiesToRegister: any[][] = [];
-			// Process npcs
-			Object.keys(this.npcMap).forEach((key) => {
-				const npc = this.npcMap[key];
+		if (getIsMultiplayer()) {
+			this.connectToServer().then(() => {
+				const entitiesToRegister: any[][] = [];
+				// Process npcs
+				Object.keys(this.npcMap).forEach((key) => {
+					const npc = this.npcMap[key];
+					entitiesToRegister.push([
+						npc.id,
+						npc.x,
+						npc.y,
+						npc.body.velocity.x,
+						npc.body.velocity.y,
+						npc.stateObject.currentFacing,
+						npc.stateObject.health,
+					]);
+				});
+				// Process player
 				entitiesToRegister.push([
-					npc.id,
-					npc.x,
-					npc.y,
-					npc.body.velocity.x,
-					npc.body.velocity.y,
-					npc.stateObject.currentFacing,
-					npc.stateObject.health,
+					this.mainCharacter.id,
+					this.mainCharacter.x,
+					this.mainCharacter.y,
+					this.mainCharacter.body.velocity.x,
+					this.mainCharacter.body.velocity.y,
+					this.mainCharacter.stateObject.currentFacing,
+					this.mainCharacter.stateObject.health,
 				]);
+				this.serverRoom!.send('registerEntities', entitiesToRegister);
 			});
-			// Process player
-			entitiesToRegister.push([
-				this.mainCharacter.id,
-				this.mainCharacter.x,
-				this.mainCharacter.y,
-				this.mainCharacter.body.velocity.x,
-				this.mainCharacter.body.velocity.y,
-				this.mainCharacter.stateObject.currentFacing,
-				this.mainCharacter.stateObject.health,
-			]);
-			this.room.send('registerEntities', entitiesToRegister);
 		}
 
 		this.mainCharacter.setScale(SCALE);
@@ -1025,9 +1035,12 @@ export default class MainScene extends Phaser.Scene {
 			this.scriptHelper.resumePausedScripts();
 		}
 
-		if (this.room && now - this.lastPlayerPositionUpdate > MS_BETWEEN_PLAYER_POSITION_UPDATES) {
+		if (
+			this.serverRoom &&
+			now - this.lastPlayerPositionUpdate > MS_BETWEEN_PLAYER_POSITION_UPDATES
+		) {
 			this.lastPlayerPositionUpdate = now;
-			this.room.send('move', [
+			this.serverRoom.send('move', [
 				[
 					this.mainCharacter.id,
 					Math.round(this.mainCharacter.x),
