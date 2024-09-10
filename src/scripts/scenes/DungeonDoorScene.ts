@@ -8,11 +8,11 @@ import { SingleScriptState } from '../worldstate/ScriptState';
 import { loadContentBlocksFromDatabase } from '../helpers/ContentDataLibrary';
 
 export default class DungeonDoorScene extends Phaser.Scene {
-	dungeonDoor: DungeonDoor;
-	keyboardHelper: KeyboardHelper;
+	dungeonDoor?: DungeonDoor;
+	keyboardHelper?: KeyboardHelper;
 	keyLastPressed: number = 0;
 	keyCD: number = 350;
-	contentDataLibraryUpdatePromise: Promise<any>;
+	contentDataLibraryUpdatePromise?: Promise<any>;
 
 	constructor() {
 		super({ key: 'DungeonDoorScene' });
@@ -69,11 +69,11 @@ export default class DungeonDoorScene extends Phaser.Scene {
 		this.scene.start('RoomPreloaderScene');
 	}
 	update(globalTime: number, _delta: number) {
-		this.keyboardHelper.updateGamepad();
-		if (this.keyboardHelper.isEnterPressed()) {
+		this.keyboardHelper?.updateGamepad();
+		if (this.keyboardHelper?.isEnterPressed()) {
 			if (globalTime - this.keyLastPressed > this.keyCD) this.keyLastPressed = globalTime;
 			else return;
-			this.dungeonDoor.openDoor();
+			this.dungeonDoor?.openDoor();
 		}
 	}
 }

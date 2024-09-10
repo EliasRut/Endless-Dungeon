@@ -14,10 +14,11 @@ import {
 import globalState from '../worldstate';
 import DungeonGenerator from '../helpers/generateDungeon';
 import { BLOCK_SIZE } from '../helpers/generateRoom';
-import firebase from 'firebase';
 import { Quest } from '../../../typings/custom';
 import { fillLoadedQuestFromDb, fillQuestScriptsFromDb, QuestScripts } from '../helpers/quests';
-import { loadContentBlocksFromDatabase } from '../helpers/ContentDataLibrary';
+import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import { app } from '../../shared/initializeApp';
+import { getBaseUrl } from '../helpers/getBaseUrl';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -46,21 +47,22 @@ export default class PreloadScene extends Phaser.Scene {
 	}
 
 	preload() {
+		const baseUrl = getBaseUrl();
 		// Empty tile
-		this.load.image('empty-tile', 'assets/img/empty_16x16_tile.png');
-		this.load.image('empty-tile-large-portrait', 'assets/img/empty_32x48_tile.png');
-		this.load.image('search-icon', 'assets/img/search-icon.png');
+		this.load.image('empty-tile', `${baseUrl}/assets/img/empty_16x16_tile.png`);
+		this.load.image('empty-tile-large-portrait', `${baseUrl}/assets/img/empty_32x48_tile.png`);
+		this.load.image('search-icon', `${baseUrl}/assets/img/search-icon.png`);
 
 		// Prepare aseprite data for player, npcs, enemies
 		Object.entries(npcToAespriteMap).forEach(([npcKey, { png, json }]) => {
-			this.load.aseprite(npcKey, png, json);
+			this.load.aseprite(npcKey, `${baseUrl}/${png}`, `${baseUrl}/${json}`);
 		});
 
 		// death
 		this.load.aseprite(
 			'death_anim_small',
-			'assets/sprites/enemy_explosion_small.png',
-			'assets/sprites/enemy_explosion_small.json'
+			`${baseUrl}/assets/sprites/enemy_explosion_small.png`,
+			`${baseUrl}/assets/sprites/enemy_explosion_small.json`
 		);
 
 		// Overlay screens
@@ -70,11 +72,11 @@ export default class PreloadScene extends Phaser.Scene {
 		});
 
 		// Ability effects
-		this.load.image('fire', 'assets/abilities/fire.png');
-		this.load.image('ice', 'assets/abilities/ice.png');
-		this.load.image('snow', 'assets/abilities/snow.png');
-		this.load.image('rock', 'assets/abilities/rock.png');
-		this.load.image('skull', 'assets/abilities/skull.png');
+		this.load.image('fire', `${baseUrl}/assets/abilities/fire.png`);
+		this.load.image('ice', `${baseUrl}/assets/abilities/ice.png`);
+		this.load.image('snow', `${baseUrl}/assets/abilities/snow.png`);
+		this.load.image('rock', `${baseUrl}/assets/abilities/rock.png`);
+		this.load.image('skull', `${baseUrl}/assets/abilities/skull.png`);
 
 		// Other elements
 		this.load.image('quest', 'assets/img/quest.png');
@@ -87,122 +89,136 @@ export default class PreloadScene extends Phaser.Scene {
 			'rexUI'
 		);
 
-		this.load.image('quickselect-wheel', 'assets/img/quickselect-wheel.png');
+		this.load.image('quickselect-wheel', `${baseUrl}/assets/img/quickselect-wheel.png`);
 		this.load.image(
 			'quickselect-wheel-selection-large',
-			'assets/img/quickselect-wheel-selection-large.png'
+			`${baseUrl}/assets/img/quickselect-wheel-selection-large.png`
 		);
 		this.load.image(
 			'quickselect-wheel-selection-small',
-			'assets/img/quickselect-wheel-selection-small.png'
+			`${baseUrl}/assets/img/quickselect-wheel-selection-small.png`
 		);
-		this.load.image('pad-background', 'assets/img/pad-background.png');
-		this.load.image('pad-stick', 'assets/img/pad-stick.png');
-		this.load.image('icon-backpack', 'assets/img/backpack-icon.png');
-		this.load.image('icon-enchantments', 'assets/img/enchantment-icon.png');
-		this.load.image('icon-quests', 'assets/img/quest-icon.png');
-		this.load.image('icon-settings', 'assets/img/settings-icon.png');
-		this.load.image('icon-hero', 'assets/img/hero-icon.png');
-		this.load.image('icon-agnes', 'assets/img/agnes-icon.png');
-		this.load.image('icon-healthbar-background', 'assets/img/gui-healthbar.png');
-		this.load.image('icon-npc-healthbar-background', 'assets/img/gui-npc-healthbar.png');
-		this.load.image('ability-background-desktop', 'assets/img/ability-icon-background-desktop.png');
-		this.load.image('ability-background-mobile', 'assets/img/ability-icon-background-mobile.png');
-		this.load.image('gui-text-equipment', 'assets/img/gui-text-equipment.png');
-		this.load.image('gui-text-info', 'assets/img/gui-text-info.png');
-		this.load.image('gui-text-stats', 'assets/img/gui-text-stats.png');
-		this.load.image('ability-background-p', 'assets/img/ability-icon-background-p.png');
-		this.load.image('ability-background-1', 'assets/img/ability-icon-background-1.png');
-		this.load.image('ability-background-2', 'assets/img/ability-icon-background-2.png');
-		this.load.image('ability-background-3', 'assets/img/ability-icon-background-3.png');
-		this.load.image('ability-background-4', 'assets/img/ability-icon-background-4.png');
-		this.load.image('icon-guibase', 'assets/img/gui-base.png');
-		this.load.image('icon-healthbar', 'assets/img/gui-life.png');
-		this.load.image('icon-npc-healthbar', 'assets/img/gui-npc-life.png');
-		this.load.image('inventory-borders', 'assets/img/inventory-borders-tall.png');
-		this.load.image('inventory-selection', 'assets/img/inventory-selection.png');
-		this.load.image('checkbox-empty', 'assets/img/checkbox-empty.png');
-		this.load.image('checkbox-filled', 'assets/img/checkbox-filled.png');
-		this.load.spritesheet('icon-abilities', 'assets/img/abilities-sheet.png', {
+		this.load.image('pad-background', `${baseUrl}/assets/img/pad-background.png`);
+		this.load.image('pad-stick', `${baseUrl}/assets/img/pad-stick.png`);
+		this.load.image('icon-backpack', `${baseUrl}/assets/img/backpack-icon.png`);
+		this.load.image('icon-enchantments', `${baseUrl}/assets/img/enchantment-icon.png`);
+		this.load.image('icon-quests', `${baseUrl}/assets/img/quest-icon.png`);
+		this.load.image('icon-settings', `${baseUrl}/assets/img/settings-icon.png`);
+		this.load.image('icon-hero', `${baseUrl}/assets/img/hero-icon.png`);
+		this.load.image('icon-agnes', `${baseUrl}/assets/img/agnes-icon.png`);
+		this.load.image('icon-healthbar-background', `${baseUrl}/assets/img/gui-healthbar.png`);
+		this.load.image('icon-npc-healthbar-background', `${baseUrl}/assets/img/gui-npc-healthbar.png`);
+		this.load.image(
+			'ability-background-desktop',
+			`${baseUrl}/assets/img/ability-icon-background-desktop.png`
+		);
+		this.load.image(
+			'ability-background-mobile',
+			`${baseUrl}/assets/img/ability-icon-background-mobile.png`
+		);
+		this.load.image('gui-text-equipment', `${baseUrl}/assets/img/gui-text-equipment.png`);
+		this.load.image('gui-text-info', `${baseUrl}/assets/img/gui-text-info.png`);
+		this.load.image('gui-text-stats', `${baseUrl}/assets/img/gui-text-stats.png`);
+		this.load.image('ability-background-p', `${baseUrl}/assets/img/ability-icon-background-p.png`);
+		this.load.image('ability-background-1', `${baseUrl}/assets/img/ability-icon-background-1.png`);
+		this.load.image('ability-background-2', `${baseUrl}/assets/img/ability-icon-background-2.png`);
+		this.load.image('ability-background-3', `${baseUrl}/assets/img/ability-icon-background-3.png`);
+		this.load.image('ability-background-4', `${baseUrl}/assets/img/ability-icon-background-4.png`);
+		this.load.image('icon-guibase', `${baseUrl}/assets/img/gui-base.png`);
+		this.load.image('icon-healthbar', `${baseUrl}/assets/img/gui-life.png`);
+		this.load.image('icon-npc-healthbar', `${baseUrl}/assets/img/gui-npc-life.png`);
+		this.load.image('inventory-borders', `${baseUrl}/assets/img/inventory-borders-tall.png`);
+		this.load.image('inventory-selection', `${baseUrl}/assets/img/inventory-selection.png`);
+		this.load.image('checkbox-empty', `${baseUrl}/assets/img/checkbox-empty.png`);
+		this.load.image('checkbox-filled', `${baseUrl}/assets/img/checkbox-filled.png`);
+		this.load.spritesheet('icon-abilities', `${baseUrl}/assets/img/abilities-sheet.png`, {
 			frameWidth: 20,
 			frameHeight: 20,
 		});
 
 		// Essences
-		this.load.spritesheet('items-essence', 'assets/sprites/items-essence.png', {
+		this.load.spritesheet('items-essence', `${baseUrl}/assets/sprites/items-essence.png`, {
 			frameWidth: 16,
 			frameHeight: 16,
 		});
 
 		// Items
-		this.load.spritesheet('test-items-spritesheet', 'assets/img/items-test-small.png', {
+		this.load.spritesheet('test-items-spritesheet', `${baseUrl}/assets/img/items-test-small.png`, {
 			frameWidth: 16,
 			frameHeight: 16,
 		});
-		this.load.spritesheet('armor-spritesheet', 'assets/img/armor-icons.png', {
+		this.load.spritesheet('armor-spritesheet', `${baseUrl}/assets/img/armor-icons.png`, {
 			frameWidth: 32,
 			frameHeight: 48,
 		});
-		this.load.spritesheet('catalyst-spritesheet', 'assets/img/catalyst-icons.png', {
+		this.load.spritesheet('catalyst-spritesheet', `${baseUrl}/assets/img/catalyst-icons.png`, {
 			frameWidth: 32,
 			frameHeight: 48,
 		});
 		this.load.aseprite(
 			'source-fire1',
-			'assets/sprites/source_flame01.png',
-			'assets/sprites/source_flame01.json'
+			`${baseUrl}/assets/sprites/source_flame01.png`,
+			`${baseUrl}/assets/sprites/source_flame01.json`
 		);
 		this.load.aseprite(
 			'source-ice1',
-			'assets/sprites/source_ice01.png',
-			'assets/sprites/source_ice01.json'
+			`${baseUrl}/assets/sprites/source_ice01.png`,
+			`${baseUrl}/assets/sprites/source_ice01.json`
 		);
 		this.load.aseprite(
 			'source-necrotic1',
-			'assets/sprites/source_necrotic01.png',
-			'assets/sprites/source_necrotic01.json'
+			`${baseUrl}/assets/sprites/source_necrotic01.png`,
+			`${baseUrl}/assets/sprites/source_necrotic01.json`
 		);
 		this.load.aseprite(
 			'source-arcane1',
-			'assets/sprites/source_arcane01.png',
-			'assets/sprites/source_arcane01.json'
+			`${baseUrl}/assets/sprites/source_arcane01.png`,
+			`${baseUrl}/assets/sprites/source_arcane01.json`
 		);
-		this.load.image('icon-source-fire1', 'assets/img/source_icon_flame01.png');
-		this.load.image('icon-source-ice1', 'assets/img/source_icon_ice01.png');
-		this.load.image('icon-source-necrotic1', 'assets/img/source_icon_necrotic01.png');
-		this.load.image('icon-source-arcane1', 'assets/img/source_icon_arcane01.png');
+		this.load.image('icon-source-fire1', `${baseUrl}/assets/img/source_icon_flame01.png`);
+		this.load.image('icon-source-ice1', `${baseUrl}/assets/img/source_icon_ice01.png`);
+		this.load.image('icon-source-necrotic1', `${baseUrl}/assets/img/source_icon_necrotic01.png`);
+		this.load.image('icon-source-arcane1', `${baseUrl}/assets/img/source_icon_arcane01.png`);
 
-		this.load.aseprite('essence', 'assets/sprites/essence.png', 'assets/sprites/essence.json');
+		this.load.aseprite(
+			'essence',
+			`${baseUrl}/assets/sprites/essence.png`,
+			`${baseUrl}/assets/sprites/essence.json`
+		);
 		// Doors
-		this.load.spritesheet('red-door-north', 'assets/img/red-door-north.png', {
+		this.load.spritesheet('red-door-north', `${baseUrl}/assets/img/red-door-north.png`, {
 			frameWidth: 48,
 			frameHeight: 32,
 		});
-		this.load.image('iron_door_idle', 'assets/img/iron_door_idle.png');
+		this.load.image('iron_door_idle', `${baseUrl}/assets/img/iron_door_idle.png`);
 		this.load.aseprite(
 			'iron_door',
-			'assets/sprites/iron_door.png',
-			'assets/sprites/iron_door.json'
+			`${baseUrl}/assets/sprites/iron_door.png`,
+			`${baseUrl}/assets/sprites/iron_door.json`
 		);
 
 		// Dungeon Door
-		this.load.image('dungeon-door', 'assets/img/dungeon-door.png');
+		this.load.image('dungeon-door', `${baseUrl}/assets/img/dungeon-door.png`);
 
 		// load music score
-		this.load.audio('score-town', 'assets/sounds/score-town.mp3');
-		this.load.audio('score-dungeon', 'assets/sounds/score-dungeon.mp3');
+		this.load.audio('score-town', `${baseUrl}/assets/sounds/score-town.mp3`);
+		this.load.audio('score-dungeon', `${baseUrl}/assets/sounds/score-dungeon.mp3`);
 
 		// load sound effects
-		this.load.audio('sound-step-grass-l', 'assets/sounds/step-grass-l.wav');
-		this.load.audio('sound-step-grass-r', 'assets/sounds/step-grass-r.wav');
-		this.load.audio('sound-fireball', 'assets/sounds/fireball.wav');
-		this.load.audio('sound-icespike', 'assets/sounds/icespike.wav');
-		this.load.audio('sound-icespike-hit', 'assets/sounds/icespike-hit.wav');
-		this.load.audio('sound-fireball-explosion', 'assets/sounds/fireball-explosion.wav');
-		this.load.audio('sound-wind', 'assets/sounds/wind.wav');
+		this.load.audio('sound-step-grass-l', `${baseUrl}/assets/sounds/step-grass-l.wav`);
+		this.load.audio('sound-step-grass-r', `${baseUrl}/assets/sounds/step-grass-r.wav`);
+		this.load.audio('sound-fireball', `${baseUrl}/assets/sounds/fireball.wav`);
+		this.load.audio('sound-icespike', `${baseUrl}/assets/sounds/icespike.wav`);
+		this.load.audio('sound-icespike-hit', `${baseUrl}/assets/sounds/icespike-hit.wav`);
+		this.load.audio('sound-fireball-explosion', `${baseUrl}/assets/sounds/fireball-explosion.wav`);
+		this.load.audio('sound-wind', `${baseUrl}/assets/sounds/wind.wav`);
 
 		// load font
-		this.load.bitmapFont('pixelfont', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
+		this.load.bitmapFont(
+			'pixelfont',
+			`${baseUrl}/assets/fonts/font.png`,
+			`${baseUrl}/assets/fonts/font.fnt`
+		);
 
 		// Find out which files we need by going through all rendered rooms
 		const requiredNpcs = new Set<string>();
@@ -229,7 +245,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Tiles
 		globalState.availableTilesets.forEach((tileSet) => {
-			this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
+			this.load.image(tileSet, `${baseUrl}/assets/tilesets/${tileSet}.png`);
 		});
 
 		// Load all default enemies.
@@ -248,10 +264,16 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// If we are in map editor mode, also load the library background tilesets
 		if (activeMode === MODE.MAP_EDITOR) {
-			this.load.image('base-background', 'assets/tilesets/base-background.png');
-			this.load.image('decoration-background', 'assets/tilesets/decoration-background.png');
-			this.load.image('overlay-background', 'assets/tilesets/overlay-background.png');
-			this.load.image('map-editor-highlighting', 'assets/img/map-editor-highlighting.png');
+			this.load.image('base-background', `${baseUrl}/assets/tilesets/base-background.png`);
+			this.load.image(
+				'decoration-background',
+				`${baseUrl}/assets/tilesets/decoration-background.png`
+			);
+			this.load.image('overlay-background', `${baseUrl}/assets/tilesets/overlay-background.png`);
+			this.load.image(
+				'map-editor-highlighting',
+				`${baseUrl}/assets/img/map-editor-highlighting.png`
+			);
 		}
 
 		requiredNpcs.add('vanya-base');
@@ -490,8 +512,9 @@ export default class PreloadScene extends Phaser.Scene {
 		}
 
 		// Load quests from database
-		const questDb = firebase.firestore().collection('quests');
-		const questQuery = await questDb.get();
+		const db = getFirestore(app);
+		const questsCollection = collection(db, 'quests');
+		const questQuery = await getDocs(questsCollection);
 		const quests = questQuery.docs.map((doc) => [doc.id, doc.data() as Quest]) as [string, Quest][];
 		const loadedQuestScripts = quests.reduce((obj, [id, quest]) => {
 			if (quest.scripts) {

@@ -24,8 +24,9 @@ const CIRCELING_TIME_MS = 500;
 const SPRITE_SCALE = 0.3;
 
 export default class CircelingEffect extends AbilityEffect {
+	declare scene: MainScene;
 	lastCast: number;
-	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
+	emitter?: Phaser.GameObjects.Particles.ParticleEmitter;
 	allowedTargets: PossibleTargets = PossibleTargets.NONE;
 	summoningType: SUMMONING_TYPE;
 	circelingAbility: AbilityType;
@@ -54,12 +55,12 @@ export default class CircelingEffect extends AbilityEffect {
 		scene.add.existing(this);
 		this.setDepth(1);
 		scene.physics.add.existing(this);
-		this.body.checkCollision.none = true;
+		this.body!.checkCollision.none = true;
 		this.setScale(SCALE * (summoningType === SUMMONING_TYPE.FIRE_ELEMENTAL ? 1 : SPRITE_SCALE));
 
 		// Clean up players active summons
 		const identicalSummons = globalState.playerCharacter.activeSummons.map((summon) => {
-			const effect = (this.scene as MainScene).abilityHelper.abilityEffects.find((ability) => {
+			const effect = this.scene.abilityHelper!.abilityEffects.find((ability) => {
 				(ability as any).id === summon.id;
 			});
 			return effect;
@@ -145,7 +146,7 @@ export default class CircelingEffect extends AbilityEffect {
 
 			if (time - this.lastCast > 1000) {
 				this.lastCast = time;
-				(this.scene as MainScene).abilityHelper.triggerAbility(
+				this.scene.abilityHelper!.triggerAbility(
 					globalState.playerCharacter,
 					{
 						...globalState.playerCharacter,

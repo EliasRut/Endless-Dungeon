@@ -1,8 +1,4 @@
-import { Facings, Faction, PossibleTargets, SCALE, UiDepths } from '../../helpers/constants';
-import AbilityEffect from './AbilityEffect';
-import MainScene from '../../scenes/MainScene';
-import CharacterToken from '../tokens/CharacterToken';
-import { VISITED_TILE_TINT } from '../../helpers/constants';
+import { Facings, SCALE, UiDepths } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
 
@@ -34,15 +30,12 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 		scene.add.existing(this);
 		this.setDepth(1);
 		scene.physics.add.existing(this);
-		this.body.setCircle(BODY_RADIUS, 0, 0);
-		this.body.setMass(100);
+		this.body!.setCircle(BODY_RADIUS, 0, 0);
+		this.body!.setMass(100);
 		this.tint = 0xff00ff;
 		this.setVisible(false);
 
-		const particles = scene.add.particles('rock');
-		particles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-
-		this.trailEmitter = particles.createEmitter({
+		this.trailEmitter = scene.add.particles(x, y, 'rock', {
 			alpha: { start: 1, end: 0 },
 			scale: { start: 0.01 * this.effectScale * SCALE, end: 0 },
 			speed: 70 * SCALE,
@@ -62,8 +55,9 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 			frequency: 0,
 			maxParticles: 200,
 		});
+		this.trailEmitter.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 
-		this.coreEmitter = particles.createEmitter({
+		this.coreEmitter = scene.add.particles(x, y, 'rock', {
 			alpha: { start: 1, end: 0, ease: 'ease-out' },
 			// scale: { start: 0.033, end: 0.2 },
 			scale: 0.033 * this.effectScale * SCALE,
@@ -86,8 +80,8 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 			frequency: 0,
 			maxParticles: 2000,
 		});
-		this.trailEmitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
-		this.coreEmitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
+		this.trailEmitter.addDeathZone({ type: 'onEnter', source: this.particleDeathZone });
+		this.coreEmitter.addDeathZone({ type: 'onEnter', source: this.particleDeathZone });
 
 		if (projectileData?.timeToLive) {
 			setTimeout(() => {
@@ -98,23 +92,30 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 
 	destroy() {
 		this.trailEmitter.stopFollow();
-		if (this.body && this.explodeOnDestruction) {
+		if (this.body! && this.explodeOnDestruction) {
 			// this.trailEmitter.setEmitterAngle({min: 120, max: 240});
-			this.trailEmitter.setSpeed({
-				min: 0.1 * EXPLOSION_PARTICLE_SPEED * SCALE,
-				max: 1 * EXPLOSION_PARTICLE_SPEED * SCALE,
+			this.trailEmitter.updateConfig({
+				speed: {
+					min: 0.1 * EXPLOSION_PARTICLE_SPEED * SCALE,
+					max: 1 * EXPLOSION_PARTICLE_SPEED * SCALE,
+				},
+				lifespan: { min: 200, max: 400 },
+				scale: {
+					start: 0.03 * this.effectScale * SCALE,
+					end: 0 * SCALE,
+				},
 			});
-			this.trailEmitter.setLifespan({ min: 200, max: 400 });
-			this.trailEmitter.setScale({ start: 0.03 * this.effectScale * SCALE, end: 0 * SCALE });
-			this.trailEmitter.explode(40, this.body.x, this.body.y);
+			this.trailEmitter.explode(40, this.body!.x, this.body!.y);
 
-			this.coreEmitter.setSpeed({
-				min: 0.4 * EXPLOSION_PARTICLE_SPEED * SCALE,
-				max: EXPLOSION_PARTICLE_SPEED * SCALE,
+			this.coreEmitter.updateConfig({
+				speed: {
+					min: 0.4 * EXPLOSION_PARTICLE_SPEED * SCALE,
+					max: EXPLOSION_PARTICLE_SPEED * SCALE,
+				},
+				lifespan: { min: 200, max: 700 },
+				alpha: { start: 1, end: 0 },
 			});
-			this.coreEmitter.setLifespan({ min: 200, max: 700 });
-			this.coreEmitter.setAlpha({ start: 1, end: 0 });
-			this.coreEmitter.explode(8, this.body.x, this.body.y);
+			this.coreEmitter.explode(8, this.body!.x, this.body!.y);
 
 			setTimeout(() => {
 				this.coreEmitter.stopFollow();
@@ -129,9 +130,9 @@ export default class ArcaneBoltEffect extends TargetingEffect {
 	update(time: number) {
 		super.update(time);
 		if (time - this.castTime > VISIBILITY_DELAY && !this.isStarted) {
-			this.trailEmitter.startFollow(this.body.gameObject);
+			this.trailEmitter.startFollow(this.body!);
 			this.trailEmitter.start();
-			this.coreEmitter.startFollow(this.body.gameObject);
+			this.coreEmitter.startFollow(this.body!);
 			this.coreEmitter.start();
 			this.setVisible(true);
 			this.isStarted = true;

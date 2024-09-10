@@ -1,28 +1,16 @@
 import 'phaser';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
-import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import firebase from 'firebase';
 import { Dropdown } from '../components/Dropdown';
 import MapEditor from '../../scripts/scenes/MapEditor';
-import {
-	DatabaseRoom,
-	ItemsPositioning,
-	NpcPositioning,
-	NpcScriptStep,
-	ScriptWait,
-	ScriptMove,
-	ScriptWalk,
-	ScriptAnimation,
-	Room,
-} from '../../../typings/custom';
-import '../App.css';
+import { NpcPositioning, NpcScriptStep } from '../../../typings/custom';
 import { UserInformation } from '../../scripts/helpers/UserInformation';
 import { AppLayout } from '../components/AppLayout';
 import { DropdownMenu, DropdownMenuOption } from '../components/DropdownMenu';
 import { ToolsBar } from '../components/ToolsBar';
+import '../App.css';
 
 export interface MapEditorScreenProps {
 	user: UserInformation;
@@ -123,7 +111,7 @@ export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
 				<MenueWrapper id="mapEditorMenu"></MenueWrapper>
 				<GameWrapper ref={phaserRef}></GameWrapper>
 			</PageWrapper>
-			<NpcDetailsDialog id="npcDetailsDialog" isVisible={isNpcDialogVisible}>
+			<NpcDetailsDialog id="npcDetailsDialog" $isVisible={isNpcDialogVisible}>
 				<DialogTitle>NPC Details</DialogTitle>
 				<TwoColumnLayout>
 					<Column>
@@ -349,8 +337,8 @@ const DownloadAnker = styled.a`
 	display: none;
 `;
 
-const NpcDetailsDialog = styled.div<{ isVisible: boolean }>`
-	display: ${(props) => (props.isVisible ? 'flex' : 'none')};
+const NpcDetailsDialog = styled.div<{ $isVisible: boolean }>`
+	display: ${(props) => (props.$isVisible ? 'flex' : 'none')};
 	position: fixed;
 	top: 50%;
 	right: 5%;

@@ -23,12 +23,12 @@ const ICE_TINT = [0xdbf3fa, 0xb7e9f7, 0x92dff3, 0x7ad7f0];
 const HEALTHBAR_MAX_WIDTH = 16 * SCALE;
 const HEALTHBAR_Y_OFFSET = 2 * SCALE;
 export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
-	stateObject: Character;
-	scene: MainScene;
+	declare scene: MainScene;
+	declare stateObject: Character;
 	id: string;
 	type: string;
 	script?: NpcScript;
-	faction: Faction;
+	faction?: Faction;
 	isBeingMoved?: boolean;
 	lastMovedTimestamp: number;
 	lastNecroticEffectTimestamp: number;
@@ -37,7 +37,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	lastIceEffectTimestamp: number;
 	iceEffectStacks: number;
 	tokenName: string;
-	healthbar: Phaser.GameObjects.Image;
+	healthbar?: Phaser.GameObjects.Image;
 	charmedTime: number;
 	healedTime: number;
 
@@ -56,6 +56,8 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		this.id = id;
 		this.lastMovedTimestamp = -Infinity;
 		this.lastNecroticEffectTimestamp = -Infinity;
+		this.hitAt = -Infinity;
+		this.healedTime = -Infinity;
 		this.necroticEffectStacks = 0;
 		this.lastIceEffectTimestamp = -Infinity;
 		this.iceEffectStacks = 0;
@@ -138,7 +140,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		if (this.body) {
 			const x = Math.round(this.body.x / TILE_WIDTH / SCALE);
 			const y = Math.round(this.body.y / TILE_HEIGHT / SCALE);
-			return this.scene.tileLayer.getTileAt(x, y);
+			return this.scene.tileLayer!.getTileAt(x, y);
 		}
 		return null;
 	}
@@ -149,7 +151,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			FadingLabelSize.NORMAL,
 			'#FFFF00',
 			this.x,
-			this.y - this.body.height,
+			this.y - this.body!.height,
 			1000
 		);
 		this.stateObject.health -= damage;
@@ -164,7 +166,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			FadingLabelSize.NORMAL,
 			'#00FF00',
 			this.x,
-			this.y - this.body.height,
+			this.y - this.body!.height,
 			1000
 		);
 		this.stateObject.health += healing;
@@ -175,20 +177,20 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 
 	destroy(fromScene?: boolean) {
 		if (this.showHealthbar()) {
-			this.healthbar.destroy(fromScene);
+			this.healthbar!.destroy(fromScene);
 		}
 		super.destroy(fromScene);
 	}
 
 	die() {
 		if (this.showHealthbar()) {
-			this.healthbar.scaleX = 0;
-			this.healthbar.setVisible(false);
+			this.healthbar!.scaleX = 0;
+			this.healthbar!.setVisible(false);
 		}
 	}
 
 	public updateHealthbar() {
-		this.healthbar.scaleX =
+		this.healthbar!.scaleX =
 			(Math.max(0, this.stateObject.health) / this.stateObject.maxHealth) * HEALTHBAR_MAX_WIDTH;
 	}
 
@@ -225,7 +227,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			if (this.charmedTime + 6000 >= time) {
 				this.tint = 0xffcccc;
 				if (hasHealthbar) {
-					this.healthbar.tint = 0xffcccc;
+					this.healthbar!.tint = 0xffcccc;
 				}
 			} else if (this.healedTime + 300 >= time) {
 				this.tint = 0x00ff00;
@@ -233,7 +235,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 				// Color the token green and deal damage over time
 				this.tint = DOT_TINT[this.necroticEffectStacks - 1];
 				if (hasHealthbar) {
-					this.healthbar.tint = DOT_TINT[this.necroticEffectStacks - 1];
+					this.healthbar!.tint = DOT_TINT[this.necroticEffectStacks - 1];
 				}
 				// this.tint = Math.min(0x00ff00, 0x006600 + GREEN_DIFF * this.necroticEffectStacks);
 				this.receiveDotDamage(deltaTime);
@@ -241,21 +243,21 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 				// Color the token blue and slows down
 				this.tint = ICE_TINT[this.iceEffectStacks - 1];
 				if (hasHealthbar) {
-					this.healthbar.tint = ICE_TINT[this.iceEffectStacks - 1];
+					this.healthbar!.tint = ICE_TINT[this.iceEffectStacks - 1];
 				}
 				// this.tint = Math.min(0x0000ff, 0x000066 + BLUE_DIFF * this.iceEffectStacks);
 				this.setSlowFactor();
 			} else {
 				this.tint = tile.tint;
 				if (hasHealthbar) {
-					this.healthbar.tint = tile.tint;
+					this.healthbar!.tint = tile.tint;
 				}
 			}
 			this.setVisible(tile.tint > VISITED_TILE_TINT);
 			if (hasHealthbar) {
-				this.healthbar.setVisible(tile.tint > VISITED_TILE_TINT);
-				this.healthbar.x = this.x;
-				this.healthbar.y = this.y - this.height - HEALTHBAR_Y_OFFSET;
+				this.healthbar!.setVisible(tile.tint > VISITED_TILE_TINT);
+				this.healthbar!.x = this.x;
+				this.healthbar!.y = this.y - this.height - HEALTHBAR_Y_OFFSET;
 			}
 		}
 	}

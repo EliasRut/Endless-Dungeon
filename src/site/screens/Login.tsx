@@ -1,8 +1,8 @@
 import React from 'react';
-import '../App.css';
 import CenteredContainer from '../components/CenteredContainer';
 import { ButtonContainer, SiteHeader } from './StartScreen';
 import styled from 'styled-components';
+import '../App.css';
 
 interface Props {
 	auth: () => void;

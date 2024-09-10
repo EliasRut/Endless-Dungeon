@@ -1,7 +1,7 @@
 import { UiDepths, UI_SCALE } from '../helpers/constants';
 
 export default class OverlayScreen extends Phaser.GameObjects.Group {
-	visibility: boolean;
+	visibility: boolean = false;
 
 	constructor(scene: Phaser.Scene, startX: number, startY: number, width: number, height: number) {
 		super(scene);

@@ -38,7 +38,7 @@ export default class SummoningEffect extends AbilityEffect {
 			(activeSummon) => activeSummon.summoningType === summoningType
 		);
 		if (summon) {
-			const effect = (this.scene as MainScene).abilityHelper.abilityEffects.find(
+			const effect = (this.scene as MainScene).abilityHelper!.abilityEffects.find(
 				(ability) => (ability as any).id === summon.id
 			);
 			if (effect) {
@@ -55,7 +55,7 @@ export default class SummoningEffect extends AbilityEffect {
 
 				const tileX = Math.round(targetX / TILE_WIDTH / SCALE);
 				const tileY = Math.round(targetY / TILE_HEIGHT / SCALE);
-				const tile = (this.scene as MainScene).tileLayer.getTileAt(tileX, tileY);
+				const tile = (this.scene as MainScene).tileLayer!.getTileAt(tileX, tileY);
 				if (tile && !isCollidingTile(tile.index)) {
 					const npc = (this.scene as MainScene).addNpc(
 						summon.id,

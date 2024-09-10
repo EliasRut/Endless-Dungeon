@@ -35,14 +35,12 @@ export default class IceSpikeEffect extends TargetingEffect {
 		scene.add.existing(this);
 		this.setDepth(1);
 		scene.physics.add.existing(this);
-		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
-		this.body.setMass(1);
+		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
+		this.body!.setMass(1);
 
 		const facingVectors = getVelocitiesForFacing(facing);
 
-		const snowParticles = scene.add.particles('snow');
-		snowParticles.setDepth(1);
-		this.snowEmitter = snowParticles.createEmitter({
+		this.snowEmitter = scene.add.particles(x, y, 'snow', {
 			alpha: { start: 1, end: 0.4 },
 			// scale: { start: 0.3, end: 0.05 },
 			scale: { start: 0.3 * (projectileData.effectScale || 1) * SCALE, end: 0.15 * SCALE },
@@ -58,10 +56,9 @@ export default class IceSpikeEffect extends TargetingEffect {
 			x: PARTICLE_START_X_OFFSET * facingVectors.x * SCALE,
 			y: PARTICLE_START_Y_OFFSET * facingVectors.y * SCALE,
 		});
+		this.snowEmitter.setDepth(1);
 
-		const iceParticles = scene.add.particles('ice');
-		iceParticles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-		this.spikeEmitter = iceParticles.createEmitter({
+		this.spikeEmitter = scene.add.particles(x, y, 'ice', {
 			alpha: { start: 1, end: 0.4 },
 			scale: { start: 0.3 * (projectileData.effectScale || 1) * SCALE, end: 0 },
 			speed: { min: 60 * SCALE, max: 100 * SCALE },
@@ -74,9 +71,10 @@ export default class IceSpikeEffect extends TargetingEffect {
 			x: PARTICLE_START_X_OFFSET * facingVectors.x * SCALE,
 			y: PARTICLE_START_Y_OFFSET * facingVectors.y * SCALE,
 		});
+		this.spikeEmitter.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 
-		this.snowEmitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
-		this.spikeEmitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
+		this.snowEmitter.addDeathZone({ type: 'onEnter', source: this.particleDeathZone });
+		this.spikeEmitter.addDeathZone({ type: 'onEnter', source: this.particleDeathZone });
 
 		if (projectileData?.timeToLive) {
 			setTimeout(() => {
@@ -89,28 +87,36 @@ export default class IceSpikeEffect extends TargetingEffect {
 		this.wasStuckToEnemy = true;
 		this.stuckEnemy = enemy.body as Phaser.Physics.Arcade.Body;
 		this.stuckEnemyOffset = {
-			x: this.stuckEnemy.position.x - this.body.x - this.body.velocity.x,
-			y: this.stuckEnemy.position.y - this.body.y - this.body.velocity.y,
+			x: this.stuckEnemy.position.x - this.body!.x - this.body!.velocity.x,
+			y: this.stuckEnemy.position.y - this.body!.y - this.body!.velocity.y,
 		};
 	}
 
 	// tslint:disable: no-magic-numbers
 	destroy() {
-		this.snowEmitter.setEmitterAngle({ min: -180, max: 180 });
-		this.snowEmitter.setSpeed({ min: 10 * SCALE, max: 40 * SCALE });
-		this.snowEmitter.explode(100, this.body.x, this.body.y);
+		this.snowEmitter.updateConfig({
+			angle: { min: -180, max: 180 },
+			speed: { min: 10 * SCALE, max: 40 * SCALE },
+		});
+		this.snowEmitter.explode(100, this.body!.x, this.body!.y);
+
 		setTimeout(() => {
-			this.snowEmitter.setSpeed({ min: 15 * SCALE, max: 40 * SCALE });
-			this.snowEmitter.setFrequency(80);
-			this.snowEmitter.setLifespan(700);
+			this.snowEmitter.updateConfig({
+				speed: { min: 15 * SCALE, max: 40 * SCALE },
+				frequency: 80,
+				lifespan: 700,
+			});
 			this.spikeEmitter.start();
 		}, 0);
+
 		this.spikeEmitter.stopFollow();
-		this.spikeEmitter.setEmitterAngle({ min: -180, max: 180 });
-		this.spikeEmitter.setSpeed({ min: 10 * SCALE, max: 40 * SCALE });
-		this.spikeEmitter.explode(10, this.body.x, this.body.y);
-		this.body.stop();
-		this.body.destroy();
+		this.spikeEmitter.updateConfig({
+			angle: { min: -180, max: 180 },
+			speed: { min: 10 * SCALE, max: 40 * SCALE },
+		});
+		this.spikeEmitter.explode(10, this.body!.x, this.body!.y);
+		this.body!.stop();
+		this.body!.destroy();
 
 		if (this.explodeOnDestruction || this.stuckEnemy) {
 			setTimeout(() => {
@@ -127,15 +133,15 @@ export default class IceSpikeEffect extends TargetingEffect {
 	update(time: number) {
 		super.update(time);
 
-		if (this.body.velocity.x || this.body.velocity.y) {
+		if (this.body!.velocity.x || this.body!.velocity.y) {
 			this.setRotation(
-				getRotationInRadiansForFacing(getFacing8Dir(this.body.velocity.x, this.body.velocity.y)) -
+				getRotationInRadiansForFacing(getFacing8Dir(this.body!.velocity.x, this.body!.velocity.y)) -
 					0.5 * Math.PI
 			);
 		}
 		if (time - this.castTime > VISIBILITY_DELAY && !this.isStarted) {
-			this.snowEmitter.startFollow(this.body.gameObject);
-			this.spikeEmitter.startFollow(this.body.gameObject);
+			this.snowEmitter.startFollow(this.body!);
+			this.spikeEmitter.startFollow(this.body!);
 			this.snowEmitter.start();
 			this.spikeEmitter.start();
 			this.isStarted = true;

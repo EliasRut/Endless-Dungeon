@@ -1,21 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export interface DropdownMenuPorps {
+export interface DropdownMenuProps {
 	text: string;
 	options: JSX.Element[];
 	contentWidth?: number;
 }
 
-export const DropdownMenu = (props: DropdownMenuPorps) => {
+export const DropdownMenu = (props: DropdownMenuProps) => {
 	const [isActive, setActive] = React.useState(false);
 
 	return (
-		<Container onClick={() => setActive(!isActive)} {...props}>
-			<TitleElement isActive={isActive}>{props.text}</TitleElement>
-			<Connector isActive={isActive} />
-			<OptionsContainer isActive={isActive} contentWidth={props.contentWidth}>
-				{props.options}
+		<Container onClick={() => setActive(!isActive)}>
+			<TitleElement $isActive={isActive}>{props.text}</TitleElement>
+			<Connector $isActive={isActive} />
+			<OptionsContainer $isActive={isActive} $contentWidth={props.contentWidth}>
+				{props.options.map((option, index) => (
+					<React.Fragment key={index}>{option}</React.Fragment>
+				))}
 			</OptionsContainer>
 		</Container>
 	);
@@ -26,11 +28,11 @@ const Container = styled.div`
 	height: 40px;
 `;
 
-const TitleElement = styled.div<{ isActive: boolean }>`
-	background-color: ${(props) => (props.isActive ? '#222' : '#1c1c1c')};
+const TitleElement = styled.div<{ $isActive: boolean }>`
+	background-color: ${(props) => (props.$isActive ? '#222' : '#1c1c1c')};
 	border: 1px solid #aaa;
-	border-radius: ${(props) => (props.isActive ? '4px 4px 0 0' : '4px')};
-	padding: ${(props) => (props.isActive ? '8px 16px 16px' : '8px 16px')};
+	border-radius: ${(props) => (props.$isActive ? '4px 4px 0 0' : '4px')};
+	padding: ${(props) => (props.$isActive ? '8px 16px 16px' : '8px 16px')};
 	border-bottom: '1px solid #aaa';
 	position: relative;
 	z-index: 0;
@@ -41,21 +43,21 @@ const TitleElement = styled.div<{ isActive: boolean }>`
 	}
 `;
 
-const Connector = styled.div<{ isActive: boolean }>`
+const Connector = styled.div<{ $isActive: boolean }>`
 	position: absolute;
 	top: 100%;
 	left: 0.5px;
 	right: 0.5px;
 	height: 3px;
 	background-color: #222;
-	visibility: ${(props) => (props.isActive ? 'visible' : 'hidden')};
+	visibility: ${(props) => (props.$isActive ? 'visible' : 'hidden')};
 	margin-top: 7px;
 	z-index: 1;
 `;
 
-const OptionsContainer = styled.div<{ isActive: boolean; contentWidth: number | undefined }>`
-	visibility: ${(props) => (props.isActive ? 'visible' : 'hidden')};
-	height: ${(props) => (props.isActive ? 'auto' : '0')};
+const OptionsContainer = styled.div<{ $isActive: boolean; $contentWidth: number | undefined }>`
+	visibility: ${(props) => (props.$isActive ? 'visible' : 'hidden')};
+	height: ${(props) => (props.$isActive ? 'auto' : '0')};
 	position: absolute;
 	top: 100%;
 	left: 0;
@@ -67,7 +69,7 @@ const OptionsContainer = styled.div<{ isActive: boolean; contentWidth: number | 
 	flex-direction: column;
 	gap: 2px;
 	padding: 4px;
-	${(props) => (props.contentWidth ? `width: ${props.contentWidth}px;` : '')}
+	${(props) => (props.$contentWidth ? `width: ${props.$contentWidth}px;` : '')}
 `;
 
 export const DropdownMenuOption = styled.div`

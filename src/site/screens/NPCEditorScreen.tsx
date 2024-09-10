@@ -4,7 +4,6 @@ import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import firebase from 'firebase';
 import { Input } from '../components/Input';
 import { Dropdown } from '../components/Dropdown';
 import '../App.css';

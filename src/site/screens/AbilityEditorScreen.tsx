@@ -1,13 +1,10 @@
 import 'phaser';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode, MinMaxParticleEffectValue } from '../../scripts/helpers/constants';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import firebase from 'firebase';
-import { Input } from '../components/Input';
 import { Dropdown } from '../components/Dropdown';
-import '../App.css';
 import { UserInformation } from '../../scripts/helpers/UserInformation';
 import AbilityEditor, {
 	DefaultAbilityData,
@@ -20,6 +17,8 @@ import {
 	ProjectileData,
 	ProjectileParticleData,
 } from '../../scripts/abilities/abilityData';
+import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
+import '../App.css';
 
 const showGame = true;
 
@@ -94,28 +93,29 @@ export const AbilityEditorScreen = ({ user }: AbilityEditorScreenProps) => {
 	const [storedAbilities, setStoredAbilities] = useState<[string, string][]>([]);
 
 	const saveAbility = async (data: AbilityData, id: string | undefined) => {
-		const abilityDoc = firebase.firestore().collection('abilities').doc(id);
+		const db = getFirestore();
+		const abilityCollection = collection(db, 'abilities');
+		const abilityDocRef = doc(abilityCollection, id);
 
-		await abilityDoc.set(data);
-		const abilityId = abilityDoc.id;
+		await setDoc(abilityDocRef, data);
+		const abilityId = abilityDocRef.id;
 		setActiveAbilityId(abilityId);
 
-		firebase
-			.firestore()
-			.collection('abilities')
-			.get()
-			.then((query) => {
-				const abilities: [string, string][] = query.docs.map((doc) => [
-					doc.id,
-					doc.get('abilityName') as string,
-				]);
-				setStoredAbilities(abilities);
-			});
+		getDocs(abilityCollection).then((query) => {
+			const abilities: [string, string][] = query.docs.map((doc) => [
+				doc.id,
+				doc.get('abilityName') as string,
+			]);
+			setStoredAbilities(abilities);
+		});
 	};
 
 	const loadAbility = async (id: string) => {
-		const doc = await firebase.firestore().collection('abilities').doc(id).get();
-		const data = doc.data() as AbilityData;
+		const db = getFirestore();
+		const abilityCollection = collection(db, 'abilities');
+		const abilityDocRef = doc(abilityCollection, id);
+		const abilityDoc = await getDoc(abilityDocRef);
+		const data = abilityDoc.data() as AbilityData;
 		setAbilityName(data.abilityName);
 		setProjectiles(data.projectiles || 0);
 		setDelay(data.projectileData?.delay || 0);
@@ -148,17 +148,15 @@ export const AbilityEditorScreen = ({ user }: AbilityEditorScreenProps) => {
 	};
 
 	useEffect(() => {
-		firebase
-			.firestore()
-			.collection('abilities')
-			.get()
-			.then((query) => {
-				const abilities: [string, string][] = query.docs.map((doc) => [
-					doc.id,
-					doc.get('abilityName') as string,
-				]);
-				setStoredAbilities(abilities);
-			});
+		const db = getFirestore();
+		const abilityCollection = collection(db, 'abilities');
+		getDocs(abilityCollection).then((query) => {
+			const abilities: [string, string][] = query.docs.map((doc) => [
+				doc.id,
+				doc.get('abilityName') as string,
+			]);
+			setStoredAbilities(abilities);
+		});
 	}, [showGame]);
 
 	return (

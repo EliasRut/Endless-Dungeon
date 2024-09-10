@@ -13,7 +13,7 @@ export default class PlayerCharacterToken extends CharacterToken {
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 
-		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
+		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
 		this.stateObject = globalState.playerCharacter;
 		this.faction = Faction.PLAYER;

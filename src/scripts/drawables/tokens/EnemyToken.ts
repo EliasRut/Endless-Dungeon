@@ -34,9 +34,9 @@ const dropType = {
 };
 
 export default class EnemyToken extends CharacterToken {
-	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
+	emitter?: Phaser.GameObjects.Particles.ParticleEmitter;
 	tokenName: string;
-	attackRange: number;
+	attackRange: number = 0;
 	spawnedAt: number | undefined = undefined;
 	attackedAt: number = -Infinity;
 	lastUpdate: number = -Infinity;
@@ -46,10 +46,10 @@ export default class EnemyToken extends CharacterToken {
 	nextWaypoint: [number, number][] | undefined;
 	color: ColorsOfMagic;
 	targetStateObject: Character | undefined;
-	lastTileX: number;
-	lastTileY: number;
+	lastTileX?: number;
+	lastTileY?: number;
 	enemyData: EnemyData;
-	dead: boolean;
+	dead: boolean = false;
 	isCharging: boolean = false;
 	isCasting: boolean = false;
 	chargeX: number | undefined;
@@ -82,7 +82,7 @@ export default class EnemyToken extends CharacterToken {
 			enemyData.movementSpeed
 		);
 		globalState.enemies[id] = this.stateObject;
-		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
+		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 		this.tokenName = tokenName;
 		this.target = new Phaser.Geom.Point(0, 0);
 		this.faction = Faction.ENEMIES;
@@ -178,20 +178,20 @@ export default class EnemyToken extends CharacterToken {
 			: [tx, ty];
 		if (DEBUG_PATHFINDING) {
 			this.nextWaypoint?.forEach((waypoint) => {
-				const tile = this.scene.tileLayer.getTileAt(waypoint[0], waypoint[1]);
+				const tile = this.scene.tileLayer!.getTileAt(waypoint[0], waypoint[1]);
 				if (tile) {
 					tile.tint = 0xff0000;
 				}
 			});
 		}
 		const totalDistance =
-			Math.abs(tx * SCALE - this.body.x) + Math.abs(ty * SCALE - this.body.y) || 1;
+			Math.abs(tx * SCALE - this.body!.x) + Math.abs(ty * SCALE - this.body!.y) || 1;
 		const xSpeed =
-			((tx * SCALE - this.body.x) / totalDistance) *
+			((tx * SCALE - this.body!.x) / totalDistance) *
 			this.stateObject.movementSpeed *
 			this.stateObject.slowFactor;
 		const ySpeed =
-			((ty * SCALE - this.body.y) / totalDistance) *
+			((ty * SCALE - this.body!.y) / totalDistance) *
 			this.stateObject.movementSpeed *
 			this.stateObject.slowFactor;
 		this.setVelocityX(xSpeed);
@@ -215,7 +215,7 @@ export default class EnemyToken extends CharacterToken {
 	die() {
 		super.die();
 		this.play({ key: 'death_anim_small', frameRate: NORMAL_ANIMATION_FRAME_RATE });
-		this.body.destroy();
+		this.body!.destroy();
 		this.on('animationcomplete', () => this.destroy());
 		console.log(`Enemy ${this.id} died.`);
 		if (DEBUG_ENEMY_AI) {
@@ -253,8 +253,8 @@ export default class EnemyToken extends CharacterToken {
 			}
 		}
 
-		this.stateObject.x = this.body.x / SCALE;
-		this.stateObject.y = this.body.y / SCALE;
+		this.stateObject.x = this.body!.x / SCALE;
+		this.stateObject.y = this.body!.y / SCALE;
 	}
 
 	executeMeleeAttack(time: number) {
@@ -474,7 +474,7 @@ export default class EnemyToken extends CharacterToken {
 					1000
 				);
 			}
-			this.scene.abilityHelper.triggerAbility(
+			this.scene.abilityHelper!.triggerAbility(
 				this.stateObject,
 				this.stateObject,
 				this.enemyData.rangedAttackData!.abilityType,
@@ -531,7 +531,7 @@ export default class EnemyToken extends CharacterToken {
 			if (this.enemyData.useSpawnAnimation) {
 				const animation = `${this.tokenName}-spawn-e`;
 				this.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
-				this.healthbar.setVisible(false);
+				this.healthbar!.setVisible(false);
 			}
 		}
 
@@ -546,7 +546,7 @@ export default class EnemyToken extends CharacterToken {
 			this.isSpawning = false;
 			const isHealthbarVisible = this.showHealthbar();
 			if (isHealthbarVisible) {
-				this.healthbar.setVisible(true);
+				this.healthbar!.setVisible(true);
 				this.updateHealthbar();
 			}
 		}
@@ -585,8 +585,8 @@ export default class EnemyToken extends CharacterToken {
 			return;
 		}
 		if (this.isCharging) {
-			this.stateObject.x = this.body.x / SCALE;
-			this.stateObject.y = this.body.y / SCALE;
+			this.stateObject.x = this.body!.x / SCALE;
+			this.stateObject.y = this.body!.y / SCALE;
 			this.executeMeleeAttack(time);
 			return;
 		}
@@ -608,7 +608,7 @@ export default class EnemyToken extends CharacterToken {
 			this.handleTokenMovement();
 		} else {
 			// Find closest target from all possible targets available
-			const closestTarget = getClosestTarget(this.faction, this.x, this.y);
+			const closestTarget = getClosestTarget(this.faction!, this.x, this.y);
 
 			// If target is in vision, set aggro and update target
 			const distanceToClosestTarget = closestTarget
@@ -658,8 +658,8 @@ export default class EnemyToken extends CharacterToken {
 				}
 			}
 		}
-		this.stateObject.x = this.body.x / SCALE;
-		this.stateObject.y = this.body.y / SCALE;
+		this.stateObject.x = this.body!.x / SCALE;
+		this.stateObject.y = this.body!.y / SCALE;
 	}
 
 	onCollide(withEnemy: boolean) {

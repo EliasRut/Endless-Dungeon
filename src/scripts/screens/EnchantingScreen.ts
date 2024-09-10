@@ -1,7 +1,5 @@
-import Button from 'phaser3-rex-plugins/plugins/button';
 import {
 	Buttons,
-	FixWidthSizer,
 	Label,
 	RoundRectangle,
 	ScrollablePanel,
@@ -9,7 +7,7 @@ import {
 import { Enchantment, EnchantmentName } from '../../items/enchantmentData';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import {
-	ColorsOfMagic,	
+	ColorsOfMagic,
 	NORMAL_ANIMATION_FRAME_RATE,
 	statDisplayNames,
 	UiDepths,
@@ -33,7 +31,7 @@ const NOUN_START_Y = (SCREEN_START_Y + 50) * UI_SCALE;
 const LIST_START_X = (SCREEN_START_X + 25) * UI_SCALE;
 const LIST_START_Y = (SCREEN_START_Y + 50) * UI_SCALE;
 const LIST_WIDTH = (SCREEN_WIDTH / 2) * UI_SCALE;
-const LIST_HEIGHT = SCREEN_HEIGHT * UI_SCALE - (LIST_START_Y - SCREEN_START_Y) - (30 * UI_SCALE);
+const LIST_HEIGHT = SCREEN_HEIGHT * UI_SCALE - (LIST_START_Y - SCREEN_START_Y) - 30 * UI_SCALE;
 
 const ESSENCE_START_X = (SCREEN_START_X + 300) * UI_SCALE;
 const ESSENCE_START_Y = (SCREEN_START_Y + 175) * UI_SCALE;
@@ -46,7 +44,7 @@ const COLOR_DARK = 0x260e04;
 
 export default class EnchantingScreen extends OverlayScreen {
 	title: Phaser.GameObjects.Text;
-	essenTokens: InventoryItemToken[];
+	essenceTokens: InventoryItemToken[] = [];
 	essenceNumbers: Phaser.GameObjects.Text[] = [];
 	enchantmentName: Phaser.GameObjects.Text;
 	enchantmentModifier: Phaser.GameObjects.Text;
@@ -81,7 +79,7 @@ export default class EnchantingScreen extends OverlayScreen {
 				fontSize: `${12 * UI_SCALE}pt`,
 				fontFamily: 'endlessDungeon',
 				align: 'center',
-				fixedWidth: (SCREEN_WIDTH - 28) * UI_SCALE,				
+				fixedWidth: (SCREEN_WIDTH - 28) * UI_SCALE,
 			}
 		);
 		this.title.setDepth(UiDepths.UI_FOREGROUND_LAYER);
@@ -107,12 +105,12 @@ export default class EnchantingScreen extends OverlayScreen {
 		this.enchantmentButton.setShadow(0, 1 * UI_SCALE, 'black');
 		this.enchantmentButton.setInteractive();
 		this.enchantmentButton.on('pointerdown', () => {
-			if(this.enchantmentBlocked) {
-				console.log("NOT ENOUGH RESOURCES!");
+			if (this.enchantmentBlocked) {
+				console.log('NOT ENOUGH RESOURCES!');
 				return;
 			}
 			this.scene.closeAllIconScreens();
-			this.scene.icons.backpackIcon.openScreen(this.selectedEnchantment);
+			this.scene.icons!.backpackIcon.openScreen(this.selectedEnchantment);
 		});
 		this.add(this.enchantmentButton, true);
 
@@ -133,7 +131,8 @@ export default class EnchantingScreen extends OverlayScreen {
 			const essenceToken = new InventoryItemToken(
 				this.scene,
 				ESSENCE_START_X + ESSENCE_SEPARATOR * (counter % (Object.values(ColorsOfMagic).length / 2)),
-				ESSENCE_START_Y + ESSENCE_SEPARATOR * Math.round(counter / Object.values(ColorsOfMagic).length),
+				ESSENCE_START_Y +
+					ESSENCE_SEPARATOR * Math.round(counter / Object.values(ColorsOfMagic).length),
 				'empty-tile',
 				-1
 			);
@@ -226,7 +225,7 @@ export default class EnchantingScreen extends OverlayScreen {
 		}
 	}
 
-	update() {		
+	update() {
 		const essences = globalState.inventory.essences;
 		const enchantment = Enchantment[this.selectedEnchantment];
 		let counter = 0;
@@ -235,8 +234,8 @@ export default class EnchantingScreen extends OverlayScreen {
 			const available = essences[essence];
 			let required = 0;
 			if (enchantment && enchantment.cost) {
-				enchantment.cost.forEach(cost => {
-					if(cost.essence == essence) required = cost.amount;
+				enchantment.cost.forEach((cost) => {
+					if (cost.essence == essence) required = cost.amount;
 				});
 			}
 			let text = `${available}`;
@@ -245,13 +244,12 @@ export default class EnchantingScreen extends OverlayScreen {
 				if (required > available) {
 					blocking = true;
 					this.essenceNumbers[counter].setColor('red');
-				}
-				else this.essenceNumbers[counter].setColor('green');
+				} else this.essenceNumbers[counter].setColor('green');
 			} else this.essenceNumbers[counter].setColor('white');
 			this.enchantmentBlocked = blocking;
 			this.essenceNumbers[counter].setText(text);
 			counter++;
-		});		
+		});
 		this.enchantmentName.setText(`${enchantment?.name}`);
 		const stat = enchantment!.affectedStat;
 		const modifierText = stat
@@ -276,11 +274,12 @@ export default class EnchantingScreen extends OverlayScreen {
 		const notSelf = this;
 		// Note: Buttons and scrolling are at different touch targets
 		scene.input.topOnly = false;
+		const enchantmentButtons = enchantmentNames.map((enchantment) =>
+			this.createButton(scene, enchantment)
+		);
 		const buttonSizer = new Buttons(scene, {
 			orientation: 'y',
-			buttons: enchantmentNames.map((enchantment) => {
-				return notSelf.createButton(scene, enchantment);
-			}),
+			buttons: enchantmentButtons,
 		})
 			.on('button.over', (button: any) => {
 				button.getElement('background').setStrokeStyle(1, 0xffffff);

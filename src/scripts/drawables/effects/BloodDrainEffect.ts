@@ -1,17 +1,9 @@
 import { AbilityType, ProjectileData } from '../../abilities/abilityData';
-import {
-	Facings,
-	SCALE,
-	UiDepths,
-	SUMMONING_TYPE,
-	PossibleTargets,
-	FadingLabelSize,
-} from '../../helpers/constants';
+import { Facings, SCALE, PossibleTargets } from '../../helpers/constants';
 import MainScene from '../../scenes/MainScene';
 import Character from '../../worldstate/Character';
 import CharacterToken from '../tokens/CharacterToken';
 import InstantEffect, { InstantEffectShape } from './InstantEffect';
-import SummoningEffect from './SummoningEffect';
 
 const RED_MIN = 0xcc0000;
 const RED_DIFF = 0x010000;
@@ -100,7 +92,7 @@ export default class BloodDrainEffect extends InstantEffect {
 			const deltaY = casterY - ty;
 			const totalDistance = Math.abs(casterX - tx) + Math.abs(casterY - ty);
 			const mainScene = this.scene as MainScene;
-			mainScene.abilityHelper.triggerAbility(
+			mainScene.abilityHelper!.triggerAbility(
 				this.caster,
 				{
 					...target.stateObject,

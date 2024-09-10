@@ -1,8 +1,5 @@
 import 'phaser';
-import firebase from 'firebase';
 import AbilityHelper from '../helpers/AbilityHelper';
-import AbilityEffect from '../drawables/effects/AbilityEffect';
-import FireBallEffect from '../drawables/effects/FireBallEffect';
 import MainScene from './MainScene';
 import {
 	ColorsOfMagic,
@@ -11,10 +8,8 @@ import {
 	MinMaxParticleEffectValue,
 	SimpleParticleEffectValue,
 } from '../helpers/constants';
-import { Abilities, AbilityType, ProjectileData } from '../abilities/abilityData';
-import PlayerCharacter from '../worldstate/PlayerCharacter';
+import { Abilities, AbilityType } from '../abilities/abilityData';
 import Character from '../worldstate/Character';
-import NpcToken from '../drawables/tokens/NpcToken';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import DungeonGenerator from '../helpers/generateDungeon';
 import globalState from '../worldstate/index';
@@ -23,6 +18,8 @@ import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
 import DoorToken from '../drawables/tokens/DoorToken';
 import { ColorEffectValue } from '../helpers/constants';
+import { collection, CollectionReference, DocumentData, getFirestore } from 'firebase/firestore';
+import { app } from '../../shared/initializeApp';
 
 const SCALE = 2;
 
@@ -75,15 +72,15 @@ export interface MapEditorReactBridge {
 }
 
 export default class AbilityEditor extends Phaser.Scene {
-	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
+	database: CollectionReference<DocumentData>;
 	lastCast: number = -Infinity;
 	abilityHelper: AbilityHelper;
-	mainCharacter: PlayerCharacterToken;
+	mainCharacter: PlayerCharacterToken | undefined;
 	npcMap: { [id: string]: CharacterToken } = {};
 	doorMap: { [id: string]: DoorToken } = {};
-	tileLayer: Phaser.Tilemaps.TilemapLayer;
-	decorationLayer: Phaser.Tilemaps.TilemapLayer;
-	overlayLayer: Phaser.Tilemaps.TilemapLayer;
+	tileLayer: Phaser.Tilemaps.TilemapLayer | undefined;
+	decorationLayer: Phaser.Tilemaps.TilemapLayer | undefined;
+	overlayLayer: Phaser.Tilemaps.TilemapLayer | undefined;
 	startX: number = 0;
 	startY: number = 0;
 
@@ -91,7 +88,9 @@ export default class AbilityEditor extends Phaser.Scene {
 
 	constructor() {
 		super({ key: 'AbilityEditor' });
-		this.database = firebase.firestore().collection('abilities');
+
+		const db = getFirestore(app);
+		this.database = collection(db, 'abilities');
 		this.abilityHelper = new AbilityHelper(this as unknown as MainScene);
 	}
 

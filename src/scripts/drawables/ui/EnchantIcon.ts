@@ -9,8 +9,8 @@ export default class EnchantIcon extends MenuIcon {
 	}
 
 	setScreens() {
-		if (!this.screens) {
-			this.screens = [this.scene.overlayScreens.enchantingScreen];
+		if (!this.screens && this.scene.overlayScreens!.enchantingScreen) {
+			this.screens = [this.scene.overlayScreens!.enchantingScreen];
 		}
 	}
 }

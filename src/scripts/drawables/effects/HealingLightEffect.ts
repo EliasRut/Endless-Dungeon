@@ -21,12 +21,10 @@ export default class HealingLightEffect extends AbilityEffect {
 		scene.add.existing(this);
 		this.setDepth(1);
 		scene.physics.add.existing(this);
-		this.body.setCircle(BODY_RADIUS, 0, 0);
-		this.body.setMass(0);
+		this.body!.setCircle(BODY_RADIUS, 0, 0);
+		this.body!.setMass(0);
 
-		const particles = scene.add.particles('fire');
-		particles.setDepth(1);
-		this.emitter = particles.createEmitter({
+		this.emitter = scene.add.particles(x, y, 'fire', {
 			alpha: { start: 0.4, end: 0 },
 			scale: { start: 0, end: 0.8 },
 			speed: 40,
@@ -37,7 +35,8 @@ export default class HealingLightEffect extends AbilityEffect {
 			frequency: 20,
 			maxParticles: 40,
 		});
-		this.emitter.startFollow(this.body.gameObject);
+		this.emitter.setDepth(1);
+		this.emitter.startFollow(this.body!);
 		this.emitter.start();
 
 		globalState.playerCharacter.health = Math.min(

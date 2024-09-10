@@ -16,10 +16,9 @@ import {
 	getItemDataForName,
 	SourceData,
 	CatalystData,
-	getItemTexture,
 	getCatalystAbility,
 } from '../../items/itemData';
-import PlayerCharacter, { updateAbility } from '../worldstate/PlayerCharacter';
+import { updateAbility } from '../worldstate/PlayerCharacter';
 import EquipmentSelectionWheel from '../drawables/ui/EquipmentSelectionWheel';
 import {
 	getEquippedItems,
@@ -28,7 +27,6 @@ import {
 	getFullDataForEquipmentSlot,
 	getEquipmentDataRecordForEquipmentSlot,
 	getEquipmentDataForItemKey,
-	attachEnchantmentItem,
 	getEquipmentDataForSlot,
 } from '../helpers/inventory';
 import { STAT_SCREEN_RIGHT_BORDER } from './StatScreen';
@@ -132,7 +130,7 @@ export default class InventoryScreen extends OverlayScreen {
 	currentXY: [number, number];
 	inventorySelection: Phaser.GameObjects.Image;
 	equipmentSelectionWheel: EquipmentSelectionWheel;
-	isEquipmentSelectionWheelShown: boolean;
+	isEquipmentSelectionWheelShown: boolean = false;
 	currentEnchantment?: EnchantmentName;
 
 	constructor(scene: Phaser.Scene) {
@@ -341,7 +339,7 @@ export default class InventoryScreen extends OverlayScreen {
 
 		this.focusedSlot = COORDINATES_TO_SLOT[`${this.currentXY[0]}_${this.currentXY[1]}`];
 		const [itemData, equipmentData] = getFullDataForEquipmentSlot(this.focusedSlot);
-		this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+		this.scene.overlayScreens!.itemScreen.update(itemData, equipmentData);
 		const selectionPos = EQUIPMENT_SLOT_COORDINATES[this.focusedSlot];
 
 		this.inventorySelection.setX(selectionPos[0] * UI_SCALE);
@@ -491,7 +489,7 @@ export default class InventoryScreen extends OverlayScreen {
 
 		abilityIcon.on('pointerdown', () => {
 			if (this.focusedSlot !== undefined) this.focusedSlot = undefined;
-			this.scene.overlayScreens.itemScreen.updateAbility(ability, slotKey);
+			this.scene.overlayScreens!.itemScreen.updateAbility(ability, slotKey);
 		});
 	}
 
@@ -535,7 +533,7 @@ export default class InventoryScreen extends OverlayScreen {
 		const [itemData, equipmentData] = this.focusedSlot
 			? getFullDataForEquipmentSlot(this.focusedSlot)
 			: [undefined, undefined];
-		this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+		this.scene.overlayScreens!.itemScreen.update(itemData, equipmentData);
 	}
 
 	modify(enchantment?: EnchantmentName): void {

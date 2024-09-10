@@ -22,7 +22,6 @@ const GREEN_DIFF = 0x000100;
 
 export default class CharmEffect extends TargetingEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
 	constructor(
 		scene: Phaser.Scene,
 		x: number,
@@ -36,11 +35,10 @@ export default class CharmEffect extends TargetingEffect {
 		this.setDepth(UiDepths.TOKEN_FOREGROUND_LAYER);
 		this.setScale(SCALE);
 		scene.physics.add.existing(this);
-		this.body.setCircle(BODY_RADIUS, 0, 0);
-		this.body.setMass(1);
+		this.body!.setCircle(BODY_RADIUS, 0, 0);
+		this.body!.setMass(1);
 
-		this.particles = scene.add.particles(projectileData.particleData?.particleImage || 'ice');
-		this.emitter = this.particles.createEmitter({
+		this.emitter = scene.add.particles(x, y, projectileData.particleData?.particleImage || 'ice', {
 			alpha: { start: 1, end: 0 },
 			scale: { start: this.effectScale * SCALE, end: 0.2 * SCALE },
 			speed: 20 * SCALE,
@@ -62,7 +60,7 @@ export default class CharmEffect extends TargetingEffect {
 			maxParticles: 100,
 		});
 
-		this.particles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.emitter.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		if (projectileData?.timeToLive) {
 			setTimeout(() => {
 				this.destroy();
@@ -92,18 +90,23 @@ export default class CharmEffect extends TargetingEffect {
 	destroy() {
 		this.emitter.stopFollow();
 		if (this.body && this.explodeOnDestruction) {
-			this.emitter.setEmitterAngle({ min: -180, max: 180 });
-			this.emitter.setSpeed(70 * SCALE);
-			this.emitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
-			this.emitter.setScale({ start: this.effectScale, end: 0.125 });
+			this.emitter.updateConfig({
+				angle: { min: -180, max: 180 },
+				speed: 70 * SCALE,
+				scale: { start: this.effectScale, end: 0.125 },
+			});
+			this.emitter.addDeathZone({ type: 'onEnter', source: this.particleDeathZone });
 			this.emitter.explode(20, this.body.x + 6 * SCALE, this.body.y + 6 * SCALE);
-			this.emitter.setSpeed({ min: 5 * SCALE, max: 55 * SCALE });
-			this.emitter.setScale({ start: 0.8 * this.effectScale * SCALE, end: 0.1 * SCALE });
+
+			this.emitter.updateConfig({
+				speed: { min: 5 * SCALE, max: 55 * SCALE },
+				scale: { start: 0.8 * this.effectScale * SCALE, end: 0.1 * SCALE },
+			});
 			this.emitter.explode(10, this.body.x + 6 * SCALE, this.body.y + 6 * SCALE);
 		}
 
 		setTimeout(() => {
-			this.particles.destroy();
+			this.emitter.destroy();
 		}, 1000);
 		super.destroy();
 	}
@@ -111,7 +114,7 @@ export default class CharmEffect extends TargetingEffect {
 	update(time: number) {
 		super.update(time);
 		if (time - this.castTime > VISIBILITY_DELAY && !this.isStarted) {
-			this.emitter.startFollow(this.body.gameObject);
+			this.emitter.startFollow(this.body!);
 			this.emitter.start();
 			this.isStarted = true;
 		}

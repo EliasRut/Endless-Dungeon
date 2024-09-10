@@ -1,7 +1,6 @@
 import 'phaser';
 import React from 'react';
 import styled from 'styled-components';
-import firebase from 'firebase';
 import '../App.css';
 import { Input } from '../components/Input';
 import { ItemWithCount, ScriptEntry, Quest } from '../../../typings/custom';
@@ -22,6 +21,15 @@ import { Dropdown } from '../components/Dropdown';
 import { QuestItemPrecondition } from '../components/QuestItemPrecondition';
 import { PreviousQuestPrecondition } from '../components/PreviousQuestPrecondition';
 import { UserInformation } from '../../scripts/helpers/UserInformation';
+import {
+	collection,
+	doc,
+	getDoc,
+	getDocs,
+	getFirestore,
+	setDoc,
+	updateDoc,
+} from 'firebase/firestore';
 
 export interface QuestEditorScreenProps {
 	user: UserInformation;
@@ -74,21 +82,20 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 	};
 
 	componentDidMount() {
-		firebase
-			.firestore()
-			.collection('quests')
-			.get()
-			.then((quests) => {
-				this.setState({
-					knownQuests: quests.docs.map((questDoc) => {
-						const quest = questDoc.data() as Quest;
-						return {
-							name: quest.name,
-							id: questDoc.id,
-						};
-					}),
-				});
+		const db = getFirestore();
+		const questsCollection = collection(db, 'quests');
+
+		getDocs(questsCollection).then((quests) => {
+			this.setState({
+				knownQuests: quests.docs.map((questDoc) => {
+					const quest = questDoc.data() as Quest;
+					return {
+						name: quest.name,
+						id: questDoc.id,
+					};
+				}),
 			});
+		});
 	}
 
 	replaceScriptBlockData(index: number, newData: Partial<ScriptEntry>) {
@@ -191,12 +198,15 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 				intro: this.state.scriptBlocks as ScriptEntry[],
 			},
 		};
+
+		const db = getFirestore();
 		if (this.state.id) {
-			firebase.firestore().collection('quests').doc(this.state.id).update(quest);
+			const questDocRef = doc(db, 'quests', this.state.id);
+			updateDoc(questDocRef, { ...quest });
 		} else {
-			const questDoc = firebase.firestore().collection('quests').doc();
-			const questId = questDoc.id;
-			questDoc.set(quest);
+			const questDocRef = doc(db, 'quests');
+			const questId = questDocRef.id;
+			setDoc(questDocRef, { ...quest });
 			this.setState({ id: questId });
 		}
 	}
@@ -205,7 +215,10 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 		if (!this.state.id) {
 			return;
 		}
-		const questDoc = await firebase.firestore().collection('quests').doc(this.state.id).get();
+		const db = getFirestore();
+		const questDocRef = doc(db, 'quests');
+
+		const questDoc = await getDoc(questDocRef);
 		const quest: Quest = questDoc.data() as Quest;
 
 		const questState = {

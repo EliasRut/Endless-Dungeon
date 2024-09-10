@@ -1,7 +1,6 @@
 import { AbilityType } from '../../abilities/abilityData';
 import { getFacing8Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
-import globalState from '../../worldstate';
 import Enemy from '../../worldstate/Enemy';
 import EnemyToken from './EnemyToken';
 import { isCollidingTile } from '../../helpers/movement';
@@ -19,7 +18,7 @@ export default class LichtKingToken extends EnemyToken {
 	summonedAt = -Infinity;
 	casting = 0;
 	addsCounter: number = 0;
-	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
+
 	constructor(
 		scene: MainScene,
 		x: number,
@@ -45,23 +44,6 @@ export default class LichtKingToken extends EnemyToken {
 		this.setScale(2);
 		this.stateObject.attackTime = 4000;
 		this.stateObject.level = level;
-
-		const particles = scene.add.particles('fire');
-		particles.setDepth(1);
-		this.emitter = particles.createEmitter({
-			alpha: { start: 1, end: 0 },
-			scale: { start: 0.3, end: 0.05 },
-			speed: 200,
-			rotate: { min: -180, max: 180 },
-			angle: { min: -180, max: 180 },
-			lifespan: { min: 100, max: 120 },
-			blendMode: Phaser.BlendModes.ADD,
-			frequency: 30,
-			maxParticles: 200,
-			follow: this,
-		});
-		this.emitter.startFollow(this.body.gameObject);
-		this.emitter.start();
 	}
 
 	public update(time: number, delta: number) {
@@ -71,7 +53,6 @@ export default class LichtKingToken extends EnemyToken {
 		if (this.stateObject.health <= 0) {
 			this.dropNonEquippableItem(UneqippableItem.MYSTIC_BOOK);
 			this.maybeDropEquippableItem();
-			this.emitter.stop();
 			this.die();
 			return;
 		}
@@ -85,7 +66,6 @@ export default class LichtKingToken extends EnemyToken {
 			1,
 			Math.min(this.stateObject.attackTime, time - this.attackedAt)
 		);
-		this.emitter.setFrequency(30 + this.stateObject.attackTime / timeSinceAttack);
 
 		const tx = this.target.x;
 		const ty = this.target.y;
@@ -131,8 +111,8 @@ export default class LichtKingToken extends EnemyToken {
 				this.attack(time);
 			}
 
-			this.stateObject.x = this.body.x;
-			this.stateObject.y = this.body.y;
+			this.stateObject.x = this.body!.x;
+			this.stateObject.y = this.body!.y;
 		}
 	}
 
@@ -143,7 +123,7 @@ export default class LichtKingToken extends EnemyToken {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 			this.attackedAt = time;
-			this.scene.abilityHelper.triggerAbility(
+			this.scene.abilityHelper!.triggerAbility(
 				this.stateObject,
 				this.stateObject,
 				AbilityType.ARCANE_BLADE,
@@ -187,11 +167,11 @@ export default class LichtKingToken extends EnemyToken {
 	getUncollidingXY(x: number, y: number) {
 		let newX = x + Math.round(Math.random() * SPAWN_SEARCH_RADIUS);
 		let newY = y + Math.round(Math.random() * SPAWN_SEARCH_RADIUS);
-		let tile = this.scene.tileLayer.getTileAtWorldXY(newX, newY);
+		let tile = this.scene.tileLayer!.getTileAtWorldXY(newX, newY);
 		while (tile === null || isCollidingTile(tile?.index) === true) {
 			newX = x + Math.round(Math.random() * SPAWN_SEARCH_RADIUS);
 			newY = y + Math.round(Math.random() * SPAWN_SEARCH_RADIUS);
-			tile = this.scene.tileLayer.getTileAtWorldXY(newX, newY);
+			tile = this.scene.tileLayer!.getTileAtWorldXY(newX, newY);
 		}
 		return [newX, newY];
 	}

@@ -55,7 +55,7 @@ export type NoteGenerator = {
 	createPattern: (useFixedPattern: boolean) => Pattern;
 };
 
-export type DelayUnit = {
+export type TDelayUnit = {
 	dryWet: NumericParameter;
 	feedback: NumericParameter;
 	delayTime: NumericParameter;
@@ -63,7 +63,7 @@ export type DelayUnit = {
 	// outputNode: AudioNode
 };
 
-export type ClockUnit = {
+export type TClockUnit = {
 	currentStep: NumericParameter;
 	bpm: NumericParameter;
 };
@@ -110,7 +110,7 @@ export type ProgramState = {
 	notes: ThreeOhMachine[];
 	drums: NineOhMachine;
 	gen: NoteGenerator;
-	delay: DelayUnit;
-	clock: ClockUnit;
+	delay: TDelayUnit;
+	clock: TClockUnit;
 	masterVolume: NumericParameter;
 };

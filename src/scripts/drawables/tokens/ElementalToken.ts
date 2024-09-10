@@ -17,8 +17,6 @@ const ELEMENTAL_MOVEMENT_SPEED = 200;
 const REGULAR_ATTACK_RANGE = 10;
 
 export default class ElementalToken extends CharacterToken {
-	id: string;
-	tokenName: string;
 	attackRange: number;
 	attackedAt: number = -Infinity;
 	lastUpdate: number = -Infinity;
@@ -29,7 +27,7 @@ export default class ElementalToken extends CharacterToken {
 	allowedTargets: PossibleTargets = PossibleTargets.ENEMIES;
 	destroyed: boolean = false;
 	elementalAbility: AbilityType;
-	spawnTime: number;
+	spawnTime: number = -Infinity;
 
 	constructor(
 		scene: MainScene,
@@ -44,7 +42,7 @@ export default class ElementalToken extends CharacterToken {
 		this.scene = scene;
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
-		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
+		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
 		globalState.npcs[id] = this.stateObject;
 		this.stateObject = new Character(
@@ -125,7 +123,7 @@ export default class ElementalToken extends CharacterToken {
 
 			if (totalDistance < this.attackRange * SCALE) {
 				const time = this.scene.time;
-				(this.scene as MainScene).abilityHelper.triggerAbility(
+				this.scene.abilityHelper!.triggerAbility(
 					this.stateObject,
 					{
 						...this.stateObject,

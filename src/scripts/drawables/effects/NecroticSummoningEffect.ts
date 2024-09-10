@@ -7,8 +7,7 @@ const RED_DIFF = 0x010000;
 const GREEN_DIFF = 0x000100;
 
 export default class NecroticSummoningEffect extends SummoningEffect {
-	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
+	emitter?: Phaser.GameObjects.Particles.ParticleEmitter;
 	constructor(
 		scene: Phaser.Scene,
 		x: number,
@@ -30,8 +29,7 @@ export default class NecroticSummoningEffect extends SummoningEffect {
 	}
 
 	drawSummoningAnimation(targetX: number, targetY: number): void {
-		this.particles = this.scene.add.particles('necroticAura');
-		this.emitter = this.particles.createEmitter({
+		this.emitter = this.scene.add.particles(targetX, targetY, 'necroticAura', {
 			alpha: { start: 1, end: 0 },
 			scale: { start: 0.2 * this.effectScale * SCALE, end: 0.05 * SCALE },
 			speed: 20 * SCALE,
@@ -52,17 +50,23 @@ export default class NecroticSummoningEffect extends SummoningEffect {
 			maxParticles: 100,
 		});
 
-		this.particles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-		this.emitter.setEmitterAngle({ min: -180, max: 180 });
-		this.emitter.setSpeed(70 * SCALE);
-		this.emitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
-		this.emitter.setScale({ start: 0.4 * this.effectScale, end: 0.05 });
+		this.emitter.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+
+		this.emitter.addDeathZone({ type: 'onEnter', source: this.particleDeathZone });
+		this.emitter.updateConfig({
+			angle: { min: -180, max: 180 },
+			speed: 70 * SCALE,
+			scale: { start: 0.4 * this.effectScale, end: 0.05 },
+		});
 		this.emitter.explode(20, targetX, targetY);
-		this.emitter.setSpeed({ min: 5 * SCALE, max: 55 * SCALE });
-		this.emitter.setScale({ start: 0.3 * this.effectScale * SCALE, end: 0.01 * SCALE });
+
+		this.emitter.updateConfig({
+			speed: { min: 5 * SCALE, max: 55 * SCALE },
+			scale: { start: 0.3 * this.effectScale * SCALE, end: 0.01 * SCALE },
+		});
 		this.emitter.explode(10, targetX, targetY);
 		setTimeout(() => {
-			this.particles.destroy();
+			this.emitter?.destroy();
 		}, 1000);
 	}
 }

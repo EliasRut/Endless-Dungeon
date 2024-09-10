@@ -1,12 +1,7 @@
-import { Scene } from 'phaser';
-import { isJSON } from 'validator';
 import { UiDepths, UI_SCALE } from '../helpers/constants';
 import MainScene from '../scenes/MainScene';
-import RoomPreloaderScene from '../scenes/RoomPreloaderScene';
-import globalState, { WorldState } from '../worldstate';
-import PlayerCharacter from '../worldstate/PlayerCharacter';
+import globalState from '../worldstate';
 import OverlayScreen from './OverlayScreen';
-import * as data from '../../assets/newgame.json';
 import ContentDataLibrary, { loadContentPackagesFromDatabase } from '../helpers/ContentDataLibrary';
 
 const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;

@@ -1,7 +1,6 @@
 import { ProjectileData } from '../../abilities/abilityData';
 import { Facings, Faction, PossibleTargets, VISITED_TILE_TINT } from '../../helpers/constants';
 import MainScene from '../../scenes/MainScene';
-import globalState from '../../worldstate';
 import CharacterToken from '../tokens/CharacterToken';
 import AbilityEffect from './AbilityEffect';
 
@@ -67,7 +66,7 @@ export default class InstantEffect extends AbilityEffect {
 				return false;
 			});
 		} else if (allowedTargets === PossibleTargets.PLAYER) {
-			const token = (this.scene as MainScene).mainCharacter;
+			const token = (this.scene as MainScene).mainCharacter!;
 			if (Math.hypot(token.x - this.x, token.y - this.y) < range) {
 				potentialTargets = [token];
 			}

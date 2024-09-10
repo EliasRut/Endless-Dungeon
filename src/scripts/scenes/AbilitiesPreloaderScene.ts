@@ -1,16 +1,20 @@
-import { ConditionalAbilityListing, DatabaseRoom, Room } from '../../../typings/custom';
-import { getUrlParam } from '../helpers/browserState';
-import { activeMode, ColorsOfMagic, MODE } from '../helpers/constants';
-import RoomGenerator from '../helpers/generateRoom';
 import globalState from '../worldstate';
-import firebase from 'firebase';
-import { deserializeRoom } from '../helpers/serialization';
 import {
 	ConditionalAbilityDataMap,
 	Abilities,
 	AbilityType,
 	AbilityData,
 } from '../abilities/abilityData';
+import {
+	collection,
+	DocumentData,
+	getDocs,
+	getFirestore,
+	query,
+	QuerySnapshot,
+	where,
+} from 'firebase/firestore';
+import { app } from '../../shared/initializeApp';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -53,24 +57,22 @@ export default class AbilitiesPreloaderScene extends Phaser.Scene {
 			{} as ConditionalAbilityDataMap
 		);
 
-		const abilityMappingPromises: Promise<
-			firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>
-		>[] = [];
-		const abilitiesPromises: Promise<
-			firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>
-		>[] = [];
+		const abilityMappingPromises: Promise<QuerySnapshot<DocumentData>>[] = [];
+		const abilitiesPromises: Promise<QuerySnapshot<DocumentData>>[] = [];
+
+		const db = getFirestore(app);
+		const abilityMappingCollection = collection(db, 'abilityMappings');
+		const abilitiesCollection = collection(db, 'abilities');
 
 		for (const contentPackage of contentPackages) {
-			const abilityMappingsQuery = firebase
-				.firestore()
-				.collection('abilityMappings')
-				.where('contentPackage', '==', contentPackage);
-			abilityMappingPromises.push(abilityMappingsQuery.get());
-			const abilitiesQuery = firebase
-				.firestore()
-				.collection('abilities')
-				.where('contentPackage', '==', contentPackage);
-			abilitiesPromises.push(abilitiesQuery.get());
+			const abilityMappingsQuery = getDocs(
+				query(abilityMappingCollection, where('contentPackage', '==', contentPackage))
+			);
+			abilityMappingPromises.push(abilityMappingsQuery);
+			const abilitiesQuery = getDocs(
+				query(abilitiesCollection, where('contentPackage', '==', contentPackage))
+			);
+			abilitiesPromises.push(abilitiesQuery);
 		}
 
 		await Promise.all(abilitiesPromises).then((abilitiesPromise) => {

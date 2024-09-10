@@ -2,7 +2,6 @@ import {
 	Facings,
 	facingToSpriteNameMap,
 	SCALE,
-	UiDepths,
 	NORMAL_ANIMATION_FRAME_RATE,
 } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
@@ -27,8 +26,8 @@ export default class BatEffect extends TargetingEffect {
 		this.setScale(SCALE);
 		this.setOrigin(0);
 		scene.physics.add.existing(this);
-		this.body.setCircle(BODY_RADIUS, OFFSET, OFFSET);
-		this.body.setMass(1);
+		this.body!.setCircle(BODY_RADIUS, OFFSET, OFFSET);
+		this.body!.setMass(1);
 		if (projectileData.targeting) this.animationName = `${spriteName}-fly`;
 		const spawnAnimation = `${spriteName}-spawn-${facingToSpriteNameMap[facing]}`;
 		const animation = `${this.animationName}-${facingToSpriteNameMap[facing]}`;

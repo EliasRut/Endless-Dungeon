@@ -39,7 +39,6 @@ const getBodyOffset = (facing: Facings) => {
 
 export default class TrailingParticleProjectileEffect extends TargetingEffect {
 	emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-	particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
 	projectileData: ProjectileData;
 	constructor(
 		scene: Phaser.Scene,
@@ -57,14 +56,11 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 
 		const bodyOffset = getBodyOffset(facing);
 
-		this.body.setCircle(BODY_RADIUS, bodyOffset.x, bodyOffset.y);
-		this.body.setMass(1);
+		this.body!.setCircle(BODY_RADIUS, bodyOffset.x, bodyOffset.y);
+		this.body!.setMass(1);
 
 		this.projectileData = projectileData;
 
-		this.particles = scene.add.particles(
-			projectileData.particleData?.particleImage || 'empty-tile'
-		);
 		const emitterData = {
 			alpha: { start: 1, end: 0 },
 			speed: 20,
@@ -73,26 +69,32 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 			...(projectileData.particleData || {}),
 		} as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig;
 		const tintData = projectileData.particleData?.tint;
-		this.emitter = this.particles.createEmitter({
-			...convertEmitterDataToScaledValues(emitterData, projectileData.effectScale || 1),
-			...(typeof tintData === 'object'
-				? {
-						tint: {
-							onEmit: (particle) => {
-								return (
-									RED_VAL * (tintData.redMin + Math.floor(Math.random() * tintData.redDiff)) +
-									GREEN_VAL * (tintData.greenMin + Math.floor(Math.random() * tintData.greenDiff)) +
-									BLUE_VAL * (tintData.blueMin + Math.floor(Math.random() * tintData.blueDiff))
-								);
+		this.emitter = scene.add.particles(
+			(this.width * SCALE) / 2 - bodyOffset.x,
+			(this.height * SCALE) / 2 - bodyOffset.y,
+			projectileData.particleData?.particleImage || 'empty-tile',
+			{
+				...convertEmitterDataToScaledValues(emitterData, projectileData.effectScale || 1),
+				...(typeof tintData === 'object'
+					? {
+							tint: {
+								onEmit: (particle) => {
+									return (
+										RED_VAL * (tintData.redMin + Math.floor(Math.random() * tintData.redDiff)) +
+										GREEN_VAL *
+											(tintData.greenMin + Math.floor(Math.random() * tintData.greenDiff)) +
+										BLUE_VAL * (tintData.blueMin + Math.floor(Math.random() * tintData.blueDiff))
+									);
+								},
 							},
-						},
-				  }
-				: typeof tintData === 'number'
-				? { tint: tintData }
-				: {}),
-		});
+					  }
+					: typeof tintData === 'number'
+					? { tint: tintData }
+					: {}),
+			}
+		);
 
-		this.particles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
+		this.emitter.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 		if (projectileData?.timeToLive) {
 			setTimeout(() => {
 				this.destroy();
@@ -103,15 +105,16 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 	destroy() {
 		this.emitter.stopFollow();
 		if (this.body && this.explodeOnDestruction) {
-			this.emitter.setEmitterAngle({ min: -180, max: 180 });
-			this.emitter.setDeathZone({ type: 'onEnter', source: this.particleDeathZone });
-			this.emitter.setSpeed(
-				multiplyParticleValueByScale(
+			this.emitter.addDeathZone({ type: 'onEnter', source: this.particleDeathZone });
+			this.emitter.updateConfig({
+				angle: { min: -180, max: 180 },
+				speed: multiplyParticleValueByScale(
 					this.projectileData?.explosionData?.speed || 70,
 					this.projectileData.effectScale || 1
-				) as any
-			);
-			this.emitter.setLifespan(this.projectileData?.explosionData?.lifespan || 300);
+				) as any,
+				lifespan: this.projectileData?.explosionData?.lifespan || 300,
+			});
+
 			this.emitter.explode(
 				this.projectileData?.explosionData?.particles || 20,
 				this.body.x + 6 * SCALE,
@@ -125,10 +128,10 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 		this.lightingMaxStrength = 4;
 		this.lightingFrequency = 1000;
 		this.lightingSeed = globalState.gameTime - 100;
-		this.body.destroy();
+		this.body!.destroy();
 		this.setVisible(false);
 		setTimeout(() => {
-			this.particles.destroy();
+			this.emitter.destroy();
 		}, 1000);
 		setTimeout(() => {
 			super.destroy();
@@ -138,7 +141,7 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 	update(time: number) {
 		super.update(time);
 		if (time - this.castTime > VISIBILITY_DELAY && !this.isStarted) {
-			this.emitter.startFollow(this.body.gameObject);
+			this.emitter.startFollow(this.body!);
 			this.emitter.start();
 			this.isStarted = true;
 		}

@@ -94,8 +94,8 @@ export default class TargetingEffect extends AbilityEffect {
 			this.setAcceleration(xAccel, yAccel);
 		}
 		if (this.animationName !== '') {
-			const xSpeed = this.body.velocity.x;
-			const ySpeed = this.body.velocity.y;
+			const xSpeed = this.body!.velocity.x;
+			const ySpeed = this.body!.velocity.y;
 			const newFacing = getFacing4Dir(xSpeed, ySpeed);
 			if (this.facing !== newFacing) {
 				this.facing = newFacing;

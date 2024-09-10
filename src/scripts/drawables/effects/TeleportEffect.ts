@@ -1,26 +1,9 @@
-import { AbilityType, ProjectileData } from '../../abilities/abilityData';
-import {
-	AbilityKey,
-	DASH_REVERSE_DELAY,
-	Facings,
-	FadingLabelSize,
-	PossibleTargets,
-	SCALE,
-	SUMMONING_TYPE,
-	UiDepths,
-} from '../../helpers/constants';
-import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
-import {
-	getOneLetterFacingName,
-	getRotationInRadiansForFacing,
-	getVelocitiesForFacing,
-	isCollidingTile,
-} from '../../helpers/movement';
+import { ProjectileData } from '../../abilities/abilityData';
+import { DASH_REVERSE_DELAY, Facings, SCALE, UiDepths } from '../../helpers/constants';
+import { getVelocitiesForFacing } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
 import globalState from '../../worldstate';
-import { updateAbility } from '../../worldstate/PlayerCharacter';
 import AbilityEffect from './AbilityEffect';
-import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
 
 const RED_DIFF = 0x010000;
 const GREEN_DIFF = 0x000100;
@@ -44,8 +27,8 @@ export default class TeleportEffect extends AbilityEffect {
 		const playerCharacter = globalState.playerCharacter;
 		const rotationFactors = getVelocitiesForFacing(playerCharacter.currentFacing);
 
-		const playerToken = (this.scene as MainScene).mainCharacter;
-		const velocity = playerToken.body.velocity;
+		const playerToken = (this.scene as MainScene).mainCharacter!;
+		const velocity = playerToken.body!.velocity;
 		if (playerCharacter.reverseDashDirectionTime + DASH_REVERSE_DELAY > globalState.gameTime) {
 			playerToken.setVelocity(
 				-TELEPORT_VELOCITY * SCALE * rotationFactors.x,
@@ -57,14 +40,11 @@ export default class TeleportEffect extends AbilityEffect {
 				TELEPORT_VELOCITY * SCALE * rotationFactors.y
 			);
 		}
-		playerToken.body.checkCollision.none = true;
+		playerToken.body!.checkCollision.none = true;
 		playerCharacter.dashing = true;
 		playerToken.alpha = 0.2;
 
-		const particles = scene.add.particles('rock');
-		particles.setDepth(UiDepths.UI_FOREGROUND_LAYER);
-
-		const trailEmitter = particles.createEmitter({
+		const trailEmitter = scene.add.particles(x, y, 'rock', {
 			alpha: { start: 1, end: 1 },
 			scale: { start: 0.4 * this.effectScale * SCALE, end: 0 },
 			speed: 0,
@@ -84,13 +64,14 @@ export default class TeleportEffect extends AbilityEffect {
 			frequency: 0,
 			maxParticles: 200,
 		});
+		trailEmitter.setDepth(UiDepths.UI_FOREGROUND_LAYER);
 
 		trailEmitter.startFollow(playerToken);
 
 		setTimeout(() => {
 			playerToken.setVelocity(velocity.x, velocity.y);
 			playerCharacter.dashing = false;
-			playerToken.body.checkCollision.none = false;
+			playerToken.body!.checkCollision.none = false;
 			playerToken.alpha = 1;
 			trailEmitter.stopFollow();
 		}, TELEPORT_DURATION);

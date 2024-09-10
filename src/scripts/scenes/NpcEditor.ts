@@ -9,9 +9,20 @@ import {
 	PalleteLookup,
 	generateColorConversionTable,
 } from '../helpers/colors';
-import firebase from 'firebase';
 import { NpcData } from '../../../typings/custom';
 import { generateColorReplacedTextures } from '../helpers/colors';
+import {
+	collection,
+	CollectionReference,
+	doc,
+	DocumentData,
+	getDoc,
+	getDocs,
+	getFirestore,
+	setDoc,
+} from 'firebase/firestore';
+import { app } from '../../shared/initializeApp';
+import { getBaseUrl } from '../helpers/getBaseUrl';
 
 const SCALE = 2;
 
@@ -22,8 +33,8 @@ const LAYER_X_OFFSET = LAYER_WIDTH / 2;
 const LAYER_Y_OFFSET = LAYER_HEIGHT / 2;
 
 export default class NpcEditor extends Phaser.Scene {
-	database: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
-	palleteLookup: PalleteLookup;
+	database: CollectionReference<DocumentData>;
+	palleteLookup?: PalleteLookup;
 
 	npcDropdownElement: HTMLSelectElement;
 	loadButton: HTMLButtonElement;
@@ -53,14 +64,16 @@ export default class NpcEditor extends Phaser.Scene {
 	pantsColorInputElement: HTMLInputElement;
 	shoesColorInputElement: HTMLInputElement;
 
-	bodyLayer: Phaser.GameObjects.Image;
-	hairLayer: Phaser.GameObjects.Image;
-	shirtLayer: Phaser.GameObjects.Image;
-	pantsLayer: Phaser.GameObjects.Image;
+	bodyLayer?: Phaser.GameObjects.Image;
+	hairLayer?: Phaser.GameObjects.Image;
+	shirtLayer?: Phaser.GameObjects.Image;
+	pantsLayer?: Phaser.GameObjects.Image;
 
 	constructor() {
 		super({ key: 'NpcEditor' });
-		this.database = firebase.firestore().collection('npcs');
+
+		const db = getFirestore(app);
+		this.database = collection(db, 'npcs');
 
 		this.npcIdInputElement = document.getElementById('npcId') as HTMLInputElement;
 		this.npcNameInputElement = document.getElementById('npcName') as HTMLInputElement;
@@ -143,18 +156,19 @@ export default class NpcEditor extends Phaser.Scene {
 	}
 
 	preload() {
+		const baseUrl = getBaseUrl();
 		// Bodies
-		this.load.image('body-1', 'assets/npcSets/bodies/body1.png');
+		this.load.image('body-1', baseUrl + '/assets/npcSets/bodies/body1.png');
 
 		// Hair
-		this.load.image('hair-1', 'assets/npcSets/hair/hair1.png');
-		this.load.image('hair-2', 'assets/npcSets/hair/hair2.png');
+		this.load.image('hair-1', baseUrl + '/assets/npcSets/hair/hair1.png');
+		this.load.image('hair-2', baseUrl + '/assets/npcSets/hair/hair2.png');
 
 		// Shirts
-		this.load.image('shirt-1', 'assets/npcSets/shirt/shirt1.png');
+		this.load.image('shirt-1', baseUrl + '/assets/npcSets/shirt/shirt1.png');
 
 		// Pants
-		this.load.image('pants-1', 'assets/npcSets/pants/pants1.png');
+		this.load.image('pants-1', baseUrl + '/assets/npcSets/pants/pants1.png');
 	}
 
 	async loadNpcList() {
@@ -162,7 +176,7 @@ export default class NpcEditor extends Phaser.Scene {
 			this.npcDropdownElement.removeChild(this.npcDropdownElement.childNodes[0]);
 		}
 
-		const query = await this.database.get();
+		const query = await getDocs(this.database);
 		const defaultOption = document.createElement('option');
 		defaultOption.value = 'new';
 		defaultOption.innerText = 'New Npc';
@@ -181,7 +195,7 @@ export default class NpcEditor extends Phaser.Scene {
 		if (!npcId || npcId === 'new') {
 			return;
 		}
-		const npcDoc = await this.database.doc(npcId).get();
+		const npcDoc = await getDoc(doc(this.database, npcId));
 		const npc = npcDoc.data() as NpcData;
 
 		this.npcIdInputElement.value = npcDoc.id;
@@ -206,7 +220,7 @@ export default class NpcEditor extends Phaser.Scene {
 			alert('Npc needs an ID and a name.');
 		}
 
-		await this.database.doc(this.npcIdInputElement.value!).set({
+		await setDoc(doc(this.database, this.npcIdInputElement.value!), {
 			name: this.npcNameInputElement.value,
 			bodyColor: this.bodyColorInputElement.value.substr(1),
 			eyeColor: this.eyeColorInputElement.value.substr(1),
@@ -267,7 +281,7 @@ export default class NpcEditor extends Phaser.Scene {
 			shoesColor: this.shoesColorInputElement.value.substr(1),
 		};
 
-		this.palleteLookup = generateColorConversionTable(this.palleteLookup, colorConfig);
+		this.palleteLookup = generateColorConversionTable(this.palleteLookup!, colorConfig);
 
 		generateColorReplacedTextures(this.textures, this.palleteLookup, {
 			...colorConfig,
@@ -277,9 +291,9 @@ export default class NpcEditor extends Phaser.Scene {
 			pantsTemplate: this.pantsDropdownElement.value!,
 		});
 
-		this.bodyLayer.setTexture('body-temp');
-		this.hairLayer.setTexture('hair-temp');
-		this.shirtLayer.setTexture('shirt-temp');
-		this.pantsLayer.setTexture('pants-temp');
+		this.bodyLayer!.setTexture('body-temp');
+		this.hairLayer!.setTexture('hair-temp');
+		this.shirtLayer!.setTexture('shirt-temp');
+		this.pantsLayer!.setTexture('pants-temp');
 	}
 }

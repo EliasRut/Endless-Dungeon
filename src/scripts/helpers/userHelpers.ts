@@ -1,5 +1,6 @@
-import firebase from 'firebase';
 import { UserInformation } from './UserInformation';
+import { collection, doc, getDoc, getFirestore } from 'firebase/firestore';
+import { app } from '../../shared/initializeApp';
 
 let cachedUserData: UserInformation | undefined;
 
@@ -10,9 +11,12 @@ export const getCachedUserData: () => UserInformation | undefined = () => {
 export const loadUserData: (userId: string) => Promise<UserInformation | undefined> = async (
 	userId: string
 ) => {
-	const userDocRef = firebase.firestore().collection('users').doc(userId);
-	const userDoc = await userDocRef.get();
-	if (userDoc.exists) {
+	const db = getFirestore(app);
+	const usersCollection = collection(db, 'users');
+
+	const userDocRef = doc(usersCollection, userId);
+	const userDoc = await getDoc(userDocRef);
+	if (userDoc.exists()) {
 		cachedUserData = userDoc.data() as UserInformation;
 	} else {
 		cachedUserData = undefined;

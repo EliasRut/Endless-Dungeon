@@ -1,6 +1,6 @@
 import { EquipmentSlot, UiDepths, UI_SCALE } from '../helpers/constants';
 import OverlayScreen from './OverlayScreen';
-import { Abilities, AbilityType, getRelevantAbilityVersion } from '../abilities/abilityData';
+import { AbilityType, getRelevantAbilityVersion } from '../abilities/abilityData';
 import globalState from '../worldstate';
 import { ItemData } from '../../items/itemData';
 import { EquippedItemData } from '../worldstate/Inventory';
@@ -28,7 +28,7 @@ export default class ItemScreen extends OverlayScreen {
 	lableLevel: Phaser.GameObjects.Text;
 	lableEnchantment: Phaser.GameObjects.Text;
 	lableEnchantmentValue: Phaser.GameObjects.Text;
-	lableMovSpeedValue: Phaser.GameObjects.Text;
+	lableMovSpeedValue?: Phaser.GameObjects.Text;
 	flavorText: Phaser.GameObjects.Text;
 
 	constructor(scene: Phaser.Scene) {

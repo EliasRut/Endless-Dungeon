@@ -95,19 +95,19 @@ export default class MainScene extends Phaser.Scene {
 	levelName?: LevelName;
 	minimap?: Minimap;
 
-	keyboardHelper: KeyboardHelper;
+	keyboardHelper?: KeyboardHelper;
 	dynamicLightingHelper?: DynamicLightingHelper;
-	scriptHelper: ScriptHelper;
-	abilityHelper: AbilityHelper;
+	scriptHelper?: ScriptHelper;
+	abilityHelper?: AbilityHelper;
 
-	mainCharacter: PlayerCharacterToken;
+	mainCharacter?: PlayerCharacterToken;
 	follower?: FollowerToken;
-	npcMap: { [id: string]: CharacterToken };
-	doorMap: { [id: string]: DoorToken };
-	worldItems: WorldItemToken[];
-	fadingLabels: FadingLabelData[];
+	npcMap: { [id: string]: CharacterToken } = {};
+	doorMap: { [id: string]: DoorToken } = {};
+	worldItems: WorldItemToken[] = [];
+	fadingLabels: FadingLabelData[] = [];
 
-	overlayScreens: {
+	overlayScreens?: {
 		inventory: InventoryScreen;
 		statScreen: StatScreen;
 		dialogScreen: DialogScreen;
@@ -116,19 +116,19 @@ export default class MainScene extends Phaser.Scene {
 		questDetailsScreen: QuestDetailsScreen;
 		itemScreen: ItemScreen;
 		contentManagementScreen: ContentManagementScreen;
-		enchantingScreen: EnchantingScreen;
+		enchantingScreen?: EnchantingScreen;
 	};
-	alive: number;
+	alive: number = 0;
 	isPaused = false;
 	blockUserInteraction = false;
 
 	mobilePadBackground?: Phaser.GameObjects.Image;
 	mobilePadStick?: Phaser.GameObjects.Image;
 
-	playerCharacterAvatar: PlayerCharacterAvatar;
+	playerCharacterAvatar?: PlayerCharacterAvatar;
 	nPCAvatar?: NPCAvatar;
 
-	icons: {
+	icons?: {
 		backpackIcon: BackpackIcon;
 		settingsIcon: SettingsIcon;
 		questsIcon: QuestsIcon;
@@ -137,14 +137,14 @@ export default class MainScene extends Phaser.Scene {
 
 	overlayPressed: number = 0;
 
-	tileLayer: Phaser.Tilemaps.TilemapLayer;
-	decorationLayer: Phaser.Tilemaps.TilemapLayer;
-	overlayLayer: Phaser.Tilemaps.TilemapLayer;
+	tileLayer?: Phaser.Tilemaps.TilemapLayer;
+	decorationLayer?: Phaser.Tilemaps.TilemapLayer;
+	overlayLayer?: Phaser.Tilemaps.TilemapLayer;
 
-	navigationalMap: boolean[][];
+	navigationalMap: boolean[][] = [];
 
 	useDynamicLighting = false;
-	dungeonRunData: DungeonRunData;
+	dungeonRunData?: DungeonRunData;
 
 	lastSave: number = Date.now();
 
@@ -187,10 +187,10 @@ export default class MainScene extends Phaser.Scene {
 
 		if (this.useDynamicLighting) {
 			this.dynamicLightingHelper = new DynamicLightingHelper(
-				this.tileLayer,
-				this.decorationLayer,
-				this.overlayLayer,
-				this.doorMap,
+				this.tileLayer!,
+				this.decorationLayer!,
+				this.overlayLayer!,
+				this.doorMap!,
 				this
 			);
 		}
@@ -203,13 +203,13 @@ export default class MainScene extends Phaser.Scene {
 		this.mainCharacter.setScale(SCALE);
 		this.mainCharacter.setDepth(UiDepths.TOKEN_MAIN_LAYER);
 		this.cameras.main.startFollow(this.mainCharacter, false);
-		this.physics.add.collider(this.mainCharacter, this.tileLayer);
-		this.physics.add.collider(this.mainCharacter, this.decorationLayer);
+		this.physics.add.collider(this.mainCharacter, this.tileLayer!);
+		this.physics.add.collider(this.mainCharacter, this.decorationLayer!);
 		Object.values(this.doorMap).forEach((door) => {
-			this.physics.add.collider(this.mainCharacter, door);
+			this.physics.add.collider(this.mainCharacter!, door);
 		});
 		Object.values(this.npcMap).forEach((npc) => {
-			this.physics.add.collider(this.mainCharacter, npc, () => {
+			this.physics.add.collider(this.mainCharacter!, npc, () => {
 				npc.onCollide(true);
 			});
 		});
@@ -317,7 +317,7 @@ export default class MainScene extends Phaser.Scene {
 			questLogScreen: new QuestLogScreen(this),
 			questDetailsScreen: new QuestDetailsScreen(this),
 			contentManagementScreen: new ContentManagementScreen(this),
-			enchantingScreen: new EnchantingScreen(this),
+			// enchantingScreen: new EnchantingScreen(this),
 		};
 
 		this.icons.backpackIcon.setScreens();
@@ -355,9 +355,9 @@ export default class MainScene extends Phaser.Scene {
 		this.follower = new FollowerToken(this, x, y, type, id);
 		this.follower.setScale(SCALE);
 		this.follower.setDepth(UiDepths.TOKEN_MAIN_LAYER);
-		this.physics.add.collider(this.follower, this.tileLayer);
-		this.physics.add.collider(this.follower, this.decorationLayer);
-		this.physics.add.collider(this.follower, this.mainCharacter);
+		this.physics.add.collider(this.follower, this.tileLayer!);
+		this.physics.add.collider(this.follower, this.decorationLayer!);
+		this.physics.add.collider(this.follower, this.mainCharacter!);
 		Object.values(this.npcMap).forEach((npc) => {
 			this.physics.add.collider(this.follower!, npc, () => {
 				npc.onCollide(true);
@@ -390,10 +390,10 @@ export default class MainScene extends Phaser.Scene {
 		Object.entries(this.npcMap).forEach(([key, value]) => {
 			this.physics.add.collider(this.npcMap[id], value);
 		});
-		this.physics.add.collider(this.npcMap[id], this.tileLayer, () => {
+		this.physics.add.collider(this.npcMap[id], this.tileLayer!, () => {
 			npc.onCollide(false);
 		});
-		this.physics.add.collider(this.npcMap[id], this.decorationLayer, () => {
+		this.physics.add.collider(this.npcMap[id], this.decorationLayer!, () => {
 			npc.onCollide(false);
 		});
 		if (this.mainCharacter && npc.faction === Faction.ENEMIES) {
@@ -427,7 +427,7 @@ export default class MainScene extends Phaser.Scene {
 		}
 		this.doorMap[id] = new DoorToken(this, x, y, type, id);
 		this.doorMap[id].setDepth(UiDepths.TOKEN_BACKGROUND_LAYER);
-		this.physics.add.collider(this.doorMap[id], this.mainCharacter);
+		this.physics.add.collider(this.doorMap[id], this.mainCharacter!);
 		Object.values(this.npcMap).forEach((npc) => {
 			this.physics.add.collider(this.doorMap[id], npc);
 		});
@@ -571,12 +571,12 @@ export default class MainScene extends Phaser.Scene {
 		// tslint:disable: no-magic-numbers
 		const tileDebugGraphics = this.add.graphics().setAlpha(0.75);
 		const decorationDebugGraphics = this.add.graphics().setAlpha(0.75);
-		this.tileLayer.renderDebug(tileDebugGraphics, {
+		this.tileLayer!.renderDebug(tileDebugGraphics, {
 			tileColor: null, // Color of non-colliding tiles
 			collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255),
 			faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Color of colliding face edges
 		});
-		this.decorationLayer.renderDebug(decorationDebugGraphics, {
+		this.decorationLayer!.renderDebug(decorationDebugGraphics, {
 			tileColor: null, // Color of non-colliding tiles
 			collidingTileColor: new Phaser.Display.Color(0, 134, 48, 255),
 			faceColor: new Phaser.Display.Color(0, 39, 37, 255), // Color of colliding face edges
@@ -591,30 +591,30 @@ export default class MainScene extends Phaser.Scene {
 			this.fpsText?.update();
 		}
 		this.minimap?.update();
-		this.keyboardHelper.updateGamepad();
+		this.keyboardHelper?.updateGamepad();
 		updateStatus(globalState.gameTime, globalState.playerCharacter);
 
-		if (this.keyboardHelper.isKKeyPressed()) {
+		if (this.keyboardHelper?.isKKeyPressed()) {
 			globalState.clearState();
 			location.reload();
 		}
 
-		if (this.keyboardHelper.isEnterPressed()) {
-			if (this.scriptHelper.isScriptRunning()) {
-				this.scriptHelper.handleScriptStep(globalState.gameTime, true);
+		if (this.keyboardHelper?.isEnterPressed()) {
+			if (this.scriptHelper?.isScriptRunning()) {
+				this.scriptHelper?.handleScriptStep(globalState.gameTime, true);
 				return;
 			}
 		}
 
 		let open = false;
-		Object.values(this.icons).forEach((icon) => {
+		Object.values(this.icons!).forEach((icon) => {
 			if (icon.open) open = true;
 		});
-		if (this.keyboardHelper.isSettingsPressed(open)) {
-			if (!this.scriptHelper.isScriptRunning()) {
+		if (this.keyboardHelper?.isSettingsPressed(open)) {
+			if (!this.scriptHelper?.isScriptRunning()) {
 				if (this.handleOverlayCooldown()) {
 					this.closeAllIconScreens();
-					if (!open) this.icons.settingsIcon.openScreen();
+					if (!open) this.icons?.settingsIcon.openScreen();
 				}
 			} else {
 				this.scriptHelper.handleScriptStep(globalState.gameTime, true);
@@ -622,35 +622,35 @@ export default class MainScene extends Phaser.Scene {
 			}
 		}
 
-		open = this.icons.backpackIcon.open;
+		open = !!this.icons?.backpackIcon.open;
 		if (
-			this.keyboardHelper.isInventoryPressed() &&
-			!this.scriptHelper.isScriptRunning() &&
+			this.keyboardHelper?.isInventoryPressed() &&
+			!this.scriptHelper?.isScriptRunning() &&
 			this.handleOverlayCooldown()
 		) {
 			this.closeAllIconScreens();
-			if (!open) this.icons.backpackIcon.openScreen();
+			if (!open) this.icons!.backpackIcon.openScreen();
 		}
 		//this.overlayScreens.inventory.interactInventory(['pressed'], globalState.gameTime); // <= dunno what this is for, delete if no inventory bugs are found
 
-		open = this.icons.questsIcon.open;
+		open = !!this.icons?.questsIcon.open;
 		if (
-			this.keyboardHelper.isQuestsPressed() &&
-			!this.scriptHelper.isScriptRunning() &&
+			this.keyboardHelper?.isQuestsPressed() &&
+			!this.scriptHelper?.isScriptRunning() &&
 			this.handleOverlayCooldown()
 		) {
 			this.closeAllIconScreens();
-			if (!open) this.icons.questsIcon.openScreen();
+			if (!open) this.icons?.questsIcon.openScreen();
 		}
 
-		open = this.icons.enchantIcon.open;
+		open = !!this.icons?.enchantIcon.open;
 		if (
-			this.keyboardHelper.isEnchantPressed() &&
-			!this.scriptHelper.isScriptRunning() &&
+			this.keyboardHelper?.isEnchantPressed() &&
+			!this.scriptHelper?.isScriptRunning() &&
 			this.handleOverlayCooldown()
 		) {
 			this.closeAllIconScreens();
-			if (!open) this.icons.enchantIcon.openScreen();
+			if (!open) this.icons?.enchantIcon.openScreen();
 		}
 
 		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
@@ -666,13 +666,13 @@ export default class MainScene extends Phaser.Scene {
 			return;
 		}
 
-		this.overlayScreens.statScreen.update();
+		this.overlayScreens?.statScreen.update();
 
 		if (this.isPaused) {
-			this.scriptHelper.handleScripts(globalState.gameTime);
-			if (this.icons.backpackIcon.open)
-				this.overlayScreens.inventory.interactInventory(
-					this.keyboardHelper.getInventoryKeyPress(),
+			this.scriptHelper?.handleScripts(globalState.gameTime);
+			if (this.icons?.backpackIcon.open)
+				this.overlayScreens?.inventory.interactInventory(
+					this.keyboardHelper!.getInventoryKeyPress(),
 					globalState.gameTime
 				);
 			return;
@@ -681,32 +681,32 @@ export default class MainScene extends Phaser.Scene {
 		// Reset Player position to last position if they are on a blocking tile now
 		const playerX = globalState.playerCharacter.x;
 		const playerY = globalState.playerCharacter.y;
-		const currentBaseTileIndex = this.tileLayer.getTileAtWorldXY(
-			this.mainCharacter.x,
-			this.mainCharacter.y
+		const currentBaseTileIndex = this.tileLayer?.getTileAtWorldXY(
+			this.mainCharacter!.x,
+			this.mainCharacter!.y
 		)?.index;
-		const currentDecorationTileIndex = this.decorationLayer.getTileAtWorldXY(
-			this.mainCharacter.x,
-			this.mainCharacter.y
+		const currentDecorationTileIndex = this.decorationLayer?.getTileAtWorldXY(
+			this.mainCharacter!.x,
+			this.mainCharacter!.y
 		)?.index;
 
 		if (
 			isCollidingTile(currentBaseTileIndex || -1) ||
 			isCollidingTile(currentDecorationTileIndex || -1)
 		) {
-			this.mainCharacter.x = this.lastPlayerPosition!.x;
-			this.mainCharacter.y = this.lastPlayerPosition!.y;
-			this.mainCharacter.setVelocity(0);
+			this.mainCharacter!.x = this.lastPlayerPosition!.x;
+			this.mainCharacter!.y = this.lastPlayerPosition!.y;
+			this.mainCharacter!.setVelocity(0);
 		} else {
 			this.lastPlayerPosition = {
-				x: this.mainCharacter.x,
-				y: this.mainCharacter.y,
+				x: this.mainCharacter!.x,
+				y: this.mainCharacter!.y,
 			};
 		}
 
 		if (!this.blockUserInteraction) {
 			if (globalState.playerCharacter.stunned === true) {
-				this.mainCharacter.setVelocity(0, 0);
+				this.mainCharacter!.setVelocity(0, 0);
 			} else {
 				if (
 					globalState.playerCharacter.comboCast > 0 &&
@@ -715,12 +715,12 @@ export default class MainScene extends Phaser.Scene {
 				) {
 					globalState.playerCharacter.comboCast = 0;
 				}
-				const msSinceLastCast = this.keyboardHelper.getMsSinceLastCast(globalState.gameTime);
-				const castingDuration = this.keyboardHelper.getLastCastingDuration();
+				const msSinceLastCast = this.keyboardHelper!.getMsSinceLastCast(globalState.gameTime);
+				const castingDuration = this.keyboardHelper!.getLastCastingDuration();
 				const isCasting = msSinceLastCast < castingDuration;
 
 				if (!globalState.playerCharacter.dashing) {
-					const [xFacing, yFacing] = this.keyboardHelper.getCharacterFacing(
+					const [xFacing, yFacing] = this.keyboardHelper!.getCharacterFacing(
 						this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackground!.x : 0,
 						this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackground!.y : 0
 					);
@@ -763,19 +763,29 @@ export default class MainScene extends Phaser.Scene {
 					}
 
 					if (playerAnimation) {
-						this.mainCharacter.play({
+						console.log(
+							`Playing animation ${playerAnimation}, current frame is ${
+								this.mainCharacter!.anims.currentFrame?.index
+							}`
+						);
+						this.mainCharacter!.play({
 							key: playerAnimation,
 							// duration: 5,
-							frameRate: isCasting
-								? NORMAL_ANIMATION_FRAME_RATE * (MINIMUM_CASTING_TIME_MS / castingDuration)
-								: isWalking
-								? NORMAL_ANIMATION_FRAME_RATE / 2
-								: NORMAL_ANIMATION_FRAME_RATE,
+							// frameRate: isCasting
+							// 	? NORMAL_ANIMATION_FRAME_RATE * (MINIMUM_CASTING_TIME_MS / castingDuration)
+							// 	: isWalking
+							// 	? NORMAL_ANIMATION_FRAME_RATE / 2
+							// 	: NORMAL_ANIMATION_FRAME_RATE,
 							startFrame:
 								isCasting && this.hasCasted
-									? this.mainCharacter.anims.currentFrame?.index - 1 || 0
+									? this.mainCharacter!.anims.currentFrame?.index! - 1 || 0
 									: 0,
 							repeat: -1,
+							timeScale: isCasting
+								? MINIMUM_CASTING_TIME_MS / castingDuration
+								: isWalking
+								? 0.5
+								: 1,
 						});
 					}
 					if (hasMoved) {
@@ -802,27 +812,27 @@ export default class MainScene extends Phaser.Scene {
 						? getCharacterSpeed(globalState.playerCharacter) / 2
 						: getCharacterSpeed(globalState.playerCharacter);
 
-					this.mainCharacter.setVelocity(xFacing * speed, yFacing * speed);
-					this.mainCharacter.body.velocity.normalize().scale(speed);
+					this.mainCharacter!.setVelocity(xFacing * speed, yFacing * speed);
+					this.mainCharacter!.body!.velocity.normalize().scale(speed);
 				}
 			}
-			globalState.playerCharacter.x = Math.round(this.mainCharacter.x / SCALE);
-			globalState.playerCharacter.y = Math.round(this.mainCharacter.y / SCALE);
+			globalState.playerCharacter.x = Math.round(this.mainCharacter!.x / SCALE);
+			globalState.playerCharacter.y = Math.round(this.mainCharacter!.y / SCALE);
 
 			if (!this.blockUserInteraction) {
-				const castAbilities = this.keyboardHelper.getCastedAbilities(globalState.gameTime);
-				this.abilityHelper.update(globalState.gameTime, castAbilities);
+				const castAbilities = this.keyboardHelper!.getCastedAbilities(globalState.gameTime);
+				this.abilityHelper!.update(globalState.gameTime, castAbilities);
 			}
 		}
-		const cooldowns = this.keyboardHelper.getAbilityCooldowns(globalState.gameTime);
-		this.playerCharacterAvatar.update(cooldowns);
+		const cooldowns = this.keyboardHelper!.getAbilityCooldowns(globalState.gameTime);
+		this.playerCharacterAvatar!.update(cooldowns);
 
 		if (this.useDynamicLighting && this.dynamicLightingHelper) {
 			this.dynamicLightingHelper.updateDynamicLighting(globalState.gameTime);
 		}
 
 		// Updated npcs
-		this.mainCharacter.update(globalState.gameTime, delta);
+		this.mainCharacter!.update(globalState.gameTime, delta);
 		Object.values(this.npcMap).forEach((curNpc) => {
 			curNpc.update(globalState.gameTime, delta);
 		});
@@ -866,19 +876,19 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		// Set parts of the overlay layer transparent if the character is behind it
-		this.overlayLayer.forEachTile((tile) => (tile.alpha = 1));
-		const overlayTile = this.overlayLayer.getTileAtWorldXY(playerX, playerY);
+		this.overlayLayer!.forEachTile((tile) => (tile.alpha = 1));
+		const overlayTile = this.overlayLayer!.getTileAtWorldXY(playerX, playerY);
 		if (overlayTile) {
 			const overlayTiles = [
 				overlayTile,
-				this.overlayLayer.getTileAtWorldXY(playerX - 16, playerY - 16),
-				this.overlayLayer.getTileAtWorldXY(playerX, playerY - 16),
-				this.overlayLayer.getTileAtWorldXY(playerX + 16, playerY - 16),
-				this.overlayLayer.getTileAtWorldXY(playerX - 16, playerY),
-				this.overlayLayer.getTileAtWorldXY(playerX + 16, playerY),
-				this.overlayLayer.getTileAtWorldXY(playerX - 16, playerY + 16),
-				this.overlayLayer.getTileAtWorldXY(playerX, playerY + 16),
-				this.overlayLayer.getTileAtWorldXY(playerX + 16, playerY + 16),
+				this.overlayLayer!.getTileAtWorldXY(playerX - 16, playerY - 16),
+				this.overlayLayer!.getTileAtWorldXY(playerX, playerY - 16),
+				this.overlayLayer!.getTileAtWorldXY(playerX + 16, playerY - 16),
+				this.overlayLayer!.getTileAtWorldXY(playerX - 16, playerY),
+				this.overlayLayer!.getTileAtWorldXY(playerX + 16, playerY),
+				this.overlayLayer!.getTileAtWorldXY(playerX - 16, playerY + 16),
+				this.overlayLayer!.getTileAtWorldXY(playerX, playerY + 16),
+				this.overlayLayer!.getTileAtWorldXY(playerX + 16, playerY + 16),
 			];
 
 			for (const currentTile of overlayTiles) {
@@ -904,7 +914,7 @@ export default class MainScene extends Phaser.Scene {
 
 		this.fadingLabels = this.fadingLabels.filter((label) => label.fontElement);
 
-		this.scriptHelper.handleScripts(globalState.gameTime);
+		this.scriptHelper!.handleScripts(globalState.gameTime);
 
 		const now = Date.now();
 
@@ -919,9 +929,9 @@ export default class MainScene extends Phaser.Scene {
 
 			for (let animatedX = lowestRelevantX; animatedX < highestRelevantX; animatedX++) {
 				for (let animatedY = lowestRelevantY; animatedY < highestRelevantY; animatedY++) {
-					updateAnimatedTile(this.tileLayer.getTileAt(animatedX, animatedY));
-					updateAnimatedTile(this.decorationLayer.getTileAt(animatedX, animatedY));
-					updateAnimatedTile(this.overlayLayer.getTileAt(animatedX, animatedY));
+					updateAnimatedTile(this.tileLayer!.getTileAt(animatedX, animatedY));
+					updateAnimatedTile(this.decorationLayer!.getTileAt(animatedX, animatedY));
+					updateAnimatedTile(this.overlayLayer!.getTileAt(animatedX, animatedY));
 				}
 			}
 		}
@@ -934,14 +944,14 @@ export default class MainScene extends Phaser.Scene {
 
 		// tslint:disable-next-line: no-magic-numbers
 		if (now - this.lastScriptUnpausing > 1000) {
-			this.scriptHelper.resumePausedScripts();
+			this.scriptHelper!.resumePausedScripts();
 		}
 
 		// Update drum state based on distance to enemy
 		const closestEnemy = getClosestTarget(
 			Faction.PLAYER,
-			this.mainCharacter.x,
-			this.mainCharacter.y
+			this.mainCharacter!.x,
+			this.mainCharacter!.y
 		);
 		if (closestEnemy) {
 			const distanceToEnemy = Math.hypot(
@@ -992,7 +1002,7 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	closeAllIconScreens() {
-		Object.values(this.icons).forEach((icon) => {
+		Object.values(this.icons!).forEach((icon) => {
 			if (icon.open) icon.closeScreen();
 		});
 		this.resume();
@@ -1014,7 +1024,7 @@ export default class MainScene extends Phaser.Scene {
 			globalState.playerCharacter.currentFacing
 		);
 		if (playerAnimation) {
-			this.mainCharacter.play({ key: playerAnimation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
+			this.mainCharacter!.play({ key: playerAnimation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		}
 		Object.values(this.npcMap).forEach((curNpc) => {
 			curNpc.update(globalState.gameTime, 0);
@@ -1052,7 +1062,7 @@ export default class MainScene extends Phaser.Scene {
 
 	getLightingSources(): LightingSource[] {
 		return [
-			...this.abilityHelper.abilityEffects.map((abilityEffect) => {
+			...this.abilityHelper!.abilityEffects.map((abilityEffect) => {
 				return {
 					x: Math.round(abilityEffect.x / TILE_WIDTH / SCALE),
 					y: Math.round(abilityEffect.y / TILE_HEIGHT / SCALE),

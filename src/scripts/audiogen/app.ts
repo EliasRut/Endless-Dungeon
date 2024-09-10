@@ -19,8 +19,8 @@ import {
 	ProgramState,
 	ThreeOhMachine,
 	trigger,
-	DelayUnit,
-	ClockUnit,
+	TDelayUnit,
+	TClockUnit,
 	AutoPilotUnit,
 	GeneralisedParameter,
 } from './interface';
@@ -164,7 +164,7 @@ async function NineOhUnit(audio: AudioT): Promise<NineOhMachine> {
 	};
 }
 
-function DelayUnit(audio: AudioT): DelayUnit {
+function DelayUnit(audio: AudioT): TDelayUnit {
 	const dryWet = parameter('Dry/Wet', [0, 0.0], 0);
 	const feedback = parameter('Feedback', [0, 0.0], 0);
 	const delayTime = parameter('Time', [0, 1], 0.5);
@@ -245,7 +245,7 @@ function AutoPilot(state: ProgramState): AutoPilotUnit {
 	};
 }
 
-function ClockUnit(): ClockUnit {
+function ClockUnit(): TClockUnit {
 	const bpm = parameter('BPM', [70, 200], 142);
 	const currentStep = parameter('Current Step', [0, 15], 0);
 	const clockImpl = Clock(bpm.value, 4, 0.0);

@@ -1,37 +1,50 @@
-# Vector Monkeys Coding Dojo - Project Endless Dungeon
+# React + TypeScript + Vite
 
-Welcome to the GitHub repo for our game dev session.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Please
+Currently, two official plugins are available:
 
-- also join in [discord](https://discord.gg/nKMYqD)
-- join the [trello](https://trello.com/b/BA8Hl0gK/game-dev-2020-10-0304)
-- and check out the [doc](https://docs.google.com/document/d/1KXyBbbSeEYwZWmmzd-1DQ6IxI9Zw5MNtJTyMrL2TV0o/edit#)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-# How to run
+## Expanding the ESLint configuration
 
-## Install dependencies
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
+- Configure the top-level `parserOptions` property like this:
+
+```js
+export default tseslint.config({
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
 ```
-npm install
+
+- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
+- Optionally add `...tseslint.configs.stylisticTypeChecked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+
+```js
+// eslint.config.js
+import react from 'eslint-plugin-react'
+
+export default tseslint.config({
+  // Set the react version
+  settings: { react: { version: '18.3' } },
+  plugins: {
+    // Add the react plugin
+    react,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended rules
+    ...react.configs.recommended.rules,
+    ...react.configs['jsx-runtime'].rules,
+  },
+})
 ```
-
-## Start the local development server (on port 8080)
-
-```
-npm start
-```
-
-# Recommended Visual Studio Code extensions
-
-Please install the following:
-
-- Live Share
-- tslint
-
-You might also want to install GitLens
-
-## Running tile extruder
-
-npm install -g tile-extruder
-tile-extruder --tileWidth 16 --tileHeight 16 --input ./src/assets/tilesets/... .png --output ./src/assets/tilesets/... .png

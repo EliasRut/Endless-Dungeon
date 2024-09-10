@@ -1,5 +1,4 @@
 import {
-	Abilities,
 	AbilityData,
 	AbilityType,
 	SpreadData,
@@ -7,15 +6,12 @@ import {
 } from '../abilities/abilityData';
 import AbilityEffect from '../drawables/effects/AbilityEffect';
 import CharacterToken from '../drawables/tokens/CharacterToken';
-import EnemyToken from '../drawables/tokens/EnemyToken';
-import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import MainScene from '../scenes/MainScene';
-import globalState, { WorldState } from '../worldstate';
+import globalState from '../worldstate';
 import Character from '../worldstate/Character';
 import { Facings, Faction, PossibleTargets, SCALE } from './constants';
 import { getFacing8Dir, getRotationInRadiansForFacing, getVelocitiesForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
-import Enemy from '../worldstate/Enemy';
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
 import { CASTING_SPEED_MS } from '../scenes/MainScene';
 import { getAbsoluteDistancesToWorldStatePosition, getClosestTarget } from './targetingHelpers';
@@ -37,7 +33,7 @@ export interface PointOfOrigin extends SimplePointOfOrigin {
 export default class AbilityHelper {
 	scene: MainScene;
 	abilityEffects: AbilityEffect[] = [];
-	abilities: AbilityEffect[];
+	abilities: AbilityEffect[] = [];
 
 	constructor(scene: MainScene) {
 		this.scene = scene;
@@ -112,7 +108,7 @@ export default class AbilityHelper {
 			}
 			effect.setVelocity(xMultiplier * SCALE, yMultiplier * SCALE);
 			effect.setMaxVelocity(projectileData!.velocity * SCALE);
-			effect.body.velocity.scale(projectileData!.velocity);
+			effect.body!.velocity.scale(projectileData!.velocity);
 
 			effect.setDrag(
 				(projectileData!.drag || 0) * SCALE * Math.abs(xMultiplier),
@@ -121,7 +117,7 @@ export default class AbilityHelper {
 
 			effect.setDebug(true, true, 0xffff00);
 
-			this.scene.physics.add.collider(effect, this.scene.tileLayer, () => {
+			this.scene.physics.add.collider(effect, this.scene.tileLayer!, () => {
 				if (projectileData!.destroyOnWallContact) {
 					effect.destroy();
 				}
@@ -131,7 +127,7 @@ export default class AbilityHelper {
 					});
 				}
 			});
-			this.scene.physics.add.collider(effect, this.scene.decorationLayer, () => {
+			this.scene.physics.add.collider(effect, this.scene.decorationLayer!, () => {
 				if (projectileData!.destroyOnWallContact) {
 					effect.destroy();
 				}
@@ -155,11 +151,11 @@ export default class AbilityHelper {
 			const enemyNpcs = Object.values(this.scene.npcMap).filter(
 				(npc) => npc.faction === Faction.ENEMIES
 			);
-			const friendlyNpcs = [
-				this.scene.mainCharacter,
+			const friendlyNpcs: CharacterToken[] = [
+				this.scene.mainCharacter!,
 				...(this.scene.follower ? [this.scene.follower] : []),
 			];
-			const targetTokens = projectileData?.inverseAllowedTargets
+			const targetTokens: CharacterToken[] = projectileData?.inverseAllowedTargets
 				? caster.faction === Faction.PLAYER || caster.faction === Faction.ALLIES
 					? friendlyNpcs
 					: enemyNpcs
@@ -243,9 +239,9 @@ export default class AbilityHelper {
 				}
 			};
 			if (!projectileData?.passThroughEnemies) {
-				this.scene.physics.add.collider(effect, targetTokens, collidingCallback as any);
+				this.scene.physics.add.collider(effect, targetTokens!, collidingCallback as any);
 			} else {
-				this.scene.physics.add.overlap(effect, targetTokens, collidingCallback as any);
+				this.scene.physics.add.overlap(effect, targetTokens!, collidingCallback as any);
 			}
 			this.abilityEffects.push(effect);
 		};
@@ -266,12 +262,12 @@ export default class AbilityHelper {
 			const casterToken = this.scene.getTokenForStateObject(caster);
 			if (casterToken) {
 				const rotationFactors = getVelocitiesForFacing(caster.currentFacing);
-				const velocity = casterToken.body.velocity;
+				const velocity = casterToken.body!.velocity;
 				const dashVelocityX = usedAbilityData.dashSpeed * SCALE * rotationFactors.x;
 				const dashVelocityY = usedAbilityData.dashSpeed * SCALE * rotationFactors.y;
 				casterToken.setVelocity(dashVelocityX, dashVelocityY);
 				if (usedAbilityData.dashInvulnerability) {
-					casterToken.body.checkCollision.none = true;
+					casterToken.body!.checkCollision.none = true;
 					caster.dashing = true;
 					casterToken.alpha = 0.2;
 				}
@@ -308,7 +304,7 @@ export default class AbilityHelper {
 				setTimeout(() => {
 					casterToken.setVelocity(velocity.x, velocity.y);
 					caster.dashing = false;
-					casterToken.body.checkCollision.none = false;
+					casterToken.body!.checkCollision.none = false;
 					casterToken.alpha = 1;
 				}, Math.min(maximumDashDuration, usedAbilityData.dashDuration));
 			}
@@ -366,7 +362,7 @@ export default class AbilityHelper {
 					globalState.playerCharacter.lastComboCastTime = time;
 				}
 			}, castingTime * 0.67);
-			this.scene.keyboardHelper.lastCastingDuration = castingTime;
+			this.scene.keyboardHelper!.lastCastingDuration = castingTime;
 		});
 
 		this.abilityEffects = this.abilityEffects.filter((effect) => !effect.destroyed);

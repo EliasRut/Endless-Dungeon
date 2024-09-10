@@ -16,7 +16,6 @@ import {
 	isCollidingTile,
 	updateMovingState,
 } from '../../helpers/movement';
-import { AbilityType } from '../../abilities/abilityData';
 import CharacterToken from './CharacterToken';
 
 const BODY_RADIUS = 8;
@@ -47,13 +46,13 @@ export default class FollowerToken extends CharacterToken {
 	exhausted: boolean = false;
 	exhaustedAt: number = 0;
 	exhaustionDuration: number = 6000;
-	exhaustionText: Phaser.GameObjects.Text;
+	exhaustionText?: Phaser.GameObjects.Text;
 
 	constructor(scene: MainScene, x: number, y: number, type: string, id: string) {
 		super(scene, x, y, type, type, id);
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
-		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
+		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
 		this.stateObject = globalState.followers[id];
 
@@ -146,13 +145,14 @@ export default class FollowerToken extends CharacterToken {
 					newYPosition = (ty + yDiff * TILE_WIDTH) * SCALE;
 
 					// Test if target base or decoration tile is occupied and find unoccupied tile if necessary
-					const currentBaseTileIndex = (this.scene as MainScene).tileLayer.getTileAtWorldXY(
+					const currentBaseTileIndex = this.scene.tileLayer!.getTileAtWorldXY(
 						newXPosition,
 						newYPosition
 					)?.index;
-					const currentDecorationTileIndex = (
-						this.scene as MainScene
-					).decorationLayer.getTileAtWorldXY(newXPosition, newYPosition)?.index;
+					const currentDecorationTileIndex = this.scene.decorationLayer!.getTileAtWorldXY(
+						newXPosition,
+						newYPosition
+					)?.index;
 
 					if (
 						currentBaseTileIndex === undefined ||
@@ -241,7 +241,7 @@ export default class FollowerToken extends CharacterToken {
 					console.log(`Animation ${animation} does not exist.`);
 				}
 				setTimeout(() => {
-					(this.scene as MainScene).abilityHelper.triggerAbility(
+					this.scene.abilityHelper!.triggerAbility(
 						this.stateObject,
 						{
 							...this.stateObject,

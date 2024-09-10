@@ -45,7 +45,7 @@ export default class AbilityEffect extends Phaser.Physics.Arcade.Sprite {
 
 		this.particleDeathZone = {
 			contains: (particleX, particleY) => {
-				const tileLayerTile = mainScene.tileLayer.getTileAtWorldXY(particleX, particleY);
+				const tileLayerTile = mainScene.tileLayer!.getTileAtWorldXY(particleX, particleY);
 				return !tileLayerTile || isCollidingTile(tileLayerTile.index);
 			},
 		};

@@ -15,7 +15,11 @@ export const Game = () => {
 		setActiveMode(MODE.GAME);
 		const config = getGameConfig(phaserRef.current!, MODE.GAME);
 		const game = new Phaser.Game(config);
-		startAudioGeneration();
+		try {
+			startAudioGeneration();
+		} catch (e) {
+			console.log(e);
+		}
 	}, [showGame]);
 
 	return <div className="game__container" ref={phaserRef} />;

@@ -1,10 +1,18 @@
-import { DatabaseRoom, Room } from '../../../typings/custom';
+import { DatabaseRoom } from '../../../typings/custom';
 import { getUrlParam } from '../helpers/browserState';
 import { activeMode, ColorsOfMagic, MODE } from '../helpers/constants';
 import RoomGenerator from '../helpers/generateRoom';
 import globalState from '../worldstate';
-import firebase from 'firebase';
 import { deserializeRoom } from '../helpers/serialization';
+import {
+	collection,
+	doc,
+	DocumentData,
+	DocumentSnapshot,
+	getDoc,
+	getFirestore,
+} from 'firebase/firestore';
+import { app } from '../../shared/initializeApp';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -96,17 +104,14 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 	}
 
 	create() {
-		const db = firebase.firestore().collection('rooms');
+		const db = getFirestore(app);
+		const roomsCollection = collection(db, 'rooms');
+
 		const roomPromises = this.usedRooms
 			.filter((roomId) => !roomId.startsWith('awsomeRoom'))
 			.map((roomId) => {
-				return db
-					.doc(roomId)
-					.get()
-					.then((data) => [roomId, data]);
-			}) as Promise<
-			[string, firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>]
-		>[];
+				return getDoc(doc(roomsCollection, roomId)).then((data) => [roomId, data]);
+			}) as Promise<[string, DocumentSnapshot<DocumentData>]>[];
 
 		Promise.all(roomPromises)
 			.then((roomDocs) => {

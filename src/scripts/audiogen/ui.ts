@@ -5,10 +5,10 @@
 */
 
 import {
-	DelayUnit,
+	TDelayUnit,
 	DrumPattern,
 	GeneralisedParameter,
-	ClockUnit,
+	TClockUnit,
 	NineOhMachine,
 	NoteGenerator,
 	NumericParameter,
@@ -258,7 +258,7 @@ function Mutes(params: GeneralisedParameter<boolean>[]) {
 	return container;
 }
 
-function DelayControls(delayUnit: DelayUnit) {
+function DelayControls(delayUnit: TDelayUnit) {
 	const controls = DialSet([delayUnit.dryWet, delayUnit.feedback]);
 	controls.classList.add('horizontal');
 

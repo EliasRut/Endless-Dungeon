@@ -13,6 +13,7 @@ const MAX_INTERACTION_DISTANCE = 30;
 const HEAL_PERCENTAGE = 1 / 4; // health
 
 export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
+	declare scene: MainScene;
 	isDestroyed: boolean = false;
 	itemKey: string;
 	level: number;
@@ -35,7 +36,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		this.level = level;
 		this.tileY = Math.round(y / TILE_HEIGHT / SCALE);
 		this.tileX = Math.round(x / TILE_WIDTH / SCALE);
-		this.tile = (this.scene as MainScene).tileLayer.getTileAt(this.tileX, this.tileY);
+		this.tile = this.scene.tileLayer!.getTileAt(this.tileX, this.tileY);
 		this.setScale(SCALE);
 		scene.add.existing(this);
 		this.playItemAnimation();
@@ -43,8 +44,8 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 
 	loadIcon() {}
 	public update(scene: MainScene) {
-		const px = scene.mainCharacter.x;
-		const py = scene.mainCharacter.y;
+		const px = scene.mainCharacter!.x;
+		const py = scene.mainCharacter!.y;
 		const distance = Math.hypot(this.x - px, this.y - py);
 		// if you run over item, put into inventory
 		if (distance < MAX_INTERACTION_DISTANCE * SCALE) {
@@ -54,7 +55,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 					globalState.playerCharacter.health + heal > globalState.playerCharacter.maxHealth
 						? globalState.playerCharacter.maxHealth
 						: globalState.playerCharacter.health + heal;
-			} else if (this.isEssence()){				
+			} else if (this.isEssence()) {
 				globalState.inventory.essences[this.itemKey as ColorsOfMagic]++;
 			} else {
 				if (isEquippable(this.itemKey)) {
@@ -63,7 +64,7 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 						equipmentData.level = this.level;
 						equipItemIfNoneEquipped(this.itemKey as EquipmentKey);
 					}
-					scene.overlayScreens.inventory.update();
+					scene.overlayScreens!.inventory.update();
 				} else {
 					const unequippableItemKey = this.itemKey as UneqippableItem;
 					globalState.inventory.bag[unequippableItemKey] =

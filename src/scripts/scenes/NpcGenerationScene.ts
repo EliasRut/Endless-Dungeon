@@ -1,19 +1,22 @@
 import { NpcData } from '../../../typings/custom';
-import {
-	FacingRange,
-	npcToAespriteMap,
-	npcTypeToFileMap,
-	NUM_DIRECTIONS,
-	spriteDirectionList,
-} from '../helpers/constants';
+import { npcToAespriteMap, npcTypeToFileMap } from '../helpers/constants';
 import globalState from '../worldstate';
-import firebase from 'firebase';
 import {
 	generateColorConversionTable,
 	generateColorReplacedTextures,
 	generatePalleteLookup,
 	getColorReplacedImageSource,
 } from '../helpers/colors';
+import {
+	collection,
+	doc,
+	DocumentData,
+	DocumentSnapshot,
+	getDoc,
+	getFirestore,
+} from 'firebase/firestore';
+import { app } from '../../shared/initializeApp';
+import { getBaseUrl } from '../helpers/getBaseUrl';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -28,7 +31,7 @@ export default class NpcGenerationScene extends Phaser.Scene {
 
 	preload() {
 		this.npcForGeneration = [];
-		const requiredNpcs = new Set<string>();		
+		const requiredNpcs = new Set<string>();
 		requiredNpcs.add('vanya-base');
 		requiredNpcs.add('agnes');
 		requiredNpcs.add('erwin');
@@ -48,12 +51,21 @@ export default class NpcGenerationScene extends Phaser.Scene {
 			});
 		});
 
+		const baseUrl = getBaseUrl();
+
 		// NPCs
 		requiredNpcs.forEach((npc) => {
 			if (npcTypeToFileMap[npc]) {
-				this.load.spritesheet(npc, npcTypeToFileMap[npc].file, { frameWidth: 40, frameHeight: 40 });
+				this.load.spritesheet(npc, `${baseUrl}/${npcTypeToFileMap[npc].file}`, {
+					frameWidth: 40,
+					frameHeight: 40,
+				});
 			} else if (npcToAespriteMap[npc]) {
-				this.load.aseprite(npc, npcToAespriteMap[npc].png, npcToAespriteMap[npc].json)
+				this.load.aseprite(
+					npc,
+					`${baseUrl}/${npcToAespriteMap[npc].png}`,
+					`${baseUrl}/${npcToAespriteMap[npc].json}`
+				);
 			} else {
 				if (!this.textures.exists(npc)) {
 					this.npcForGeneration.push(npc);
@@ -62,27 +74,25 @@ export default class NpcGenerationScene extends Phaser.Scene {
 		});
 
 		// Bodies
-		this.load.image('body-1', 'assets/npcSets/bodies/body1.png');
+		this.load.image('body-1', `${baseUrl}/assets/npcSets/bodies/body1.png`);
 
 		// Hair
-		this.load.image('hair-1', 'assets/npcSets/hair/hair1.png');
-		this.load.image('hair-2', 'assets/npcSets/hair/hair2.png');
+		this.load.image('hair-1', `${baseUrl}/assets/npcSets/hair/hair1.png`);
+		this.load.image('hair-2', `${baseUrl}/assets/npcSets/hair/hair2.png`);
 
 		// Shirts
-		this.load.image('shirt-1', 'assets/npcSets/shirt/shirt1.png');
+		this.load.image('shirt-1', `${baseUrl}/assets/npcSets/shirt/shirt1.png`);
 
 		// Pants
-		this.load.image('pants-1', 'assets/npcSets/pants/pants1.png');
+		this.load.image('pants-1', `${baseUrl}/assets/npcSets/pants/pants1.png`);
 	}
 
 	create() {
-		const db = firebase.firestore().collection('npcs');
+		const db = getFirestore(app);
+		const npcsCollection = collection(db, 'npcs');
 		const npcPromises = this.npcForGeneration.map((npcId) => {
-			return db
-				.doc(npcId)
-				.get()
-				.then((data) => [npcId, data]);
-		}) as Promise<[string, firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>]>[];
+			return getDoc(doc(npcsCollection, npcId)).then((data) => [npcId, data]);
+		}) as Promise<[string, DocumentSnapshot<DocumentData>]>[];
 
 		Promise.all(npcPromises)
 			.then((npcDocs) => {

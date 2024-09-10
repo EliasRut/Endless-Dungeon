@@ -31,7 +31,7 @@ export default class NpcToken extends CharacterToken {
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 
-		this.body.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
+		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
 		this.questGiverId = options?.questGiverId;
 		this.traderId = options?.traderId;
@@ -49,20 +49,20 @@ export default class NpcToken extends CharacterToken {
 			const yOffset = (Math.abs(500 - (globalTime % 1000)) / 125) * SCALE;
 			if (!this.openQuestSymbol) {
 				this.openQuestSymbol = this.scene.add.image(
-					this.body.x + 8 * SCALE,
-					this.body.y - (14 - yOffset) * SCALE,
+					this.body!.x + 8 * SCALE,
+					this.body!.y - (14 - yOffset) * SCALE,
 					'quest'
 				);
 				this.openQuestSymbol.setDepth(UiDepths.TOKEN_FOREGROUND_LAYER);
 				this.openQuestSymbol.setScale(SCALE);
 			} else {
-				this.openQuestSymbol.x = this.body.x + 8 * SCALE;
-				this.openQuestSymbol.y = this.body.y - (22 - yOffset) * SCALE;
+				this.openQuestSymbol.x = this.body!.x + 8 * SCALE;
+				this.openQuestSymbol.y = this.body!.y - (22 - yOffset) * SCALE;
 			}
 			const player = globalState.playerCharacter;
 			if (this.getDistanceToWorldStatePosition(player.x, player.y) < 60 * SCALE) {
 				const mainScene = this.scene as MainScene;
-				if (!mainScene.scriptHelper.isScriptRunning()) {
+				if (!mainScene.scriptHelper!.isScriptRunning()) {
 					const nextQuestId = getNextQuestId(this.questGiverId);
 					if (nextQuestId) {
 						globalState.quests[nextQuestId] = {
@@ -70,7 +70,7 @@ export default class NpcToken extends CharacterToken {
 							questGiverId: this.questGiverId,
 							states: {},
 						};
-						mainScene.scriptHelper.loadScript(loadQuestScript(nextQuestId));
+						mainScene.scriptHelper!.loadScript(loadQuestScript(nextQuestId));
 					}
 				}
 			}

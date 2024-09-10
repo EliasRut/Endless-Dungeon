@@ -1,12 +1,8 @@
-import { Scene } from 'phaser';
 import { isJSON } from 'validator';
 import { UiDepths, UI_SCALE } from '../helpers/constants';
 import MainScene from '../scenes/MainScene';
-import RoomPreloaderScene from '../scenes/RoomPreloaderScene';
-import globalState, { WorldState } from '../worldstate';
-import PlayerCharacter from '../worldstate/PlayerCharacter';
+import globalState from '../worldstate';
 import OverlayScreen from './OverlayScreen';
-import * as data from '../../assets/newgame.json';
 
 const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
 const SCALED_WINDOW_HEIGHT = window.innerHeight / UI_SCALE;
@@ -149,7 +145,7 @@ export default class SettingsScreen extends OverlayScreen {
 		this.manageContentText.setShadow(0, 1 * UI_SCALE, 'black');
 		this.manageContentText.on('pointerdown', () => {
 			this.setVisible(false);
-			(scene as MainScene).overlayScreens.contentManagementScreen.setVisible(true);
+			(scene as MainScene).overlayScreens!.contentManagementScreen.setVisible(true);
 		});
 		this.add(this.manageContentText, true);
 
