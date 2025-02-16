@@ -340,6 +340,7 @@ export default class AbilityHelper {
 			);
 			const castingTime = relevantAbility?.castingTime || CASTING_SPEED_MS;
 			worldstate.playerCharacter.lastComboCast = worldstate.playerCharacter.comboCast;
+			console.log('Casting ability', ability, 'at level', abilityLevel);
 			setTimeout(() => {
 				this.triggerAbility(
 					worldstate.playerCharacter,

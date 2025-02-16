@@ -1,3 +1,5 @@
+import { FadingLabelSize } from '../game/phaser/helpers/constants';
+
 export interface CharacterTokenUpdateEffect {
 	receiveStunMs?: number;
 	takeDamage?: number;
@@ -12,6 +14,16 @@ export interface CharacterTokenUpdateEffect {
 			key: string;
 			repeat: number;
 		};
+		progress?: number;
+		startFrame?: number;
+	};
+	addFadingLabel?: {
+		text: string;
+		size: FadingLabelSize;
+		color: string;
+		x: number;
+		y: number;
+		timeMs: number;
 	};
 }
 

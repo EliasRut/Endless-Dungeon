@@ -1,4 +1,4 @@
-import { AbilityType } from '../abilities/abilityData';
+import { AbilityType } from '../../../types/AbilityType';
 import { ColorsOfMagic } from '../helpers/constants';
 
 export interface EnemyData {

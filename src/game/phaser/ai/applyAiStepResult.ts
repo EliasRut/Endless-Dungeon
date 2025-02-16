@@ -11,12 +11,18 @@ const applyAiStepResultToToken = (token: CharacterToken, result: CharacterTokenU
 			key: result.playAnimation.key,
 			frameRate: result.playAnimation.frameRate,
 			repeat: result.playAnimation.repeat,
+			...(result.playAnimation.startFrame !== undefined
+				? { startFrame: result.playAnimation.startFrame }
+				: {}),
 		});
 		if (result.playAnimation.chain) {
 			anim.chain({
 				key: result.playAnimation.chain.key,
 				repeat: result.playAnimation.chain.repeat,
 			});
+		}
+		if (result.playAnimation.progress) {
+			token.anims.setProgress(result.playAnimation.progress);
 		}
 	}
 	if (result.setVelocity) {

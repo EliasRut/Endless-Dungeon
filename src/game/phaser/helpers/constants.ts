@@ -308,7 +308,8 @@ export const CHARACTER_SPRITE_WIDTH = 320;
 export const CHARACTER_SPRITE_HEIGHT = 240;
 
 export const SCALE = 3;
-export const UI_SCALE = window.innerWidth >= 1900 && window.innerHeight >= 840 ? 3 : 2;
+export const UI_SCALE =
+	typeof window !== 'undefined' && window.innerWidth >= 1900 && window.innerHeight >= 840 ? 3 : 2;
 
 export enum SUMMONING_TYPE {
 	FIRE_ELEMENTAL = 'fire_elemental',
