@@ -1,4 +1,4 @@
-import { ColorsOfMagic, EquipmentSlot } from '../scripts/helpers/constants';
+import { ColorsOfMagic, EquipmentSlot } from '../game/phaser/helpers/constants';
 import {
 	Amulet,
 	Catalyst,
@@ -12,7 +12,7 @@ import {
 	ChestPieceKey,
 	AmuletKey,
 } from '../types/Item';
-import { EnchantmentName } from '../items/enchantmentData';
+import { EnchantmentName } from '../data/enchantmentData';
 
 export interface EquippedItemData {
 	level: number;

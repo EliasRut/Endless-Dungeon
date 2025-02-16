@@ -1,8 +1,8 @@
-import { AbilityType, AbilityData } from '../src/scripts/abilities/abilityData';
-import { EnemyData } from '../src/scripts/enemies/enemyData';
-import { ColorsOfMagic } from '../src/scripts/helpers/constants';
-import { RandomItemOptions } from '../src/scripts/helpers/item';
-import { QuestScripts } from '../src/scripts/helpers/quests';
+import { AbilityType, AbilityData } from '../src/game/phaser/abilities/abilityData';
+import { EnemyData } from '../src/game/phaser/enemies/enemyData';
+import { ColorsOfMagic } from '../src/game/phaser/helpers/constants';
+import { RandomItemOptions } from '../src/game/phaser/helpers/item';
+import { QuestScripts } from '../src/game/phaser/helpers/quests';
 import Follower from '../src/types/Follower';
 
 export type EnumDictionary<T extends string | symbol | number, U> = {

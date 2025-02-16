@@ -1,4 +1,4 @@
-import { ColorsOfMagic } from '../scripts/helpers/constants';
+import { ColorsOfMagic } from '../game/phaser/helpers/constants';
 
 export interface SecondaryContentBlock {
 	title: string;

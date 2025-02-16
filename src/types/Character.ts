@@ -1,4 +1,4 @@
-import { Facings, Faction } from '../scripts/helpers/constants';
+import { Facings, Faction } from '../game/phaser/helpers/constants';
 
 export default class Character {
 	public animationBase: string;

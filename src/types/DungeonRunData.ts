@@ -1,4 +1,4 @@
-import { ColorsOfMagic } from '../scripts/helpers/constants';
+import { ColorsOfMagic } from '../game/phaser/helpers/constants';
 import { PrimaryContentBlock } from './PrimaryContentBlock';
 import { SecondaryContentBlock } from './SecondaryContentBlock';
 

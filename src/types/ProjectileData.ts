@@ -1,4 +1,4 @@
-import AbilityEffect from '../scripts/drawables/effects/AbilityEffect';
+import AbilityEffect from '../game/phaser/drawables/effects/AbilityEffect';
 import {
 	ColorEffectValue,
 	MinMaxParticleEffectValue,

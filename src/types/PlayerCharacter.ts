@@ -1,6 +1,6 @@
-import { AbilityKey, Faction, SCALE } from '../scripts/helpers/constants';
+import { AbilityKey, Faction, SCALE } from '../game/phaser/helpers/constants';
 import Character from './Character';
-import MainScene from '../scripts/scenes/MainScene';
+import MainScene from '../game/phaser/scenes/MainScene';
 import { AbilityType } from './AbilityType';
 
 const DEFAULT_HEALTH = 100;

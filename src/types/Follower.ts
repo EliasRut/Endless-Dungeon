@@ -1,4 +1,4 @@
-import { Faction } from '../scripts/helpers/constants';
+import { Faction } from '../game/phaser/helpers/constants';
 import { AbilityType } from './AbilityType';
 import Character from './Character';
 
