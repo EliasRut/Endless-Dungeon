@@ -7,7 +7,7 @@ export const MENU_ICON_LEFT_BORDER = 32;
 
 export default abstract class MenuIcon extends Phaser.GameObjects.Image implements Icons {
 	scene: MainScene;
-	screens: OverlayScreen[] = [];
+	screens: OverlayScreen[] | undefined;
 	ICON: string = '';
 	open: boolean = false;
 
@@ -45,7 +45,7 @@ export default abstract class MenuIcon extends Phaser.GameObjects.Image implemen
 	closeScreen() {
 		this.setScreens();
 
-		this.screens.forEach((screen) => {
+		this.screens!.forEach((screen) => {
 			screen.modify();
 			screen.setVisible(false);
 			screen.visibility = false;
@@ -56,7 +56,7 @@ export default abstract class MenuIcon extends Phaser.GameObjects.Image implemen
 	openScreen(openingModifier?: any) {
 		this.setScreens();
 
-		this.screens.forEach((screen) => {
+		this.screens!.forEach((screen) => {
 			screen.modify(openingModifier);
 			screen.update();
 			screen.setVisible(true);
@@ -68,7 +68,7 @@ export default abstract class MenuIcon extends Phaser.GameObjects.Image implemen
 
 	setScreenVisibility(visible: boolean): void {
 		this.setScreens();
-		this.screens.forEach((screen) => screen.setVisible(visible));
+		this.screens!.forEach((screen) => screen.setVisible(visible));
 	}
 
 	abstract setScreens(): void;

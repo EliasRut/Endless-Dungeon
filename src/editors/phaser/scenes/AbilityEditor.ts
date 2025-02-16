@@ -6,7 +6,7 @@ import { Abilities } from '../../../game/phaser/abilities/abilityData';
 import Character from '../../../types/Character';
 import CharacterToken from '../../../game/phaser/drawables/tokens/CharacterToken';
 import DungeonGenerator from '../../../game/phaser/helpers/generateDungeon';
-import worldstate from '../../../game/phaser/worldState';
+import worldState from '../../../game/phaser/worldState';
 import { generateTilemap } from '../../../game/phaser/helpers/drawDungeon';
 import PlayerCharacterToken from '../../../game/phaser/drawables/tokens/PlayerCharacterToken';
 import { TILE_WIDTH, TILE_HEIGHT } from '../../../game/phaser/helpers/generateDungeon';
@@ -112,8 +112,8 @@ export default class AbilityEditor extends Phaser.Scene {
 		this.load.audio('sound-fireball-explosion', 'assets/sounds/fireball-explosion.wav');
 		this.load.audio('sound-wind', 'assets/sounds/wind.wav');
 
-		worldstate.availableTilesets.push('COM-death-B', 'COM-death-D', 'COM-death-O');
-		worldstate.availableTilesets.forEach((tileSet) => {
+		worldState.availableTilesets.push('COM-death-B', 'COM-death-D', 'COM-death-O');
+		worldState.availableTilesets.forEach((tileSet) => {
 			this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
 		});
 	}
@@ -122,7 +122,7 @@ export default class AbilityEditor extends Phaser.Scene {
 		const tilesetLayoutRow = Array.from({ length: 32 }, () => 32);
 		const overlayLayoutRow = Array.from({ length: 32 }, () => 0);
 		const generator = new DungeonGenerator();
-		worldstate.availableRooms.abilityEditorRoom = {
+		worldState.availableRooms.abilityEditorRoom = {
 			startRoom: true,
 			tileset: 'COM-death-B',
 			decorationTileset: 'COM-death-D',
@@ -198,7 +198,7 @@ export default class AbilityEditor extends Phaser.Scene {
 		return undefined;
 	};
 
-	update(globalTime: number, delta: number) {
+	update(globalTime: number, _delta: number) {
 		// const projectileData = Abilities[AbilityType.FIREBALL].projectileData;
 		const projectileData = Abilities[AbilityType.FIREBALL].projectileData;
 
