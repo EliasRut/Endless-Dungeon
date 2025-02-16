@@ -9,8 +9,8 @@ import { ScriptBlock } from '../../../layout/components/ScriptBlock';
 import {
 	AddButton,
 	ButtonWrapper,
-	MenueElementWrapper,
-	MenueWrapper,
+	MenuElementWrapper,
+	MenuWrapper,
 	NotPaddedButtonWrapper,
 	StyledButton,
 	StyledLink,
@@ -270,15 +270,15 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 					<StyledLink to="/game">Game</StyledLink>
 				</NavigationWrapper>
 				<PageWrapper>
-					<MenueWrapper id="questEditorMenu">
-						<MenueElementWrapper>
+					<MenuWrapper id="questEditorMenu">
+						<MenuElementWrapper>
 							<div>New Quest</div>
 							<NotPaddedButtonWrapper>
 								<StyledButton id="newQuestButton" onClick={() => this.clearFields()}>
 									Create
 								</StyledButton>
 							</NotPaddedButtonWrapper>
-						</MenueElementWrapper>
+						</MenuElementWrapper>
 						<div>
 							<div>Load Quest</div>
 							<Dropdown
@@ -308,7 +308,7 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 								</StyledButton>
 							</ButtonWrapper>
 						</div>
-					</MenueWrapper>
+					</MenuWrapper>
 					<QuestWrapper>
 						<QuestContainer>
 							<InputWrapper>
@@ -425,7 +425,7 @@ export class QuestEditorScreen extends React.Component<QuestEditorScreenProps, Q
 								/>
 							</InputWrapper>
 							<InputWrapper>
-								<div>Required Dungeonlevel</div>
+								<div>Required Dungeon level</div>
 								<LargeInput
 									id="questPreconditions"
 									value={this.state.questPreconditions}

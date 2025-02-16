@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import { Dropdown } from './Dropdown';
 import { NavLink } from 'react-router-dom';
@@ -110,7 +109,7 @@ export const StyledLink = styled(NavLink)`
 	}
 `;
 
-export const MenueWrapper = styled.div`
+export const MenuWrapper = styled.div`
 	width: 245px;
 	background-color: black;
 	color: white;
@@ -121,7 +120,7 @@ export const MenueWrapper = styled.div`
 	padding: 24px;
 `;
 
-export const MenueElementWrapper = styled.div`
+export const MenuElementWrapper = styled.div`
 	color: white;
 	padding-bottom: 12px;
 `;

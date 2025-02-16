@@ -1,5 +1,5 @@
 import 'phaser';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { getGameConfig } from '../../../game/phaser';
 import { MODE, setActiveMode } from '../../../game/phaser/helpers/constants';
 import { NavLink } from 'react-router-dom';
@@ -14,13 +14,13 @@ export interface NPCEditorScreenProps {
 	user: UserInformation;
 }
 
-export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
+export const NPCEditorScreen = ({}: NPCEditorScreenProps) => {
 	const phaserRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		setActiveMode(MODE.NPC_EDITOR);
 		const config = getGameConfig(phaserRef.current!, MODE.NPC_EDITOR);
-		const game = new Phaser.Game(config);
+		new Phaser.Game(config);
 	}, [showGame]);
 
 	return (
@@ -33,7 +33,7 @@ export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
 				<StyledLink to="/game">Game</StyledLink>
 			</NavigationWrapper>
 			<PageWrapper>
-				<MenueWrapper id="npcEditorMenu">
+				<MenuWrapper id="npcEditorMenu">
 					<div>
 						<div>Load NPC:</div>
 						<Dropdown id="npcDropdown">
@@ -81,7 +81,7 @@ export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
 					<ExportButtonWrapper>
 						<StyledButton id="exportButton">Save</StyledButton>
 					</ExportButtonWrapper>
-				</MenueWrapper>
+				</MenuWrapper>
 				<GameWrapper ref={phaserRef}></GameWrapper>
 				<ColorManagerWrapper>
 					<ColorSelectionWrapper>
@@ -114,7 +114,7 @@ export const NPCEditorScreen = ({ user }: NPCEditorScreenProps) => {
 					</ColorSelectionWrapper>
 				</ColorManagerWrapper>
 			</PageWrapper>
-			<DownloadAnker id="downloadAnchorElem"></DownloadAnker>
+			<DownloadAnchor id="downloadAnchorElem"></DownloadAnchor>
 		</PageContainer>
 	);
 };
@@ -157,7 +157,7 @@ const PageWrapper = styled.div`
 	flex-direction: row;
 `;
 
-const MenueWrapper = styled.div`
+const MenuWrapper = styled.div`
 	width: 245px;
 	background-color: black;
 	color: white;
@@ -199,7 +199,7 @@ const GameWrapper = styled.div`
 	flex-grow: 1;
 `;
 
-const DownloadAnker = styled.a`
+const DownloadAnchor = styled.a`
 	display: none;
 `;
 

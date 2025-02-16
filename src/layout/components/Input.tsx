@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 
 export const Input = (props: any) => <FormattedInput {...props}>{props.children}</FormattedInput>;

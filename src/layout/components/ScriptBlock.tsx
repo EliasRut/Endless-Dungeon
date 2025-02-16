@@ -1,4 +1,3 @@
-import React from 'react';
 import { ScriptEntry } from '../../../typings/custom';
 import { DefaultCharacterData } from '../../types/Character';
 import { ScriptBlockContainer } from './ScriptBlockContainer';

@@ -51,7 +51,7 @@ const renderScriptStep: (props: { step: NpcScriptStep }) => JSX.Element = ({ ste
 	}
 };
 
-export const MapEditorScreen = ({ user }: MapEditorScreenProps) => {
+export const MapEditorScreen = ({}: MapEditorScreenProps) => {
 	const phaserRef = useRef<HTMLDivElement>(null);
 
 	const [activeNpc, setActiveNpc] = useState<NpcPositioning | undefined>(undefined);
@@ -253,13 +253,6 @@ const InlineInput = styled.input`
 	width: 60px;
 `;
 
-const PageContainer = styled.div`
-	height: 100%;
-	width: 100%;
-	display: flex;
-	flex-direction: column;
-`;
-
 const LoadRoomHeader = styled.div`
 	margin-top: 16px;
 `;
@@ -322,10 +315,6 @@ const Input = styled.input`
 	width: 100%;
 	font-family: 'endlessDungeon';
 	font-size: 1.4rem;
-`;
-
-const ExportButtonWrapper = styled.div`
-	margin-top: 60px;
 `;
 
 const GameWrapper = styled.div`

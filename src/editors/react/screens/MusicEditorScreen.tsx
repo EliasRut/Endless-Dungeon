@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { startAudioGeneration } from '../../../game/phaser/audiogen/app';
 
 import './MusicEditorScreen.css';

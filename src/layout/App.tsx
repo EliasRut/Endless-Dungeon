@@ -1,5 +1,5 @@
 import 'phaser';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Game } from './components/Game';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { StartScreen } from './screens/StartScreen';
@@ -31,24 +31,23 @@ export default function App() {
 	const authenticate = () => {
 		const auth = getAuth(app);
 		const provider = new GoogleAuthProvider();
-		signInWithPopup(auth, provider)
-			.then((result) => {
-				if (result.user) {
-					loadUserData(result.user.uid).then((userData) => setUser(userData));
-				} else {
-					setUser(undefined);
-				}
-			})
-			.catch((error) => {
-				// Handle Errors here.
-				const errorCode = error.code;
-				const errorMessage = error.message;
-				// The email of the user's account used.
-				const email = error.email;
-				// The firebase.auth.AuthCredential type that was used.
-				const credential = error.credential;
-				// ...
-			});
+		signInWithPopup(auth, provider).then((result) => {
+			if (result.user) {
+				loadUserData(result.user.uid).then((userData) => setUser(userData));
+			} else {
+				setUser(undefined);
+			}
+		});
+		// .catch((error) => {
+		// // Handle Errors here.
+		// const errorCode = error.code;
+		// const errorMessage = error.message;
+		// // The email of the user's account used.
+		// const email = error.email;
+		// // The firebase.auth.AuthCredential type that was used.
+		// const credential = error.credential;
+		// // ...
+		// });
 	};
 
 	if (user) {

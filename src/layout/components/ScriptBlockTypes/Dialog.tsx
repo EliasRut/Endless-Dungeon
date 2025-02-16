@@ -1,6 +1,4 @@
-import React from 'react';
 import styled from 'styled-components';
-import { LargeDropdown } from '../LargeDropdown';
 import { LargeInput } from '../LargeInput';
 import { LargeTextArea } from '../LargeTextArea';
 import { ScriptBlockContainer } from '../ScriptBlockContainer';

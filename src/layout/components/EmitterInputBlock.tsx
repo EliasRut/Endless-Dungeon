@@ -1,5 +1,5 @@
 import 'phaser';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Dropdown } from './Dropdown';
 import styled from 'styled-components';
 import { MinMaxParticleEffectValue, SimpleParticleEffectValue } from '../../types/AbilityType';

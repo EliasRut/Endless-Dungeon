@@ -1,10 +1,7 @@
-import React from 'react';
 import styled from 'styled-components';
 
 export const PaddedContainer = (props: any) => (
-	<StyledContainer {...props}>
-		{props.children}
-	</StyledContainer>
+	<StyledContainer {...props}>{props.children}</StyledContainer>
 );
 
 const StyledContainer = styled.div`

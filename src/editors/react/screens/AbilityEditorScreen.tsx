@@ -57,7 +57,7 @@ const setAbilityDataFromDataObject = (data: AbilityData) => {
 	abilityData.drag = data.projectileData?.drag || 0;
 };
 
-export const AbilityEditorScreen = ({ user }: AbilityEditorScreenProps) => {
+export const AbilityEditorScreen = ({}: AbilityEditorScreenProps) => {
 	const phaserRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {

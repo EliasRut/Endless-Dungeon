@@ -1,5 +1,5 @@
 import 'phaser';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { ColorEffectValue } from '../../types/AbilityType';
 
@@ -8,7 +8,7 @@ export interface EmitterTintInputBlockProps {
 	onValidChange: (value: ColorEffectValue) => void;
 }
 
-type EmitterValueType = 'numeric' | 'min-max' | 'start-end';
+// type EmitterValueType = 'numeric' | 'min-max' | 'start-end';
 
 export const EmitterTintInputBlock = ({ inputName, onValidChange }: EmitterTintInputBlockProps) => {
 	const [valueRedMin, setValueRedMin] = useState<string>('1');

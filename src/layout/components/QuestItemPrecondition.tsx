@@ -1,4 +1,3 @@
-import React from 'react';
 import { ItemWithCount } from '../../../typings/custom';
 import { Input } from './Input';
 import {
