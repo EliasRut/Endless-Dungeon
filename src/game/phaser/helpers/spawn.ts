@@ -83,7 +83,8 @@ export const spawnNpc = (
 					castTime: 1000,
 					castRange: 75 * SCALE,
 					animationName: 'throw',
-					abilityType: AbilityType.BAT,
+					abilityType: AbilityType.FIREBALL,
+					// abilityType: AbilityType.BAT,
 				},
 			});
 		}

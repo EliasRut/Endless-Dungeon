@@ -390,7 +390,7 @@ export const MOBILE_INTERACTION_OFFSETS = 96;
 
 export const DEBUG_PHYSICS = false;
 export const DEBUG_PATHFINDING = false;
-export const DEBUG_ENEMY_AI = false;
+export const DEBUG_ENEMY_AI = true;
 export const FPS_DEBUG = true;
 export const COMBO_CAST_RESET_DELAY = 2000;
 export const DASH_REVERSE_DELAY = 1500;

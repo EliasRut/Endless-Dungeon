@@ -1,5 +1,8 @@
 import Character from '../../../../types/Character';
-import { AiStepResult } from '../../../../types/CharacterTokenUpdateEffect';
+import {
+	AiStepResult,
+	CharacterTokenUpdateEffect,
+} from '../../../../types/CharacterTokenUpdateEffect';
 import { EnemyTokenData } from '../../../../types/EnemyTokenData';
 import { MeleeAttackType } from '../../enemies/enemyData';
 import {
@@ -9,7 +12,10 @@ import {
 	NORMAL_ANIMATION_FRAME_RATE,
 	SCALE,
 } from '../../helpers/constants';
+import { getDistanceToWorldStatePosition } from '../../helpers/getDistanceToWorldStatePosition';
 import { getFacing4Dir, getXYfromTotalSpeed } from '../../helpers/movement';
+import MainScene from '../../scenes/MainScene';
+import { handleTokenMovement } from './handleTokenMovement';
 
 export function executeMeleeAttack(
 	tokenData: EnemyTokenData,
@@ -139,4 +145,86 @@ export function executeMeleeAttack(
 		delete result.self;
 	}
 	return result;
+}
+
+export function dealMeleeDamage(
+	tokenData: EnemyTokenData,
+	stateObject: Character,
+	x: number,
+	y: number
+): AiStepResult {
+	const result: AiStepResult = {
+		self: {},
+		target: {},
+	};
+
+	tokenData.isWaitingToDealDamage = false;
+	const distance = getDistanceToWorldStatePosition(
+		x,
+		y,
+		tokenData.targetStateObject!.x,
+		tokenData.targetStateObject!.y
+	);
+	// If target is in attack range, attack and deal damage
+	if (distance < tokenData.enemyData!.meleeAttackData!.attackRange) {
+		// const targetToken = this.scene.getTokenForStateObject(tokenData.targetStateObject!);
+		result.target!.takeDamage = stateObject.damage;
+		result.target!.receiveHit = true;
+		if (DEBUG_ENEMY_AI) {
+			result.self!.addFadingLabel = {
+				text: 'Dealing Damage',
+				size: FadingLabelSize.NORMAL,
+				color: '#ff0000',
+				x,
+				y,
+				timeMs: 1000,
+			};
+		}
+	}
+	return result;
+}
+
+export function handleMeleeAttack(
+	tokenData: EnemyTokenData,
+	stateObject: Character,
+	x: number,
+	y: number,
+	bodyX: number,
+	bodyY: number,
+	time: number,
+	scene?: MainScene
+): AiStepResult {
+	const distance = getDistanceToWorldStatePosition(
+		x,
+		y,
+		tokenData.targetStateObject!.x,
+		tokenData.targetStateObject!.y
+	);
+
+	// Deal damage for the currently running attack
+	if (
+		tokenData.isWaitingToDealDamage &&
+		tokenData.enemyData?.meleeAttackData?.attackType === MeleeAttackType.HIT
+	) {
+		if (tokenData.attackedAt + tokenData.enemyData?.meleeAttackData!.attackDamageDelay < time) {
+			return dealMeleeDamage(tokenData, stateObject, x, y);
+		}
+		return {};
+	}
+
+	// If we are still in the cooldown period of the current attack, do nothing
+	if (tokenData.attackedAt + stateObject.attackTime >= time) {
+		return {};
+	}
+
+	// When token is in the proximity of the target, and target is alive, attack
+	if (
+		distance <= tokenData.enemyData!.meleeAttackData!.attackRange &&
+		tokenData.targetStateObject!.health > 0
+	) {
+		return executeMeleeAttack(tokenData, stateObject, x, y, time);
+	} else {
+		// Handle moving the token towards the enemy
+		return handleTokenMovement(tokenData, stateObject, bodyX, bodyY, scene);
+	}
 }

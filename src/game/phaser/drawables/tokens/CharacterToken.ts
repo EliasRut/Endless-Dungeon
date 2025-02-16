@@ -17,6 +17,7 @@ import {
 	DefaultCharacterTokenData,
 } from '../../../../types/CharacterTokenData';
 import { AiStepResult } from '../../../../types/CharacterTokenUpdateEffect';
+import { getOccupiedTile } from '../../helpers/getOccupiedTile';
 
 // const GREEN_DIFF = 0x003300;
 const DOT_TINT = [0xc8e44c, 0xb1db30, 0x98d023, 0x588800];
@@ -127,21 +128,6 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 		}
 	}
 
-	public getDistanceToWorldStatePosition(px: number, py: number) {
-		const x = this.x - px * SCALE;
-		const y = this.y - py * SCALE;
-		return Math.hypot(x, y);
-	}
-
-	protected getOccupiedTile() {
-		if (this.body) {
-			const x = Math.round(this.body.x / TILE_WIDTH / SCALE);
-			const y = Math.round(this.body.y / TILE_HEIGHT / SCALE);
-			return this.scene.tileLayer!.getTileAt(x, y);
-		}
-		return null;
-	}
-
 	public takeDamage(damage: number) {
 		this.scene.addFadingLabel(
 			`${Math.round(damage)}`,
@@ -207,7 +193,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 
 	// update from main Scene
 	public update(time: number, deltaTime: number) {
-		const tile = this.getOccupiedTile();
+		const tile = getOccupiedTile(this.body?.x, this.body?.y, this.scene);
 		if (tile) {
 			const hasHealthbar = this.showHealthbar();
 			// let the necrotic Effekt disapear after 2 sec

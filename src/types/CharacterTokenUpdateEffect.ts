@@ -1,4 +1,8 @@
 import { FadingLabelSize } from '../game/phaser/helpers/constants';
+import { AbilityData } from './AbilityData';
+import { AbilityType } from './AbilityType';
+import Character from './Character';
+import { PointOfOrigin } from './SimplePointOfOrigin';
 
 export interface CharacterTokenUpdateEffect {
 	receiveStunMs?: number;
@@ -24,6 +28,15 @@ export interface CharacterTokenUpdateEffect {
 		x: number;
 		y: number;
 		timeMs: number;
+	};
+	triggerAbility?: {
+		caster: Character;
+		pointOfOrigin: PointOfOrigin;
+		type: AbilityType;
+		abilityLevel: number;
+		globalTime: number;
+		comboCast: number;
+		abilityData?: AbilityData;
 	};
 }
 

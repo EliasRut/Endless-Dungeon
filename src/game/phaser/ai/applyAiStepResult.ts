@@ -7,6 +7,9 @@ import CharacterToken from '../drawables/tokens/CharacterToken';
 
 const applyAiStepResultToToken = (token: CharacterToken, result: CharacterTokenUpdateEffect) => {
 	if (result.playAnimation) {
+		if (!token.scene.game.anims.exists(result.playAnimation.key)) {
+			console.error(`Animation ${result.playAnimation.key} does not exist.`);
+		}
 		const anim = token.play({
 			key: result.playAnimation.key,
 			frameRate: result.playAnimation.frameRate,
@@ -39,6 +42,27 @@ const applyAiStepResultToToken = (token: CharacterToken, result: CharacterTokenU
 	}
 	if (result.receiveHit) {
 		token.receiveHit();
+	}
+	if (result.addFadingLabel) {
+		token.scene.addFadingLabel(
+			result.addFadingLabel.text,
+			result.addFadingLabel.size,
+			result.addFadingLabel.color,
+			token.x,
+			token.y,
+			result.addFadingLabel.timeMs
+		);
+	}
+	if (result.triggerAbility) {
+		token.scene.abilityHelper?.triggerAbility(
+			result.triggerAbility.caster,
+			result.triggerAbility.pointOfOrigin,
+			result.triggerAbility.type,
+			result.triggerAbility.abilityLevel,
+			result.triggerAbility.globalTime,
+			result.triggerAbility.comboCast,
+			result.triggerAbility.abilityData
+		);
 	}
 };
 
