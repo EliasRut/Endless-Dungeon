@@ -146,7 +146,7 @@ export default class AbilityHelper {
 			});
 
 			const enemyNpcs = Object.values(this.scene.npcMap).filter(
-				(npc) => npc.faction === Faction.ENEMIES
+				(npc) => npc.tokenData.faction === Faction.ENEMIES
 			);
 			const friendlyNpcs: CharacterToken[] = [
 				this.scene.mainCharacter!,
@@ -214,15 +214,15 @@ export default class AbilityHelper {
 					enemy.receiveHealing();
 				}
 				if (usedAbilityData.necroticStacks) {
-					enemy.lastNecroticEffectTimestamp = globalTime;
-					enemy.necroticEffectStacks += usedAbilityData.necroticStacks!;
+					enemy.tokenData.lastNecroticEffectTimestamp = globalTime;
+					enemy.tokenData.necroticEffectStacks += usedAbilityData.necroticStacks!;
 				}
 				if (usedAbilityData.iceStacks) {
-					enemy.lastIceEffectTimestamp = globalTime;
-					enemy.iceEffectStacks += usedAbilityData.iceStacks!;
+					enemy.tokenData.lastIceEffectTimestamp = globalTime;
+					enemy.tokenData.iceEffectStacks += usedAbilityData.iceStacks!;
 				}
 				if (projectileData?.knockback) {
-					enemy.lastMovedTimestamp = globalTime;
+					enemy.tokenData.lastMovedTimestamp = globalTime;
 					const angle = Phaser.Math.Angle.Between(effect.x, effect.y, enemy.x, enemy.y);
 					enemy.setVelocity(
 						Math.cos(angle) * projectileData.knockback,
@@ -273,7 +273,7 @@ export default class AbilityHelper {
 
 				if (usedAbilityData.stopDashBeforeEnemyCollision) {
 					const closestTaget = getClosestTarget(
-						casterToken.faction!,
+						casterToken.tokenData.faction!,
 						casterToken.x,
 						casterToken.y,
 						caster.currentFacing

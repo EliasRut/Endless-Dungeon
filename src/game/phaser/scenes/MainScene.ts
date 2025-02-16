@@ -214,7 +214,7 @@ export default class MainScene extends Phaser.Scene {
 		Object.values(this.npcMap).forEach((npc) => {
 			this.physics.add.collider(Object.values(this.npcMap), npc, (collidingToken) => {
 				const castCollidingToken = collidingToken as CharacterToken;
-				npc.onCollide(castCollidingToken.faction !== npc.faction);
+				npc.onCollide(castCollidingToken.tokenData.faction !== npc.tokenData.faction);
 			});
 		});
 
@@ -361,7 +361,7 @@ export default class MainScene extends Phaser.Scene {
 				npc.onCollide(true);
 			});
 		});
-		this.nPCAvatar = new NPCAvatar(this, this.follower.id, 'icon-agnes');
+		this.nPCAvatar = new NPCAvatar(this, this.follower.tokenData.id, 'icon-agnes');
 	}
 
 	addNpc(
@@ -394,12 +394,12 @@ export default class MainScene extends Phaser.Scene {
 		this.physics.add.collider(this.npcMap[id], this.decorationLayer!, () => {
 			npc.onCollide(false);
 		});
-		if (this.mainCharacter && npc.faction === Faction.ENEMIES) {
+		if (this.mainCharacter && npc.tokenData.faction === Faction.ENEMIES) {
 			this.physics.add.collider(this.npcMap[id], this.mainCharacter, () => {
 				npc.onCollide(true);
 			});
 		}
-		this.npcMap[id].script = options?.script;
+		this.npcMap[id].tokenData.script = options?.script;
 		return npc;
 	}
 

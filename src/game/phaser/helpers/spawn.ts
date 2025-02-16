@@ -1,7 +1,6 @@
 import MainScene from '../scenes/MainScene';
 import NpcToken from '../drawables/tokens/NpcToken';
 import { NpcOptions } from '../../../../typings/custom';
-import LichKingToken from '../drawables/tokens/LichKing';
 import FireElementalToken from '../drawables/tokens/FireElementalToken';
 import IceElementalToken from '../drawables/tokens/IceElementalToken';
 import ArcaneElementalToken from '../drawables/tokens/ArcaneElementalToken';
@@ -67,6 +66,7 @@ export const spawnNpc = (
 				},
 			});
 		}
+		case 'lich-king':
 		case 'pierre': {
 			return new EnemyToken(scene, posX, posY, type, id, {
 				startingHealth: 4 * (1 + level * 0.5),
@@ -86,9 +86,6 @@ export const spawnNpc = (
 					abilityType: AbilityType.BAT,
 				},
 			});
-		}
-		case 'lich-king': {
-			return new LichKingToken(scene, posX, posY, 'rich', level, id);
 		}
 		case 'fire_elemental': {
 			return new FireElementalToken(scene, posX, posY, level, id);
