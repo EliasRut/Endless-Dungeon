@@ -1,4 +1,3 @@
-import { AbilityType, ProjectileData } from '../../abilities/abilityData';
 import {
 	AbilityKey,
 	Facings,
@@ -9,8 +8,8 @@ import {
 	VISITED_TILE_TINT,
 } from '../../helpers/constants';
 import MainScene from '../../scenes/MainScene';
-import globalState from '../../worldstate';
-import { updateAbility } from '../../worldstate/PlayerCharacter';
+import worldstate from '../../worldState';
+import { updateAbility } from '../../../types/PlayerCharacter';
 import CharacterToken from '../tokens/CharacterToken';
 import AbilityEffect from './AbilityEffect';
 import {
@@ -19,6 +18,8 @@ import {
 	shiftFacingByOneClockwise,
 } from '../../helpers/movement';
 import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
+import { AbilityType } from '../../../types/AbilityType';
+import { ProjectileData } from '../../../types/ProjectileData';
 
 const CIRCELING_TIME_MS = 500;
 const SPRITE_SCALE = 0.3;
@@ -59,7 +60,7 @@ export default class CircelingEffect extends AbilityEffect {
 		this.setScale(SCALE * (summoningType === SUMMONING_TYPE.FIRE_ELEMENTAL ? 1 : SPRITE_SCALE));
 
 		// Clean up players active summons
-		const identicalSummons = globalState.playerCharacter.activeSummons.map((summon) => {
+		const identicalSummons = worldstate.playerCharacter.activeSummons.map((summon) => {
 			const effect = this.scene.abilityHelper!.abilityEffects.find((ability) => {
 				(ability as any).id === summon.id;
 			});
@@ -70,32 +71,27 @@ export default class CircelingEffect extends AbilityEffect {
 				summon.destroy();
 			}
 		});
-		globalState.playerCharacter.activeSummons.push({
+		worldstate.playerCharacter.activeSummons.push({
 			summoningType: this.summoningType,
 			id: this.id,
 		});
-		updateAbility(
-			scene as MainScene,
-			globalState.playerCharacter,
-			AbilityKey.TWO,
-			summoningAbility
-		);
+		updateAbility(scene as MainScene, worldstate.playerCharacter, AbilityKey.TWO, summoningAbility);
 	}
 
 	destroy() {
 		super.destroy();
-		globalState.playerCharacter.activeSummons = globalState.playerCharacter.activeSummons.filter(
+		worldstate.playerCharacter.activeSummons = worldstate.playerCharacter.activeSummons.filter(
 			(effect) => effect.id !== this.id
 		);
 	}
 
 	update(time: number) {
-		const activeAbilityTwo = globalState.playerCharacter.abilityKeyMapping[AbilityKey.TWO];
+		const activeAbilityTwo = worldstate.playerCharacter.abilityKeyMapping[AbilityKey.TWO];
 		if (activeAbilityTwo !== this.summoningAbility) {
 			if (activeAbilityTwo === this.circelingAbility) {
 				updateAbility(
 					this.scene as MainScene,
-					globalState.playerCharacter,
+					worldstate.playerCharacter,
 					AbilityKey.TWO,
 					this.summoningAbility
 				);
@@ -107,8 +103,8 @@ export default class CircelingEffect extends AbilityEffect {
 
 		const xOffset = Math.sin(time / CIRCELING_TIME_MS) * 36;
 		const yOffset = Math.cos(time / CIRCELING_TIME_MS) * 36;
-		this.x = globalState.playerCharacter.x * SCALE + xOffset * SCALE;
-		this.y = globalState.playerCharacter.y * SCALE + yOffset * SCALE;
+		this.x = worldstate.playerCharacter.x * SCALE + xOffset * SCALE;
+		this.y = worldstate.playerCharacter.y * SCALE + yOffset * SCALE;
 
 		let nearestEnemy: CharacterToken | undefined;
 		let closestDistance = Infinity;
@@ -147,11 +143,11 @@ export default class CircelingEffect extends AbilityEffect {
 			if (time - this.lastCast > 1000) {
 				this.lastCast = time;
 				this.scene.abilityHelper!.triggerAbility(
-					globalState.playerCharacter,
+					worldstate.playerCharacter,
 					{
-						...globalState.playerCharacter,
-						x: globalState.playerCharacter.x + xOffset,
-						y: globalState.playerCharacter.y + yOffset,
+						...worldstate.playerCharacter,
+						x: worldstate.playerCharacter.x + xOffset,
+						y: worldstate.playerCharacter.y + yOffset,
 						exactTargetXFactor: xFactor,
 						exactTargetYFactor: yFactor,
 					},

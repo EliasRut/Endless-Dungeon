@@ -1,13 +1,13 @@
 import MainScene from '../../scenes/MainScene';
-import globalState from '../../worldstate';
+import worldstate from '../../worldState';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
-import { ItemData, EquipmentKey, UneqippableItem } from '../../../items/itemData';
 import {
 	isEquippable,
 	getEquipmentDataForItemKey,
 	equipItemIfNoneEquipped,
 } from '../../helpers/inventory';
 import { ColorsOfMagic, SCALE } from '../../helpers/constants';
+import { EquipmentKey, ItemData, UneqippableItem } from '../../../types/Item';
 
 const MAX_INTERACTION_DISTANCE = 30;
 const HEAL_PERCENTAGE = 1 / 4; // health
@@ -50,13 +50,13 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 		// if you run over item, put into inventory
 		if (distance < MAX_INTERACTION_DISTANCE * SCALE) {
 			if (this.itemKey === 'health') {
-				const heal = Math.round(globalState.playerCharacter.maxHealth / HEAL_PERCENTAGE);
-				globalState.playerCharacter.health =
-					globalState.playerCharacter.health + heal > globalState.playerCharacter.maxHealth
-						? globalState.playerCharacter.maxHealth
-						: globalState.playerCharacter.health + heal;
+				const heal = Math.round(worldstate.playerCharacter.maxHealth / HEAL_PERCENTAGE);
+				worldstate.playerCharacter.health =
+					worldstate.playerCharacter.health + heal > worldstate.playerCharacter.maxHealth
+						? worldstate.playerCharacter.maxHealth
+						: worldstate.playerCharacter.health + heal;
 			} else if (this.isEssence()) {
-				globalState.inventory.essences[this.itemKey as ColorsOfMagic]++;
+				worldstate.inventory.essences[this.itemKey as ColorsOfMagic]++;
 			} else {
 				if (isEquippable(this.itemKey)) {
 					const equipmentData = getEquipmentDataForItemKey(this.itemKey as EquipmentKey);
@@ -67,8 +67,8 @@ export default class ItemToken extends Phaser.Physics.Arcade.Sprite {
 					scene.overlayScreens!.inventory.update();
 				} else {
 					const unequippableItemKey = this.itemKey as UneqippableItem;
-					globalState.inventory.bag[unequippableItemKey] =
-						(globalState.inventory.bag[unequippableItemKey] || 0) + 1;
+					worldstate.inventory.bag[unequippableItemKey] =
+						(worldstate.inventory.bag[unequippableItemKey] || 0) + 1;
 				}
 			}
 

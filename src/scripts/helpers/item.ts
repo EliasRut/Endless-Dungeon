@@ -1,20 +1,19 @@
 import {
-	EquippableItemType,
 	SourceData,
 	CatalystData,
 	ChestPieceData,
 	RingData,
 	AmuletData,
-	CatalystItem,
+} from '../../items/itemData';
+import {
+	EquippableItemType,
 	Source,
 	Catalyst,
 	ChestPiece,
 	Ring,
 	Amulet,
 	EquipmentKey,
-} from '../../items/itemData';
-import { AbilityType } from '../abilities/abilityData';
-import { getItemDataForName } from '../../items/itemData';
+} from '../../types/Item';
 
 export interface EquippableDroppedItemData {
 	level: number;

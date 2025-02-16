@@ -1,11 +1,8 @@
 import 'phaser';
 import React, { useState } from 'react';
-import {
-	SimpleParticleEffectValue,
-	MinMaxParticleEffectValue,
-} from '../../scripts/helpers/constants';
 import { Dropdown } from '../components/Dropdown';
 import styled from 'styled-components';
+import { MinMaxParticleEffectValue, SimpleParticleEffectValue } from '../../types/AbilityType';
 
 export interface EmitterInputBlockProps {
 	inputName: string;

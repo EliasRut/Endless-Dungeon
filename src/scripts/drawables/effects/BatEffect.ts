@@ -1,3 +1,4 @@
+import { ProjectileData } from '../../../types/ProjectileData';
 import {
 	Facings,
 	facingToSpriteNameMap,
@@ -5,7 +6,6 @@ import {
 	NORMAL_ANIMATION_FRAME_RATE,
 } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
-import { ProjectileData } from '../../abilities/abilityData';
 
 const BODY_RADIUS = 6;
 const OFFSET = 14;

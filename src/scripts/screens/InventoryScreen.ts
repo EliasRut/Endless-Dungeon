@@ -6,19 +6,18 @@ import {
 	UI_SCALE,
 	NORMAL_ANIMATION_FRAME_RATE,
 } from '../helpers/constants';
-import { AbilityType, Abilities, getRelevantAbilityVersion } from '../abilities/abilityData';
+import { Abilities, getRelevantAbilityVersion } from '../abilities/abilityData';
 import OverlayScreen from './OverlayScreen';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
-import globalState from '../worldstate';
+import worldstate from '../worldState';
 import MainScene from '../scenes/MainScene';
 import {
-	AbilityLinkedItem,
 	getItemDataForName,
 	SourceData,
 	CatalystData,
 	getCatalystAbility,
 } from '../../items/itemData';
-import { updateAbility } from '../worldstate/PlayerCharacter';
+import { updateAbility } from '../../types/PlayerCharacter';
 import EquipmentSelectionWheel from '../drawables/ui/EquipmentSelectionWheel';
 import {
 	getEquippedItems,
@@ -32,6 +31,8 @@ import {
 import { STAT_SCREEN_RIGHT_BORDER } from './StatScreen';
 import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
 import { Enchantment, EnchantmentName } from '../../items/enchantmentData';
+import { AbilityType } from '../../types/AbilityType';
+import { AbilityLinkedItem } from '../../types/Item';
 
 const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
 
@@ -260,7 +261,7 @@ export default class InventoryScreen extends OverlayScreen {
 		itemToken.setScale(UI_SCALE);
 		this.add(itemToken, true);
 		itemToken.on('pointerdown', () => {
-			this.interactInventory(['enter', 'mouse'], globalState.gameTime);
+			this.interactInventory(['enter', 'mouse'], worldstate.gameTime);
 		});
 		itemToken.on('pointerover', () => {
 			if (!this.equipmentSelectionWheel.visibility) {
@@ -271,7 +272,7 @@ export default class InventoryScreen extends OverlayScreen {
 						this.currentXY[1] = Number(y);
 					}
 				});
-				this.interactInventory(['mouse'], globalState.gameTime);
+				this.interactInventory(['mouse'], worldstate.gameTime);
 			}
 		});
 		return itemToken;
@@ -377,7 +378,7 @@ export default class InventoryScreen extends OverlayScreen {
 				if (this.abilityIconMap[slotKey]) this.abilityIconMap[slotKey].destroy();
 				if (this.abilityTextMap[slotKey]) this.abilityTextMap[slotKey].destroy();
 				if (slotKey === EquipmentSlot.SOURCE) {
-					updateAbility(this.scene, globalState.playerCharacter, 0, AbilityType.FIREBALL);
+					updateAbility(this.scene, worldstate.playerCharacter, 0, AbilityType.FIREBALL);
 					const newAbilityIcon = this.createAbilityIcon();
 					this.handleIconOptions(newAbilityIcon, AbilityType.FIREBALL, slotKey);
 					this.abilityIconMap[EquipmentSlot.SOURCE] = newAbilityIcon;
@@ -386,7 +387,7 @@ export default class InventoryScreen extends OverlayScreen {
 				} else {
 					updateAbility(
 						this.scene,
-						globalState.playerCharacter,
+						worldstate.playerCharacter,
 						EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
 						AbilityType.NOTHING
 					);
@@ -395,8 +396,8 @@ export default class InventoryScreen extends OverlayScreen {
 			}
 			let ability: AbilityType | undefined;
 			if (slotKey === EquipmentSlot.CATALYST) {
-				const sourceType = globalState.inventory.equippedSource;
-				const catalystType = globalState.inventory.equippedCatalyst;
+				const sourceType = worldstate.inventory.equippedSource;
+				const catalystType = worldstate.inventory.equippedCatalyst;
 
 				const sourceAbility = sourceType ? SourceData[sourceType].ability : AbilityType.FIREBALL;
 				const catalystData = catalystType ? CatalystData[catalystType] : undefined;
@@ -421,7 +422,7 @@ export default class InventoryScreen extends OverlayScreen {
 
 			updateAbility(
 				this.scene,
-				globalState.playerCharacter,
+				worldstate.playerCharacter,
 				EQUIPMENT_SLOT_TO_ABILITY_KEY[slotKey],
 				ability
 			);
@@ -495,26 +496,26 @@ export default class InventoryScreen extends OverlayScreen {
 
 	// enchantment = undefined => erase all enchantment modifiers.
 	applyEnchantment(enchantment?: EnchantmentName) {
-		let enchantmentModifiers = globalState.playerCharacter.enchantmentModifiers;
+		let enchantmentModifiers = worldstate.playerCharacter.enchantmentModifiers;
 		if (enchantment === undefined) {
 			Object.entries(enchantmentModifiers).forEach((mod) => {
 				let stat = mod[0] as keyof typeof enchantmentModifiers;
-				globalState.playerCharacter[stat] -= mod[1];
+				worldstate.playerCharacter[stat] -= mod[1];
 				enchantmentModifiers[stat] -= mod[1];
 				if (stat === 'maxHealth') {
-					if (globalState.playerCharacter.health > mod[1])
-						globalState.playerCharacter.health -= mod[1];
-					else globalState.playerCharacter.health = 1;
+					if (worldstate.playerCharacter.health > mod[1])
+						worldstate.playerCharacter.health -= mod[1];
+					else worldstate.playerCharacter.health = 1;
 				}
 			});
 		} else {
 			if (enchantment === 'None') return;
 			let stat = Enchantment[enchantment]?.affectedStat?.stat! as keyof typeof enchantmentModifiers;
 			let value = Enchantment[enchantment]?.affectedStat?.value!;
-			globalState.playerCharacter[stat] += value!;
+			worldstate.playerCharacter[stat] += value!;
 			enchantmentModifiers[stat] += value!;
 			if (stat === 'maxHealth') {
-				globalState.playerCharacter.health += value!;
+				worldstate.playerCharacter.health += value!;
 			}
 		}
 	}

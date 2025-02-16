@@ -3,7 +3,7 @@ import { EnemyData } from '../src/scripts/enemies/enemyData';
 import { ColorsOfMagic } from '../src/scripts/helpers/constants';
 import { RandomItemOptions } from '../src/scripts/helpers/item';
 import { QuestScripts } from '../src/scripts/helpers/quests';
-import Follower from '../src/scripts/worldstate/Follower';
+import Follower from '../src/types/Follower';
 
 export type EnumDictionary<T extends string | symbol | number, U> = {
 	[K in T]: U;
@@ -55,6 +55,8 @@ export interface Door {
 	id: string;
 	x: number;
 	y: number;
+	width?: number;
+	height?: number;
 	type: string;
 	open: boolean;
 }

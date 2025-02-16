@@ -1,6 +1,6 @@
 import { NpcData } from '../../../typings/custom';
 import { npcToAespriteMap, npcTypeToFileMap } from '../helpers/constants';
-import globalState from '../worldstate';
+import worldstate from '../worldState';
 import {
 	generateColorConversionTable,
 	generateColorReplacedTextures,
@@ -36,7 +36,7 @@ export default class NpcGenerationScene extends Phaser.Scene {
 		requiredNpcs.add('agnes');
 		requiredNpcs.add('erwin');
 		requiredNpcs.add('hilda-base');
-		Object.values(globalState.availableRooms).forEach((room) => {
+		Object.values(worldstate.availableRooms).forEach((room) => {
 			room.npcs?.forEach((npc) => {
 				if (!npc.type) {
 					throw new Error(`No npc type found for room ${room.name}.`);

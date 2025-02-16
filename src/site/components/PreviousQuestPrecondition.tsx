@@ -1,11 +1,7 @@
 import React from 'react';
-import { ItemWithCount } from '../../../typings/custom';
-import { ItemData } from '../../items/itemData';
-import { Input } from './Input';
 import {
 	CloseButton,
 	ItemIdContainer,
-	ItemsContainer,
 	LargeDropdown,
 	ScriptBlockContainer,
 	TextWrapper,

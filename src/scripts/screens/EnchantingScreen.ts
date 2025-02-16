@@ -14,7 +14,7 @@ import {
 	UI_SCALE,
 } from '../helpers/constants';
 import MainScene from '../scenes/MainScene';
-import globalState from '../worldstate';
+import worldstate from '../worldState';
 import OverlayScreen from './OverlayScreen';
 
 const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
@@ -154,7 +154,7 @@ export default class EnchantingScreen extends OverlayScreen {
 				ESSENCE_START_Y +
 					ESSENCE_SEPARATOR * Math.round(counter / Object.values(ColorsOfMagic).length) +
 					ESSENCE_NUMBER_OFFSET,
-				`${globalState.inventory.essences[essence]}`,
+				`${worldstate.inventory.essences[essence]}`,
 				{
 					color: 'white',
 					// wordWrap: { width: SCREEN_X - 40, useAdvancedWrap: true },
@@ -226,7 +226,7 @@ export default class EnchantingScreen extends OverlayScreen {
 	}
 
 	update() {
-		const essences = globalState.inventory.essences;
+		const essences = worldstate.inventory.essences;
 		const enchantment = Enchantment[this.selectedEnchantment];
 		let counter = 0;
 		let blocking = false;

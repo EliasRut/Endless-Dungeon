@@ -10,19 +10,19 @@ import {
 	FadingLabelSize,
 } from '../../helpers/constants';
 import CharacterToken from './CharacterToken';
-import Enemy from '../../worldstate/Enemy';
-import globalState from '../../worldstate';
+import Enemy from '../../../types/Enemy';
+import worldstate from '../../worldState';
 import MainScene from '../../scenes/MainScene';
 import { generateRandomItem } from '../../helpers/item';
 import { RandomItemOptions } from '../../helpers/item';
-import Character, { updateStatus } from '../../worldstate/Character';
+import Character, { updateStatus } from '../../../types/Character';
 import { findNextPathSegmentTo } from '../../helpers/pathfindingHelper';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import { getFacing4Dir, getXYfromTotalSpeed, updateMovingState } from '../../helpers/movement';
 import { EnemyData, EnemyCategory, MeleeAttackType } from '../../enemies/enemyData';
-import { UneqippableItem } from '../../../items/itemData';
 import { DEBUG_ENEMY_AI } from '../../helpers/constants';
 import { getClosestTarget } from '../../helpers/targetingHelpers';
+import { UneqippableItem } from '../../../types/Item';
 
 const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;
@@ -81,7 +81,7 @@ export default class EnemyToken extends CharacterToken {
 			enemyData.startingHealth,
 			enemyData.movementSpeed
 		);
-		globalState.enemies[id] = this.stateObject;
+		worldstate.enemies[id] = this.stateObject;
 		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 		this.tokenName = tokenName;
 		this.target = new Phaser.Geom.Point(0, 0);
@@ -150,7 +150,7 @@ export default class EnemyToken extends CharacterToken {
 	 */
 	dropItemsAfterDeath() {
 		const HEALT_POTION_DROP_CHANCE =
-			this.enemyData.healthPotionDropChance * globalState.playerCharacter.luck;
+			this.enemyData.healthPotionDropChance * worldstate.playerCharacter.luck;
 
 		if (this.stateObject.health <= 0 && !this.dead) {
 			// Check if an equipable item or a health potion are dropped
@@ -574,7 +574,7 @@ export default class EnemyToken extends CharacterToken {
 			return;
 		}
 
-		if (this.charmedTime + 6000 < globalState.gameTime) {
+		if (this.charmedTime + 6000 < worldstate.gameTime) {
 			// If enemy is charmed, let it get back to normal aggro pattern
 			this.faction = Faction.ENEMIES;
 			this.stateObject.faction = Faction.ENEMIES;

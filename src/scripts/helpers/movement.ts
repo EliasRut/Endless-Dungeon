@@ -1,4 +1,4 @@
-import Character from '../worldstate/Character';
+import Character from '../../types/Character';
 import {
 	ANIMATION_IDLE,
 	ANIMATION_WALK,

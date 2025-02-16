@@ -5,7 +5,7 @@ import {
 	DOOR_OFFSETS,
 	DOOR_TYPE,
 } from '../../helpers/constants';
-import globalState from '../../worldstate/index';
+import worldstate from '../../worldState';
 import MainScene from '../../scenes/MainScene';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 
@@ -37,7 +37,7 @@ export default class DoorToken extends Phaser.Physics.Arcade.Sprite {
 		scene.physics.add.existing(this);
 		this.id = id;
 		this.body!.immovable = true;
-		const door = globalState.doors[id];
+		const door = worldstate.doors[id];
 		this.body!.checkCollision.none = door.open as any;
 		if (door.open) {
 			this.play({ key: `${doorName}_o`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
@@ -47,7 +47,7 @@ export default class DoorToken extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	open() {
-		const door = globalState.doors[this.id];
+		const door = worldstate.doors[this.id];
 		door.open = true;
 		this.play({ key: `${this.doorName}_open`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.on('animationcomplete', () => {
@@ -57,7 +57,7 @@ export default class DoorToken extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	close() {
-		const door = globalState.doors[this.id];
+		const door = worldstate.doors[this.id];
 		door.open = false;
 		this.play({ key: `${this.doorName}_c`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.body!.checkCollision.none = false as any;

@@ -1,10 +1,10 @@
-import { AbilityType } from '../../abilities/abilityData';
 import { Faction, PossibleTargets, SCALE, VISITED_TILE_TINT } from '../../helpers/constants';
 import { getFacing4Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
-import globalState from '../../worldstate';
-import Character from '../../worldstate/Character';
+import worldstate from '../../worldState';
+import Character from '../../../types/Character';
 import CharacterToken from './CharacterToken';
+import { AbilityType } from '../../../types/AbilityType';
 
 const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;
@@ -44,7 +44,7 @@ export default class ElementalToken extends CharacterToken {
 		scene.physics.add.existing(this);
 		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
-		globalState.npcs[id] = this.stateObject;
+		worldstate.npcs[id] = this.stateObject;
 		this.stateObject = new Character(
 			id,
 			tokenName,

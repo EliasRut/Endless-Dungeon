@@ -1,7 +1,7 @@
 import { Facings } from '../../helpers/constants';
 import AbilityEffect from './AbilityEffect';
-import globalState from '../../worldstate/index';
-import { ProjectileData } from '../../abilities/abilityData';
+import worldstate from '../../worldState';
+import { ProjectileData } from '../../../types/ProjectileData';
 
 const BODY_RADIUS = 6;
 const EFFECT_DESTRUCTION_TIMEOUT_MS = 300;
@@ -39,9 +39,9 @@ export default class HealingLightEffect extends AbilityEffect {
 		this.emitter.startFollow(this.body!);
 		this.emitter.start();
 
-		globalState.playerCharacter.health = Math.min(
-			globalState.playerCharacter.health + HEALING_STRENGTH,
-			globalState.playerCharacter.maxHealth
+		worldstate.playerCharacter.health = Math.min(
+			worldstate.playerCharacter.health + HEALING_STRENGTH,
+			worldstate.playerCharacter.maxHealth
 		);
 
 		setTimeout(() => {
@@ -56,6 +56,6 @@ export default class HealingLightEffect extends AbilityEffect {
 	}
 
 	update() {
-		this.setPosition(globalState.playerCharacter.x, globalState.playerCharacter.y);
+		this.setPosition(worldstate.playerCharacter.x, worldstate.playerCharacter.y);
 	}
 }

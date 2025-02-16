@@ -1,20 +1,17 @@
-import {
-	AbilityData,
-	AbilityType,
-	SpreadData,
-	getRelevantAbilityVersion,
-} from '../abilities/abilityData';
+import { getRelevantAbilityVersion } from '../abilities/abilityData';
 import AbilityEffect from '../drawables/effects/AbilityEffect';
 import CharacterToken from '../drawables/tokens/CharacterToken';
 import MainScene from '../scenes/MainScene';
-import globalState from '../worldstate';
-import Character from '../worldstate/Character';
+import worldstate from '../worldState';
+import Character from '../../types/Character';
 import { Facings, Faction, PossibleTargets, SCALE } from './constants';
 import { getFacing8Dir, getRotationInRadiansForFacing, getVelocitiesForFacing } from './movement';
 import TargetingEffect from '../drawables/effects/TargetingEffect';
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
 import { CASTING_SPEED_MS } from '../scenes/MainScene';
 import { getAbsoluteDistancesToWorldStatePosition, getClosestTarget } from './targetingHelpers';
+import { AbilityType, SpreadData } from '../../types/AbilityType';
+import { AbilityData } from '../../types/AbilityData';
 
 export interface SimplePointOfOrigin {
 	currentFacing: Facings;
@@ -276,7 +273,7 @@ export default class AbilityHelper {
 
 				if (usedAbilityData.stopDashBeforeEnemyCollision) {
 					const closestTaget = getClosestTarget(
-						casterToken.faction,
+						casterToken.faction!,
 						casterToken.x,
 						casterToken.y,
 						caster.currentFacing
@@ -310,7 +307,7 @@ export default class AbilityHelper {
 			}
 		}
 		if (usedAbilityData.reverseDash) {
-			globalState.playerCharacter.reverseDashDirectionTime = globalTime;
+			worldstate.playerCharacter.reverseDashDirectionTime = globalTime;
 		}
 		if (usedAbilityData.castEffect) {
 			const effect = new usedAbilityData.castEffect(
@@ -339,27 +336,27 @@ export default class AbilityHelper {
 			const relevantAbility = getRelevantAbilityVersion(
 				ability,
 				abilityLevel,
-				globalState.playerCharacter.comboCast
+				worldstate.playerCharacter.comboCast
 			);
 			const castingTime = relevantAbility?.castingTime || CASTING_SPEED_MS;
-			globalState.playerCharacter.lastComboCast = globalState.playerCharacter.comboCast;
+			worldstate.playerCharacter.lastComboCast = worldstate.playerCharacter.comboCast;
 			setTimeout(() => {
 				this.triggerAbility(
-					globalState.playerCharacter,
+					worldstate.playerCharacter,
 					{
-						...globalState.playerCharacter,
-						getUpdatedData: () => globalState.playerCharacter,
+						...worldstate.playerCharacter,
+						getUpdatedData: () => worldstate.playerCharacter,
 					},
 					ability,
 					abilityLevel,
 					time,
-					globalState.playerCharacter.comboCast
+					worldstate.playerCharacter.comboCast
 				);
 				if (relevantAbility.resetComboCast) {
-					globalState.playerCharacter.comboCast = 1;
+					worldstate.playerCharacter.comboCast = 1;
 				} else if (relevantAbility.increaseComboCast) {
-					globalState.playerCharacter.comboCast++;
-					globalState.playerCharacter.lastComboCastTime = time;
+					worldstate.playerCharacter.comboCast++;
+					worldstate.playerCharacter.lastComboCastTime = time;
 				}
 			}, castingTime * 0.67);
 			this.scene.keyboardHelper!.lastCastingDuration = castingTime;

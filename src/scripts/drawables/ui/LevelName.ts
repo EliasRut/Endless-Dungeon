@@ -1,5 +1,5 @@
 import { UiDepths, UI_SCALE } from '../../helpers/constants';
-import globalState from '../../worldstate/index';
+import worldstate from '../../worldState';
 
 const X_POSITION = 12;
 const Y_POSITION = 146;
@@ -19,7 +19,7 @@ export default class Minimap extends Phaser.GameObjects.Text {
 		this.setScrollFactor(0);
 		scene.add.existing(this);
 		this.setOrigin(0);
-		this.setText(globalState.roomAssignment[globalState.currentLevel]?.title || '');
+		this.setText(worldstate.roomAssignment[worldstate.currentLevel]?.title || '');
 		this.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 	}
 }

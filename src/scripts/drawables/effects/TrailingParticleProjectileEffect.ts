@@ -7,7 +7,7 @@ import {
 } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
 import { ProjectileData } from '../../abilities/abilityData';
-import globalState from '../../worldstate/index';
+import worldstate from '../../worldState';
 
 const BODY_RADIUS = 4;
 const VISIBILITY_DELAY = 50;
@@ -127,7 +127,7 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 		this.lightingMinStrength = 0;
 		this.lightingMaxStrength = 4;
 		this.lightingFrequency = 1000;
-		this.lightingSeed = globalState.gameTime - 100;
+		this.lightingSeed = worldstate.gameTime - 100;
 		this.body!.destroy();
 		this.setVisible(false);
 		setTimeout(() => {

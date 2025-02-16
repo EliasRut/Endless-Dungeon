@@ -1,4 +1,4 @@
-import { Room } from '../../../typings/custom';
+import { Room } from '../../typings/custom';
 import Character from './Character';
 import Follower from './Follower';
 import Door from './Door';
@@ -11,7 +11,7 @@ import RoomAssignment from './RoomAssignment';
 import { RoomCoordinates } from './RoomCoordinates';
 import ScriptState from './ScriptState';
 import { EmptyInventory } from './Inventory';
-import { ConditionalAbilityDataMap } from '../abilities/abilityData';
+import { ConditionalAbilityDataMap } from './AbilityData';
 
 /*
 	This file contains the full, current game state. It is intended to handle all information that
@@ -135,9 +135,3 @@ export class WorldState {
 		localStorage.clear();
 	}
 }
-
-// This initializes an instance of the world state. We want this to be a Singleton.
-const globalState = new WorldState();
-
-// We are default-exporting the singleton, so that everything should use the same object.
-export default globalState;

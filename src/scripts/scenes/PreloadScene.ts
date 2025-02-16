@@ -11,7 +11,7 @@ import {
 	NpcTypeList,
 	SummonsTypeList,
 } from '../helpers/constants';
-import globalState from '../worldstate';
+import worldstate from '../worldState';
 import DungeonGenerator from '../helpers/generateDungeon';
 import { BLOCK_SIZE } from '../helpers/generateRoom';
 import { Quest } from '../../../typings/custom';
@@ -222,18 +222,18 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Find out which files we need by going through all rendered rooms
 		const requiredNpcs = new Set<string>();
-		Object.values(globalState.availableRooms).forEach((room) => {
-			if (!globalState.availableTilesets.includes(room.tileset)) {
-				globalState.availableTilesets.push(room.tileset);
+		Object.values(worldstate.availableRooms).forEach((room) => {
+			if (!worldstate.availableTilesets.includes(room.tileset)) {
+				worldstate.availableTilesets.push(room.tileset);
 			}
 			if (
 				room.decorationTileset &&
-				!globalState.availableTilesets.includes(room.decorationTileset)
+				!worldstate.availableTilesets.includes(room.decorationTileset)
 			) {
-				globalState.availableTilesets.push(room.decorationTileset);
+				worldstate.availableTilesets.push(room.decorationTileset);
 			}
-			if (room.overlayTileset && !globalState.availableTilesets.includes(room.overlayTileset)) {
-				globalState.availableTilesets.push(room.overlayTileset);
+			if (room.overlayTileset && !worldstate.availableTilesets.includes(room.overlayTileset)) {
+				worldstate.availableTilesets.push(room.overlayTileset);
 			}
 			room.npcs?.forEach((npc) => {
 				requiredNpcs.add(npc.type);
@@ -244,7 +244,7 @@ export default class PreloadScene extends Phaser.Scene {
 		});
 
 		// Tiles
-		globalState.availableTilesets.forEach((tileSet) => {
+		worldstate.availableTilesets.forEach((tileSet) => {
 			this.load.image(tileSet, `${baseUrl}/assets/tilesets/${tileSet}.png`);
 		});
 
@@ -456,21 +456,21 @@ export default class PreloadScene extends Phaser.Scene {
 
 		// Construct dungeon for this map
 		if (
-			!globalState.dungeon.levels[globalState.currentLevel] &&
-			globalState.currentLevel.startsWith('dungeonLevel')
+			!worldstate.dungeon.levels[worldstate.currentLevel] &&
+			worldstate.currentLevel.startsWith('dungeonLevel')
 		) {
 			// Town is 0, "dungeonLevelx"s are their last character (that's a bit hacky)
 			// everything else is -1
 			const numericLevel =
-				globalState.currentLevel === 'town'
+				worldstate.currentLevel === 'town'
 					? 0
-					: globalState.currentLevel.startsWith('dungeonLevel')
-					? parseInt(globalState.currentLevel.substr(-1), 10)
+					: worldstate.currentLevel.startsWith('dungeonLevel')
+					? parseInt(worldstate.currentLevel.substr(-1), 10)
 					: -1;
 
-			const levelData = globalState.roomAssignment[globalState.currentLevel];
+			const levelData = worldstate.roomAssignment[worldstate.currentLevel];
 			const dungeonLevel = new DungeonGenerator().generateLevel(
-				globalState.currentLevel,
+				worldstate.currentLevel,
 				numericLevel,
 				{
 					title: levelData.title,
@@ -484,21 +484,21 @@ export default class PreloadScene extends Phaser.Scene {
 				}
 			);
 
-			globalState.dungeon.levels[globalState.currentLevel] = dungeonLevel;
-		} else if (!globalState.dungeon.levels[globalState.currentLevel]) {
+			worldstate.dungeon.levels[worldstate.currentLevel] = dungeonLevel;
+		} else if (!worldstate.dungeon.levels[worldstate.currentLevel]) {
 			// Town is 0, "dungeonLevelx"s are their last character (that's a bit hacky)
 			// everything else is -1
-			const numericLevel = globalState.currentLevel.startsWith('town') ? 0 : -1;
+			const numericLevel = worldstate.currentLevel.startsWith('town') ? 0 : -1;
 
-			const roomData = globalState.availableRooms[globalState.currentLevel];
+			const roomData = worldstate.availableRooms[worldstate.currentLevel];
 
 			// const levelData = globalState.roomAssignment[globalState.currentLevel];
 			const roomLevelData = new DungeonGenerator().generateLevel(
-				globalState.currentLevel,
+				worldstate.currentLevel,
 				numericLevel,
 				{
 					title: roomData.title || '',
-					rooms: [globalState.currentLevel],
+					rooms: [worldstate.currentLevel],
 					width: Math.ceil(roomData.layout[0].length / BLOCK_SIZE) + 2,
 					height: Math.ceil(roomData.layout.length / BLOCK_SIZE) + 2,
 					enemyBudget: 0,
@@ -508,7 +508,7 @@ export default class PreloadScene extends Phaser.Scene {
 				}
 			);
 
-			globalState.dungeon.levels[globalState.currentLevel] = roomLevelData;
+			worldstate.dungeon.levels[worldstate.currentLevel] = roomLevelData;
 		}
 
 		// Load quests from database

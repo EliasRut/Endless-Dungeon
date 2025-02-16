@@ -1,10 +1,10 @@
 import 'phaser';
 import DungeonDoor from '../drawables/ui/DungeonDoor';
-import globalState from '../worldstate/index';
+import worldstate from '../worldState';
 import { RuneAssignment } from '../helpers/constants';
 import { generateDungeonRun } from '../helpers/generateDungeonRun';
 import KeyboardHelper from '../helpers/KeyboardHelper';
-import { SingleScriptState } from '../worldstate/ScriptState';
+import { SingleScriptState } from '../../types/ScriptState';
 import { loadContentBlocksFromDatabase } from '../helpers/ContentDataLibrary';
 
 export default class DungeonDoorScene extends Phaser.Scene {
@@ -32,18 +32,18 @@ export default class DungeonDoorScene extends Phaser.Scene {
 		console.log('entering dungeon');
 		await this.contentDataLibraryUpdatePromise;
 		const dungeonRun = generateDungeonRun(runeAssignment);
-		globalState.enemies = {};
-		globalState.dungeon.levels = {};
-		globalState.doors = {};
+		worldstate.enemies = {};
+		worldstate.dungeon.levels = {};
+		worldstate.doors = {};
 		const newScriptState: { [id: string]: SingleScriptState } = {};
-		Object.entries(globalState.scripts.states || {}).forEach(([scriptId, scriptState]) => {
+		Object.entries(worldstate.scripts.states || {}).forEach(([scriptId, scriptState]) => {
 			if (!scriptId.startsWith('dungeonLevel')) {
 				newScriptState[scriptId] = scriptState;
 			}
 		});
-		globalState.scripts.states = newScriptState;
-		globalState.playerCharacter.x = 0;
-		globalState.playerCharacter.y = 0;
+		worldstate.scripts.states = newScriptState;
+		worldstate.playerCharacter.x = 0;
+		worldstate.playerCharacter.y = 0;
 
 		dungeonRun.levels.forEach((levelData, level) => {
 			const rooms = [];
@@ -53,7 +53,7 @@ export default class DungeonDoorScene extends Phaser.Scene {
 			if (level < dungeonRun.levels.length - 1) {
 				rooms.push(`COM-${levelData.style.toLowerCase()}-connection-down`);
 			}
-			globalState.roomAssignment['dungeonLevel' + (level + 1)] = {
+			worldstate.roomAssignment['dungeonLevel' + (level + 1)] = {
 				dynamicLighting: true,
 				rooms: rooms.concat(levelData.rooms),
 				width: levelData.width,
@@ -65,7 +65,7 @@ export default class DungeonDoorScene extends Phaser.Scene {
 			};
 		});
 
-		globalState.currentLevel = 'dungeonLevel1';
+		worldstate.currentLevel = 'dungeonLevel1';
 		this.scene.start('RoomPreloaderScene');
 	}
 	update(globalTime: number, _delta: number) {

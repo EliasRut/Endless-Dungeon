@@ -1,5 +1,5 @@
-import { ColorsOfMagic } from '../helpers/constants';
-import { PrimaryContentDungeonLevelBaseData } from '../models/PrimaryContentBlock';
+import { ColorsOfMagic } from '../scripts/helpers/constants';
+import { PrimaryContentDungeonLevelBaseData } from './PrimaryContentBlock';
 
 export default interface RoomAssignment extends PrimaryContentDungeonLevelBaseData {
 	dynamicLighting: boolean;

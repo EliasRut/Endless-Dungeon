@@ -1,18 +1,10 @@
 import 'phaser';
-import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
-import PositionText, {
-	POSITION_TEXT_X_OFFSET,
-	POSITION_TEXT_Y_OFFSET,
-} from '../drawables/ui/PositionText';
-import globalState from '../worldstate';
 import { DatabaseRoom, ItemsPositioning, NpcPositioning, Room } from '../../../typings/custom';
-import { deserializeRoom } from '../helpers/serialization';
-import { spawnNpc } from '../helpers/spawn';
+
 import fixedItems from '../../items/fixedItems.json';
-import WorldItemToken from '../drawables/tokens/WorldItemToken';
-import { getItemDataForName, UneqippableItem } from '../../items/itemData';
-import { getCachedUserData } from '../helpers/userHelpers';
-import { COLUMNS_PER_TILESET } from '../helpers/constants';
+
+import { getItemDataForName } from '../../items/itemData';
+
 import {
 	collection,
 	CollectionReference,
@@ -26,6 +18,18 @@ import {
 	where,
 } from 'firebase/firestore';
 import { app } from '../../shared/initializeApp';
+import PositionText, {
+	POSITION_TEXT_X_OFFSET,
+	POSITION_TEXT_Y_OFFSET,
+} from '../../scripts/drawables/ui/PositionText';
+import { deserializeRoom } from '../../scripts/helpers/serialization';
+import { getCachedUserData } from '../../scripts/helpers/userHelpers';
+import worldState from '../../scripts/worldState';
+import { COLUMNS_PER_TILESET } from '../../scripts/helpers/constants';
+import { spawnNpc } from '../../scripts/helpers/spawn';
+import { TILE_HEIGHT, TILE_WIDTH } from '../../scripts/helpers/generateDungeon';
+import WorldItemToken from '../../scripts/drawables/tokens/WorldItemToken';
+import { UneqippableItem } from '../../types/Item';
 
 const SCALE = 2;
 
@@ -363,7 +367,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.tilesetDropdownElement.remove(0);
 		}
 
-		globalState.availableTilesets.forEach((tileset) => {
+		worldState.availableTilesets.forEach((tileset) => {
 			const newOption = document.createElement('option');
 			newOption.value = tileset;
 			newOption.innerText = tileset;
@@ -375,7 +379,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.tilesetDecorationDropdownElement.remove(0);
 		}
 
-		globalState.availableTilesets.forEach((tileset) => {
+		worldState.availableTilesets.forEach((tileset) => {
 			const newOption = document.createElement('option');
 			newOption.value = tileset;
 			newOption.innerText = tileset;
@@ -387,7 +391,7 @@ export default class MapEditor extends Phaser.Scene {
 			this.tilesetOverlayDropdownElement.remove(0);
 		}
 
-		globalState.availableTilesets.forEach((tileset) => {
+		worldState.availableTilesets.forEach((tileset) => {
 			const newOption = document.createElement('option');
 			newOption.value = tileset;
 			newOption.innerText = tileset;

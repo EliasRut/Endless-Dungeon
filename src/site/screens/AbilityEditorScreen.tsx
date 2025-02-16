@@ -1,7 +1,7 @@
 import 'phaser';
 import { useEffect, useRef, useState } from 'react';
 import { getGameConfig } from '../../scripts/game';
-import { MODE, setActiveMode, MinMaxParticleEffectValue } from '../../scripts/helpers/constants';
+import { MODE, setActiveMode } from '../../scripts/helpers/constants';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { Dropdown } from '../components/Dropdown';
@@ -9,16 +9,14 @@ import { UserInformation } from '../../scripts/helpers/UserInformation';
 import AbilityEditor, {
 	DefaultAbilityData,
 	EditedAbilityData,
-} from '../../scripts/scenes/AbilityEditor';
+} from '../../editors/scenes/AbilityEditor';
 import { EmitterInputBlock } from '../components/EmitterInputBlock';
 import { EmitterTintInputBlock } from '../components/EmitterTintInputBlock';
-import {
-	AbilityData,
-	ProjectileData,
-	ProjectileParticleData,
-} from '../../scripts/abilities/abilityData';
 import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
 import '../App.css';
+import { AbilityData } from '../../types/AbilityData';
+import { ProjectileData, ProjectileParticleData } from '../../types/ProjectileData';
+import { MinMaxParticleEffectValue } from '../../types/AbilityType';
 
 const showGame = true;
 

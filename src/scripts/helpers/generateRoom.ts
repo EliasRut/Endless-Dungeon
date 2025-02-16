@@ -1,6 +1,5 @@
-import { NpcPositioning, Opening, Room, Scripting } from '../../../typings/custom';
+import { Opening, Room, Scripting } from '../../../typings/custom';
 import { ColorsOfMagic } from './constants';
-import { generateTilemap } from './drawDungeon';
 
 import {
 	EMPTY,
@@ -191,7 +190,7 @@ export default class RoomGenerator {
 	minSize: number = 1;
 	maxSize: number = 3 * this.minSize;
 
-	blocksUsed: number[][];
+	blocksUsed: number[][] = [];
 
 	private roomSize(min: number, max: number) {
 		const factor = Math.max(min, Math.floor(Math.random() * 100) % max);

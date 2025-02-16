@@ -1,7 +1,7 @@
-import { AbilityType } from '../abilities/abilityData';
-import { AbilityKey, Faction, SCALE } from '../helpers/constants';
+import { AbilityKey, Faction, SCALE } from '../scripts/helpers/constants';
 import Character from './Character';
-import MainScene from '../scenes/MainScene';
+import MainScene from '../scripts/scenes/MainScene';
+import { AbilityType } from './AbilityType';
 
 const DEFAULT_HEALTH = 100;
 const DEFAULT_DAMAGE = 1;
@@ -54,5 +54,5 @@ export const updateAbility = (
 ) => {
 	if (abilityKey === AbilityKey.FIVE) return;
 	player.abilityKeyMapping[abilityKey] = ability;
-	scene.playerCharacterAvatar.updateAbility(abilityKey, ability);
+	scene.playerCharacterAvatar!.updateAbility(abilityKey, ability);
 };

@@ -1,8 +1,7 @@
 import DoorToken from '../drawables/tokens/DoorToken';
 import MainScene from '../scenes/MainScene';
-import globalState from '../worldstate';
-import Door from '../worldstate/Door';
-import { B_BOT, B_LFT, B_RGT, B_TOP } from './cells';
+import worldstate from '../worldState';
+import { B_BOT, B_TOP } from './cells';
 import { DEFAULT_TILE_TINT, SCALE, VISITED_TILE_TINT, getTileIndex } from './constants';
 import { GID_MULTIPLE, TILE_HEIGHT, TILE_WIDTH } from './generateDungeon';
 import { isCollidingTile } from './movement';
@@ -109,12 +108,12 @@ export default class DynamicLightingHelper {
 	}
 
 	getCurrentLevel() {
-		return globalState.roomAssignment[globalState.currentLevel];
+		return worldstate.roomAssignment[worldstate.currentLevel];
 	}
 
 	updateDoorState() {
 		for (let doorToken of Object.values(this.doors)) {
-			const door = globalState.doors[doorToken.id];
+			const door = worldstate.doors[doorToken.id];
 			const doorXTile = Math.round(door.x / TILE_WIDTH / SCALE);
 			const doorYTile = Math.round(door.y / TILE_HEIGHT / SCALE);
 			for (let x = doorXTile - 3; x < doorXTile + door.width + 3; x++) {
@@ -237,8 +236,8 @@ export default class DynamicLightingHelper {
 
 		// We have a slight offset on the player token, not yet sure why
 		// tslint:disable-next-line: no-magic-numbers
-		const playerTokenX = globalState.playerCharacter.x - 5;
-		const playerTokenY = globalState.playerCharacter.y;
+		const playerTokenX = worldstate.playerCharacter.x - 5;
+		const playerTokenY = worldstate.playerCharacter.y;
 		// Get the tile the player token is on
 		const playerTileX = Math.round(playerTokenX / TILE_WIDTH);
 		const playerTileY = Math.round(playerTokenY / TILE_HEIGHT);
@@ -397,7 +396,7 @@ export default class DynamicLightingHelper {
 		}
 
 		Object.values(this.doors).forEach((doorToken) => {
-			const door = globalState.doors[doorToken.id];
+			const door = worldstate.doors[doorToken.id];
 			const doorXTile = Math.round(door.x / TILE_WIDTH / SCALE);
 			const doorYTile = Math.round(door.y / TILE_HEIGHT / SCALE);
 			const baseTile = this.tileLayer.getTileAt(doorXTile, doorYTile);

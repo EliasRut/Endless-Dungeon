@@ -1,4 +1,4 @@
-import globalState from '../../worldstate/index';
+import worldstate from '../../worldState';
 import { BLOCK_SIZE, TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
 import { UiDepths, UI_SCALE } from '../../helpers/constants';
@@ -57,12 +57,12 @@ export default class Minimap extends Phaser.GameObjects.Text {
 	}
 
 	public update() {
-		const xPos = Math.floor(globalState.playerCharacter.x / BLOCK_SIZE / TILE_WIDTH);
-		const yPos = Math.floor(globalState.playerCharacter.y / BLOCK_SIZE / TILE_HEIGHT);
+		const xPos = Math.floor(worldstate.playerCharacter.x / BLOCK_SIZE / TILE_WIDTH);
+		const yPos = Math.floor(worldstate.playerCharacter.y / BLOCK_SIZE / TILE_HEIGHT);
 		const xxPos = xPos * BLOCK_SIZE;
 		const yyPos = yPos * BLOCK_SIZE;
 
-		const layout = globalState.dungeon.levels[globalState.currentLevel].layout;
+		const layout = worldstate.dungeon.levels[worldstate.currentLevel].layout;
 		const width = layout[0].length;
 		const height = layout.length;
 

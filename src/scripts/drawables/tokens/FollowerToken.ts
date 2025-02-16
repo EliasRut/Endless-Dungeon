@@ -7,8 +7,8 @@ import {
 	PossibleTargets,
 	FadingLabelSize,
 } from '../../helpers/constants';
-import globalState from '../../worldstate';
-import Follower from '../../worldstate/Follower';
+import worldstate from '../../worldState';
+import Follower from '../../../types/Follower';
 import { TILE_WIDTH } from '../../helpers/generateDungeon';
 import {
 	getFacing4Dir,
@@ -54,7 +54,7 @@ export default class FollowerToken extends CharacterToken {
 		scene.physics.add.existing(this);
 		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
-		this.stateObject = globalState.followers[id];
+		this.stateObject = worldstate.followers[id];
 
 		// this.stateObject = new Follower(
 		// 	id,
@@ -83,7 +83,7 @@ export default class FollowerToken extends CharacterToken {
 	// The follower should stay near the player and if it moves out of range, it should move closer
 	// to the player.
 	protected followPlayer() {
-		const player = globalState.playerCharacter;
+		const player = worldstate.playerCharacter;
 		if (this.getDistanceToWorldStatePosition(player.x, player.y) > OPTIMAL_DISTANCE_TO_PLAYER) {
 			const tx = player.x;
 			const ty = player.y;
@@ -120,7 +120,7 @@ export default class FollowerToken extends CharacterToken {
 
 	// If follower is too far away from the player, it should be teleported to the player
 	protected teleportFollower() {
-		const player = globalState.playerCharacter;
+		const player = worldstate.playerCharacter;
 
 		if (this.getDistanceToWorldStatePosition(player.x, player.y) > MAX_DISTANCE_TO_PLAYER) {
 			const tx = player.x;

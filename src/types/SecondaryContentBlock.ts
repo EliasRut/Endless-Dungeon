@@ -1,4 +1,4 @@
-import { ColorsOfMagic } from '../helpers/constants';
+import { ColorsOfMagic } from '../scripts/helpers/constants';
 
 export interface SecondaryContentBlock {
 	title: string;

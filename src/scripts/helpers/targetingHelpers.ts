@@ -1,5 +1,5 @@
-import globalState from '../worldstate';
-import Character from '../worldstate/Character';
+import worldstate from '../worldState';
+import Character from '../../types/Character';
 import { Facings, Faction, SCALE } from './constants';
 
 export const getAbsoluteDistancesToWorldStatePosition: (
@@ -32,13 +32,13 @@ export const getClosestTarget: (
 ) => Character | undefined = (ownFaction, ownX, ownY, inFacing) => {
 	let possibleTargets: Character[];
 	if (ownFaction === Faction.ALLIES || ownFaction === Faction.PLAYER) {
-		possibleTargets = [...Object.values(globalState.enemies)].filter(
+		possibleTargets = [...Object.values(worldstate.enemies)].filter(
 			(character) => character.health > 0 && character.faction === Faction.ENEMIES
 		);
 	} else {
 		possibleTargets = [
-			globalState.playerCharacter,
-			...(globalState.activeFollower ? [globalState.followers[globalState.activeFollower]] : []),
+			worldstate.playerCharacter,
+			...(worldstate.activeFollower ? [worldstate.followers[worldstate.activeFollower]] : []),
 		].filter((character) => character.health > 0);
 	}
 	if (inFacing !== undefined) {

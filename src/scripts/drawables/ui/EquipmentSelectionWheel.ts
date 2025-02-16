@@ -1,11 +1,11 @@
-import { EquippedItemData } from '../../worldstate/Inventory';
+import { EquippedItemData } from '../../../types/Inventory';
 import {
 	EquipmentSlot,
 	UiDepths,
 	UI_SCALE,
 	NORMAL_ANIMATION_FRAME_RATE,
 } from '../../helpers/constants';
-import { EquipmentKey, getItemDataForName, getItemTexture } from '../../../items/itemData';
+import { getItemDataForName, getItemTexture } from '../../../items/itemData';
 import {
 	attachEnchantmentItem,
 	equipItem,
@@ -16,7 +16,8 @@ import MainScene from '../../scenes/MainScene';
 import ItemToken from '../tokens/WorldItemToken';
 import { ScriptPlaceItem } from '../../../../typings/custom';
 import { EnchantmentName } from '../../../items/enchantmentData';
-import globalState from '../../worldstate';
+import worldstate from '../../worldState';
+import { EquipmentKey } from '../../../types/Item';
 
 const EIGHT_ITEMS_OFFSETS = [
 	[0, -40],
@@ -39,11 +40,11 @@ const FOUR_ITEMS_OFFSETS = [
 export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 	visibility: boolean;
 	scene: MainScene;
-	leftBorderX: number;
-	topBorderY: number;
+	leftBorderX: number | undefined;
+	topBorderY: number | undefined;
 	selection?: Phaser.GameObjects.Image;
 	equipmentSlot?: EquipmentSlot;
-	itemMap: { [key: string]: EquippedItemData };
+	itemMap: { [key: string]: EquippedItemData } = {};
 	selectedItem?: number;
 
 	constructor(scene: Phaser.Scene) {
@@ -54,7 +55,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.visibility = true;
 	}
 
-	toggleVisibility() {		
+	toggleVisibility() {
 		this.toggleVisible();
 		this.visibility = !this.visibility;
 		this.selection?.setVisible(false);
@@ -87,7 +88,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		this.selectedItem = itemIndex;
 		if (itemIndex === -1) {
 			this.selection?.setVisible(false);
-			this.scene.overlayScreens.itemScreen.update();
+			this.scene.overlayScreens!.itemScreen.update();
 			return;
 		}
 
@@ -97,7 +98,7 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 		if (equipmentData.level > 0) {
 			this.selection?.setVisible(true);
 			this.selection?.setRotation((itemIndex / numItems) * Math.PI * 2);
-			this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+			this.scene.overlayScreens!.itemScreen.update(itemData, equipmentData);
 		}
 	}
 
@@ -113,21 +114,21 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 			const [itemData, equipmentData] = getFullDataForItemKey(itemKey);
 			if (equipmentData.level > 0) {
 				equipItem(this.equipmentSlot!, itemKey);
-				this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);
+				this.scene.overlayScreens!.itemScreen.update(itemData, equipmentData);
 			} else {
-				this.scene.overlayScreens.itemScreen.update();
+				this.scene.overlayScreens!.itemScreen.update();
 			}
 		} else {
-			console.log("APPLYING ENCHANTMENT: ", enchantment);
+			console.log('APPLYING ENCHANTMENT: ', enchantment);
 			attachEnchantmentItem(itemKey, enchantment);
 		}
-		this.scene.overlayScreens.inventory.update();
+		this.scene.overlayScreens!.inventory.update();
 		this.toggleVisibility();
 		this.selection?.setVisible(false);
 
 		if (enchantment) {
 			this.scene.closeAllIconScreens();
-			this.scene.icons.enchantIcon.openScreen();
+			this.scene.icons!.enchantIcon.openScreen();
 		}
 	}
 
@@ -226,13 +227,13 @@ export default class EquipmentSelectionWheel extends Phaser.GameObjects.Group {
 			itemImage.setScale(UI_SCALE);
 			if (equipmentData.level) {
 				itemImage.on('pointerdown', () => {
-					this.scene.overlayScreens.inventory.interactInventory(['enter'], globalState.gameTime);
+					this.scene.overlayScreens!.inventory.interactInventory(['enter'], worldstate.gameTime);
 				});
 				itemImage.on('pointerover', () => {
 					this.selectedItem = itemIndex;
 					const [itemData, equipmentData] = getFullDataForItemKey(itemKey as EquipmentKey);
-					this.scene.overlayScreens.itemScreen.update(itemData, equipmentData);					
-					// this.scene.overlayScreens.inventory.focusedSlot = equipmentSlot;
+					this.scene.overlayScreens!.itemScreen.update(itemData, equipmentData);
+					// this.scene.overlayScreens!.inventory.focusedSlot = equipmentSlot;
 					this.selection?.setVisible(true);
 					this.selection?.setRotation((itemIndex / numItems) * Math.PI * 2);
 				});

@@ -1,4 +1,4 @@
-import globalState from '../../worldstate/index';
+import worldstate from '../../worldState';
 import { BLOCK_SIZE, TILE_WIDTH, TILE_HEIGHT } from '../../helpers/generateDungeon';
 import { SCALE, UiDepths } from '../../helpers/constants';
 
@@ -19,8 +19,8 @@ export default class FpsText extends Phaser.GameObjects.Text {
 	}
 
 	public update() {
-		const xPos = Math.round(globalState.playerCharacter.x / BLOCK_SIZE / TILE_WIDTH);
-		const yPos = Math.round(globalState.playerCharacter.y / BLOCK_SIZE / TILE_HEIGHT);
+		const xPos = Math.round(worldstate.playerCharacter.x / BLOCK_SIZE / TILE_WIDTH);
+		const yPos = Math.round(worldstate.playerCharacter.y / BLOCK_SIZE / TILE_HEIGHT);
 		this.setText(
 			`fps: ${Math.floor(this.scene.game.loop.actualFps)}. ` + `Pos y${yPos}, x${xPos}.`
 		);

@@ -1,4 +1,3 @@
-import { AbilityType, ProjectileData } from '../../abilities/abilityData';
 import {
 	AbilityKey,
 	Facings,
@@ -9,10 +8,12 @@ import {
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import { getOneLetterFacingName, isCollidingTile } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
-import globalState from '../../worldstate';
-import { updateAbility } from '../../worldstate/PlayerCharacter';
+import worldstate from '../../worldState';
+import { updateAbility } from '../../../types/PlayerCharacter';
 import AbilityEffect from './AbilityEffect';
 import { NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
+import { ProjectileData } from '../../../types/ProjectileData';
+import { AbilityType } from '../../../types/AbilityType';
 
 export default class SummoningEffect extends AbilityEffect {
 	allowedTargets: PossibleTargets = PossibleTargets.NONE;
@@ -33,7 +34,7 @@ export default class SummoningEffect extends AbilityEffect {
 		this.setDepth(1);
 		scene.physics.add.existing(this);
 
-		const playerCharacter = globalState.playerCharacter;
+		const playerCharacter = worldstate.playerCharacter;
 		const summon = playerCharacter.activeSummons.find(
 			(activeSummon) => activeSummon.summoningType === summoningType
 		);

@@ -1,7 +1,8 @@
-import { Abilities, AbilityType, getRelevantAbilityVersion } from '../abilities/abilityData';
-import globalState from '../worldstate';
+import { getRelevantAbilityVersion } from '../abilities/abilityData';
+import worldstate from '../worldState';
 import { AbilityKey } from './constants';
-import MainScene, { CASTING_SPEED_MS } from '../scenes/MainScene';
+import { CASTING_SPEED_MS } from '../scenes/MainScene';
+import { AbilityType } from '../../types/AbilityType';
 
 const AXIS_MOVEMENT_THRESHOLD = 0.4;
 
@@ -59,21 +60,21 @@ export default class KeyboardHelper {
 	scene: Phaser.Scene;
 
 	constructor(scene: Phaser.Scene) {
-		this.upKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-		this.downKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-		this.leftKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
-		this.rightKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-		this.wKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-		this.aKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-		this.sKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-		this.dKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-		this.kKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
-		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
-		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
-		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-		this.spaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-		this.enchantKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+		this.upKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+		this.downKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+		this.leftKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+		this.rightKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+		this.wKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+		this.aKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+		this.sKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+		this.dKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+		this.kKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+		this.inventoryKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.I);
+		this.settingsKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.J);
+		this.questsKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+		this.enterKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+		this.spaceKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+		this.enchantKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 		this.wasEnterKeyPressed = false;
 
 		this.scene = scene;
@@ -175,16 +176,16 @@ export default class KeyboardHelper {
 			}
 		};
 
-		this.abilityKey1 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
-		this.abilityKey2 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
-		this.abilityKey3 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
-		this.abilityKey4 = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
-		this.inventoryKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
-		this.settingsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-		this.questsKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
-		this.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-		this.spaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-		this.enchantKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+		this.abilityKey1 = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+		this.abilityKey2 = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
+		this.abilityKey3 = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
+		this.abilityKey4 = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
+		this.inventoryKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.I);
+		this.settingsKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+		this.questsKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.J);
+		this.enterKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+		this.spaceKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+		this.enchantKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
 		this.isAbility1Pressed = () => {
 			if (this.abilityKeyPressed[AbilityKey.ONE]) {
@@ -326,7 +327,7 @@ export default class KeyboardHelper {
 	}
 
 	getAbilityLevelForAbilityKey(abilityKey: AbilityKey) {
-		const inventory = globalState.inventory;
+		const inventory = worldstate.inventory;
 		switch (abilityKey) {
 			case AbilityKey.ONE:
 				return inventory.equippedSource ? inventory.sources[inventory.equippedSource].level : 0;
@@ -366,14 +367,14 @@ export default class KeyboardHelper {
 	}
 
 	getAbilityCooldown(abilityKey: AbilityKey, gameTime: number) {
-		const ability = globalState.playerCharacter.abilityKeyMapping[abilityKey] as AbilityType;
+		const ability = worldstate.playerCharacter.abilityKeyMapping[abilityKey] as AbilityType;
 		const abilityData = getRelevantAbilityVersion(
 			ability,
 			this.getAbilityLevelForAbilityKey(abilityKey),
-			globalState.playerCharacter.lastComboCast || 0
+			worldstate.playerCharacter.lastComboCast || 0
 		);
 		// console.log(`Using ${abilityData.abilityName} with ${abilityData.cooldownMs}ms cooldown`);
-		const lastCasted = globalState.playerCharacter.abilityCastTime[abilityKey];
+		const lastCasted = worldstate.playerCharacter.abilityCastTime[abilityKey];
 		const readyAt = lastCasted + (abilityData.cooldownMs || 0);
 		if (readyAt <= gameTime) {
 			return 1;
@@ -384,11 +385,11 @@ export default class KeyboardHelper {
 
 	getMsSinceLastCast(gameTime: number) {
 		const lastCast = [
-			globalState.playerCharacter.abilityCastTime[AbilityKey.ONE],
-			globalState.playerCharacter.abilityCastTime[AbilityKey.TWO],
-			globalState.playerCharacter.abilityCastTime[AbilityKey.THREE],
-			globalState.playerCharacter.abilityCastTime[AbilityKey.FOUR],
-			globalState.playerCharacter.abilityCastTime[AbilityKey.SPACE],
+			worldstate.playerCharacter.abilityCastTime[AbilityKey.ONE],
+			worldstate.playerCharacter.abilityCastTime[AbilityKey.TWO],
+			worldstate.playerCharacter.abilityCastTime[AbilityKey.THREE],
+			worldstate.playerCharacter.abilityCastTime[AbilityKey.FOUR],
+			worldstate.playerCharacter.abilityCastTime[AbilityKey.SPACE],
 		].reduce((max, value) => Math.max(max, value), -Infinity);
 
 		return gameTime - lastCast;
@@ -413,18 +414,18 @@ export default class KeyboardHelper {
 		if (!relevantFunction()) {
 			return false;
 		}
-		const ability = globalState.playerCharacter.abilityKeyMapping[abilityKey] as AbilityType;
+		const ability = worldstate.playerCharacter.abilityKeyMapping[abilityKey] as AbilityType;
 		const abilityData = getRelevantAbilityVersion(
 			ability,
 			this.getAbilityLevelForAbilityKey(abilityKey),
-			globalState.playerCharacter.lastComboCast || 0
+			worldstate.playerCharacter.lastComboCast || 0
 		);
-		const lastCasted = globalState.playerCharacter.abilityCastTime[abilityKey];
+		const lastCasted = worldstate.playerCharacter.abilityCastTime[abilityKey];
 		const readyAt = lastCasted + (abilityData.cooldownMs || 0);
 		if (readyAt > gameTime) {
 			return false;
 		}
-		globalState.playerCharacter.abilityCastTime[abilityKey] = gameTime;
+		worldstate.playerCharacter.abilityCastTime[abilityKey] = gameTime;
 		return ability;
 	}
 }

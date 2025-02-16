@@ -1,7 +1,7 @@
 import { NpcOptions } from '../../../../typings/custom';
 import { Faction, SCALE, UiDepths, NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
-import globalState from '../../worldstate';
-import Character from '../../worldstate/Character';
+import worldstate from '../../worldState';
+import Character from '../../../types/Character';
 import CharacterToken from './CharacterToken';
 import { getNextQuestId, hasAnyOpenQuests, loadQuestScript } from '../../helpers/quests';
 import MainScene from '../../scenes/MainScene';
@@ -37,7 +37,7 @@ export default class NpcToken extends CharacterToken {
 		this.traderId = options?.traderId;
 
 		this.stateObject = new Character(id, type, NPC_DAMAGE, NPC_HEALTH, NPC_SPEED);
-		globalState.npcs[id] = this.stateObject;
+		worldstate.npcs[id] = this.stateObject;
 
 		this.play({ key: `${type}-idle-s`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		this.faction = Faction.NPCS;
@@ -59,13 +59,13 @@ export default class NpcToken extends CharacterToken {
 				this.openQuestSymbol.x = this.body!.x + 8 * SCALE;
 				this.openQuestSymbol.y = this.body!.y - (22 - yOffset) * SCALE;
 			}
-			const player = globalState.playerCharacter;
+			const player = worldstate.playerCharacter;
 			if (this.getDistanceToWorldStatePosition(player.x, player.y) < 60 * SCALE) {
 				const mainScene = this.scene as MainScene;
 				if (!mainScene.scriptHelper!.isScriptRunning()) {
 					const nextQuestId = getNextQuestId(this.questGiverId);
 					if (nextQuestId) {
-						globalState.quests[nextQuestId] = {
+						worldstate.quests[nextQuestId] = {
 							questFinished: false,
 							questGiverId: this.questGiverId,
 							states: {},

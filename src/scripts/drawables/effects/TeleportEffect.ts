@@ -1,8 +1,8 @@
-import { ProjectileData } from '../../abilities/abilityData';
+import { ProjectileData } from '../../../types/ProjectileData';
 import { DASH_REVERSE_DELAY, Facings, SCALE, UiDepths } from '../../helpers/constants';
 import { getVelocitiesForFacing } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
-import globalState from '../../worldstate';
+import worldstate from '../../worldState';
 import AbilityEffect from './AbilityEffect';
 
 const RED_DIFF = 0x010000;
@@ -24,12 +24,12 @@ export default class TeleportEffect extends AbilityEffect {
 		this.setDepth(1);
 		scene.physics.add.existing(this);
 
-		const playerCharacter = globalState.playerCharacter;
+		const playerCharacter = worldstate.playerCharacter;
 		const rotationFactors = getVelocitiesForFacing(playerCharacter.currentFacing);
 
 		const playerToken = (this.scene as MainScene).mainCharacter!;
 		const velocity = playerToken.body!.velocity;
-		if (playerCharacter.reverseDashDirectionTime + DASH_REVERSE_DELAY > globalState.gameTime) {
+		if (playerCharacter.reverseDashDirectionTime + DASH_REVERSE_DELAY > worldstate.gameTime) {
 			playerToken.setVelocity(
 				-TELEPORT_VELOCITY * SCALE * rotationFactors.x,
 				-TELEPORT_VELOCITY * SCALE * rotationFactors.y

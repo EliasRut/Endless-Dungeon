@@ -1,7 +1,7 @@
-import { SecondaryContentBlock } from '../models/SecondaryContentBlock';
-import { PrimaryContentBlock } from '../models/PrimaryContentBlock';
-import globalState from '../worldstate/index';
-import { ContentPackage } from '../models/ContentPackage';
+import { SecondaryContentBlock } from '../../types/SecondaryContentBlock';
+import { PrimaryContentBlock } from '../../types/PrimaryContentBlock';
+import worldstate from '../worldState';
+import { ContentPackage } from '../../types/ContentPackage';
 import { collection, getDocs, getFirestore, query, where } from 'firebase/firestore';
 import { app } from '../../shared/initializeApp';
 import { getBaseUrl } from './getBaseUrl';
@@ -41,7 +41,7 @@ export const loadContentBlocksFromDatabase = async () => {
 	const db = getFirestore(app);
 	const primaryContentBlocksCollection = collection(db, 'primaryContentBlocks');
 	const promises: Promise<any>[] = [];
-	for (const contentPackage of globalState.contentPackages) {
+	for (const contentPackage of worldstate.contentPackages) {
 		promises.push(
 			getDocs(
 				query(primaryContentBlocksCollection, where('contentPackage', '==', contentPackage))

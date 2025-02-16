@@ -1,13 +1,14 @@
 import { EquipmentSlot, UiDepths, UI_SCALE } from '../helpers/constants';
 import OverlayScreen from './OverlayScreen';
-import { AbilityType, getRelevantAbilityVersion } from '../abilities/abilityData';
-import globalState from '../worldstate';
-import { ItemData } from '../../items/itemData';
-import { EquippedItemData } from '../worldstate/Inventory';
+import { getRelevantAbilityVersion } from '../abilities/abilityData';
+import worldstate from '../worldState';
+import { EquippedItemData } from '../../types/Inventory';
 import { Enchantment } from '../../items/enchantmentData';
 import { STAT_SCREEN_RIGHT_BORDER } from './StatScreen';
 import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
 import { getEquipmentDataForSlot } from '../helpers/inventory';
+import { ItemData } from '../../types/Item';
+import { AbilityType } from '../../types/AbilityType';
 
 const BASE_SIZE_NAME = 20;
 
@@ -196,8 +197,7 @@ export default class ItemScreen extends OverlayScreen {
 		const itemLevel = getEquipmentDataForSlot(slotKey)?.level ?? 0;
 		const relevantAbility = getRelevantAbilityVersion(ability, itemLevel, 1);
 
-		const damageValue =
-			(relevantAbility.damageMultiplier || 0) * globalState.playerCharacter.damage;
+		const damageValue = (relevantAbility.damageMultiplier || 0) * worldstate.playerCharacter.damage;
 		this.lableEnchantmentValue.setText(`${damageValue.toFixed(2)}`);
 		this.lableLevel.setText(`Level 1`);
 		// this.lableMovSpeedValue.setText(`${0}`);

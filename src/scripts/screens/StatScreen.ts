@@ -1,5 +1,5 @@
 import { UiDepths, UI_SCALE } from '../helpers/constants';
-import globalState from '../worldstate';
+import worldstate from '../worldState';
 import OverlayScreen from './OverlayScreen';
 
 const FONT_SIZE_HEADER = 20;
@@ -51,10 +51,10 @@ export default class StatScreen extends OverlayScreen {
 		// header.setShadow(0, 1 * UI_SCALE, 'black');
 		// this.add(header, true);
 
-		const currentHealth = Math.round(globalState.playerCharacter.health);
-		const maxHealth = Math.round(globalState.playerCharacter.maxHealth);
-		const currentDamage = Math.round(globalState.playerCharacter.damage);
-		const currentMovSpeed = Math.round(globalState.playerCharacter.movementSpeed);
+		const currentHealth = Math.round(worldstate.playerCharacter.health);
+		const maxHealth = Math.round(worldstate.playerCharacter.maxHealth);
+		const currentDamage = Math.round(worldstate.playerCharacter.damage);
+		const currentMovSpeed = Math.round(worldstate.playerCharacter.movementSpeed);
 
 		const lableHealth = new Phaser.GameObjects.Text(
 			scene,
@@ -167,7 +167,7 @@ export default class StatScreen extends OverlayScreen {
 	}
 
 	update() {
-		const player = globalState.playerCharacter;
+		const player = worldstate.playerCharacter;
 		this.lableHealthValue.setText(`${Math.round(player.health)}/${Math.round(player.maxHealth)}`);
 		this.lableDamageValue.setText(`${Math.round(player.damage)}`);
 		this.lableMovSpeedValue.setText(`${Math.round(player.movementSpeed)}`);

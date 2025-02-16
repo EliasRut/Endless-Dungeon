@@ -1,8 +1,8 @@
-import { DungeonLevelData, DungeonRunData } from '../models/DungeonRunData';
-import { SecondaryContentBlock } from '../models/SecondaryContentBlock';
+import { DungeonLevelData, DungeonRunData } from '../../types/DungeonRunData';
+import { SecondaryContentBlock } from '../../types/SecondaryContentBlock';
 import { RuneAssignment } from './constants';
 import ContentDataLibrary from './ContentDataLibrary';
-import globalState from '../worldstate/index';
+import worldstate from '../worldState';
 
 const CHANCE_FOR_MATCHING_SECONDARY_CONTENT = 0.5;
 
@@ -13,7 +13,7 @@ export const generateDungeonRun: (runes: RuneAssignment) => DungeonRunData = (ru
 		}
 		const requiredQuests = primaryContent.requiredQuests || [];
 		const unmetPrecondition = requiredQuests.find(([questId, requiredStatus]) => {
-			const quest = globalState.quests[questId];
+			const quest = worldstate.quests[questId];
 			switch (requiredStatus) {
 				case 'open': {
 					return !!quest;

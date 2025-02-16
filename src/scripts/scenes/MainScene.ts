@@ -1,7 +1,7 @@
 import 'phaser';
 
-import globalState from '../worldstate/index';
-import Character, { updateStatus } from '../worldstate/Character';
+import worldstate from '../worldState';
+import Character, { updateStatus } from '../../types/Character';
 
 import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
 import FpsText from '../drawables/ui/FpsText';
@@ -32,7 +32,6 @@ import {
 	SCALE,
 	UiDepths,
 	UI_SCALE,
-	Facings,
 } from '../helpers/constants';
 import { generateTilemap } from '../helpers/drawDungeon';
 import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
@@ -50,7 +49,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import EnchantingScreen from '../screens/EnchantingScreen';
 import DoorToken from '../drawables/tokens/DoorToken';
 
-import { DungeonRunData } from '../models/DungeonRunData';
+import { DungeonRunData } from '../../types/DungeonRunData';
 import { TILE_HEIGHT, TILE_WIDTH } from '../helpers/generateDungeon';
 import { getItemDataForName, getItemTexture } from '../../items/itemData';
 import Minimap from '../drawables/ui/Minimap';
@@ -61,10 +60,9 @@ import QuestDetailsScreen from '../screens/QuestDetailsScreen';
 import ContentManagementScreen from '../screens/ContentManagementScreen';
 import EnchantIcon from '../drawables/ui/EnchantIcon';
 import FollowerToken from '../drawables/tokens/FollowerToken';
-import { COLUMNS_PER_TILESET } from '../helpers/constants';
 import { updateAnimatedTile } from '../helpers/cells';
-import { getAudio, setDrumMute } from '../audiogen/app';
-import { getClosestTarget, getDistanceToWorldStatePosition } from '../helpers/targetingHelpers';
+import { setDrumMute } from '../audiogen/app';
+import { getClosestTarget } from '../helpers/targetingHelpers';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;
@@ -183,7 +181,7 @@ export default class MainScene extends Phaser.Scene {
 		this.fadingLabels = [];
 		const [startX, startY] = this.drawRoom();
 
-		this.useDynamicLighting = globalState.currentLevel.startsWith('dungeonLevel');
+		this.useDynamicLighting = worldstate.currentLevel.startsWith('dungeonLevel');
 
 		if (this.useDynamicLighting) {
 			this.dynamicLightingHelper = new DynamicLightingHelper(
@@ -197,8 +195,8 @@ export default class MainScene extends Phaser.Scene {
 
 		this.mainCharacter = new PlayerCharacterToken(
 			this,
-			globalState.playerCharacter.x || startX,
-			globalState.playerCharacter.y || startY
+			worldstate.playerCharacter.x || startX,
+			worldstate.playerCharacter.y || startY
 		);
 		this.mainCharacter.setScale(SCALE);
 		this.mainCharacter.setDepth(UiDepths.TOKEN_MAIN_LAYER);
@@ -220,12 +218,12 @@ export default class MainScene extends Phaser.Scene {
 			});
 		});
 
-		if (globalState.activeFollower !== '') {
+		if (worldstate.activeFollower !== '') {
 			this.spawnFollower(
-				globalState.playerCharacter.x || startX,
-				globalState.playerCharacter.y || startY,
-				globalState.activeFollower,
-				globalState.activeFollower
+				worldstate.playerCharacter.x || startX,
+				worldstate.playerCharacter.y || startY,
+				worldstate.activeFollower,
+				worldstate.activeFollower
 			);
 		}
 
@@ -238,7 +236,7 @@ export default class MainScene extends Phaser.Scene {
 			questsIcon: new QuestsIcon(this),
 			enchantIcon: new EnchantIcon(this),
 		};
-		if (globalState.currentLevel.startsWith('dungeonLevel')) {
+		if (worldstate.currentLevel.startsWith('dungeonLevel')) {
 			this.levelName = new LevelName(this);
 			this.minimap = new Minimap(this);
 		}
@@ -379,9 +377,9 @@ export default class MainScene extends Phaser.Scene {
 		const npc = spawnNpc(this, type, id, x, y, level, options);
 		npc.setScale(SCALE);
 		this.npcMap[id] = npc;
-		if (globalState.npcs[id]) {
+		if (worldstate.npcs[id]) {
 			const facing = getFacing8Dir(facingX, facingY);
-			const animation = updateMovingState(globalState.npcs[id], false, facing, true);
+			const animation = updateMovingState(worldstate.npcs[id], false, facing, true);
 			if (animation) {
 				npc.play({ key: animation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 			}
@@ -414,8 +412,8 @@ export default class MainScene extends Phaser.Scene {
 		height: number,
 		open: boolean
 	) {
-		if (!globalState.doors[id]) {
-			globalState.doors[id] = {
+		if (!worldstate.doors[id]) {
+			worldstate.doors[id] = {
 				id,
 				type,
 				x,
@@ -431,7 +429,7 @@ export default class MainScene extends Phaser.Scene {
 		Object.values(this.npcMap).forEach((npc) => {
 			this.physics.add.collider(this.doorMap[id], npc);
 		});
-		this.doorMap[id].setFrame(globalState.doors[id].open ? 1 : 0);
+		this.doorMap[id].setFrame(worldstate.doors[id].open ? 1 : 0);
 	}
 
 	addFixedItem(id: string, x: number, y: number) {
@@ -451,13 +449,13 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	drawRoom() {
-		const dungeonLevel = globalState.dungeon.levels[globalState.currentLevel];
-		const enemies = globalState.enemies;
+		const dungeonLevel = worldstate.dungeon.levels[worldstate.currentLevel];
+		const enemies = worldstate.enemies;
 		if (!dungeonLevel) {
-			throw new Error(`No dungeon level was created for level name ${globalState.currentLevel}.`);
+			throw new Error(`No dungeon level was created for level name ${worldstate.currentLevel}.`);
 		}
 
-		const isDungeon = globalState.currentLevel.startsWith('dungeonLevel');
+		const isDungeon = worldstate.currentLevel.startsWith('dungeonLevel');
 		setDrumMute(0, true);
 		setDrumMute(1, true);
 		setDrumMute(2, true);
@@ -551,11 +549,11 @@ export default class MainScene extends Phaser.Scene {
 		// 	generateRandomItem(1, 0, 0, 0, 0)
 		// );
 
-		const transitionCoordinates = globalState.transitionStack[globalState.currentLevel];
+		const transitionCoordinates = worldstate.transitionStack[worldstate.currentLevel];
 		let usedStartPositionX = startPositionX;
 		let usedStartPositionY = startPositionY;
 		if (transitionCoordinates) {
-			const targetRoom = globalState.dungeon.levels[globalState.currentLevel]?.rooms.find(
+			const targetRoom = worldstate.dungeon.levels[worldstate.currentLevel]?.rooms.find(
 				(room) => room.roomName === transitionCoordinates.targetRoom
 			);
 			if (targetRoom) {
@@ -585,23 +583,23 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	update(globalTime: number, delta: number) {
-		globalState.gameTime += delta;
+		worldstate.gameTime += delta;
 
 		if (FPS_DEBUG) {
 			this.fpsText?.update();
 		}
 		this.minimap?.update();
 		this.keyboardHelper?.updateGamepad();
-		updateStatus(globalState.gameTime, globalState.playerCharacter);
+		updateStatus(worldstate.gameTime, worldstate.playerCharacter);
 
 		if (this.keyboardHelper?.isKKeyPressed()) {
-			globalState.clearState();
+			worldstate.clearState();
 			location.reload();
 		}
 
 		if (this.keyboardHelper?.isEnterPressed()) {
 			if (this.scriptHelper?.isScriptRunning()) {
-				this.scriptHelper?.handleScriptStep(globalState.gameTime, true);
+				this.scriptHelper?.handleScriptStep(worldstate.gameTime, true);
 				return;
 			}
 		}
@@ -617,7 +615,7 @@ export default class MainScene extends Phaser.Scene {
 					if (!open) this.icons?.settingsIcon.openScreen();
 				}
 			} else {
-				this.scriptHelper.handleScriptStep(globalState.gameTime, true);
+				this.scriptHelper.handleScriptStep(worldstate.gameTime, true);
 				return;
 			}
 		}
@@ -653,12 +651,12 @@ export default class MainScene extends Phaser.Scene {
 			if (!open) this.icons?.enchantIcon.openScreen();
 		}
 
-		if (globalState.playerCharacter.health <= 0 && this.alive === 0) {
+		if (worldstate.playerCharacter.health <= 0 && this.alive === 0) {
 			this.cameras.main.fadeOut(FADE_OUT_TIME_MS);
 			// tslint:disable-next-line: no-console
 			console.log('you died');
 			setTimeout(() => {
-				globalState.clearState();
+				worldstate.clearState();
 				location.reload();
 			}, DEATH_RESPAWN_TIME);
 			this.alive = 1;
@@ -669,18 +667,18 @@ export default class MainScene extends Phaser.Scene {
 		this.overlayScreens?.statScreen.update();
 
 		if (this.isPaused) {
-			this.scriptHelper?.handleScripts(globalState.gameTime);
+			this.scriptHelper?.handleScripts(worldstate.gameTime);
 			if (this.icons?.backpackIcon.open)
 				this.overlayScreens?.inventory.interactInventory(
 					this.keyboardHelper!.getInventoryKeyPress(),
-					globalState.gameTime
+					worldstate.gameTime
 				);
 			return;
 		}
 
 		// Reset Player position to last position if they are on a blocking tile now
-		const playerX = globalState.playerCharacter.x;
-		const playerY = globalState.playerCharacter.y;
+		const playerX = worldstate.playerCharacter.x;
+		const playerY = worldstate.playerCharacter.y;
 		const currentBaseTileIndex = this.tileLayer?.getTileAtWorldXY(
 			this.mainCharacter!.x,
 			this.mainCharacter!.y
@@ -705,21 +703,21 @@ export default class MainScene extends Phaser.Scene {
 		}
 
 		if (!this.blockUserInteraction) {
-			if (globalState.playerCharacter.stunned === true) {
+			if (worldstate.playerCharacter.stunned === true) {
 				this.mainCharacter!.setVelocity(0, 0);
 			} else {
 				if (
-					globalState.playerCharacter.comboCast > 0 &&
-					globalState.gameTime >
-						globalState.playerCharacter.lastComboCastTime + COMBO_CAST_RESET_DELAY
+					worldstate.playerCharacter.comboCast > 0 &&
+					worldstate.gameTime >
+						worldstate.playerCharacter.lastComboCastTime + COMBO_CAST_RESET_DELAY
 				) {
-					globalState.playerCharacter.comboCast = 0;
+					worldstate.playerCharacter.comboCast = 0;
 				}
-				const msSinceLastCast = this.keyboardHelper!.getMsSinceLastCast(globalState.gameTime);
+				const msSinceLastCast = this.keyboardHelper!.getMsSinceLastCast(worldstate.gameTime);
 				const castingDuration = this.keyboardHelper!.getLastCastingDuration();
 				const isCasting = msSinceLastCast < castingDuration;
 
-				if (!globalState.playerCharacter.dashing) {
+				if (!worldstate.playerCharacter.dashing) {
 					const [xFacing, yFacing] = this.keyboardHelper!.getCharacterFacing(
 						this.mobilePadStick ? this.mobilePadStick.x - this.mobilePadBackground!.x : 0,
 						this.mobilePadStick ? this.mobilePadStick.y - this.mobilePadBackground!.y : 0
@@ -728,9 +726,9 @@ export default class MainScene extends Phaser.Scene {
 
 					// const hasMoved = isCasting ? false : xFacing !== 0 || yFacing !== 0;
 					const hasMoved = xFacing !== 0 || yFacing !== 0;
-					const facingBeforeUpdate = globalState.playerCharacter.currentFacing;
+					const facingBeforeUpdate = worldstate.playerCharacter.currentFacing;
 					let playerAnimation = updateMovingState(
-						globalState.playerCharacter,
+						worldstate.playerCharacter,
 						hasMoved,
 						newFacing,
 						this.hasCasted && hasMoved
@@ -744,7 +742,7 @@ export default class MainScene extends Phaser.Scene {
 					let potentialCastingAnmiation = undefined;
 					if (isCasting) {
 						potentialCastingAnmiation = `player-cast-${getTwoLetterFacingName(
-							globalState.playerCharacter.currentFacing
+							worldstate.playerCharacter.currentFacing
 						)}`;
 					}
 					if (
@@ -790,11 +788,11 @@ export default class MainScene extends Phaser.Scene {
 					}
 					if (hasMoved) {
 						const shouldPlayLeftStepSfx =
-							!this.lastStepLeft || globalState.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
+							!this.lastStepLeft || worldstate.gameTime - this.lastStepLeft > STEP_SOUND_TIME;
 
 						if (shouldPlayLeftStepSfx) {
 							this.sound.play('sound-step-grass-l', { volume: 0.25 });
-							this.lastStepLeft = globalState.gameTime;
+							this.lastStepLeft = worldstate.gameTime;
 						}
 					} else {
 						this.lastStepLeft = undefined;
@@ -809,35 +807,35 @@ export default class MainScene extends Phaser.Scene {
 					const speed = isCasting
 						? 0
 						: isWalking
-						? getCharacterSpeed(globalState.playerCharacter) / 2
-						: getCharacterSpeed(globalState.playerCharacter);
+						? getCharacterSpeed(worldstate.playerCharacter) / 2
+						: getCharacterSpeed(worldstate.playerCharacter);
 
 					this.mainCharacter!.setVelocity(xFacing * speed, yFacing * speed);
 					this.mainCharacter!.body!.velocity.normalize().scale(speed);
 				}
 			}
-			globalState.playerCharacter.x = Math.round(this.mainCharacter!.x / SCALE);
-			globalState.playerCharacter.y = Math.round(this.mainCharacter!.y / SCALE);
+			worldstate.playerCharacter.x = Math.round(this.mainCharacter!.x / SCALE);
+			worldstate.playerCharacter.y = Math.round(this.mainCharacter!.y / SCALE);
 
 			if (!this.blockUserInteraction) {
-				const castAbilities = this.keyboardHelper!.getCastedAbilities(globalState.gameTime);
-				this.abilityHelper!.update(globalState.gameTime, castAbilities);
+				const castAbilities = this.keyboardHelper!.getCastedAbilities(worldstate.gameTime);
+				this.abilityHelper!.update(worldstate.gameTime, castAbilities);
 			}
 		}
-		const cooldowns = this.keyboardHelper!.getAbilityCooldowns(globalState.gameTime);
+		const cooldowns = this.keyboardHelper!.getAbilityCooldowns(worldstate.gameTime);
 		this.playerCharacterAvatar!.update(cooldowns);
 
 		if (this.useDynamicLighting && this.dynamicLightingHelper) {
-			this.dynamicLightingHelper.updateDynamicLighting(globalState.gameTime);
+			this.dynamicLightingHelper.updateDynamicLighting(worldstate.gameTime);
 		}
 
 		// Updated npcs
-		this.mainCharacter!.update(globalState.gameTime, delta);
+		this.mainCharacter!.update(worldstate.gameTime, delta);
 		Object.values(this.npcMap).forEach((curNpc) => {
-			curNpc.update(globalState.gameTime, delta);
+			curNpc.update(worldstate.gameTime, delta);
 		});
 
-		this.follower?.update(globalState.gameTime, delta);
+		this.follower?.update(worldstate.gameTime, delta);
 		this.nPCAvatar?.update();
 
 		// TODO: remove items that are picked up
@@ -851,23 +849,23 @@ export default class MainScene extends Phaser.Scene {
 		});
 
 		// Check if the player is close to a connection point and move them if so
-		const connections = globalState.dungeon.levels[globalState.currentLevel]?.connections || [];
+		const connections = worldstate.dungeon.levels[worldstate.currentLevel]?.connections || [];
 		connections.forEach((connection) => {
 			if (
 				Math.hypot(connection.x - playerX, connection.y - playerY) <
 				CONNECTION_POINT_THRESHOLD_DISTANCE
 			) {
-				globalState.playerCharacter.x = 0;
-				globalState.playerCharacter.y = 0;
+				worldstate.playerCharacter.x = 0;
+				worldstate.playerCharacter.y = 0;
 				if (connection.targetMap) {
 					if (connection.targetRoom) {
-						globalState.transitionStack[connection.targetMap] = {
+						worldstate.transitionStack[connection.targetMap] = {
 							targetRoom: connection.targetRoom,
 							targetX: connection.targetX || 0,
 							targetY: connection.targetY || 0,
 						};
 					}
-					globalState.currentLevel = connection.targetMap;
+					worldstate.currentLevel = connection.targetMap;
 					this.scene.start('RoomPreloaderScene');
 				} else if (connection.targetScene) {
 					this.scene.start(connection.targetScene);
@@ -914,7 +912,7 @@ export default class MainScene extends Phaser.Scene {
 
 		this.fadingLabels = this.fadingLabels.filter((label) => label.fontElement);
 
-		this.scriptHelper!.handleScripts(globalState.gameTime);
+		this.scriptHelper!.handleScripts(worldstate.gameTime);
 
 		const now = Date.now();
 
@@ -939,7 +937,7 @@ export default class MainScene extends Phaser.Scene {
 		// tslint:disable-next-line: no-magic-numbers
 		if (now - this.lastSave > 10 * 1000) {
 			this.lastSave = now;
-			globalState.storeState();
+			worldstate.storeState();
 		}
 
 		// tslint:disable-next-line: no-magic-numbers
@@ -955,8 +953,8 @@ export default class MainScene extends Phaser.Scene {
 		);
 		if (closestEnemy) {
 			const distanceToEnemy = Math.hypot(
-				globalState.playerCharacter.x - closestEnemy.x,
-				globalState.playerCharacter.y - closestEnemy.y
+				worldstate.playerCharacter.x - closestEnemy.x,
+				worldstate.playerCharacter.y - closestEnemy.y
 			);
 
 			// console.log(`Distance to enemy: ${distanceToEnemy}}`);
@@ -1009,8 +1007,8 @@ export default class MainScene extends Phaser.Scene {
 	}
 
 	handleOverlayCooldown() {
-		if (globalState.gameTime - this.overlayPressed > 250) {
-			this.overlayPressed = globalState.gameTime;
+		if (worldstate.gameTime - this.overlayPressed > 250) {
+			this.overlayPressed = worldstate.gameTime;
 			return true;
 		} else return false;
 	}
@@ -1019,15 +1017,15 @@ export default class MainScene extends Phaser.Scene {
 		this.isPaused = true;
 		this.physics.pause();
 		let playerAnimation = updateMovingState(
-			globalState.playerCharacter,
+			worldstate.playerCharacter,
 			false,
-			globalState.playerCharacter.currentFacing
+			worldstate.playerCharacter.currentFacing
 		);
 		if (playerAnimation) {
 			this.mainCharacter!.play({ key: playerAnimation, frameRate: NORMAL_ANIMATION_FRAME_RATE });
 		}
 		Object.values(this.npcMap).forEach((curNpc) => {
-			curNpc.update(globalState.gameTime, 0);
+			curNpc.update(worldstate.gameTime, 0);
 		});
 
 		this.time.paused = true;

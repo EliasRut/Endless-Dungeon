@@ -2,7 +2,7 @@ import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
 import { UiDepths, UI_SCALE } from '../helpers/constants';
 import { getQuest } from '../helpers/quests';
 import MainScene from '../scenes/MainScene';
-import globalState from '../worldstate';
+import worldstate from '../worldState';
 import OverlayScreen from './OverlayScreen';
 import { STAT_SCREEN_RIGHT_BORDER } from './StatScreen';
 
@@ -58,7 +58,7 @@ export default class QuestLogScreen extends OverlayScreen {
 	}
 
 	update() {
-		const quests = Object.entries(globalState.quests).map(([questId, questState]) => {
+		const quests = Object.entries(worldstate.quests).map(([questId, questState]) => {
 			return [questState.questFinished, questId];
 		}) as [boolean, string][];
 
@@ -102,7 +102,7 @@ export default class QuestLogScreen extends OverlayScreen {
 			questName.setDepth(UiDepths.UI_BACKGROUND_LAYER);
 			questName.setScrollFactor(0);
 			questName.on('pointerdown', () => {
-				(this.scene as MainScene).overlayScreens.questDetailsScreen.setActiveQuestId(quest[1]);
+				(this.scene as MainScene).overlayScreens!.questDetailsScreen.setActiveQuestId(quest[1]);
 				this.questNames.forEach((textField) => textField.setColor('white'));
 				questName.setColor('#ffae00');
 			});

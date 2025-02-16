@@ -6,10 +6,9 @@ import {
 	OpeningDirection,
 	Room,
 } from '../../../typings/custom';
-import { DungeonLevelData } from '../models/DungeonRunData';
-import globalState from '../worldstate';
-import Door from '../worldstate/Door';
-import DungeonLevel from '../worldstate/DungeonLevel';
+import { DungeonLevelData } from '../../types/DungeonRunData';
+import worldstate from '../worldState';
+import DungeonLevel from '../../types/DungeonLevel';
 import {
 	colorOfMagicToTilesetMap,
 	enemyBudgetCost,
@@ -17,7 +16,7 @@ import {
 	replacementTiles,
 } from './constants';
 import RoomGenerator, { translateLayoutToStyle } from './generateRoom';
-import { ColorsOfMagic, COLUMNS_PER_TILESET } from './constants';
+import { ColorsOfMagic } from './constants';
 
 export const BLOCK_SIZE = 8;
 export const TILE_WIDTH = 16;
@@ -34,21 +33,15 @@ const BIT_WEST = 8;
 
 import {
 	EMPTY,
-	DCR_L,
 	DCR_M,
-	DCR_R,
 	W_LTE,
 	W_MTE,
 	W_RTE,
 	W_LBE,
 	W_MBE,
 	W_RBE,
-	W_LTD,
-	W_LBD,
 	W_MTD,
 	W_MBD,
-	W_RTD,
-	W_RBD,
 	B_LFT,
 	B_RGT,
 	B_TOP,
@@ -62,6 +55,7 @@ import {
 	OC_BL,
 	OC_BR,
 } from './cells';
+import Door from '../../types/Door';
 
 // tslint:disable: no-magic-numbers
 const CAP_NORTH = [
@@ -235,40 +229,40 @@ const CORRIDOR_LAYOUTS = {
 };
 
 export default class DungeonGenerator {
-	tilesUsed: boolean[][];
-	allowReplacement: boolean[][];
-	rooms: Room[];
-	startRoomIndex: number;
-	roomOffsets: [number, number][];
-	tileSetCollections: { [name: string]: number[] };
-	tileSetGid: { [name: string]: number };
+	tilesUsed: boolean[][] = [];
+	allowReplacement: boolean[][] = [];
+	rooms: Room[] = [];
+	startRoomIndex: number = 0;
+	roomOffsets: [number, number][] = [];
+	tileSetCollections: { [name: string]: number[] } = {};
+	tileSetGid: { [name: string]: number } = {};
 	maxGenerationResets = 100;
 	maxRoomPlacementTries = 1000;
-	npcs: NpcPositioning[];
-	combinedLayout: number[][];
-	decorationLayout: number[][];
-	overlayLayout: number[][];
-	topLayout: number[][];
-	blocksUsed: number[][];
-	tileLayer: Phaser.Tilemaps.TilemapLayer;
-	dungeonLevel: number;
+	npcs: NpcPositioning[] = [];
+	combinedLayout: number[][] = [];
+	decorationLayout: number[][] = [];
+	overlayLayout: number[][] = [];
+	topLayout: number[][] = [];
+	blocksUsed: number[][] = [];
+	tileLayer: Phaser.Tilemaps.TilemapLayer | undefined;
+	dungeonLevel: number = 0;
 
-	fillerTilest: string;
+	fillerTilest: string = '';
 
-	dungeonWidth: number;
-	dungeonBlocksX: number;
-	dungeonHeight: number;
-	dungeonBlocksY: number;
-	enemyBudget: number;
+	dungeonWidth: number = 0;
+	dungeonBlocksX: number = 0;
+	dungeonHeight: number = 0;
+	dungeonBlocksY: number = 0;
+	enemyBudget: number = 0;
 
-	potentialEnemyFields: { x: number; y: number }[];
+	potentialEnemyFields: { x: number; y: number }[] = [];
 
 	public generateLevel: (
 		id: string,
 		dungeonLevel: number,
 		levelData: DungeonLevelData
 	) => DungeonLevel = (id, dungeonLevel, levelData) => {
-		this.rooms = levelData.rooms.map((roomName) => globalState.availableRooms[roomName]);
+		this.rooms = levelData.rooms.map((roomName) => worldstate.availableRooms[roomName]);
 		this.dungeonLevel = dungeonLevel;
 
 		this.enemyBudget = levelData.enemyBudget;
@@ -286,7 +280,7 @@ export default class DungeonGenerator {
 			const roomGen = new RoomGenerator();
 			const genericRoom = roomGen.generateRoom(this.fillerTilest, levelData.style);
 			this.rooms.push(genericRoom);
-			globalState.availableRooms[genericRoom.name] = genericRoom;
+			worldstate.availableRooms[genericRoom.name] = genericRoom;
 		}
 
 		this.startRoomIndex = Math.max(

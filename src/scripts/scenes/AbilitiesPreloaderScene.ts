@@ -1,10 +1,5 @@
-import globalState from '../worldstate';
-import {
-	ConditionalAbilityDataMap,
-	Abilities,
-	AbilityType,
-	AbilityData,
-} from '../abilities/abilityData';
+import worldstate from '../worldState';
+import { Abilities } from '../abilities/abilityData';
 import {
 	collection,
 	DocumentData,
@@ -15,6 +10,8 @@ import {
 	where,
 } from 'firebase/firestore';
 import { app } from '../../shared/initializeApp';
+import { AbilityData, ConditionalAbilityDataMap } from '../../types/AbilityData';
+import { AbilityType } from '../../types/AbilityType';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
@@ -41,13 +38,13 @@ export default class AbilitiesPreloaderScene extends Phaser.Scene {
 	}
 
 	preload() {
-		if (globalState.loadGame) {
-			globalState.loadState();
+		if (worldstate.loadGame) {
+			worldstate.loadState();
 		}
 	}
 
 	async create() {
-		const { contentPackages } = globalState;
+		const { contentPackages } = worldstate;
 		const dbAbilities: { [dbKey: string]: AbilityData } = {};
 		const conditionalAbilities: ConditionalAbilityDataMap = Object.entries(Abilities).reduce(
 			(obj, [key, ability]) => {
@@ -101,7 +98,7 @@ export default class AbilitiesPreloaderScene extends Phaser.Scene {
 			});
 		});
 
-		globalState.abilityData = conditionalAbilities;
+		worldstate.abilityData = conditionalAbilities;
 		this.scene.start('RoomPreloaderScene');
 	}
 }

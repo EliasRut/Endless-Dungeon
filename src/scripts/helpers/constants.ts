@@ -1,4 +1,5 @@
 import { EnumDictionary } from '../../../typings/custom';
+import { SimpleParticleEffectValue } from '../../types/AbilityType';
 import { EnemyData } from '../enemies/enemyData';
 export const enum Facings {
 	SOUTH,
@@ -339,20 +340,6 @@ export interface FadingLabelData {
 	posX: number;
 	posY: number;
 }
-
-export type MinMaxParticleEffectValue = undefined | number | { min: number; max: number };
-export type SimpleParticleEffectValue = MinMaxParticleEffectValue | { start: number; end: number };
-export type ColorEffectValue =
-	| undefined
-	| number
-	| {
-			redMin: number;
-			greenMin: number;
-			blueMin: number;
-			redDiff: number;
-			greenDiff: number;
-			blueDiff: number;
-	  };
 
 export const multiplyParticleValueByScale = (
 	value: SimpleParticleEffectValue,

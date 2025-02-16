@@ -1,7 +1,6 @@
 import React from 'react';
 import { ScriptEntry } from '../../../typings/custom';
-import { AbilityType } from '../../scripts/abilities/abilityData';
-import { DefaultCharacterData } from '../../scripts/worldstate/Character';
+import { DefaultCharacterData } from '../../types/Character';
 import { ScriptBlockContainer } from './ScriptBlockContainer';
 import { Condition } from './ScriptBlockTypes/Condition';
 import { DespawnFollower } from './ScriptBlockTypes/DespawnFollower';
@@ -13,6 +12,7 @@ import { SetQuestState } from './ScriptBlockTypes/SetQuestState';
 import { SpawnFollower } from './ScriptBlockTypes/SpawnFollower';
 import { Wait } from './ScriptBlockTypes/Wait';
 import { ScriptTypeDropdown } from './ScriptTypeDropdown';
+import { AbilityType } from '../../types/AbilityType';
 
 export interface ScriptBlockProps {
 	scriptBlock: Partial<ScriptEntry>;

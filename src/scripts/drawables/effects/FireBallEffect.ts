@@ -1,6 +1,6 @@
+import { ProjectileData } from '../../../types/ProjectileData';
 import { Facings, SCALE, UiDepths } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
-import { ProjectileData } from '../../abilities/abilityData';
 
 const BODY_RADIUS = 4;
 const VISIBILITY_DELAY = 50;

@@ -1,7 +1,7 @@
 import { isJSON } from 'validator';
 import { UiDepths, UI_SCALE } from '../helpers/constants';
 import MainScene from '../scenes/MainScene';
-import globalState from '../worldstate';
+import worldstate from '../worldState';
 import OverlayScreen from './OverlayScreen';
 
 const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
@@ -120,7 +120,7 @@ export default class SettingsScreen extends OverlayScreen {
 		this.newGameText.setInteractive();
 		this.newGameText.setShadow(0, 1 * UI_SCALE, 'black');
 		this.newGameText.on('pointerdown', () => {
-			globalState.clearState();
+			worldstate.clearState();
 			location.reload();
 		});
 		this.add(this.newGameText, true);
@@ -156,7 +156,7 @@ export default class SettingsScreen extends OverlayScreen {
 	}
 
 	save() {
-		globalState.storeState();
+		worldstate.storeState();
 
 		let jsonData: string = '{';
 
@@ -211,14 +211,14 @@ export default class SettingsScreen extends OverlayScreen {
 	}
 
 	async load(savegame: any): Promise<any> {
-		globalState.clearState();
+		worldstate.clearState();
 
 		Object.keys(savegame).forEach((key) => {
 			localStorage.setItem(key, JSON.stringify(savegame[key]));
 		});
 
 		// globalState.loadState();
-		globalState.loadGame = true;
+		worldstate.loadGame = true;
 		this.scene.scene.start('AbilitiesPreloaderScene');
 		(this.scene as MainScene).resume();
 

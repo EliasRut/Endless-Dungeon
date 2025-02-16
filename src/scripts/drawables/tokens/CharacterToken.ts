@@ -1,4 +1,3 @@
-import { Game } from 'phaser';
 import { NpcScript } from '../../../../typings/custom';
 import {
 	facingToSpriteNameMap,
@@ -11,8 +10,8 @@ import {
 } from '../../helpers/constants';
 import { TILE_HEIGHT, TILE_WIDTH } from '../../helpers/generateDungeon';
 import MainScene from '../../scenes/MainScene';
-import globalState from '../../worldstate';
-import Character from '../../worldstate/Character';
+import worldstate from '../../worldState';
+import Character from '../../../types/Character';
 
 // const GREEN_DIFF = 0x003300;
 const DOT_TINT = [0xc8e44c, 0xb1db30, 0x98d023, 0x588800];
@@ -99,14 +98,14 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 			return;
 		}
 		this.tint = 0x00ff00;
-		this.healedTime = globalState.gameTime;
+		this.healedTime = worldstate.gameTime;
 	}
 	public receiveStun(duration: number) {
 		if (this.isSpawning) {
 			return;
 		}
 		if (this.stateObject.health > 0) {
-			const time = globalState.gameTime;
+			const time = worldstate.gameTime;
 			if (this.stateObject.stunnedAt + this.stateObject.stunDuration > time) {
 				return true;
 			}
@@ -197,7 +196,7 @@ export default class CharacterToken extends Phaser.Physics.Arcade.Sprite {
 	protected receiveDotDamage(deltaTime: number) {
 		// dot = damage over time, deltatime is in ms so we have to devide it by 1000
 		const dot =
-			(globalState.playerCharacter.damage * this.necroticEffectStacks * deltaTime) / 1000 / 4;
+			(worldstate.playerCharacter.damage * this.necroticEffectStacks * deltaTime) / 1000 / 4;
 		this.stateObject.health = this.stateObject.health - dot;
 		this.updateHealthbar();
 	}

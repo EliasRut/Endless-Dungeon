@@ -11,8 +11,8 @@ export default class SettingsIcon extends MenuIcon {
 	setScreens() {
 		if (!this.screens) {
 			this.screens = [
-				this.scene.overlayScreens.contentManagementScreen,
-				this.scene.overlayScreens.settingsScreen,
+				this.scene.overlayScreens!.contentManagementScreen,
+				this.scene.overlayScreens!.settingsScreen,
 			];
 		}
 	}

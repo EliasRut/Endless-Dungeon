@@ -1,5 +1,5 @@
 import { UI_SCALE, UiDepths } from '../../helpers/constants';
-import globalState from '../../worldstate';
+import worldstate from '../../worldState';
 import MainScene from '../../scenes/MainScene';
 const SCREEN_OFFSET_X = 8;
 const SCREEN_OFFSET_Y = 84;
@@ -57,8 +57,8 @@ export default class NPCAvatar extends Phaser.GameObjects.Group {
 
 	update() {
 		const healthRatio =
-			globalState.followers[this.followerId].health /
-			globalState.followers[this.followerId].maxHealth;
+			worldstate.followers[this.followerId].health /
+			worldstate.followers[this.followerId].maxHealth;
 		this.healthBar.scaleX = Math.max(0, healthRatio * HEALTH_BAR_WIDTH * UI_SCALE);
 	}
 }

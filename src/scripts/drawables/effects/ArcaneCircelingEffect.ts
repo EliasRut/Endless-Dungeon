@@ -1,4 +1,5 @@
-import { AbilityType, ProjectileData } from '../../abilities/abilityData';
+import { AbilityType } from '../../../types/AbilityType';
+import { ProjectileData } from '../../../types/ProjectileData';
 import { Facings, SUMMONING_TYPE } from '../../helpers/constants';
 import CircelingEffect from './CircelingEffect';
 

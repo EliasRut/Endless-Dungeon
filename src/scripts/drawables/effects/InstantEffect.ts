@@ -1,4 +1,4 @@
-import { ProjectileData } from '../../abilities/abilityData';
+import { ProjectileData } from '../../../types/ProjectileData';
 import { Facings, Faction, PossibleTargets, VISITED_TILE_TINT } from '../../helpers/constants';
 import MainScene from '../../scenes/MainScene';
 import CharacterToken from '../tokens/CharacterToken';

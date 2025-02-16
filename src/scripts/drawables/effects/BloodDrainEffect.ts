@@ -1,9 +1,10 @@
-import { AbilityType, ProjectileData } from '../../abilities/abilityData';
 import { Facings, SCALE, PossibleTargets } from '../../helpers/constants';
 import MainScene from '../../scenes/MainScene';
-import Character from '../../worldstate/Character';
+import Character from '../../../types/Character';
 import CharacterToken from '../tokens/CharacterToken';
 import InstantEffect, { InstantEffectShape } from './InstantEffect';
+import { ProjectileData } from '../../../types/ProjectileData';
+import { AbilityType } from '../../../types/AbilityType';
 
 const RED_MIN = 0xcc0000;
 const RED_DIFF = 0x010000;

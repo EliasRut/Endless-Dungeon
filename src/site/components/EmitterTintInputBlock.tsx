@@ -1,8 +1,7 @@
 import 'phaser';
 import React, { useState } from 'react';
-import { ColorEffectValue } from '../../scripts/helpers/constants';
-import { Dropdown } from './Dropdown';
 import styled from 'styled-components';
+import { ColorEffectValue } from '../../types/AbilityType';
 
 export interface EmitterTintInputBlockProps {
 	inputName: string;

@@ -1,5 +1,5 @@
 // This class handles a singular dungeon level.
-export default class RoomPositioning {
+export default interface RoomPositioning {
 	x: number;
 	y: number;
 	width: number;

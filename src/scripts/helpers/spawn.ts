@@ -9,7 +9,7 @@ import NecroticElementalToken from '../drawables/tokens/NecroticElementalToken';
 import EnemyToken from '../drawables/tokens/EnemyToken';
 import { EnemyCategory, MeleeAttackType } from '../enemies/enemyData';
 import { ColorsOfMagic, SCALE } from './constants';
-import { AbilityType } from '../abilities/abilityData';
+import { AbilityType } from '../../types/AbilityType';
 
 export const spawnNpc = (
 	scene: MainScene,

@@ -1,6 +1,6 @@
 import { UiDepths, UI_SCALE } from '../helpers/constants';
 import MainScene from '../scenes/MainScene';
-import globalState from '../worldstate';
+import worldstate from '../worldState';
 import OverlayScreen from './OverlayScreen';
 import ContentDataLibrary, { loadContentPackagesFromDatabase } from '../helpers/ContentDataLibrary';
 
@@ -46,7 +46,7 @@ export default class ContentManagementScreen extends OverlayScreen {
 		this.checkBoxes = [];
 
 		ContentDataLibrary.contentPackages.forEach((contentPackage, packageIndex) => {
-			const isPackageActive = globalState.contentPackages.includes(contentPackage.id);
+			const isPackageActive = worldstate.contentPackages.includes(contentPackage.id);
 			const questBox = new Phaser.GameObjects.Image(
 				this.scene,
 				(SETTINGS_START_X + 16) * UI_SCALE,
@@ -59,16 +59,16 @@ export default class ContentManagementScreen extends OverlayScreen {
 			questBox.setInteractive();
 			questBox.setScale(UI_SCALE);
 			questBox.on('pointerdown', () => {
-				const existingIndex = globalState.contentPackages.findIndex(
+				const existingIndex = worldstate.contentPackages.findIndex(
 					(packageId) => contentPackage.id === packageId
 				);
 				if (existingIndex >= 0) {
-					globalState.contentPackages = [
-						...globalState.contentPackages.slice(0, existingIndex),
-						...globalState.contentPackages.slice(existingIndex + 1),
+					worldstate.contentPackages = [
+						...worldstate.contentPackages.slice(0, existingIndex),
+						...worldstate.contentPackages.slice(existingIndex + 1),
 					];
 				} else {
-					globalState.contentPackages.push(contentPackage.id);
+					worldstate.contentPackages.push(contentPackage.id);
 				}
 				this.updateContent();
 			});
@@ -96,16 +96,16 @@ export default class ContentManagementScreen extends OverlayScreen {
 			contentPackageTitle.setShadow(0, 1 * UI_SCALE, 'black');
 			contentPackageTitle.setInteractive();
 			contentPackageTitle.on('pointerdown', () => {
-				const existingIndex = globalState.contentPackages.findIndex(
+				const existingIndex = worldstate.contentPackages.findIndex(
 					(packageId) => contentPackage.id === packageId
 				);
 				if (existingIndex >= 0) {
-					globalState.contentPackages = [
-						...globalState.contentPackages.slice(0, existingIndex),
-						...globalState.contentPackages.slice(existingIndex + 1),
+					worldstate.contentPackages = [
+						...worldstate.contentPackages.slice(0, existingIndex),
+						...worldstate.contentPackages.slice(existingIndex + 1),
 					];
 				} else {
-					globalState.contentPackages.push(contentPackage.id);
+					worldstate.contentPackages.push(contentPackage.id);
 				}
 				this.updateContent();
 			});

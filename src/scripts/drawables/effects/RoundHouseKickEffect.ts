@@ -1,6 +1,6 @@
+import { ProjectileData } from '../../../types/ProjectileData';
 import { Facings } from '../../helpers/constants';
 import AbilityEffect from './AbilityEffect';
-import { ProjectileData } from '../../abilities/abilityData';
 
 const BODY_RADIUS = 6;
 const BODY_MASS = 10;

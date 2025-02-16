@@ -1,4 +1,4 @@
-import { ScriptEntry } from '../../../typings/custom';
+import { ScriptEntry } from '../../typings/custom';
 
 export interface NpcScriptState {
 	repetition: number;

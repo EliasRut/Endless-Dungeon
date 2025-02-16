@@ -4,13 +4,13 @@ import { getGameConfig } from '../../scripts/game';
 import { MODE, setActiveMode } from '../../scripts/helpers/constants';
 import styled from 'styled-components';
 import { Dropdown } from '../components/Dropdown';
-import MapEditor from '../../scripts/scenes/MapEditor';
 import { NpcPositioning, NpcScriptStep } from '../../../typings/custom';
 import { UserInformation } from '../../scripts/helpers/UserInformation';
 import { AppLayout } from '../components/AppLayout';
 import { DropdownMenu, DropdownMenuOption } from '../components/DropdownMenu';
 import { ToolsBar } from '../components/ToolsBar';
 import '../App.css';
+import MapEditor from '../../editors/scenes/MapEditor';
 
 export interface MapEditorScreenProps {
 	user: UserInformation;

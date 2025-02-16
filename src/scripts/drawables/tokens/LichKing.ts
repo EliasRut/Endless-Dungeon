@@ -1,12 +1,12 @@
-import { AbilityType } from '../../abilities/abilityData';
 import { getFacing8Dir, updateMovingState } from '../../helpers/movement';
 import MainScene from '../../scenes/MainScene';
-import Enemy from '../../worldstate/Enemy';
+import Enemy from '../../../types/Enemy';
 import EnemyToken from './EnemyToken';
 import { isCollidingTile } from '../../helpers/movement';
 import { ColorsOfMagic, NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
-import { UneqippableItem } from '../../../items/itemData';
 import { EnemyCategory } from '../../enemies/enemyData';
+import { AbilityType } from '../../../types/AbilityType';
+import { UneqippableItem } from '../../../types/Item';
 
 const ATTACK_RANGE = 120;
 const SUMMON_SPEED = 500;

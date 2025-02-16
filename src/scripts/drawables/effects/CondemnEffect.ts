@@ -1,7 +1,6 @@
-import { Facings, facingToSpriteNameMap, SCALE, UiDepths } from '../../helpers/constants';
+import { Facings, SCALE, UiDepths } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
-import { ProjectileData } from '../../abilities/abilityData';
-import { getRotationInRadiansForFacing, isCollidingTile } from '../../helpers/movement';
+import { ProjectileData } from '../../../types/ProjectileData';
 
 const BODY_RADIUS = 6;
 const OFFSET = -5;

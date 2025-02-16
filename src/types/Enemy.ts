@@ -1,4 +1,4 @@
-import { Facings, Faction } from '../helpers/constants';
+import { Faction } from '../scripts/helpers/constants';
 import Character from './Character';
 // This class handles the players character and all mechanical events associated with it.
 export default class Enemy extends Character {

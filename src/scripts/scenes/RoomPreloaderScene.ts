@@ -2,7 +2,7 @@ import { DatabaseRoom } from '../../../typings/custom';
 import { getUrlParam } from '../helpers/browserState';
 import { activeMode, ColorsOfMagic, MODE } from '../helpers/constants';
 import RoomGenerator from '../helpers/generateRoom';
-import globalState from '../worldstate';
+import worldstate from '../worldState';
 import { deserializeRoom } from '../helpers/serialization';
 import {
 	collection,
@@ -45,7 +45,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 
 		if (requestedRoomId) {
 			this.usedRooms.push(requestedRoomId);
-			globalState.roomAssignment = {
+			worldstate.roomAssignment = {
 				[`${requestedRoomId}`]: {
 					dynamicLighting: false,
 					rooms: [requestedRoomId],
@@ -56,19 +56,19 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 					title: 'Room of Requirements',
 				},
 			};
-			globalState.currentLevel = requestedRoomId;
+			worldstate.currentLevel = requestedRoomId;
 		} else {
 			// console.log(globalState.currentLevel);
 			// console.log(globalState.roomAssignment[globalState.currentLevel])
-			const levelRoomAssignment = globalState.roomAssignment[globalState.currentLevel];
+			const levelRoomAssignment = worldstate.roomAssignment[worldstate.currentLevel];
 			this.usedRooms.push(
-				...(levelRoomAssignment ? levelRoomAssignment.rooms : [globalState.currentLevel])
+				...(levelRoomAssignment ? levelRoomAssignment.rooms : [worldstate.currentLevel])
 			);
 		}
 
 		if (activeMode === MODE.MAP_EDITOR) {
 			// We need to load all tilesets if we are going to use the map editor
-			globalState.availableTilesets.push(
+			worldstate.availableTilesets.push(
 				'dungeon',
 				'dungeon-blue',
 				'dungeon-overlay',
@@ -96,7 +96,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 				cnt++;
 				const genericRoom = roomGen.generateRoom('dungeon', ColorsOfMagic.DEATH);
 				// globalState.availableRooms[genericRoom.name] = genericRoom;
-				globalState.roomAssignment[requestedRoomId].rooms.push(genericRoom.name);
+				worldstate.roomAssignment[requestedRoomId].rooms.push(genericRoom.name);
 				this.usedRooms.push(genericRoom.name);
 				this.cache.json.add(`room-${genericRoom.name}`, genericRoom);
 			}
@@ -122,7 +122,7 @@ export default class RoomPreloaderScene extends Phaser.Scene {
 					}
 					const room = deserializeRoom(roomDbData);
 					this.cache.json.add(`room-${roomDoc.id}`, roomDoc.data());
-					globalState.availableRooms[room.name] = room;
+					worldstate.availableRooms[room.name] = room;
 				});
 			})
 			.then(() => {

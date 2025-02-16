@@ -10,7 +10,7 @@ import MainScene from '../../scenes/MainScene';
 import CharacterToken from '../tokens/CharacterToken';
 import AbilityEffect from './AbilityEffect';
 import { SCALE, NORMAL_ANIMATION_FRAME_RATE } from '../../helpers/constants';
-import { ProjectileData } from '../../abilities/abilityData';
+import { ProjectileData } from '../../../types/ProjectileData';
 
 export default class TargetingEffect extends AbilityEffect {
 	allowedTargets: PossibleTargets = PossibleTargets.NONE;

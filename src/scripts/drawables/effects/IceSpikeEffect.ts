@@ -1,10 +1,10 @@
+import { ProjectileData } from '../../../types/ProjectileData';
 import { Facings, SCALE, UiDepths } from '../../helpers/constants';
 import {
 	getFacing8Dir,
 	getRotationInRadiansForFacing,
 	getVelocitiesForFacing,
 } from '../../helpers/movement';
-import { ProjectileData } from '../../abilities/abilityData';
 import TargetingEffect from './TargetingEffect';
 
 const VISIBILITY_DELAY = 50;

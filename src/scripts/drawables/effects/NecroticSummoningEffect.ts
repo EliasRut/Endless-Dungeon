@@ -1,4 +1,5 @@
-import { AbilityType, ProjectileData } from '../../abilities/abilityData';
+import { AbilityType } from '../../../types/AbilityType';
+import { ProjectileData } from '../../../types/ProjectileData';
 import { Facings, SCALE, SUMMONING_TYPE, UiDepths } from '../../helpers/constants';
 import SummoningEffect from './SummoningEffect';
 

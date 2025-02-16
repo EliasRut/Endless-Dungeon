@@ -1,7 +1,8 @@
 import { AbilityKey, UI_SCALE, UiDepths } from '../../helpers/constants';
-import globalState from '../../worldstate';
-import { AbilityType, Abilities } from '../../abilities/abilityData';
+import worldstate from '../../worldState';
+import { Abilities } from '../../abilities/abilityData';
 import MainScene from '../../scenes/MainScene';
+import { AbilityType } from '../../../types/AbilityType';
 
 const SCREEN_OFFSET_X = 8;
 const SCREEN_OFFSET_Y = 8;
@@ -93,7 +94,7 @@ export default class PlayerCharacterAvatar extends Phaser.GameObjects.Group {
 	}
 
 	update([cooldown1, cooldown2, cooldown3, cooldown4]: number[]) {
-		const healthRatio = globalState.playerCharacter.health / globalState.playerCharacter.maxHealth;
+		const healthRatio = worldstate.playerCharacter.health / worldstate.playerCharacter.maxHealth;
 		this.healthBar.scaleX = Math.max(0, healthRatio * HEALTH_BAR_WIDTH * UI_SCALE);
 
 		if (this.abilityIcons.has(AbilityKey.ONE)) {
@@ -135,11 +136,11 @@ export default class PlayerCharacterAvatar extends Phaser.GameObjects.Group {
 				const hitArea = new Phaser.Geom.Circle(10, 10, 14);
 				abilityIcon.setInteractive(hitArea, Phaser.Geom.Circle.Contains);
 				abilityIcon.on('pointerdown', () => {
-					mainScene.keyboardHelper.abilityKeyPressed[abilityKey] = true;
+					mainScene.keyboardHelper!.abilityKeyPressed[abilityKey] = true;
 				});
 				abilityIcon.on('pointerover', (_: any, pointer: any) => {
 					if (pointer.isDown) {
-						mainScene.keyboardHelper.abilityKeyPressed[abilityKey] = true;
+						mainScene.keyboardHelper!.abilityKeyPressed[abilityKey] = true;
 					}
 				});
 			}

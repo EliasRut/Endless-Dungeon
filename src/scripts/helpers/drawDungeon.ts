@@ -1,5 +1,4 @@
-import DungeonLevel from '../worldstate/DungeonLevel';
-import { UiDepths } from './constants';
+import DungeonLevel from '../../types/DungeonLevel';
 import { TILE_HEIGHT, TILE_WIDTH, GID_MULTIPLE } from './generateDungeon';
 import { COLLIDING_TILE_RANGES } from './movement';
 
@@ -25,12 +24,12 @@ const createLayer: (
 			1,
 			2,
 			gid
-		);
+		)!;
 	});
 
 	const tileLayer = map.createLayer(0, tileSets, 0, 0);
 
-	return tileLayer;
+	return tileLayer!;
 };
 
 export const generateTilemap: (

@@ -1,27 +1,17 @@
-import { AbilityType } from '../scripts/abilities/abilityData';
 import { ColorsOfMagic } from '../scripts/helpers/constants';
-
-export interface ItemData {
-	name: string;
-	description: string;
-	iconFrame: number;
-}
-
-export interface CatalystItem extends ItemData {
-	catalystType: Catalyst;
-}
-
-export interface AbilityLinkedItem extends ItemData {
-	ability: AbilityType;
-}
-
-export const enum Source {
-	FIRE = 'source-fire',
-	ICE = 'source-ice',
-	NECROTIC = 'source-necrotic',
-	ARCANE = 'source-arcane',
-}
-export type SourceKey = 'source-fire' | 'source-ice' | 'source-necrotic' | 'source-arcane';
+import { AbilityType } from '../types/AbilityType';
+import {
+	AbilityLinkedItem,
+	Catalyst,
+	CatalystItem,
+	Ring,
+	Source,
+	ItemData,
+	EquippableItemType,
+	UneqippableItem,
+	Amulet,
+	ChestPiece,
+} from '../types/Item';
 
 export const SourceData: Record<Source, AbilityLinkedItem> = {
 	[Source.FIRE]: {
@@ -52,14 +42,6 @@ export const SourceData: Record<Source, AbilityLinkedItem> = {
 		iconFrame: 27,
 	} as AbilityLinkedItem,
 };
-
-export const enum Catalyst {
-	CONE = 'catalyst-cone',
-	NOVA = 'catalyst-nova',
-	STORM = 'catalyst-storm',
-	SUMMON = 'catalyst-summon',
-}
-export type CatalystKey = 'catalyst-cone' | 'catalyst-nova' | 'catalyst-storm' | 'catalyst-summon';
 
 export const CatalystData: Record<Catalyst, CatalystItem> = {
 	[Catalyst.CONE]: {
@@ -157,26 +139,6 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 	}
 };
 
-export const enum Ring {
-	WILD = 'ring-wild',
-	ROYAL = 'ring-royal',
-	METAL = 'ring-metal',
-	PASSION = 'ring-passion',
-	FLUX = 'ring-flux',
-	DEATH = 'ring-death',
-	CHANGE = 'ring-change',
-	BLOOD = 'ring-blood',
-}
-export type RingKey =
-	| 'ring-wild'
-	| 'ring-royal'
-	| 'ring-metal'
-	| 'ring-passion'
-	| 'ring-flux'
-	| 'ring-death'
-	| 'ring-change'
-	| 'ring-blood';
-
 export const RingData: Record<Ring, AbilityLinkedItem> = {
 	[Ring.WILD]: {
 		ability: AbilityType.FIREBALL,
@@ -227,26 +189,6 @@ export const RingData: Record<Ring, AbilityLinkedItem> = {
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 };
-
-export const enum Amulet {
-	WILD = 'amulet-wild',
-	ROYAL = 'amulet-royal',
-	METAL = 'amulet-metal',
-	PASSION = 'amulet-passion',
-	FLUX = 'amulet-flux',
-	DEATH = 'amulet-death',
-	CHANGE = 'amulet-change',
-	BLOOD = 'amulet-blood',
-}
-export type AmuletKey =
-	| 'amulet-wild'
-	| 'amulet-royal'
-	| 'amulet-metal'
-	| 'amulet-passion'
-	| 'amulet-flux'
-	| 'amulet-death'
-	| 'amulet-change'
-	| 'amulet-blood';
 
 export const AmuletData: Record<Amulet, ItemData> = {
 	[Amulet.WILD]: {
@@ -299,18 +241,6 @@ export const AmuletData: Record<Amulet, ItemData> = {
 	} as ItemData,
 };
 
-export const enum ChestPiece {
-	ROBE = 'chestpiece-robe',
-	ARMOR = 'chestpiece-armor',
-	CLOAK = 'chestpiece-cloak',
-	GARB = 'chestpiece-garb',
-}
-export type ChestPieceKey =
-	| 'chestpiece-robe'
-	| 'chestpiece-armor'
-	| 'chestpiece-cloak'
-	| 'chestpiece-garb';
-
 export const ChestPieceData: Record<ChestPiece, ItemData> = {
 	[ChestPiece.ROBE]: {
 		name: 'Robe',
@@ -334,8 +264,6 @@ export const ChestPieceData: Record<ChestPiece, ItemData> = {
 	} as ItemData,
 };
 
-export type EquipmentKey = SourceKey | CatalystKey | ChestPieceKey | RingKey | AmuletKey;
-
 export const AbilityLinkedItems = {
 	...SourceData,
 	...CatalystData,
@@ -348,14 +276,6 @@ export const EquippableItems = {
 	...ChestPieceData,
 };
 
-export const enum EquippableItemType {
-	SOURCE = 'source',
-	CATALYST = 'catalyst',
-	CHESTPIECE = 'chestpiece',
-	AMULET = 'amulet',
-	RING = 'ring',
-}
-
 export const equippableTypeNames = [
 	EquippableItemType.SOURCE,
 	EquippableItemType.CATALYST,
@@ -363,16 +283,6 @@ export const equippableTypeNames = [
 	EquippableItemType.AMULET,
 	EquippableItemType.RING,
 ] as string[];
-
-export const enum UneqippableItem {
-	GOLD_KEY = 'goldKey',
-	SILVER_KEY = 'silverKey',
-	MYSTIC_BOOK = 'mysticBook',
-	HEALTH_POTION = 'health',
-	ESSENCE = 'essence',
-	EURALIAE_SEEDS = 'euraliaeSeeds',
-	PLANTLING_ROOT = 'plantlingRoot',
-}
 
 export const UneqippableItemData = {
 	[UneqippableItem.GOLD_KEY]: {
@@ -442,7 +352,7 @@ export const getItemDataForName = (name: string) => {
 	return UneqippableItemData[name as UneqippableItem] as ItemData;
 };
 
-export const ItemData = {
+export const CombinedItemData = {
 	...EquippableItems,
 	...UneqippableItemData,
 };

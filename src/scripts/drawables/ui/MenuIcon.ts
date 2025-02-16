@@ -2,14 +2,13 @@ import MainScene from '../../scenes/MainScene';
 import { UI_SCALE, UiDepths } from '../../helpers/constants';
 import { Icons } from './Icons';
 import OverlayScreen from '../../screens/OverlayScreen';
-import { EnchantmentName } from '../../../items/enchantmentData';
 
 export const MENU_ICON_LEFT_BORDER = 32;
 
 export default abstract class MenuIcon extends Phaser.GameObjects.Image implements Icons {
 	scene: MainScene;
-	screens: OverlayScreen[];
-	ICON: string;
+	screens: OverlayScreen[] = [];
+	ICON: string = '';
 	open: boolean = false;
 
 	constructor(
@@ -34,7 +33,7 @@ export default abstract class MenuIcon extends Phaser.GameObjects.Image implemen
 	}
 
 	toggleScreen() {
-		if (!this.scene.scriptHelper.isScriptRunning()) {
+		if (!this.scene.scriptHelper!.isScriptRunning()) {
 			if (this.open) this.scene.closeAllIconScreens();
 			else {
 				this.scene.closeAllIconScreens();
@@ -45,7 +44,7 @@ export default abstract class MenuIcon extends Phaser.GameObjects.Image implemen
 
 	closeScreen() {
 		this.setScreens();
-		
+
 		this.screens.forEach((screen) => {
 			screen.modify();
 			screen.setVisible(false);

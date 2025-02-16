@@ -1,4 +1,3 @@
-import AbilityEffect from '../drawables/effects/AbilityEffect';
 import FireBallEffect from '../drawables/effects/FireBallEffect';
 import IceSpikeEffect from '../drawables/effects/IceSpikeEffect';
 import ArcaneBoltEffect from '../drawables/effects/ArcaneBoltEffect';
@@ -15,137 +14,11 @@ import ArcaneSummoningEffect from '../drawables/effects/ArcaneSummoningEffect';
 import NecroticSummoningEffect from '../drawables/effects/NecroticSummoningEffect';
 import TeleportEffect from '../drawables/effects/TeleportEffect';
 import CharmEffect from '../drawables/effects/CharmEffect';
-import {
-	ColorEffectValue,
-	MinMaxParticleEffectValue,
-	SimpleParticleEffectValue,
-} from '../helpers/constants';
 // tslint:disable-next-line: max-line-length
 import TrailingParticleProjectileEffect from '../drawables/effects/TrailingParticleProjectileEffect';
-import { ConditionalAbilityData, EnumDictionary } from '../../../typings/custom';
-import globalState from '../worldstate/index';
-import BloodDrainEffect from '../drawables/effects/BloodDrainEffect';
-
-export type SpreadData = [number, number, ((factor: number) => number)?];
-
-export interface ProjectileParticleData {
-	particleImage?: string;
-	alpha?: SimpleParticleEffectValue;
-	scale?: SimpleParticleEffectValue;
-	speed?: SimpleParticleEffectValue;
-	rotate?: SimpleParticleEffectValue;
-	lifespan?: MinMaxParticleEffectValue;
-	frequency?: number;
-	maxParticles?: number;
-	tint?: ColorEffectValue;
-}
-
-export interface ProjectileParticleExplosionData {
-	particles?: number;
-	speed?: SimpleParticleEffectValue;
-	lifespan?: MinMaxParticleEffectValue;
-}
-export interface ProjectileData {
-	projectileImage?: string;
-	particleData?: ProjectileParticleData;
-	explosionData?: ProjectileParticleExplosionData;
-	spread?: SpreadData;
-	velocity: number;
-	drag?: number;
-	effectScale?: number;
-	spriteScale?: number;
-	xOffset: number;
-	yOffset: number;
-	effect: typeof AbilityEffect;
-	collisionSound?: string;
-	sfxVolume?: number;
-	delay?: number;
-	targeting?: boolean;
-	inverseAllowedTargets?: boolean;
-	knockback?: number;
-	timeToLive?: number;
-	destroyOnEnemyContact: boolean;
-	destroyOnWallContact: boolean;
-	explodeOnDestruction?: boolean;
-	passThroughEnemies?: boolean;
-	acquisitionSpeed?: number;
-	acquisitionDistance?: number;
-	seekingSpeed?: number;
-	seekingTimeOffset?: number;
-	shape?: 'source' | 'storm' | 'cone' | 'nova';
-	lightingStrength?: number;
-	lightingRadius?: number;
-}
-
-export interface AbilityData {
-	castEffect?: typeof AbilityEffect;
-	stopDashBeforeEnemyCollision?: boolean;
-	projectiles?: number;
-	projectileData?: ProjectileData;
-	sound?: string;
-	sfxVolume?: number;
-	cooldownMs?: number;
-	abilityName: string;
-	flavorText: string;
-	icon?: [string, number];
-	damageMultiplier?: number;
-	healingMultiplier?: number;
-	stun?: number;
-	necroticStacks?: number;
-	iceStacks?: number;
-	castOnEnemyDestroyed?: AbilityType;
-	castOnEnemyHit?: AbilityType;
-	spriteName?: string;
-	castingTime?: number;
-	useExactTargetVector?: boolean;
-	increaseComboCast?: boolean;
-	resetComboCast?: boolean;
-	dashSpeed?: number;
-	dashDuration?: number;
-	dashInvulnerability?: boolean;
-	delayProjectiles?: number;
-	reverseDash?: boolean;
-}
-
-export const enum AbilityType {
-	NOTHING = 'nothing',
-	FIREBALL = 'fireball',
-	ARCANE_BOLT = 'arcaneBolt',
-	HAIL_OF_DEATH = 'hailOfDeath',
-	HAIL_OF_BOLTS = 'hailOfBolts',
-	HAIL_OF_FLAMES = 'hailOfFlames',
-	HAIL_OF_ICE = 'hailOfIce',
-	ICESPIKE = 'icespike',
-	ARCANE_BLADE = 'arcaneBlade',
-	FIRE_CONE = 'fireCone',
-	FIRE_NOVA = 'fireNova',
-	ARCANE_CONE = 'arcaneCone',
-	ARCANE_NOVA = 'arcaneNova',
-	ICE_CONE = 'iceCone',
-	ICE_NOVA = 'iceNova',
-	NECROTIC_BOLT = 'necroticBolt',
-	NECROTIC_CONE = 'necroticCone',
-	NECROTIC_NOVA = 'necroticNova',
-	EXPLODING_CORPSE = 'explodingCorpse',
-	BAT = 'bat',
-	CONDEMN = 'Condemn',
-	BLOOD_DRIN = 'BloodDrain',
-	BLOOD_DRAIN_PROJECTILE = 'BloodDrainProjectile',
-	FIRE_SUMMON_CIRCELING = 'fireSummonCirceling',
-	FIRE_SUMMON_ELEMENTAL = 'fireSummonElemental',
-	ICE_SUMMON_CIRCELING = 'iceSummonCirceling',
-	ICE_SUMMON_ELEMENTAL = 'iceSummonElemental',
-	ARCANE_SUMMON_CIRCELING = 'arcaneSummonCirceling',
-	ARCANE_SUMMON_ELEMENTAL = 'arcaneSummonElemental',
-	NECROTIC_SUMMON_CIRCELING = 'necroticSummonCirceling',
-	NECROTIC_SUMMON_ELEMENTAL = 'necroticSummonElemental',
-	TELEPORT = 'teleport',
-	CHARM = 'charm',
-}
-
-export type ConditionalAbilityDataMap = EnumDictionary<AbilityType, ConditionalAbilityData[]>;
-
-export type AbilityDataMap = EnumDictionary<AbilityType, AbilityData>;
+import worldstate from '../worldState';
+import { AbilityType } from '../../types/AbilityType';
+import { AbilityDataMap } from '../../types/AbilityData';
 
 export const Abilities: AbilityDataMap = {
 	[AbilityType.NOTHING]: {
@@ -241,7 +114,7 @@ export const Abilities: AbilityDataMap = {
 	[AbilityType.HAIL_OF_BOLTS]: {
 		projectiles: 13,
 		projectileData: {
-			spread: [-0.07, 0.07, (num) => Math.sin(num * Math.PI * 0.95)],
+			spread: [-0.07, 0.07, (num: number) => Math.sin(num * Math.PI * 0.95)],
 			velocity: 350,
 			delay: 50,
 			xOffset: 0,
@@ -266,7 +139,7 @@ export const Abilities: AbilityDataMap = {
 	[AbilityType.HAIL_OF_FLAMES]: {
 		projectiles: 13,
 		projectileData: {
-			spread: [-0.07, 0.07, (num) => Math.sin(num * Math.PI * 0.95)],
+			spread: [-0.07, 0.07, (num: number) => Math.sin(num * Math.PI * 0.95)],
 			delay: 50,
 			velocity: 150,
 			effectScale: 0.8,
@@ -291,7 +164,7 @@ export const Abilities: AbilityDataMap = {
 	[AbilityType.HAIL_OF_ICE]: {
 		projectiles: 13,
 		projectileData: {
-			spread: [-0.07, 0.07, (num) => Math.sin(num * Math.PI * 0.95)],
+			spread: [-0.07, 0.07, (num: number) => Math.sin(num * Math.PI * 0.95)],
 			delay: 50,
 			velocity: 350,
 			spriteScale: 0.5,
@@ -686,7 +559,7 @@ export const Abilities: AbilityDataMap = {
 	[AbilityType.HAIL_OF_DEATH]: {
 		projectiles: 13,
 		projectileData: {
-			spread: [-0.07, 0.07, (num) => Math.sin(num * Math.PI * 0.95)],
+			spread: [-0.07, 0.07, (num: number) => Math.sin(num * Math.PI * 0.95)],
 			delay: 50,
 			velocity: 350,
 			effectScale: 0.8,
@@ -754,7 +627,7 @@ export const Abilities: AbilityDataMap = {
 	},
 	[AbilityType.BLOOD_DRIN]: {
 		sound: 'sound-icespike',
-		castEffect: BloodDrainEffect,
+		// castEffect: BloodDrainEffect,
 		sfxVolume: 0.3,
 		cooldownMs: 800,
 		damageMultiplier: 0.5,
@@ -1034,16 +907,16 @@ export const getRelevantAbilityVersion = (
 	abilityLevel: number,
 	comboCast: number
 ) => {
-	const options = globalState.abilityData[abilityType] || [{ data: Abilities[abilityType] }];
+	const options = worldstate.abilityData[abilityType] || [{ data: Abilities[abilityType] }];
 	return options.find((option) => {
 		return (
 			!option.conditions ||
 			Object.entries(option.conditions).every(([condition, conditionValue]) => {
 				switch (condition) {
 					case 'minimumLevel':
-						return abilityLevel >= conditionValue;
+						return abilityLevel >= (conditionValue as number);
 					case 'maximumLevel':
-						return abilityLevel <= conditionValue;
+						return abilityLevel <= (conditionValue as number);
 					case 'comboCastNumber':
 						return comboCast === conditionValue;
 					default:

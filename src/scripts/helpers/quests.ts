@@ -1,6 +1,6 @@
 import { Quest, ScriptEntry } from '../../../typings/custom';
-import { Source } from '../../items/itemData';
-import globalState from '../worldstate';
+import { Source } from '../../types/Item';
+import worldstate from '../worldState';
 
 export interface QuestScripts {
 	intro: ScriptEntry[];
@@ -65,7 +65,7 @@ export const areQuestPreconditionsMet: (quest: Quest) => boolean = (quest) => {
 	}
 	let areAllConditionsMet = true;
 	(quest.preconditions.previousQuests || []).forEach((questName) => {
-		if (!(globalState.quests || {})[questName]?.questFinished) {
+		if (!(worldstate.quests || {})[questName]?.questFinished) {
 			areAllConditionsMet = false;
 		}
 	});
@@ -77,7 +77,7 @@ export const getOpenQuestIds: (questGiverId: string) => string[] = (questGiverId
 		.filter(([key, quest]) => {
 			return (
 				quest.questGiverId === questGiverId &&
-				!globalState.quests[key] &&
+				!worldstate.quests[key] &&
 				areQuestPreconditionsMet(quest)
 			);
 		})
@@ -197,7 +197,7 @@ export const fillQuestScriptsFromDb = (scripts: { [name: string]: QuestScripts }
 };
 
 export const loadQuestScript: (questId: string) => ScriptEntry[] = (questId) => {
-	if (globalState.quests[questId]?.questOngoing) {
+	if (worldstate.quests[questId]?.questOngoing) {
 		return questScripts[questId].end || [];
 	}
 	return questScripts[questId].intro;

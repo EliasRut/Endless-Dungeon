@@ -1,6 +1,5 @@
 import React from 'react';
 import { ItemWithCount } from '../../../typings/custom';
-import { ItemData } from '../../items/itemData';
 import { Input } from './Input';
 import {
 	CloseButton,
@@ -11,6 +10,7 @@ import {
 	TextWrapper,
 	Wrapper,
 } from './StyledElements';
+import { CombinedItemData } from '../../items/itemData';
 
 export interface QuestRewardProps {
 	onRemove: () => void;
@@ -36,7 +36,7 @@ export const QuestItemPrecondition: (props: QuestRewardProps) => JSX.Element = (
 						onChange={(e: any) => onItemIdChange(e.target.value)}
 					>
 						<option value="none"></option>
-						{Object.entries(ItemData).map(([itemKey, itemData]) => (
+						{Object.entries(CombinedItemData).map(([itemKey, itemData]) => (
 							<option value={itemKey}>{itemData.name}</option>
 						))}
 					</LargeDropdown>

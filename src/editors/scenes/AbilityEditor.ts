@@ -1,25 +1,24 @@
 import 'phaser';
-import AbilityHelper from '../helpers/AbilityHelper';
-import MainScene from './MainScene';
-import {
-	ColorsOfMagic,
-	Facings,
-	Faction,
-	MinMaxParticleEffectValue,
-	SimpleParticleEffectValue,
-} from '../helpers/constants';
-import { Abilities, AbilityType } from '../abilities/abilityData';
-import Character from '../worldstate/Character';
-import CharacterToken from '../drawables/tokens/CharacterToken';
-import DungeonGenerator from '../helpers/generateDungeon';
-import globalState from '../worldstate/index';
-import { generateTilemap } from '../helpers/drawDungeon';
-import PlayerCharacterToken from '../drawables/tokens/PlayerCharacterToken';
-import { TILE_WIDTH, TILE_HEIGHT } from '../helpers/generateDungeon';
-import DoorToken from '../drawables/tokens/DoorToken';
-import { ColorEffectValue } from '../helpers/constants';
+import AbilityHelper from '../../scripts/helpers/AbilityHelper';
+import MainScene from '../../scripts/scenes/MainScene';
+import { ColorsOfMagic, Facings, Faction } from '../../scripts/helpers/constants';
+import { Abilities } from '../../scripts/abilities/abilityData';
+import Character from '../../types/Character';
+import CharacterToken from '../../scripts/drawables/tokens/CharacterToken';
+import DungeonGenerator from '../../scripts/helpers/generateDungeon';
+import worldstate from '../../scripts/worldState';
+import { generateTilemap } from '../../scripts/helpers/drawDungeon';
+import PlayerCharacterToken from '../../scripts/drawables/tokens/PlayerCharacterToken';
+import { TILE_WIDTH, TILE_HEIGHT } from '../../scripts/helpers/generateDungeon';
+import DoorToken from '../../scripts/drawables/tokens/DoorToken';
 import { collection, CollectionReference, DocumentData, getFirestore } from 'firebase/firestore';
 import { app } from '../../shared/initializeApp';
+import {
+	AbilityType,
+	ColorEffectValue,
+	MinMaxParticleEffectValue,
+	SimpleParticleEffectValue,
+} from '../../types/AbilityType';
 
 const SCALE = 2;
 
@@ -113,8 +112,8 @@ export default class AbilityEditor extends Phaser.Scene {
 		this.load.audio('sound-fireball-explosion', 'assets/sounds/fireball-explosion.wav');
 		this.load.audio('sound-wind', 'assets/sounds/wind.wav');
 
-		globalState.availableTilesets.push('COM-death-B', 'COM-death-D', 'COM-death-O');
-		globalState.availableTilesets.forEach((tileSet) => {
+		worldstate.availableTilesets.push('COM-death-B', 'COM-death-D', 'COM-death-O');
+		worldstate.availableTilesets.forEach((tileSet) => {
 			this.load.image(tileSet, `assets/tilesets/${tileSet}.png`);
 		});
 	}
@@ -123,7 +122,7 @@ export default class AbilityEditor extends Phaser.Scene {
 		const tilesetLayoutRow = Array.from({ length: 32 }, () => 32);
 		const overlayLayoutRow = Array.from({ length: 32 }, () => 0);
 		const generator = new DungeonGenerator();
-		globalState.availableRooms.abilityEditorRoom = {
+		worldstate.availableRooms.abilityEditorRoom = {
 			startRoom: true,
 			tileset: 'COM-death-B',
 			decorationTileset: 'COM-death-D',

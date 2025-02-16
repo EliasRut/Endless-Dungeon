@@ -1,4 +1,4 @@
-import { ColorsOfMagic, EquipmentSlot } from '../helpers/constants';
+import { ColorsOfMagic, EquipmentSlot } from '../scripts/helpers/constants';
 import {
 	Amulet,
 	Catalyst,
@@ -11,8 +11,8 @@ import {
 	RingKey,
 	ChestPieceKey,
 	AmuletKey,
-} from '../../items/itemData';
-import { EnchantmentName } from '../../items/enchantmentData';
+} from '../types/Item';
+import { EnchantmentName } from '../items/enchantmentData';
 
 export interface EquippedItemData {
 	level: number;
@@ -59,42 +59,42 @@ export const EmptyInventory: Inventory = {
 	equippedCatalyst: Catalyst.NOVA,
 	equippedAmulet: Amulet.WILD,
 	amulets: {
-		[Amulet.BLOOD]: { level: 0, enchantment: 'None'},
-		[Amulet.CHANGE]: { level: 0, enchantment: 'None'},
-		[Amulet.DEATH]: { level: 0, enchantment: 'None'},
-		[Amulet.FLUX]: { level: 1, enchantment: 'None'},
-		[Amulet.METAL]: { level: 0, enchantment: 'None'},
-		[Amulet.PASSION]: { level: 0, enchantment: 'None'},
-		[Amulet.ROYAL]: { level: 0, enchantment: 'None'},
-		[Amulet.WILD]: { level: 1, enchantment: 'None'},
+		[Amulet.BLOOD]: { level: 0, enchantment: 'None' },
+		[Amulet.CHANGE]: { level: 0, enchantment: 'None' },
+		[Amulet.DEATH]: { level: 0, enchantment: 'None' },
+		[Amulet.FLUX]: { level: 1, enchantment: 'None' },
+		[Amulet.METAL]: { level: 0, enchantment: 'None' },
+		[Amulet.PASSION]: { level: 0, enchantment: 'None' },
+		[Amulet.ROYAL]: { level: 0, enchantment: 'None' },
+		[Amulet.WILD]: { level: 1, enchantment: 'None' },
 	},
 	rings: {
-		[Ring.BLOOD]: { level: 1, enchantment: 'None'},
-		[Ring.CHANGE]: { level: 1, enchantment: 'None'},
-		[Ring.DEATH]: { level: 1, enchantment: 'None'},
-		[Ring.FLUX]: { level: 0, enchantment: 'None'},
-		[Ring.METAL]: { level: 1, enchantment: 'None'},
-		[Ring.PASSION]: { level: 1, enchantment: 'None'},
-		[Ring.ROYAL]: { level: 1, enchantment: 'None'},
-		[Ring.WILD]: { level: 1, enchantment: 'None'},
+		[Ring.BLOOD]: { level: 1, enchantment: 'None' },
+		[Ring.CHANGE]: { level: 1, enchantment: 'None' },
+		[Ring.DEATH]: { level: 1, enchantment: 'None' },
+		[Ring.FLUX]: { level: 0, enchantment: 'None' },
+		[Ring.METAL]: { level: 1, enchantment: 'None' },
+		[Ring.PASSION]: { level: 1, enchantment: 'None' },
+		[Ring.ROYAL]: { level: 1, enchantment: 'None' },
+		[Ring.WILD]: { level: 1, enchantment: 'None' },
 	},
 	sources: {
-		[Source.FIRE]: { level: 1, enchantment: 'None'},
-		[Source.ARCANE]: { level: 1, enchantment: 'None'},
-		[Source.ICE]: { level: 1, enchantment: 'None'},
-		[Source.NECROTIC]: { level: 1, enchantment: 'None'},
+		[Source.FIRE]: { level: 1, enchantment: 'None' },
+		[Source.ARCANE]: { level: 1, enchantment: 'None' },
+		[Source.ICE]: { level: 1, enchantment: 'None' },
+		[Source.NECROTIC]: { level: 1, enchantment: 'None' },
 	},
 	catalysts: {
-		[Catalyst.CONE]: { level: 1, enchantment: 'None'},
-		[Catalyst.NOVA]: { level: 1, enchantment: 'None'},
-		[Catalyst.STORM]: { level: 1, enchantment: 'None'},
-		[Catalyst.SUMMON]: { level: 1, enchantment: 'None'},
+		[Catalyst.CONE]: { level: 1, enchantment: 'None' },
+		[Catalyst.NOVA]: { level: 1, enchantment: 'None' },
+		[Catalyst.STORM]: { level: 1, enchantment: 'None' },
+		[Catalyst.SUMMON]: { level: 1, enchantment: 'None' },
 	},
 	chestPieces: {
-		[ChestPiece.ARMOR]: { level: 1, enchantment: 'None'},
-		[ChestPiece.CLOAK]: { level: 0, enchantment: 'None'},
-		[ChestPiece.GARB]: { level: 1, enchantment: 'None'},
-		[ChestPiece.ROBE]: { level: 1, enchantment: 'None'},
+		[ChestPiece.ARMOR]: { level: 1, enchantment: 'None' },
+		[ChestPiece.CLOAK]: { level: 0, enchantment: 'None' },
+		[ChestPiece.GARB]: { level: 1, enchantment: 'None' },
+		[ChestPiece.ROBE]: { level: 1, enchantment: 'None' },
 	},
 	bag: {},
 	essences: { flux: 0, metal: 0, blood: 0, change: 0, death: 2, royal: 0, passion: 0, wild: 2 },

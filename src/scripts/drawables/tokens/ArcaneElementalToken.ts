@@ -1,4 +1,4 @@
-import { AbilityType } from '../../abilities/abilityData';
+import { AbilityType } from '../../../types/AbilityType';
 import MainScene from '../../scenes/MainScene';
 import ElementalToken from './ElementalToken';
 

@@ -3,12 +3,12 @@ import {
 	ItemsPositioning,
 	MapConnection,
 	NpcPositioning,
-} from '../../../typings/custom';
+} from '../../typings/custom';
 import Door from './Door';
 import RoomPositioning from './RoomPositioning';
 
 // This class handles a singular dungeon level.
-export default class DungeonLevel {
+export default interface DungeonLevel {
 	id: string;
 	startPositionX: number;
 	startPositionY: number;

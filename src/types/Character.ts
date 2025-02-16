@@ -1,4 +1,4 @@
-import { Facings, Faction } from '../helpers/constants';
+import { Facings, Faction } from '../scripts/helpers/constants';
 
 export default class Character {
 	public animationBase: string;
@@ -9,7 +9,7 @@ export default class Character {
 	public luck: number = 1;
 	public movementSpeed: number;
 	public slowFactor: number = 1;
-	public attackTime: number;
+	public attackTime: number = 0;
 	public stunDuration: number = 0;
 	public stunnedAt: number = 0;
 	public stunned: boolean = false;
@@ -22,7 +22,7 @@ export default class Character {
 	public y = 0;
 	public vision = 0;
 
-	public faction: Faction;
+	public faction: Faction = Faction.NPCS;
 	public id: string;
 
 	constructor(

@@ -8,9 +8,9 @@ import {
 	generatePalleteLookup,
 	PalleteLookup,
 	generateColorConversionTable,
-} from '../helpers/colors';
+} from '../../scripts/helpers/colors';
 import { NpcData } from '../../../typings/custom';
-import { generateColorReplacedTextures } from '../helpers/colors';
+import { generateColorReplacedTextures } from '../../scripts/helpers/colors';
 import {
 	collection,
 	CollectionReference,
@@ -22,7 +22,7 @@ import {
 	setDoc,
 } from 'firebase/firestore';
 import { app } from '../../shared/initializeApp';
-import { getBaseUrl } from '../helpers/getBaseUrl';
+import { getBaseUrl } from '../../scripts/helpers/getBaseUrl';
 
 const SCALE = 2;
 

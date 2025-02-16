@@ -1,5 +1,5 @@
 import { Faction } from '../../helpers/constants';
-import globalState from '../../worldstate';
+import worldstate from '../../worldState';
 import CharacterToken from './CharacterToken';
 import MainScene from '../../scenes/MainScene';
 
@@ -15,7 +15,7 @@ export default class PlayerCharacterToken extends CharacterToken {
 
 		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
-		this.stateObject = globalState.playerCharacter;
+		this.stateObject = worldstate.playerCharacter;
 		this.faction = Faction.PLAYER;
 	}
 }

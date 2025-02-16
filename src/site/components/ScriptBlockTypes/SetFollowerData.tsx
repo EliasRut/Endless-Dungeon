@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Follower from '../../../scripts/worldstate/Follower';
+import Follower from '../../../types/Follower';
 import { LargeInput } from '../LargeInput';
 import { ScriptBlockContainer } from '../ScriptBlockContainer';
 import { ScriptTypeDropdown } from '../ScriptTypeDropdown';

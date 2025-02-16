@@ -1,5 +1,5 @@
-import { AbilityType } from '../abilities/abilityData';
-import { Faction } from '../helpers/constants';
+import { Faction } from '../scripts/helpers/constants';
+import { AbilityType } from './AbilityType';
 import Character from './Character';
 
 export default class Follower extends Character {

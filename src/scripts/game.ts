@@ -2,14 +2,14 @@ import 'phaser';
 import DungeonDoorPreloadScene from './scenes/DungeonDoorPreloadScene';
 import DungeonDoorScene from './scenes/DungeonDoorScene';
 import MainScene from './scenes/MainScene';
-import MapEditor from './scenes/MapEditor';
 import PreloadScene from './scenes/PreloadScene';
 import RoomPreloaderScene from './scenes/RoomPreloaderScene';
-import NpcEditor from './scenes/NpcEditor';
+import NpcEditor from '../editors/scenes/NpcEditor';
 import { DEBUG_PHYSICS, MODE } from './helpers/constants';
 import NpcGenerationScene from './scenes/NpcGenerationScene';
-import AbilityEditor from './scenes/AbilityEditor';
+import AbilityEditor from '../editors/scenes/AbilityEditor';
 import AbilitiesPreloaderScene from './scenes/AbilitiesPreloaderScene';
+import MapEditor from '../editors/scenes/MapEditor';
 
 const DEFAULT_WIDTH = 640;
 const DEFAULT_HEIGHT = 360;

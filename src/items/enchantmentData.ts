@@ -1,11 +1,14 @@
-import globalState from '../scripts/worldstate';
-import {colorOfMagicToTilesetMap, ColorsOfMagic} from '../scripts/helpers/constants';
+import worldstate from '../scripts/worldState';
+import { colorOfMagicToTilesetMap, ColorsOfMagic } from '../scripts/helpers/constants';
 
 export interface EnchantmentData {
 	name: string;
 	description: string;
-	affectedStat?: { stat: keyof typeof globalState.playerCharacter.enchantmentModifiers; value: number };
-	cost?: Array<{essence: ColorsOfMagic; amount: number}>;	
+	affectedStat?: {
+		stat: keyof typeof worldstate.playerCharacter.enchantmentModifiers;
+		value: number;
+	};
+	cost?: Array<{ essence: ColorsOfMagic; amount: number }>;
 }
 
 enum EnchantmentType {

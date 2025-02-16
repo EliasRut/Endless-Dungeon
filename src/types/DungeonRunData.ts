@@ -1,4 +1,4 @@
-import { ColorsOfMagic } from '../helpers/constants';
+import { ColorsOfMagic } from '../scripts/helpers/constants';
 import { PrimaryContentBlock } from './PrimaryContentBlock';
 import { SecondaryContentBlock } from './SecondaryContentBlock';
 

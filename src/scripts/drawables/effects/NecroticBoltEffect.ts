@@ -1,7 +1,7 @@
 import { Facings, SCALE, UiDepths } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
-import { ProjectileData } from '../../abilities/abilityData';
 import { getRotationInRadiansForFacing } from '../../helpers/movement';
+import { ProjectileData } from '../../../types/ProjectileData';
 
 const BODY_RADIUS = 6;
 const EXPLOSION_PARTICLE_SPEED = 100;
