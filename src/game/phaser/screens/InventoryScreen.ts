@@ -6,7 +6,6 @@ import {
 	UI_SCALE,
 	NORMAL_ANIMATION_FRAME_RATE,
 } from '../helpers/constants';
-import { Abilities, getRelevantAbilityVersion } from '../abilities/abilityData';
 import OverlayScreen from './OverlayScreen';
 import InventoryItemToken from '../drawables/tokens/InventoryItemToken';
 import worldstate from '../worldState';
@@ -33,6 +32,8 @@ import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
 import { Enchantment, EnchantmentName } from '../../../data/enchantmentData';
 import { AbilityType } from '../../../types/AbilityType';
 import { AbilityLinkedItem } from '../../../types/Item';
+import { Abilities } from '../helpers/abilities';
+import { getRelevantAbilityVersion } from '../helpers/getRelevantAbilityVersion';
 
 const SCALED_WINDOW_WIDTH = window.innerWidth / UI_SCALE;
 

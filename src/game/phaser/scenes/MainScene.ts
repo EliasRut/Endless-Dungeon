@@ -38,7 +38,6 @@ import DynamicLightingHelper from '../helpers/DynamicLightingHelper';
 import PlayerCharacterAvatar from '../drawables/ui/PlayerCharacterAvatar';
 import NPCAvatar from '../drawables/ui/NPCAvatar';
 import ScriptHelper from '../helpers/ScriptHelper';
-import AbilityHelper from '../helpers/AbilityHelper';
 import BackpackIcon from '../drawables/ui/BackpackIcon';
 import SettingsIcon from '../drawables/ui/SettingsIcon';
 import { spawnNpc } from '../helpers/spawn';
@@ -63,6 +62,7 @@ import FollowerToken from '../drawables/tokens/FollowerToken';
 import { updateAnimatedTile } from '../helpers/cells';
 import { setDrumMute } from '../audiogen/app';
 import { getClosestTarget } from '../helpers/targetingHelpers';
+import AbilityHelper from '../helpers/AbilityHelper';
 
 const FADE_IN_TIME_MS = 1000;
 const FADE_OUT_TIME_MS = 1000;

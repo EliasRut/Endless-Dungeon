@@ -1,8 +1,8 @@
 import { AbilityKey, UI_SCALE, UiDepths } from '../../helpers/constants';
 import worldstate from '../../worldState';
-import { Abilities } from '../../abilities/abilityData';
 import MainScene from '../../scenes/MainScene';
 import { AbilityType } from '../../../../types/AbilityType';
+import { Abilities } from '../../helpers/abilities';
 
 const SCREEN_OFFSET_X = 8;
 const SCREEN_OFFSET_Y = 8;
