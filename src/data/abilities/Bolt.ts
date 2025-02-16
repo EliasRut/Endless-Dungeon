@@ -1,0 +1,48 @@
+import TrailingParticleProjectileEffect from '../../game/phaser/drawables/effects/TrailingParticleProjectileEffect';
+import { AbilityData } from '../../types/AbilityData';
+
+export const Bolt: AbilityData = {
+	projectiles: 1,
+	projectileData: {
+		velocity: 450,
+		xOffset: 0,
+		yOffset: 0,
+		projectileImage: 'empty-tile',
+		particleData: {
+			particleImage: 'rock',
+			alpha: { start: 1, end: 0 },
+			scale: { start: 1, end: 0.2 },
+			speed: 20,
+			rotate: { min: -180, max: 180 },
+			lifespan: 100,
+			tint: {
+				blueDiff: 7,
+				blueMin: 170,
+				greenDiff: 70,
+				greenMin: 170,
+				redDiff: 70,
+				redMin: 0,
+			},
+		},
+		effect: TrailingParticleProjectileEffect,
+		collisionSound: 'sound-fireball-explosion',
+		sfxVolume: 0.2,
+		spriteScale: 0.5,
+		effectScale: 0.5,
+		knockback: 120,
+		destroyOnEnemyContact: true,
+		destroyOnWallContact: true,
+		explodeOnDestruction: true,
+		targeting: true,
+		seekingSpeed: 0,
+	},
+	increaseComboCast: true,
+	sound: 'sound-fireball',
+	sfxVolume: 0.1,
+	coolDownMs: 350,
+	castingTime: 300,
+	damageMultiplier: 0.6,
+	abilityName: 'Arcane Bolt',
+	flavorText: `Shooting magic missiles!`,
+	icon: ['icon-abilities', 1],
+};
