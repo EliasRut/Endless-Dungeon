@@ -1,8 +1,6 @@
 import 'phaser';
-import AbilityHelper from '../../../game/phaser/helpers/AbilityHelper';
 import MainScene from '../../../game/phaser/scenes/MainScene';
 import { ColorsOfMagic, Facings, Faction } from '../../../game/phaser/helpers/constants';
-import { Abilities } from '../../../game/phaser/abilities/abilityData';
 import Character from '../../../types/Character';
 import CharacterToken from '../../../game/phaser/drawables/tokens/CharacterToken';
 import DungeonGenerator from '../../../game/phaser/helpers/generateDungeon';
@@ -19,6 +17,8 @@ import {
 	MinMaxParticleEffectValue,
 	SimpleParticleEffectValue,
 } from '../../../types/AbilityType';
+import AbilityHelper from '../../../game/phaser/helpers/AbilityHelper';
+import { Abilities } from '../../../game/phaser/helpers/abilities';
 
 const SCALE = 2;
 

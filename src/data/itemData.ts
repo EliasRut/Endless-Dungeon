@@ -22,7 +22,7 @@ export const SourceData: Record<Source, AbilityLinkedItem> = {
 		iconFrame: 24,
 	} as AbilityLinkedItem,
 	[Source.ICE]: {
-		ability: AbilityType.ICESPIKE,
+		ability: AbilityType.ICE_SPIKE,
 		name: 'Ice Source',
 		description: 'Freeze your foes solid with the power of ice. Very cool!',
 		iconFrame: 26,
@@ -79,7 +79,7 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			case AbilityType.NECROTIC_BOLT: {
 				return AbilityType.NECROTIC_CONE;
 			}
-			case AbilityType.ICESPIKE: {
+			case AbilityType.ICE_SPIKE: {
 				return AbilityType.ICE_CONE;
 			}
 			case AbilityType.FIREBALL:
@@ -96,7 +96,7 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			case AbilityType.NECROTIC_BOLT: {
 				return AbilityType.NECROTIC_NOVA;
 			}
-			case AbilityType.ICESPIKE: {
+			case AbilityType.ICE_SPIKE: {
 				return AbilityType.ICE_NOVA;
 			}
 			case AbilityType.FIREBALL:
@@ -113,7 +113,7 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 			case AbilityType.NECROTIC_BOLT: {
 				return AbilityType.NECROTIC_SUMMON_CIRCELING;
 			}
-			case AbilityType.ICESPIKE: {
+			case AbilityType.ICE_SPIKE: {
 				return AbilityType.ICE_SUMMON_CIRCELING;
 			}
 			case AbilityType.FIREBALL:
@@ -123,7 +123,7 @@ export const getCatalystAbility = (baseAbility: AbilityType, offHand: CatalystIt
 		}
 	}
 	switch (baseAbility) {
-		case AbilityType.ICESPIKE: {
+		case AbilityType.ICE_SPIKE: {
 			return AbilityType.HAIL_OF_ICE;
 		}
 		case AbilityType.ARCANE_BOLT: {
@@ -183,7 +183,7 @@ export const RingData: Record<Ring, AbilityLinkedItem> = {
 		iconFrame: 56,
 	} as AbilityLinkedItem,
 	[Ring.BLOOD]: {
-		ability: AbilityType.BLOOD_DRIN,
+		ability: AbilityType.BLOOD_DRAIN,
 		name: 'Ring of Blood',
 		description: 'A ring giving you power associated with the color of magic: Blood',
 		iconFrame: 56,

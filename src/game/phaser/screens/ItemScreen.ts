@@ -1,6 +1,5 @@
 import { EquipmentSlot, UiDepths, UI_SCALE } from '../helpers/constants';
 import OverlayScreen from './OverlayScreen';
-import { getRelevantAbilityVersion } from '../abilities/abilityData';
 import worldstate from '../worldState';
 import { EquippedItemData } from '../../../types/Inventory';
 import { Enchantment } from '../../../data/enchantmentData';
@@ -9,6 +8,7 @@ import { MENU_ICON_LEFT_BORDER } from '../drawables/ui/MenuIcon';
 import { getEquipmentDataForSlot } from '../helpers/inventory';
 import { ItemData } from '../../../types/Item';
 import { AbilityType } from '../../../types/AbilityType';
+import { getRelevantAbilityVersion } from '../helpers/getRelevantAbilityVersion';
 
 const BASE_SIZE_NAME = 20;
 

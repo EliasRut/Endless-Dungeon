@@ -1,8 +1,8 @@
-import { getRelevantAbilityVersion } from '../abilities/abilityData';
 import worldstate from '../worldState';
 import { AbilityKey } from './constants';
 import { CASTING_SPEED_MS } from '../scenes/MainScene';
 import { AbilityType } from '../../../types/AbilityType';
+import { getRelevantAbilityVersion } from './getRelevantAbilityVersion';
 
 const AXIS_MOVEMENT_THRESHOLD = 0.4;
 
@@ -373,14 +373,14 @@ export default class KeyboardHelper {
 			this.getAbilityLevelForAbilityKey(abilityKey),
 			worldstate.playerCharacter.lastComboCast || 0
 		);
-		// console.log(`Using ${abilityData.abilityName} with ${abilityData.cooldownMs}ms cooldown`);
+		// console.log(`Using ${abilityData.abilityName} with ${abilityData.coolDownMs}ms cool down`);
 		const lastCasted = worldstate.playerCharacter.abilityCastTime[abilityKey];
-		const readyAt = lastCasted + (abilityData.cooldownMs || 0);
+		const readyAt = lastCasted + (abilityData.coolDownMs || 0);
 		if (readyAt <= gameTime) {
 			return 1;
 		}
 		const timeEllapsed = gameTime - lastCasted;
-		return timeEllapsed / (abilityData.cooldownMs || Infinity);
+		return timeEllapsed / (abilityData.coolDownMs || Infinity);
 	}
 
 	getMsSinceLastCast(gameTime: number) {
@@ -421,7 +421,7 @@ export default class KeyboardHelper {
 			worldstate.playerCharacter.lastComboCast || 0
 		);
 		const lastCasted = worldstate.playerCharacter.abilityCastTime[abilityKey];
-		const readyAt = lastCasted + (abilityData.cooldownMs || 0);
+		const readyAt = lastCasted + (abilityData.coolDownMs || 0);
 		if (readyAt > gameTime) {
 			return false;
 		}

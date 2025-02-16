@@ -1,5 +1,4 @@
 import worldstate from '../worldState';
-import { Abilities } from '../abilities/abilityData';
 import {
 	collection,
 	DocumentData,
@@ -12,6 +11,7 @@ import {
 import { app } from '../helpers/initializeApp';
 import { AbilityData, ConditionalAbilityDataMap } from '../../../types/AbilityData';
 import { AbilityType } from '../../../types/AbilityType';
+import { Abilities } from '../helpers/abilities';
 
 /*
 	The preload scene is the one we use to load assets. Once it's finished, it brings up the main
