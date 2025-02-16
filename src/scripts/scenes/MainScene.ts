@@ -763,11 +763,11 @@ export default class MainScene extends Phaser.Scene {
 					}
 
 					if (playerAnimation) {
-						console.log(
-							`Playing animation ${playerAnimation}, current frame is ${
-								this.mainCharacter!.anims.currentFrame?.index
-							}`
-						);
+						// console.log(
+						// 	`Playing animation ${playerAnimation}, current frame is ${
+						// 		this.mainCharacter!.anims.currentFrame?.index
+						// 	}`
+						// );
 						this.mainCharacter!.play({
 							key: playerAnimation,
 							// duration: 5,

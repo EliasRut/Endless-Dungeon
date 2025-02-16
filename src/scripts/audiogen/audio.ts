@@ -76,11 +76,11 @@ export function Audio(
 		const gain = au.createGain();
 		gain.gain.value = 0.3;
 		const limiter = au.createDynamicsCompressor();
-		limiter.attack.value = 0.005;
-		limiter.release.value = 0.1;
-		limiter.ratio.value = 15.0;
-		limiter.knee.value = 0.0;
-		limiter.threshold.value = -0.5;
+		// limiter.attack.value = 0.005;
+		// limiter.release.value = 0.1;
+		// limiter.ratio.value = 15.0;
+		// limiter.knee.value = 0.0;
+		// limiter.threshold.value = -0.5;
 
 		const analyser = au.createAnalyser();
 		analyser.fftSize = 2048;
@@ -146,33 +146,34 @@ export function Audio(
 		osc.frequency.value = pitch;
 		osc.start();
 
-		const filter = au.createBiquadFilter();
-		filter.type = 'lowpass';
-		filter.frequency.value = pitch * 4;
-		filter.Q.value = 5;
+		// const filter = au.createBiquadFilter();
+		// filter.type = 'lowpass';
+		// filter.frequency.value = pitch * 4;
+		// filter.Q.value = 5;
 
 		const gain = au.createGain();
 		gain.gain.value = 0.0;
 
-		const panner = au.createPanner();
-		panner.panningModel = 'equalpower';
-		panner.setPosition(pan, 0, 1 - Math.abs(pan));
+		// const panner = au.createPanner();
+		// panner.panningModel = 'equalpower';
+		// panner.setPosition(pan, 0, 1 - Math.abs(pan));
 
-		osc.connect(filter);
-		filter.connect(gain);
-		gain.connect(panner);
-		panner.connect(destination);
+		osc.connect(destination);
+		// osc.connect(filter);
+		// filter.connect(gain);
+		// gain.connect(panner);
+		// panner.connect(destination);
 
 		gain.gain.linearRampToValueAtTime(0.1, au.currentTime + attack);
 
 		await time(sustain + attack);
 		gain.gain.setValueAtTime(0.1, au.currentTime);
 		gain.gain.linearRampToValueAtTime(0, au.currentTime + release);
-		filter.frequency.linearRampToValueAtTime(Math.max(pitch / 2, 400), au.currentTime + release);
+		// filter.frequency.linearRampToValueAtTime(Math.max(pitch / 2, 400), au.currentTime + release);
 
 		await time(release + 0.01);
 		osc.stop(au.currentTime);
-		panner.disconnect();
+		// panner.disconnect();
 	}
 
 	function SimpleToneSynth(

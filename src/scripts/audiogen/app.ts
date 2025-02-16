@@ -25,6 +25,8 @@ import {
 	GeneralisedParameter,
 } from './interface';
 
+const MUTE_AUDIO = true;
+
 function WanderingParameter(param: NumericParameter, scaleFactor = 1 / 400) {
 	const [min, max] = param.bounds;
 
@@ -167,7 +169,7 @@ async function NineOhUnit(audio: AudioT): Promise<NineOhMachine> {
 function DelayUnit(audio: AudioT): TDelayUnit {
 	const dryWet = parameter('Dry/Wet', [0, 0.0], 0);
 	const feedback = parameter('Feedback', [0, 0.0], 0);
-	const delayTime = parameter('Time', [0, 1], 0.5);
+	const delayTime = parameter('Time', [0, 0.0], 0.0);
 	const delay = audio.DelayInsert(delayTime.value, dryWet.value, feedback.value);
 	// dryWet.subscribe((w) => (delay.wet.value = w));
 	// feedback.subscribe((f) => (delay.feedback.value = f));
@@ -284,7 +286,7 @@ export async function startAudioGeneration(uiControlContainer?: HTMLElement) {
 		gen,
 		delay,
 		clock,
-		masterVolume: parameter('Volume', [0, 1], 0.3),
+		masterVolume: parameter('Volume', [0, 1], MUTE_AUDIO ? 0 : 0.3),
 	};
 
 	programState.masterVolume.subscribe((newVolume) => {
