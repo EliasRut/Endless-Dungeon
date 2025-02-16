@@ -25,7 +25,7 @@ export default class ArcaneSummoningEffect extends SummoningEffect {
 			facing,
 			projectileData,
 			SUMMONING_TYPE.ARCANE_ELEMENTAL,
-			AbilityType.ARCANE_SUMMON_CIRCELING
+			AbilityType.ARCANE_SUMMON_CIRCLING
 		);
 	}
 

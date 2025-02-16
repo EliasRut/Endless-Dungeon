@@ -1,4 +1,4 @@
-import NecroticBoltEffect from '../../game/phaser/drawables/effects/NecroticBoltEffect';
+import TrailingParticleProjectileEffect from '../../game/phaser/drawables/effects/TrailingParticleProjectileEffect';
 import { AbilityData } from '../../types/AbilityData';
 
 export const NecroticCone: AbilityData = {
@@ -9,7 +9,15 @@ export const NecroticCone: AbilityData = {
 		drag: 700,
 		xOffset: 0,
 		yOffset: 0,
-		effect: NecroticBoltEffect,
+		particleData: {
+			particleImage: 'skull',
+			alpha: { start: 1, end: 0 },
+			scale: { start: 1, end: 0.2 },
+			speed: 20,
+			rotate: { min: -180, max: 180 },
+			lifespan: { min: 200, max: 400 },
+		},
+		effect: TrailingParticleProjectileEffect,
 		collisionSound: 'sound-fireball-explosion',
 		sfxVolume: 0.2,
 		timeToLive: 500,

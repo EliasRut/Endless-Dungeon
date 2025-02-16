@@ -6,8 +6,8 @@ import {
 	multiplyParticleValueByScale,
 } from '../../helpers/constants';
 import TargetingEffect from './TargetingEffect';
-import { ProjectileData } from '../../abilities/abilityData';
-import worldstate from '../../worldState';
+import worldState from '../../worldState';
+import { ProjectileData } from '../../../../types/ProjectileData';
 
 const BODY_RADIUS = 4;
 const VISIBILITY_DELAY = 50;
@@ -102,6 +102,26 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 		}
 	}
 
+	// gate with hasCharmEffect
+	onCollisionWithEnemy(enemy: Phaser.GameObjects.GameObject) {
+		// const hitToken = enemy as CharacterToken;
+		// hitToken.faction = Faction.ALLIES;
+		// hitToken.stateObject.faction = Faction.ALLIES;
+		// hitToken.charmedTime = worldstate.gameTime;
+		// if (Object.keys(hitToken).includes('targetStateObject')) {
+		// 	const enemyToken = hitToken as EnemyToken;
+		// 	enemyToken.targetStateObject = undefined;
+		// }
+		// (this.scene as MainScene).addFadingLabel(
+		// 	'Charmed',
+		// 	FadingLabelSize.SMALL,
+		// 	'#ff9999',
+		// 	hitToken.x,
+		// 	hitToken.y,
+		// 	6000
+		// );
+	}
+
 	destroy() {
 		this.emitter.stopFollow();
 		if (this.body && this.explodeOnDestruction) {
@@ -127,7 +147,7 @@ export default class TrailingParticleProjectileEffect extends TargetingEffect {
 		this.lightingMinStrength = 0;
 		this.lightingMaxStrength = 4;
 		this.lightingFrequency = 1000;
-		this.lightingSeed = worldstate.gameTime - 100;
+		this.lightingSeed = worldState.gameTime - 100;
 		this.body!.destroy();
 		this.setVisible(false);
 		setTimeout(() => {

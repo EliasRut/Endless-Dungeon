@@ -1,4 +1,4 @@
-import IceSpikeEffect from '../../game/phaser/drawables/effects/IceSpikeEffect';
+import TrailingParticleProjectileEffect from '../../game/phaser/drawables/effects/TrailingParticleProjectileEffect';
 import { AbilityData } from '../../types/AbilityData';
 
 export const IceCone: AbilityData = {
@@ -9,7 +9,15 @@ export const IceCone: AbilityData = {
 		drag: 700,
 		xOffset: 0,
 		yOffset: 0,
-		effect: IceSpikeEffect,
+		particleData: {
+			particleImage: 'ice',
+			alpha: { start: 1, end: 0 },
+			scale: { start: 1, end: 0.2 },
+			speed: 20,
+			rotate: { min: -180, max: 180 },
+			lifespan: { min: 200, max: 400 },
+		},
+		effect: TrailingParticleProjectileEffect,
 		collisionSound: 'sound-icespike-hit',
 		sfxVolume: 0.2,
 		timeToLive: 500,

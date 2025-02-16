@@ -1,9 +1,9 @@
 import { AbilityType } from '../../../../types/AbilityType';
 import { ProjectileData } from '../../../../types/ProjectileData';
 import { Facings, SUMMONING_TYPE } from '../../helpers/constants';
-import CircelingEffect from './CircelingEffect';
+import CirclingEffect from './CirclingEffect';
 
-export default class FireCircelingEffect extends CircelingEffect {
+export default class FireCirclingEffect extends CirclingEffect {
 	constructor(
 		scene: Phaser.Scene,
 		x: number,
@@ -20,7 +20,7 @@ export default class FireCircelingEffect extends CircelingEffect {
 			facing,
 			projectileData,
 			SUMMONING_TYPE.FIRE_ELEMENTAL,
-			AbilityType.FIRE_SUMMON_CIRCELING,
+			AbilityType.FIRE_SUMMON_CIRCLING,
 			AbilityType.FIRE_SUMMON_ELEMENTAL,
 			AbilityType.FIREBALL
 		);

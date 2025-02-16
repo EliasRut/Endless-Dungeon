@@ -21,7 +21,6 @@ export const enum AbilityType {
 	BAT = 'bat',
 	CONDEMN = 'Condemn',
 	BLOOD_DRAIN = 'BloodDrain',
-	BLOOD_DRAIN_PROJECTILE = 'BloodDrainProjectile',
 	FIRE_SUMMON_CIRCLING = 'fireSummonCircling',
 	FIRE_SUMMON_ELEMENTAL = 'fireSummonElemental',
 	ICE_SUMMON_CIRCLING = 'iceSummonCircling',

@@ -1,4 +1,4 @@
-import CharmEffect from '../../game/phaser/drawables/effects/CharmEffect';
+import TrailingParticleProjectileEffect from '../../game/phaser/drawables/effects/TrailingParticleProjectileEffect';
 import { AbilityData } from '../../types/AbilityData';
 
 export const Charm: AbilityData = {
@@ -16,7 +16,7 @@ export const Charm: AbilityData = {
 			rotate: { min: -180, max: 180 },
 			lifespan: { min: 200, max: 400 },
 		},
-		effect: CharmEffect,
+		effect: TrailingParticleProjectileEffect,
 		collisionSound: 'sound-fireball-explosion',
 		sfxVolume: 0.2,
 		destroyOnEnemyContact: true,

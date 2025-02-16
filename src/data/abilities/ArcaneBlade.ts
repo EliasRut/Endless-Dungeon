@@ -1,4 +1,4 @@
-import ArcaneBoltEffect from '../../game/phaser/drawables/effects/ArcaneBoltEffect';
+import TrailingParticleProjectileEffect from '../../game/phaser/drawables/effects/TrailingParticleProjectileEffect';
 import { AbilityData } from '../../types/AbilityData';
 
 export const ArcaneBlade: AbilityData = {
@@ -8,9 +8,28 @@ export const ArcaneBlade: AbilityData = {
 		velocity: 200,
 		xOffset: 32,
 		yOffset: 32,
-		effect: ArcaneBoltEffect,
+		particleData: {
+			particleImage: 'rock',
+			alpha: { start: 1, end: 0 },
+			scale: { start: 1, end: 0.1 },
+			speed: 20,
+			rotate: { min: -180, max: 180 },
+			lifespan: 300,
+			tint: {
+				blueDiff: 7,
+				blueMin: 170,
+				greenDiff: 70,
+				greenMin: 170,
+				redDiff: 70,
+				redMin: 0,
+			},
+		},
+		effect: TrailingParticleProjectileEffect,
 		collisionSound: 'sound-fireball-explosion',
 		sfxVolume: 0.2,
+		timeToLive: 500,
+		spriteScale: 0.5,
+		effectScale: 0.5,
 		destroyOnWallContact: true,
 		destroyOnEnemyContact: true,
 	},

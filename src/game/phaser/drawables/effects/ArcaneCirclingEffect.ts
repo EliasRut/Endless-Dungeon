@@ -1,9 +1,9 @@
 import { AbilityType } from '../../../../types/AbilityType';
 import { ProjectileData } from '../../../../types/ProjectileData';
 import { Facings, SUMMONING_TYPE } from '../../helpers/constants';
-import CircelingEffect from './CircelingEffect';
+import CirclingEffect from './CirclingEffect';
 
-export default class ArcaneCircelingEffect extends CircelingEffect {
+export default class ArcaneCirclingEffect extends CirclingEffect {
 	constructor(
 		scene: Phaser.Scene,
 		x: number,
@@ -20,7 +20,7 @@ export default class ArcaneCircelingEffect extends CircelingEffect {
 			facing,
 			projectileData,
 			SUMMONING_TYPE.ARCANE_ELEMENTAL,
-			AbilityType.ARCANE_SUMMON_CIRCELING,
+			AbilityType.ARCANE_SUMMON_CIRCLING,
 			AbilityType.ARCANE_SUMMON_ELEMENTAL,
 			AbilityType.ARCANE_BOLT
 		);

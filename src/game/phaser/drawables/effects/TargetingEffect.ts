@@ -44,7 +44,7 @@ export default class TargetingEffect extends AbilityEffect {
 		if (this.allowedTargets === PossibleTargets.ENEMIES) {
 			const potentialEnemies = Object.values((this.scene as MainScene).npcMap).filter(
 				(npc) =>
-					npc.faction === Faction.ENEMIES &&
+					npc.tokenData.faction === Faction.ENEMIES &&
 					npc.tintBottomLeft >= VISITED_TILE_TINT &&
 					npc.stateObject?.health > 0
 			);

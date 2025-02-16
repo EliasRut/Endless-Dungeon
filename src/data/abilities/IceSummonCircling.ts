@@ -1,4 +1,4 @@
-import IceCircelingEffect from '../../game/phaser/drawables/effects/IceCircelingEffect';
+import IceCirclingEffect from '../../game/phaser/drawables/effects/IceCirclingEffect';
 import { AbilityData } from '../../types/AbilityData';
 
 export const IceSummonCircling: AbilityData = {
@@ -7,7 +7,7 @@ export const IceSummonCircling: AbilityData = {
 		xOffset: 36,
 		yOffset: 36,
 		velocity: 0,
-		effect: IceCircelingEffect,
+		effect: IceCirclingEffect,
 		collisionSound: 'sound-icespike-hit',
 		sfxVolume: 0.2,
 		destroyOnEnemyContact: false,

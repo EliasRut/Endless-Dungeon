@@ -25,7 +25,7 @@ export default class NecroticSummoningEffect extends SummoningEffect {
 			facing,
 			projectileData,
 			SUMMONING_TYPE.NECROTIC_ELEMENTAL,
-			AbilityType.NECROTIC_SUMMON_CIRCELING
+			AbilityType.NECROTIC_SUMMON_CIRCLING
 		);
 	}
 

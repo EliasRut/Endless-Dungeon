@@ -25,7 +25,7 @@ export default class FireSummoningEffect extends SummoningEffect {
 			facing,
 			projectileData,
 			SUMMONING_TYPE.FIRE_ELEMENTAL,
-			AbilityType.FIRE_SUMMON_CIRCELING
+			AbilityType.FIRE_SUMMON_CIRCLING
 		);
 	}
 
