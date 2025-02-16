@@ -119,7 +119,9 @@ export const shootProjectile = (
 		}
 	});
 
-	const enemyNpcs = Object.values(scene.npcMap).filter((npc) => npc.faction === Faction.ENEMIES);
+	const enemyNpcs = Object.values(scene.npcMap).filter(
+		(npc) => npc.tokenData.faction === Faction.ENEMIES
+	);
 	const friendlyNpcs: CharacterToken[] = [
 		scene.mainCharacter!,
 		...(scene.follower ? [scene.follower] : []),
@@ -186,15 +188,15 @@ export const shootProjectile = (
 			enemy.receiveHealing();
 		}
 		if (abilityData.necroticStacks) {
-			enemy.lastNecroticEffectTimestamp = globalTime;
-			enemy.necroticEffectStacks += abilityData.necroticStacks!;
+			enemy.tokenData.lastNecroticEffectTimestamp = globalTime;
+			enemy.tokenData.necroticEffectStacks += abilityData.necroticStacks!;
 		}
 		if (abilityData.iceStacks) {
-			enemy.lastIceEffectTimestamp = globalTime;
-			enemy.iceEffectStacks += abilityData.iceStacks!;
+			enemy.tokenData.lastIceEffectTimestamp = globalTime;
+			enemy.tokenData.iceEffectStacks += abilityData.iceStacks!;
 		}
 		if (projectileData?.knockback) {
-			enemy.lastMovedTimestamp = globalTime;
+			enemy.tokenData.lastMovedTimestamp = globalTime;
 			const angle = Phaser.Math.Angle.Between(effect.x, effect.y, enemy.x, enemy.y);
 			enemy.setVelocity(
 				Math.cos(angle) * projectileData.knockback,

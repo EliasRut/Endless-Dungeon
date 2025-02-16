@@ -23,7 +23,7 @@ export const handleDash = (scene: MainScene, caster: Character, abilityData: Abi
 
 		if (abilityData.stopDashBeforeEnemyCollision) {
 			const closestTarget = getClosestTarget(
-				casterToken.faction!,
+				casterToken.tokenData.faction!,
 				casterToken.x,
 				casterToken.y,
 				caster.currentFacing

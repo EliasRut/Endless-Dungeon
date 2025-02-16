@@ -16,6 +16,6 @@ export default class PlayerCharacterToken extends CharacterToken {
 		this.body!.setCircle(BODY_RADIUS, BODY_X_OFFSET, BODY_Y_OFFSET);
 
 		this.stateObject = worldstate.playerCharacter;
-		this.faction = Faction.PLAYER;
+		this.tokenData.faction = Faction.PLAYER;
 	}
 }
