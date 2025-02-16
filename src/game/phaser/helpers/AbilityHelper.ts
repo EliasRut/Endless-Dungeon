@@ -57,8 +57,7 @@ export default class AbilityHelper {
 							abilityLevel,
 							globalTime,
 							this.abilityEffects,
-							() => null
-							// this.triggerAbility
+							this.triggerAbility.bind(this)
 						),
 					(usedAbilityData.delayProjectiles || 0) + i * (projectileData?.delay || 0)
 				);
@@ -76,7 +75,7 @@ export default class AbilityHelper {
 					abilityLevel,
 					globalTime,
 					this.abilityEffects,
-					this.triggerAbility
+					this.triggerAbility.bind(this)
 				);
 			}
 		}

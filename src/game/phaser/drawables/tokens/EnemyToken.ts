@@ -469,7 +469,7 @@ export default class EnemyToken extends CharacterToken {
 			this.scene.abilityHelper!.triggerAbility(
 				this.stateObject,
 				this.stateObject,
-				this.tokenData.enemyData?.rangedAttackData!.abilityType,
+				this.tokenData.enemyData?.rangedAttackData!.abilityType!,
 				this.stateObject.level,
 				time,
 				1
