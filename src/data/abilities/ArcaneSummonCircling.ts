@@ -1,4 +1,4 @@
-import ArcaneCircelingEffect from '../../game/phaser/drawables/effects/ArcaneCircelingEffect';
+import ArcaneCirclingEffect from '../../game/phaser/drawables/effects/ArcaneCirclingEffect';
 import { AbilityData } from '../../types/AbilityData';
 
 export const ArcaneSummonCircling: AbilityData = {
@@ -7,7 +7,7 @@ export const ArcaneSummonCircling: AbilityData = {
 		xOffset: 36,
 		yOffset: 36,
 		velocity: 0,
-		effect: ArcaneCircelingEffect,
+		effect: ArcaneCirclingEffect,
 		collisionSound: 'sound-fireball-hit',
 		sfxVolume: 0.2,
 		destroyOnEnemyContact: false,

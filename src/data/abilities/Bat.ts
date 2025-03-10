@@ -13,6 +13,7 @@ export const Bat: AbilityData = {
 		destroyOnEnemyContact: true,
 		destroyOnWallContact: true,
 		targeting: true,
+		timeToLive: 5000,
 	},
 	sound: 'sound-icespike',
 	sfxVolume: 0.3,

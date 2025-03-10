@@ -254,14 +254,6 @@ export default class AbilityEditor extends Phaser.Scene {
 					},
 				}
 			);
-			// const newEffect = new FireBallEffect(
-			// 	this.scene as unknown as MainScene,
-			// 	0,
-			// 	0,
-			// 	'',
-			// 	Facings.EAST,
-			// 	projectileData!
-			// );
 		}
 
 		this.abilityHelper.update(globalTime, []);

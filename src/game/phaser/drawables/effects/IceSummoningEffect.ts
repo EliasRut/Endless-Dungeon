@@ -25,7 +25,7 @@ export default class IceSummoningEffect extends SummoningEffect {
 			facing,
 			projectileData,
 			SUMMONING_TYPE.ICE_ELEMENTAL,
-			AbilityType.ICE_SUMMON_CIRCELING
+			AbilityType.ICE_SUMMON_CIRCLING
 		);
 	}
 

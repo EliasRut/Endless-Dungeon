@@ -1,4 +1,4 @@
-import NecroticBoltEffect from '../../game/phaser/drawables/effects/NecroticBoltEffect';
+import TrailingParticleProjectileEffect from '../../game/phaser/drawables/effects/TrailingParticleProjectileEffect';
 import { AbilityData } from '../../types/AbilityData';
 
 export const HailOfDeath: AbilityData = {
@@ -10,7 +10,16 @@ export const HailOfDeath: AbilityData = {
 		effectScale: 0.8,
 		xOffset: 0,
 		yOffset: 0,
-		effect: NecroticBoltEffect,
+		particleData: {
+			particleImage: 'skull',
+			alpha: { start: 1, end: 0 },
+			scale: { start: 1, end: 0.2 },
+			speed: 40,
+			lifespan: { min: 500, max: 1000 },
+			frequency: 15,
+			maxParticles: 100,
+		},
+		effect: TrailingParticleProjectileEffect,
 		collisionSound: 'sound-fireball-explosion',
 		sfxVolume: 0.2,
 		targeting: true,

@@ -21,8 +21,6 @@ import { NecroticNova } from '../../../data/abilities/NecroticNova';
 import { HailOfDeath } from '../../../data/abilities/HailOfDeath';
 import { Bat } from '../../../data/abilities/Bat';
 import { Condemn } from '../../../data/abilities/Condemn';
-import { BloodDrain } from '../../../data/abilities/BloodDrain';
-import { BloodDrainProjectile } from '../../../data/abilities/BloodDrainProjectile';
 import { FireSummonCircling } from '../../../data/abilities/FireSummonCircling';
 import { FireSummonElemental } from '../../../data/abilities/FireSummonElemental';
 import { IceSummonCircling } from '../../../data/abilities/IceSummonCircling';
@@ -34,6 +32,7 @@ import { NecroticSummonElemental } from '../../../data/abilities/NecroticSummonE
 import { Teleport } from '../../../data/abilities/Teleport';
 import { Charm } from '../../../data/abilities/Charm';
 import { Nothing } from '../../../data/abilities/Nothing';
+import { BloodDrain } from '../../../data/abilities/BloodDrain';
 
 export const Abilities: AbilityDataMap = {
 	[AbilityType.NOTHING]: Nothing,
@@ -58,7 +57,6 @@ export const Abilities: AbilityDataMap = {
 	[AbilityType.BAT]: Bat,
 	[AbilityType.CONDEMN]: Condemn,
 	[AbilityType.BLOOD_DRAIN]: BloodDrain,
-	[AbilityType.BLOOD_DRAIN_PROJECTILE]: BloodDrainProjectile,
 	[AbilityType.FIRE_SUMMON_CIRCLING]: FireSummonCircling,
 	[AbilityType.FIRE_SUMMON_ELEMENTAL]: FireSummonElemental,
 	[AbilityType.ICE_SUMMON_CIRCLING]: IceSummonCircling,

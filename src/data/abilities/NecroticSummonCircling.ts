@@ -1,4 +1,4 @@
-import NecroticCircelingEffect from '../../game/phaser/drawables/effects/NecroticCircelingEffect';
+import NecroticCirclingEffect from '../../game/phaser/drawables/effects/NecroticCirclingEffect';
 import { AbilityData } from '../../types/AbilityData';
 
 export const NecroticSummonCircling: AbilityData = {
@@ -7,7 +7,7 @@ export const NecroticSummonCircling: AbilityData = {
 		xOffset: 36,
 		yOffset: 36,
 		velocity: 0,
-		effect: NecroticCircelingEffect,
+		effect: NecroticCirclingEffect,
 		collisionSound: 'sound-fireball-hit',
 		sfxVolume: 0.2,
 		destroyOnEnemyContact: true,

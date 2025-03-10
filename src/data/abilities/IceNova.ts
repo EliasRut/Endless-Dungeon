@@ -1,4 +1,4 @@
-import IceSpikeEffect from '../../game/phaser/drawables/effects/IceSpikeEffect';
+import TrailingParticleProjectileEffect from '../../game/phaser/drawables/effects/TrailingParticleProjectileEffect';
 import { AbilityData } from '../../types/AbilityData';
 
 export const IceNova: AbilityData = {
@@ -9,7 +9,14 @@ export const IceNova: AbilityData = {
 		drag: 700,
 		xOffset: 0,
 		yOffset: 0,
-		effect: IceSpikeEffect,
+		particleData: {
+			particleImage: 'snow',
+			alpha: { start: 1, end: 0 },
+			scale: { start: 1, end: 0.2 },
+			speed: 20,
+			lifespan: { min: 200, max: 400 },
+		},
+		effect: TrailingParticleProjectileEffect,
 		collisionSound: 'sound-icespike-hit',
 		sfxVolume: 0.2,
 		timeToLive: 500,
@@ -20,7 +27,6 @@ export const IceNova: AbilityData = {
 		destroyOnEnemyContact: false,
 		explodeOnDestruction: false,
 		passThroughEnemies: true,
-		shape: 'nova',
 	},
 	sound: 'sound-icespike',
 	sfxVolume: 0.1,

@@ -1,4 +1,4 @@
-import FireCircelingEffect from '../../game/phaser/drawables/effects/FireCircelingEffect';
+import FireCirclingEffect from '../../game/phaser/drawables/effects/FireCirclingEffect';
 import { AbilityData } from '../../types/AbilityData';
 
 export const FireSummonCircling: AbilityData = {
@@ -7,7 +7,7 @@ export const FireSummonCircling: AbilityData = {
 		xOffset: 36,
 		yOffset: 36,
 		velocity: 0,
-		effect: FireCircelingEffect,
+		effect: FireCirclingEffect,
 		collisionSound: 'sound-fireball-explosion',
 		sfxVolume: 0.2,
 		destroyOnEnemyContact: true,
