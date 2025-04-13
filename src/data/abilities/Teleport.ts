@@ -21,5 +21,5 @@ export const Teleport: AbilityData = {
 	abilityName: 'Summon Fire Elemental',
 	flavorText: `Raise an fiery elemental.`,
 	icon: ['icon-abilities', 0],
-	castingTime: 250,
+	castingTime: 50,
 };

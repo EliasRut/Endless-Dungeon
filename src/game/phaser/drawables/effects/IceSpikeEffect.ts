@@ -40,7 +40,7 @@ export default class IceSpikeEffect extends TargetingEffect {
 
 		const facingVectors = getVelocitiesForFacing(facing);
 
-		this.snowEmitter = scene.add.particles(x, y, 'snow', {
+		this.snowEmitter = scene.add.particles(0, 0, 'snow', {
 			alpha: { start: 1, end: 0.4 },
 			// scale: { start: 0.3, end: 0.05 },
 			scale: { start: 0.3 * (projectileData.effectScale || 1) * SCALE, end: 0.15 * SCALE },
@@ -58,7 +58,7 @@ export default class IceSpikeEffect extends TargetingEffect {
 		});
 		this.snowEmitter.setDepth(1);
 
-		this.spikeEmitter = scene.add.particles(x, y, 'ice', {
+		this.spikeEmitter = scene.add.particles(0, 0, 'ice', {
 			alpha: { start: 1, end: 0.4 },
 			scale: { start: 0.3 * (projectileData.effectScale || 1) * SCALE, end: 0 },
 			speed: { min: 60 * SCALE, max: 100 * SCALE },

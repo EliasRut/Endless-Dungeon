@@ -5,6 +5,7 @@ import Character from '../../../../types/Character';
 import CharacterToken from './CharacterToken';
 import { getNextQuestId, hasAnyOpenQuests, loadQuestScript } from '../../helpers/quests';
 import MainScene from '../../scenes/MainScene';
+import { getDistanceToWorldStatePosition } from '../../helpers/getDistanceToWorldStatePosition';
 
 const BODY_RADIUS = 8;
 const BODY_X_OFFSET = 12;
@@ -40,7 +41,7 @@ export default class NpcToken extends CharacterToken {
 		worldstate.npcs[id] = this.stateObject;
 
 		this.play({ key: `${type}-idle-s`, frameRate: NORMAL_ANIMATION_FRAME_RATE });
-		this.faction = Faction.NPCS;
+		this.tokenData.faction = Faction.NPCS;
 	}
 
 	update(globalTime: number, deltaTime: number) {
@@ -60,7 +61,7 @@ export default class NpcToken extends CharacterToken {
 				this.openQuestSymbol.y = this.body!.y - (22 - yOffset) * SCALE;
 			}
 			const player = worldstate.playerCharacter;
-			if (this.getDistanceToWorldStatePosition(player.x, player.y) < 60 * SCALE) {
+			if (getDistanceToWorldStatePosition(this.x, this.y, player.x, player.y) < 60 * SCALE) {
 				const mainScene = this.scene as MainScene;
 				if (!mainScene.scriptHelper!.isScriptRunning()) {
 					const nextQuestId = getNextQuestId(this.questGiverId);

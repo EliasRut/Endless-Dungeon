@@ -7,8 +7,8 @@ import AbilityEffect from './AbilityEffect';
 
 const RED_DIFF = 0x010000;
 const GREEN_DIFF = 0x000100;
-const TELEPORT_DURATION = 200;
-const TELEPORT_VELOCITY = 400;
+const TELEPORT_DURATION = 150;
+const TELEPORT_VELOCITY = 650;
 
 export default class TeleportEffect extends AbilityEffect {
 	constructor(
@@ -42,9 +42,9 @@ export default class TeleportEffect extends AbilityEffect {
 		}
 		playerToken.body!.checkCollision.none = true;
 		playerCharacter.dashing = true;
-		playerToken.alpha = 0.2;
+		playerToken.alpha = 0.5;
 
-		const trailEmitter = scene.add.particles(x, y, 'rock', {
+		const trailEmitter = scene.add.particles(0, 0, 'rock', {
 			alpha: { start: 1, end: 1 },
 			scale: { start: 0.4 * this.effectScale * SCALE, end: 0 },
 			speed: 0,

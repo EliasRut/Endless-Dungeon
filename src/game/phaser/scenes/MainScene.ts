@@ -315,7 +315,7 @@ export default class MainScene extends Phaser.Scene {
 			questLogScreen: new QuestLogScreen(this),
 			questDetailsScreen: new QuestDetailsScreen(this),
 			contentManagementScreen: new ContentManagementScreen(this),
-			// enchantingScreen: new EnchantingScreen(this),
+			enchantingScreen: new EnchantingScreen(this),
 		};
 
 		this.icons.backpackIcon.setScreens();
@@ -592,8 +592,8 @@ export default class MainScene extends Phaser.Scene {
 		this.keyboardHelper?.updateGamepad();
 		updateStatus(worldState.gameTime, worldState.playerCharacter);
 
-		if (this.keyboardHelper?.isKKeyPressed()) {
-			worldState.clearState();
+		if (this.keyboardHelper?.isDeleteKeyPressed()) {
+			worldState.clearState(this.keyboardHelper?.isCtrlKeyPressed());
 			location.reload();
 		}
 
@@ -656,7 +656,7 @@ export default class MainScene extends Phaser.Scene {
 			// tslint:disable-next-line: no-console
 			console.log('you died');
 			setTimeout(() => {
-				worldState.clearState();
+				worldState.clearState(false);
 				location.reload();
 			}, DEATH_RESPAWN_TIME);
 			this.alive = 1;

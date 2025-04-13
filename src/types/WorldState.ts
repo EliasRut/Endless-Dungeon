@@ -97,6 +97,11 @@ export class WorldState {
 		if (!saveGameName) {
 			// tslint:disable-next-line: no-console
 			console.log('no savegamename set');
+			const inventory = localStorage.getItem(WorldState.INVENTORY);
+			if (inventory) {
+				console.log('Inventory found!');
+				this.inventory = JSON.parse(inventory);
+			}
 			return;
 		}
 		this.contentPackages = JSON.parse(
@@ -131,7 +136,11 @@ export class WorldState {
 		];
 	}
 
-	clearState() {
+	clearState(deleteInventory: boolean) {
 		localStorage.clear();
+		if (!deleteInventory) {
+			// Keep inventory and player character, only reset the rest
+			localStorage.setItem(WorldState.INVENTORY, JSON.stringify(this.inventory));
+		}
 	}
 }

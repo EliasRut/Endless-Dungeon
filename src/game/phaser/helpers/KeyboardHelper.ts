@@ -15,7 +15,7 @@ export default class KeyboardHelper {
 	aKey: Phaser.Input.Keyboard.Key;
 	sKey: Phaser.Input.Keyboard.Key;
 	dKey: Phaser.Input.Keyboard.Key;
-	kKey: Phaser.Input.Keyboard.Key;
+	deleteKey: Phaser.Input.Keyboard.Key;
 	abilityKey1: Phaser.Input.Keyboard.Key;
 	abilityKey2: Phaser.Input.Keyboard.Key;
 	abilityKey3: Phaser.Input.Keyboard.Key;
@@ -26,6 +26,7 @@ export default class KeyboardHelper {
 	enterKey: Phaser.Input.Keyboard.Key;
 	spaceKey: Phaser.Input.Keyboard.Key;
 	enchantKey: Phaser.Input.Keyboard.Key;
+	controlKey: Phaser.Input.Keyboard.Key;
 
 	wasEnterKeyPressed: boolean;
 
@@ -68,7 +69,8 @@ export default class KeyboardHelper {
 		this.aKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 		this.sKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S);
 		this.dKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-		this.kKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+		this.deleteKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DELETE);
+		this.controlKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
 		this.inventoryKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.I);
 		this.settingsKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.J);
 		this.questsKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
@@ -302,8 +304,15 @@ export default class KeyboardHelper {
 		return [xFacing, yFacing];
 	}
 
-	isKKeyPressed() {
-		if (this.kKey.isDown) {
+	isDeleteKeyPressed() {
+		if (this.deleteKey.isDown) {
+			return true;
+		}
+		return false;
+	}
+
+	isCtrlKeyPressed() {
+		if (this.controlKey.isDown) {
 			return true;
 		}
 		return false;

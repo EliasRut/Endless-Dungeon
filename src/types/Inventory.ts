@@ -79,7 +79,7 @@ export const EmptyInventory: Inventory = {
 		[Ring.WILD]: { level: 1, enchantment: 'None' },
 	},
 	sources: {
-		[Source.FIRE]: { level: 1, enchantment: 'None' },
+		[Source.FIRE]: { level: 3, enchantment: 'None' },
 		[Source.ARCANE]: { level: 1, enchantment: 'None' },
 		[Source.ICE]: { level: 1, enchantment: 'None' },
 		[Source.NECROTIC]: { level: 1, enchantment: 'None' },
@@ -97,5 +97,5 @@ export const EmptyInventory: Inventory = {
 		[ChestPiece.ROBE]: { level: 1, enchantment: 'None' },
 	},
 	bag: {},
-	essences: { flux: 0, metal: 0, blood: 0, change: 0, death: 2, royal: 0, passion: 0, wild: 2 },
+	essences: { flux: 0, metal: 0, blood: 0, change: 0, death: 0, royal: 0, passion: 0, wild: 0 },
 };
